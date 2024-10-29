@@ -1,0 +1,1869 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 32px;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+    border-radius: 0;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 9px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 9px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 9px);
+}
+#divContensbox{
+    overflow: hidden;
+    background-color: #f3f3f3;
+}
+.actionButtonBox {
+    width: auto;
+    margin: 0 16px;
+    padding: 8px 0;
+}
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/*非活性ボタン*/
+.btn-sticky:disabled {
+    background-color: #f3f3f3;
+    border: 1px solid #cfcfcf;
+    color: #aaa;
+}
+
+/* 明細のボタン */
+.btn-stickyDetail {
+    text-decoration: none;
+    height: 32px;
+    width: 67px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+    border-radius: 6px;
+    background-color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+}
+
+.btn-stickyDetail:hover {
+    border-color: #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.btn-stickyDetail:disabled {
+    background-color: #f3f3f3;
+    border: 1px solid #cfcfcf;
+    color: #aaa;
+}
+
+/* 締日区分のボタン */
+.btn-stickyClosingdayKbn {
+    text-decoration: none;
+    height: 32px;
+    width: 100px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+    border-radius: 6px;
+    background-color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+}
+
+.btn-stickyClosingdayKbn:hover {
+    border-color: #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.btn-stickyClosingdayKbn:disabled {
+    background-color: #f3f3f3;
+    border: 1px solid #cfcfcf;
+    color: #aaa;
+}
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+#detailbox {
+    width: calc(100% - 16px);
+    height: calc(100% - 2.4em - 1.4em);
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    margin-left: 16px;
+    padding: 0 16px 16px;
+    position: relative;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.detailbox a {
+    display: block;
+    font-weight: bold;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 16px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+/* 空白行 */
+.detailboxLineBlank2 {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 30px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+/* 空白行 */
+.detailboxLineBlank3 {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 10px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    flex-wrap: wrap;
+    height: 26px;
+    margin-top: 16px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineLabel > span.spanLeft {
+    width: 46px;
+    height:24px;
+}
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width: 17px;
+    height:24px;
+}
+.detailboxLineLabel > span.span2 {
+    width: 23px;
+    height:24px;
+}
+.detailboxLineLabel > span.span3 {
+    width: 23px;
+    height:24px;
+}
+.detailboxLineLabel > span.span4 {
+    width: 60px;
+    height:24px;
+}
+
+/* 月額リース料（更新後） 右の空白 */
+.detailboxLineLabel > span.spanUpdMonthleaseFee {
+    width: 10px;
+    height:24px;
+}
+/* 税区分（更新後） 右の空白 */
+.detailboxLineLabel > span.spanUpdTaxKbn {
+    width: 5px;
+    height:24px;
+}
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* 請求先 */
+.detailboxLineLabel > div.divLblInvoiceChg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 234px;
+    height: 24px;
+}
+/* 請求先の注意書き */
+.detailboxLineLabel > div.divLblInvoiceNote {
+    color: red;
+    width: 371px;
+    height: 24px;
+    font-size: 12px;
+}
+
+/* 複写の注意書き */
+div.divLblCopyNote {
+    color: red;
+    width: 700px;
+    height: 24px;
+    padding-left: 16px;
+    font-size: 12px;
+}
+
+/* 請求先、請求先部門、請求先分割、契約形態、請求書出力先、計上先 */
+.detailboxLineLabel > div.divLblInvoice {
+    width:228px;
+    height: 24px;
+}
+
+/* 細分コード */
+.detailboxLineLabel > div.divLblInvSubCd {
+    width:80px;
+    height: 24px;
+}
+
+.detailboxLineLabel > span.spanInvSplit {
+    width:85px;
+    height: 24px;
+}
+
+
+/* 契約形態  */
+.detailboxLineLabel > div.divLblTypeContract {
+    width:470px;
+    height: 24px;
+}
+
+/* 改造費リース区分 */
+.detailboxLineLabel > div.divLblRemodelLeaseKbn {
+    width:300px;
+    height: 24px;
+    margin-right: 8px;
+}
+
+/* リース開始日、リース終了日、更新後リース開始日、更新後リース終了日 */
+.detailboxLineLabel > div.divLblDate {
+    width:140px;
+    height: 24px;
+}
+
+/* 日割計算*/
+.detailboxLineLabel > div.divLblDayCalc {
+    width:67px;
+    height: 24px;
+}
+
+/* 自動計算 */
+.detailboxLineLabel > div.divLblAuotUpd {
+    width:100px;
+    height: 24px;
+}
+
+
+/* 更新期間 */
+.detailboxLineLabel > div.divLblUpdPeriod {
+    width:90px;
+    height: 24px;
+}
+
+/* 月額リース料*/
+.detailboxLineLabel > div.divLblMonthleaseFee {
+    width:150px;
+    height: 24px;
+}
+
+/* 一括請求 */
+.detailboxLineLabel > div.divLblInvoiceAll {
+    width:100px;
+    height: 24px;
+}
+
+/* 税区分*/
+.detailboxLineLabel > div.divLblTaxKbn {
+    width:100px;
+    height: 24px;
+}
+
+/* 月額リース料（更新後）*/
+.detailboxLineLabel > div.divLblUpdMonthleaseFee {
+    width:160px;
+    height: 24px;
+}
+/* 税区分（更新後）*/
+.detailboxLineLabel > div.divLblUpdTaxKbn {
+    width:116px;
+    height: 24px;
+}
+
+/* 日割端数処理、日割端数処理(更新後) */
+.detailboxLineLabel > div.divLblHasuu {
+    width:187px;
+    height: 24px;
+}
+
+/* アップロードファイルを選択 */
+.detailboxLineLabel > div.divUploadArea {
+    width:221px;
+    height: 24px;
+}
+
+.detailboxLineLabel > span.spanClosingDate {
+    width: 73px;
+    height:24px;
+}
+
+/* 空白 */
+.detailboxLineInput > span.spanFinal {
+    width: 15px;
+    height:24px;
+}
+
+.detailboxLineInput > span.spanFinal2 {
+    width: 34px;
+    height:24px;
+}
+
+/* 計上区分ラベル */
+.detailboxLineLabel > div.divLblAccountKbn {
+    width:345px;
+    height: 24px;
+}
+
+/* 締日区分ラベル  */
+.detailboxLineLabel > div.divLblClosingDayKbn {
+    width:100px;
+    height: 24px;
+}
+
+/* 締日ラベル  */
+.detailboxLineLabel > div.divLblClosingDate {
+    width:  65px;
+    height: 24px;
+}
+
+/* 計算月区分 */
+.detailboxLineLabel > div.divLblCalcMonthKbn {
+    width:110px;
+    height: 24px;
+}
+
+/* 締日ラベル  */
+.detailboxLineLabel > div.divLblClosingDateDay {
+    width:100px;
+    height: 34px;
+    align-items: flex-end;
+}
+
+/* 計上月区分テキスト */
+.divDdlArea select.ddlSelectKeijoMKbn {
+    height: 32px;
+    width: 110px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea select.ddlSelectKeijoMKbn:not(:disabled):hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+/* 締日 */
+.grc0001Wrapper ul[id='WF_CLOSINGDATE_chklGrc0001SelectionBox'] {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width:150px;
+}
+
+/* 入金日 */
+.grc0001Wrapper ul[id='WF_DEPOSITDATE_chklGrc0001SelectionBox'] {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width:150px;
+}
+
+/* 取引先コード */
+input.txtToriCode {
+    height: 32px;
+    width: 110px;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: center;
+    overflow: hidden;
+    border: none;
+    pointer-events: none;
+    background-color: transparent;
+    text-align: right;
+    padding-right: 0;
+}
+
+/* 締日テキスト */
+input.txtClosingDate {
+    width: 60px;
+    height: 32px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* テキストボックス補正 */
+input.aspNetDisabled {
+    width: 120px;
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+
+input.aspNetDisabled[id='txtClosingDate'] {
+    width: 50px;
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+
+input.aspNetDisabled[id='txtDepOsitDay'] {
+    width: 50px;
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+
+/* ファイナンスリース料 */
+/* 料金 */
+input.txtFinalLeaseFee {
+    width: 100px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* 残存率 */
+.divDdlArea select.ddlSelectSurvivalRate {
+    height: 30px;
+    width: 85px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+}
+
+.divDdlArea select.ddlSelectSurvivalRate:hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+/* 年数 */
+input.txtFinalYears {
+    width: 60px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* コンテナ一括入力入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.ctnAddInput {
+    box-sizing: border-box;
+    padding-left: 16px;
+}
+
+/* ファイナンス情報一括入力入力欄(INPUT)  ------------------------------------------------------------------- */
+/* 明細入力欄 */
+.finalInfoInput {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 16px;
+    width: 700px;
+    margin-top: 16px;
+    box-sizing: border-box;
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.detailboxLineInput {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    box-sizing: border-box;
+}
+
+/* 日付 */
+.detailboxLineInput > a.ymd {
+    width:140px;
+    height: 30px;
+}
+/* 請求先 */
+.detailboxLineInput > a.toriname {
+    width:400px;
+    height: 30px;
+}
+
+/* 請求先部門、請求書出力先、計上先 */
+.detailboxLineInput > a.invoice {
+    width:221px;
+    height: 30px;
+}
+
+/* 日割端数処理 */
+.detailboxLineInput > a.daylyHassu1 {
+    width:110px;
+    height: 30px;
+}
+.detailboxLineInput > a.daylyHassu2 {
+    width:150px;
+    height: 30px;
+}
+
+/* 1項目のサイズ */
+.detailboxLineInput > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineInput > span.spanLeft {
+    width: 46px;
+    height:30px;
+}
+/* 空白 最小 */
+.detailboxLineInput > span.span1 {
+    width: 17px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span2 {
+    width: 50px;
+    height:30px;
+}
+/* 空白 */
+.detailboxLineInput > span.span4 {
+    width: 55px;
+    height:30px;
+}
+.detailboxLineInput > span.span5 {
+    width: 25px;
+    height:30px;
+}
+
+/* 空白 最小 */
+.detailboxLineInput > span.spanAutoUpd {
+    width: 50px;
+    height:30px;
+}
+
+/* 空白 一括請求 */
+.detailboxLineInput > span.spanAllInvoice {
+    width: 90px;
+    height:30px;
+}
+
+/* 請求書分割 右の空白 */
+.detailboxLineInput > span.spanInvSplit {
+    width: 85px;
+    height:30px;
+}
+
+/* ファイナンス用 */
+.detailboxLineInput2 {
+    display: flex;
+    flex-wrap: wrap;
+    width: 367px;
+    height: 34px;
+    box-sizing: border-box;
+}
+
+/* 空白 最小 */
+.detailboxLineInput2 > span.span1 {
+    width: 17px;
+    height:30px;
+}
+
+/* 月額リース料、月額リース料（更新後） */
+input.txtMonthLeaseFee { 
+    width: 150px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* 細分コード */
+input.txtInvSubCd { 
+    width:  50px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+
+/* タイトル用 */
+.pnlSubTitle {
+    background: rgb(149,179,215);
+    color: rgb(0, 32, 96);
+    margin-TOP: 5px;
+    font-weight: bold;
+    font-size: 16pt;
+    border-radius: 5px;
+    width: 95%;
+}
+
+/* リース額 */
+.pnlSubTitle > a.divLblLeaseMoney {
+    width:100px;
+    height: 30px;
+}
+
+/* 決算区分 */
+.detailboxLineInput2 > a.kesanKbn {
+    width:350px;
+    height: 30px;
+}
+
+/* 請求書出力先・計上先 */
+.detailboxLineInput3 {
+    display: flex;
+    flex-wrap: wrap;
+    width: 245px;
+    height: 34px;
+    box-sizing: border-box;
+}
+
+.detailboxLineInput3 a {
+    display: block;
+    width: 228px;
+}
+
+/* 空白 最小 */
+.detailboxLineInput3 > span.span1 {
+    width: 13px;
+    height:30px;
+}
+
+.detailboxLineInput4 {
+    display: flex;
+    flex-wrap: wrap;
+    width: 300px;
+    height: 25px;
+    box-sizing: border-box;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+/* 締日 */
+.detailboxLineInput5 {
+    display: flex;
+    flex-wrap: wrap;
+    width: 30px;
+    height: 34px;
+    box-sizing: border-box;
+}
+
+/* 決算区分 */
+.detailboxLineInput4 > a.kesanKbn {
+    width:300px;
+    height: 30px;
+}
+
+/* 空白 最小 */
+.detailboxLineInput4 > span.span1 {
+    width: 13px;
+    height:30px;
+}
+
+.detailboxLineLabel > span.spanAccountKbnSplit {
+    width:216px;
+    height: 24px;
+}
+
+/* 更新後決済条件ラベル */
+.detailboxLineLabel > divLblUpdAccountKbn {
+    width:110px;
+    height: 24px;
+}
+
+/* 細分コード */
+.detailboxLineInput6 {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100px;
+    height: 34px;
+    box-sizing: border-box;
+}
+
+/* ************************** */
+/* ファイル選択               */
+/* ************************** */
+.divUploadArea {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 32px 0 0 16px;
+}
+
+.divUploadAreaLeft,
+.divUploadAreaCenter{
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+/* アップロードファイルを選択 */
+#btnFileSelect {
+    display: block;
+    text-decoration: none;
+    height: 32px;
+    width: 240px;
+    line-height: 32px;
+    padding: 0 8px;
+    font-weight: bold;
+    text-align: center;
+    border:1px solid #cfcfcf;
+    border-radius: 6px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+#btnFileSelect:hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+#txtFileName {
+    text-decoration: none;
+    height: 32px;
+    width: 500px;
+    line-height: 32px;
+    text-align: left;
+    border: 1px solid #cfcfcf;
+    background-color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 8px;
+    padding: 0 8px;
+    box-sizing: border-box  ;
+}
+
+#txtFileName:not(:disabled):hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.divUploadAreaCenter .btn-sticky {
+    height: 32px;
+    font-size: 16px;
+}
+
+#pnlCtnListBtn.detailboxLineInput {
+    margin-top: 8px;
+    padding-left: 16px;
+    column-gap: 8px;
+}
+
+#pnlCtnListBtn.detailboxLineInput .btn-sticky {
+    font-size: 16px;
+    height: 32px;
+}
+
+#pnlCtnListBtn.detailboxLineInput span {
+    padding-top: 3px;
+}
+
+/* ************************** */
+/* スプレッド                 */
+/* ************************** */
+/* リース契約履歴部(登録モード用) */
+.detailboxLineLeaseHistory {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1235px;
+    height: 68px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* リース契約履歴部(更新モード用) */
+.detailboxLineUpdLeaseHistory {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1285px;
+    height: 190px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* コンテナ一覧部(登録モード用) */
+.detailboxLineCtnList {
+    display: flex;
+    flex-wrap: wrap;
+    height: 420px;
+    box-sizing: border-box;
+}
+
+
+/* コンテナ一覧部(更新モード用) */
+.detailboxLineUpdCtnList {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1300px;
+    height: 365px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* リース額一覧部(更新モードのみ) */
+.detailboxLineLeaseList {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1110px;
+    height: 288px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* 月別コンテナ一覧部(更新モードのみ) */
+.detailboxLineMonthlyCtnList {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1097px;
+    height: 350px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* スプレッド */
+.detailboxLineCtnList > div {
+    border-color: #cfcfcf !important;
+}
+
+.spreadStyle {
+    display: flex;
+    flex-wrap: nowrap;
+    height: auto;
+    background-color: white;
+}
+
+table#spdCtnList_cht {
+    border-left: none !important;
+}
+
+table#spdCtnList_hct td {
+    background-color: #0f4493 !important;
+}
+
+table#spdCtnList_fcht td.s0s0,
+table#spdCtnList_cht td.s0s1,
+table#spdCtnList_rh td.s0s2 {
+    background-color: #0f4493 !important;
+    border-right-color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf !important;
+}
+table#spdCtnList_rh td.s0s2 {
+    color: #fff;
+}
+.spdCtnList_s0s0,
+.spdCtnList_s0s1,
+table#spdCtnList_viewport2 td.s0s3,
+table#spdCtnList_viewport2 td.s0s4,
+table#spdCtnList_viewport2 td.s0s5,
+table#spdCtnList_viewport td.s0s6,
+table#spdCtnList_viewport td.s0s7,
+table#spdCtnList_viewport td.s0s8,
+table#spdCtnList_viewport td.s0s9,
+table#spdCtnList_viewport td.s0s10,
+table#spdCtnList_viewport td.s0s11 {
+    background-color: transparent !important;
+}
+
+table#spdCtnList_viewport tr:nth-child(odd),
+table#spdCtnList_viewport2 tr:nth-child(odd) {
+    background-color: #e1eeff;
+}
+
+.GrayAreaContainer {
+    display: none !important;
+}
+
+/* ************************** */
+/* コンボボックス             */
+/* ************************** */
+/* 更新期間 */
+.divDdlArea select.ddlSelectUpdPeriod {
+    height: 32px;
+    width: 90px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea select.ddlSelectUpdPeriod:not(:disabled):hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+/* 税区分 */
+.divDdlArea select.ddlSelectTaxKbn {
+    height: 32px;
+    width: 105px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea select.ddlSelectTaxKbn:not(:disabled):hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+/* 年区分 */
+.divDdlArea select.ddlSelectYearKbn {
+    height: 30px;
+    width: 105px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+/* ************************** */
+/* 選択                       */
+/* ************************** */
+/* 選択ボックス */
+div.singleInput > span {
+    display: block;
+}
+/* 選択ボックス */
+div.singleInput > .actionButtonBox {
+    padding-left: 0px;
+}
+/* 高さ指定 */
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label{
+    width: 142px;
+    height:32px;
+    margin-right: 8px;
+    margin-bottom: 0;
+    border-radius: 0;
+    border: 1px solid #cfcfcf;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.detailboxLineInput > div.singleInput.right-harf.grc0001Wrapper {
+    width: 146px;
+    height:30px;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label,
+.grc0001Wrapper input[type=radio]:disabled + label{
+    background-color: #f3f3f3;
+    border: 1px solid #cfcfcf;
+    color: #aaa;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    border: 1px solid #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.grc0001Wrapper ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width:470px;
+}
+
+.grc0001Wrapper #WF_REMODELLEASEKBNLIST_chklGrc0001SelectionBox {
+    width: auto;
+    margin-right: 8px;
+}
+
+select.Width90,
+input[type=text].Width90,
+textarea.Width90 {
+    width: 90%;
+}
+
+#pnlUpdInvoiceInput .divLblInvoiceNote {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #de0000;
+}
+
+/* ************************** */
+/* 決済条件検索               */
+/* ************************** */
+#pnlKekkjSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlKekkjSrcArea {
+    /*height: 80%;*/
+    width: 60%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divKekkjSrcHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divKekkjSrcHeadLeft {
+    display: flex;
+    width: 230px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divKekkjSrcHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 90px;
+}
+
+.divKekkjSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 228px;
+}
+
+
+#divKekkjSrcButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnKekkjSrcCLOSE {
+    position: relative;
+    /*left: 294px;*/
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divKekkjSrcBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlKekkjSrc {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlKekkjSrc td, #pnlKekkjSrc th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* 決済条件一覧部 */
+.detailboxLineKekkjSrc {
+    display: flex;
+    flex-wrap: wrap;
+    width: 900px;
+    height: 435px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* ************************** */
+/* コンテナ検索               */
+/* ************************** */
+#pnlReconmSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlReconmSrcArea {
+    /*height: 80%;*/
+    width: 60%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divReconmSrcHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divReconmSrcHeadLeft {
+    display: flex;
+    width: 500px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divReconmSrcHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 90px;
+}
+
+.divReconmSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+}
+
+
+#divReconmSrcButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#divReconmSrcBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlReconmSrc {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlReconmSrc td, #pnlReconmSrc th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* コンテナ一覧部 */
+.detailboxLineReconmSrc {
+    display: flex;
+    flex-wrap: wrap;
+    width: 900px;
+    height: 435px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* コンテナ記号 */
+Input.reconmCtnType {
+    width: 80px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* コンテナ番号 */
+Input.reconmCtnNo {
+    width: 80px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+
+/* 空白 最小 */
+.divReconmSrcHeadLeft > span.span1 {
+    width: 13px;
+    height:30px;
+}
+
+/* ************************** */
+/* 請求情報                   */
+/* ************************** */
+#pnlInvoiceInfoSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 10;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlInvoiceInfoSrcArea {
+    width: 1150px;
+    height: 520px;
+    margin-top: 0px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #fff;
+    text-align: left;
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.InvoiceInfoLineInput {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+    height: 34px;
+    box-sizing: border-box;
+    margin-top: 10px;
+    margin-left: 30px;
+}
+.InvoiceInfoLineInput a{
+    margin-top: 5px;;
+    width: 180px;
+}
+
+.divInvoiceInfoSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 38px;
+}
+
+/* 明細のボタン */
+.btn-stickyInvoiceInfo {
+    text-decoration: none;
+    height: 30px;
+    width: 67px;
+    line-height: 23px;
+    text-align: center;
+    color: #2bb6c1;
+    border: solid 1px #2bb6c1;
+    transition: 0.3s;
+    font-size: 14.5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.btn-stickyInvoiceInfo:hover {
+    background: #2bb6c1;
+    color: #fff;
+}
+
+.btn-stickyInvoiceInfo:disabled {
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+
+/* ************************** */
+/* ファイナンス情報           */
+/* ************************** */
+#pnlLeaseFinalSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 11;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlLeaseFinalSrcArea {
+    width: 500px;
+    height: 430px;
+    margin-top: 20px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+    text-align: left;
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.leaseFinalLineInput {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+    box-sizing: border-box;
+    margin-left: 16px;
+}
+.leaseFinalLineInput a{
+    padding-top: 5px;
+    width: 200px;
+}
+
+.divLeaseFinalSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+/* 明細のボタン */
+.btn-stickyLeaseFinal {
+    text-decoration: none;
+    height: 30px;
+    width: 67px;
+    line-height: 23px;
+    text-align: center;
+    color: #2bb6c1;
+    border: solid 1px #2bb6c1;
+    transition: 0.3s;
+    font-size: 14.5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.btn-stickyLeaseFinal:hover {
+    background: #2bb6c1;
+    color: #fff;
+}
+
+.btn-stickyLeaseFinal:disabled {
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+
+/* ************************** */
+/* リース明細画面              */
+/* ************************** */
+#pnlLeaseDatalistWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 12;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    text-align: left;
+}
+
+#pnlLeseDataListArea {
+    /*height: 80%;*/
+    width: 45%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divLeseDataListHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divLeseDataListHeadLeft {
+    display: flex;
+    width: 230px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divLeseDataListHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 0px;
+}
+
+.divLeseDataListHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 200px;
+}
+
+
+#divLeseDataListButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnLeseDataListCLOSE {
+    position: relative;
+    /*left: 250px;*/
+    right:150px;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divLeseDataListBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlLeseDataList {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlLeseDataList td, #pnlLeseDataList th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* リース明細画面一覧部 */
+.detailboxLeseDataList {
+    display: flex;
+    flex-wrap: wrap;
+    width: 450px;
+    height: 435px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+.title1 {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    height: 45px;
+    margin-top: 24px;
+    padding: 8px;
+    border-left: 10px solid #0f4493;
+    border-bottom: 1px solid #0f4493;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.title1 .btn-sticky{
+    height: 32px;
+    font-size: 16px;
+}
+
+.title2 {
+    margin-top: 0px;
+    border-left: 10px solid rgb(0, 148, 255);
+    padding: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom: 1px solid rgb(0, 148, 255);
+}
+
+/* 追加コンテナ欄  */
+/* #region コンテナ一括入力フィールド表示制御 */
+#divContainerBulkInputField #spnShowHideContainerBulkInputField {
+    display: flex;
+    align-items: center;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    height: 32px;
+    padding: 2px 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+#divContainerBulkInputField #spnShowHideContainerBulkInputField:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+#divContainerBulkInputField #spnShowHideContainerBulkInputField:after {
+    content: "非表示"
+}
+#divContainerBulkInputField.hide #spnShowHideContainerBulkInputField:after {
+    content: "表示"
+}
+#divContainerBulkInputField.hide .divContainerBulkInputSubFiled {
+    display: none;
+}
+#divContainerBulkInputField.hide input#WF_TAB3_BTN_CONTAINER_BULK_INPUT {
+    display: none;
+}
+
+.title1.alert {
+    border-color : red;
+    color : red;
+}
+
+.mar-b5 {
+    margin-bottom: 5px !important;
+}
+
+/* ************************** */
+/* ファイナンス情報欄         */
+/* ************************** */
+/* #region ファイナンス情報一括入力フィールド表示制御 */
+#divFinalBulkInputField #spnShowHideFinalBulkInputField {
+    display: flex;
+    align-items: center;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    height: 32px;
+    padding: 2px 16px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+#divFinalBulkInputField #spnShowHideFinalBulkInputField:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+#divFinalBulkInputField #spnShowHideFinalBulkInputField:after {
+    content: "非表示"
+}
+#divFinalBulkInputField.hide #spnShowHideFinalBulkInputField:after {
+    content: "表示"
+}
+#divFinalBulkInputField.hide .divFinalBulkInputSubFiled {
+    display: none;
+}
+#divFinalBulkInputField.hide input#WF_BTN_FINAL_BULK_INPUT {
+    display: none;
+}
+
+
+/* ************************** */
+/* 請求先検索画面              */
+/* ************************** */
+#pnlInvoiceSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 13;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlInvoiceSrcArea {
+    width: 62%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+.divInvoiceButton {
+    position: relative;
+    left: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+}
+
+#divInvoiceSrcButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnInvoiceSrcCLOSE {
+    /*position: relative;*/
+    /*left: 250px;*/
+    right: 150px;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divInvoiceSrcHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divInvoiceSrcHeadLeft {
+    display: flex;
+    width: 130px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divInvoiceSrcHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 0px;
+}
+
+#divInvoiceSrcBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlInvoiceSrc {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+#pnlInvoiceSrc td, #pnlInvoiceSrc th {
+    white-space: nowrap; /* 折り返させない */
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-size: 10pt;
+}
+
+/* 請求先検索画面一覧部 */
+.detailboxInvoiceSrc {
+    display: flex;
+    flex-wrap: wrap;
+    width: 450px;
+    height: 435px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+
+#hdnSelectInvoice {
+    display: none;
+}

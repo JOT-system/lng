@@ -1,0 +1,15 @@
+﻿[id^="WF_DDL"] {
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    ime-mode: inactive;
+    color: #404040;
+    /*padding: 6px 4px 6px 4px;*/
+    border-color: skyblue;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
+    width: 80px;
+    height: 25px;
+}

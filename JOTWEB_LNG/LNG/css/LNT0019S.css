@@ -1,0 +1,455 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+#divContensbox{
+    overflow: hidden;
+}
+ /* コンテンツの最小横幅 */
+.headerbox {
+    min-width: 1220px;
+}
+
+.headerbox a {
+    font-size: 0.8em;
+}
+.actionButtonBox {
+    padding:8px 16px;
+}
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/* 戻るボタン */
+/* メニューボタンのみを表示するために定義 */
+.btn-back {
+    display: none;
+}
+
+/* 明細のボタン */
+.downloadbtn-sticky {
+    text-decoration: none;
+    height: 32px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 16px;
+    outline: none;
+}
+
+.downloadbtn-sticky:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.downloadbtn-sticky:disabled {
+    background-color: #f3f3f3;
+    border-color: #cfcfcf;
+    color: #aaa;
+}
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+#detailbox {
+    height: 100%;
+    padding-bottom: 16px;
+    background-color: #f3f3f3;
+    overflow: auto;
+}
+
+.detailbox a {
+    font-size:14px;
+    align-items: flex-end;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: none;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 15px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 空白行2行 */
+.detailboxLineBlank2 {
+    display: flex;
+    flex-wrap: wrap;
+    height: 16px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+#Panel21.detailboxLineBlank2 {
+    width: calc(100% - 32px);
+    height: 8px;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+/* 空白行2行線有 */
+.detailboxLineBlank2line {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    column-gap: 8px;
+    background-color: #fff;
+    padding: 8px 0;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    border-top: 1px solid #cfcfcf;
+    font-size: 14px;
+    font-weight: bold;
+}
+@media screen and (max-width: 1279px) {
+    .detailboxLineBlank2line {
+        width: calc(110px*2 + 180px*5 + 8px*6);
+    }
+}
+
+/* 空白行3行 */
+.detailboxLineBlank3 {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: #fff;
+    width: calc(100% - 32px);
+    height: 24px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    border-top: 1px solid #cfcfcf;
+}
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    column-gap: 8px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-weight: bold;
+    font-size: 14px;
+}
+@media screen and (max-width: 1279px) {
+    .detailboxLineLabel {
+        width: calc(110px*2 + 180px*5 + 8px*6);
+    }
+    #Panel2.detailboxLineLabel {
+        width: 100%;
+    }
+}
+
+/* 見出し */
+#Panel4.detailboxLineLabel {
+    background-color: #0f4493;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+}
+/* 見出し以外のラベル行 */
+#Panel6.detailboxLineLabel,
+#Panel8.detailboxLineLabel,
+#Panel10.detailboxLineLabel,
+#Panel12.detailboxLineLabel,
+#Panel14.detailboxLineLabel,
+#Panel16.detailboxLineLabel,
+#Panel18.detailboxLineLabel {
+    background-color: #fff;
+    padding-bottom: 8px;
+}
+#Panel20.detailboxLineLabel {
+    background-color: #fff;
+    width: calc(100% - 32px);
+    margin: 0 auto;
+    padding: 0 16px;
+}
+#Panel22.detailboxLineLabel {
+    background-color: #fff;
+    width: calc(100% - 32px);
+    margin: 0 auto 16px;
+    padding: 0 16px 24px;
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineLabel > span.spanLeft {
+    width: 110px;
+    height:24px;
+}
+
+/* 文字間隔をあける空白 */
+.detailboxLineLabel > span.spanLeft2 {
+    width:123px;
+    height:30px;
+}
+
+/* 文字間隔をあける空白 */
+.detailboxLineLabel > span.spanLeft3 {
+    width: 20px;
+    height:30px;
+}
+
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width:17px;
+    height:24px;
+}
+
+/* 原価計算位置を合わせる用の空白 */
+.detailboxLineBlank2line > span.spanLong {
+    width: 556px;
+    height: 27px;
+    flex-shrink: 0;
+}
+.detailboxLineBlank2line > .spanLeft {
+    width: 110px;
+    height: 27px;
+    flex-shrink: 0;
+}
+
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* 計上年月 */
+.detailboxLineLabel > div.divKeijoYM {
+    margin: 0 8px 0 16px;
+    padding-top: 5px;
+}
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* 支店名 */
+.detailboxLineLabel > .divBranch {
+    width:110px;
+    height:28px;
+    padding-top: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.detailboxLineBlank2line .divBranch {
+    width: 110px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineBlank2line .divBranch:first-of-type {
+    padding-left: 16px;
+}
+
+/* 見出し */
+#Panel4.detailboxLineLabel > div.divBranch:nth-of-type(3),
+#Panel4.detailboxLineLabel > div.divBranch:nth-of-type(4),
+#Panel4.detailboxLineLabel > div.divBranch:nth-of-type(5),
+#Panel4.detailboxLineLabel > div.divBranch:nth-of-type(6),
+#Panel4.detailboxLineLabel > div.divBranch:last-of-type {
+    max-width: 180px;
+    width: 100%;
+}
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* CSV・締め確定 */
+.detailboxLineLabel > div.divCSVClose {
+    width: 96px;
+}
+.detailboxLineLabel > div.divCSVClose a {
+    font-size: 14px;
+}
+/* 高さ指定 */
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label{
+    width: 88px;
+    height: 32px;
+    margin: 0;
+    padding: 0 16px;
+    border: 1px solid #cfcfcf;
+    border-radius: 0;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: #333;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label,
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.detailboxLineInput > div.singleInput.right-harf.grc0001Wrapper {
+    width: 146px;
+    height:32px;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label,
+.grc0001Wrapper input[type=radio]:disabled + label{
+    background-color: #f3f3f3;
+    border-color: #cfcfcf;
+    color: #aaa;
+    margin: 0;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label:before,
+.grc0001Wrapper input[type=radio]:disabled + label:before {
+    color: #666;
+}
+
+.grc0001Wrapper ul {
+    width: auto;
+    column-gap: 8px;
+}
+
+/* レンタル使用料 ------------------------------------------------------------- */
+.detailboxLineLabel > div.divRental {
+    width:180px;
+    height:28px;
+    padding: 4px 8px 0 8px;
+    Text-align-last:end;
+    font-size:15px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineLabel > div.divRental span {
+    margin-right: 3px;
+    font-size: 20px;
+}
+
+/* リース料支払料 ------------------------------------------------------------- */
+.detailboxLineLabel > div.divLease {
+    width:180px;
+    height:28px;
+    padding: 4px 8px 0 8px;
+    Text-align-last:end;
+    font-size:15px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineLabel > div.divLease span {
+    margin-right: 3px;
+    font-size: 20px;
+}
+
+/* 手書き請求書料 ------------------------------------------------------------- */
+.detailboxLineLabel > div.divWrite {
+    width:180px;
+    height:28px;
+    padding: 4px 8px 0 8px;
+    Text-align-last:end;
+    font-size:15px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineLabel > div.divWrite span {
+    margin-right: 3px;
+    font-size: 20px;
+}
+
+/* コンテナ売却請求書料 ------------------------------------------------------- */
+.detailboxLineLabel > div.divCtnSale,
+.detailboxLineBlank2line > div.divCtnSale {
+    width:180px;
+    height:28px;
+    padding: 4px 8px 0 8px;
+    Text-align-last:end;
+    font-size:15px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineLabel > div.divCtnSale span,
+.detailboxLineBlank2line > div.divCtnSale span {
+    margin-right: 3px;
+    font-size: 20px;
+}
+
+/* 回送費 ------------------------------------------------------------- */
+.detailboxLineLabel > div.divPayment {
+    width:180px;
+    height:28px;
+    padding: 4px 8px 0 8px;
+    Text-align-last:end;
+    font-size:15px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+.detailboxLineLabel > div.divPayment span {
+    margin-right: 3px;
+    font-size: 20px;
+}
+
+/* 計上年月 */
+input.txtDownloadMonth { 
+    width: 120px;
+    height: 30px;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+a.size {
+    font-weight: normal;
+}
+
+/* 表 ------------------------------------------------------------- */
+.panelFrame {
+    width: calc(100% - 32px);
+    margin: 0 auto;
+    overflow-x: auto;
+}
+
+/* 経理連携不可理由メッセージ表示ラベル */
+#WF_SHONIN_LABEL,
+#WF_GENKA_LABEL {
+    color: red;
+    font-size: 22px;
+}
+#WF_SHONIN_LABEL {
+    margin-left: 76px;
+}
+#WF_GENKA_LABEL {
+    margin-left: 10px;
+}

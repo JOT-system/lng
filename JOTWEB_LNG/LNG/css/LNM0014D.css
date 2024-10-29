@@ -1,0 +1,58 @@
+﻿body {
+}
+
+.flexible {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flexible > span {
+    width: 33%;
+    box-sizing: border-box;
+}
+
+input[type=text][readonly] {
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=text][readonly].disabledboxIcon:not(.iconOnly) {
+    padding-left: 0.3em;
+}
+
+input[type=text].disabledboxIcon {
+    padding-left: 25px;
+}
+
+#WF_EXCEPTION1_PANEL,
+#WF_EXCEPTION2_PANEL {
+    margin-top: 24px;
+    font-weight: bold;
+    border: 1px solid #cfcfcf;
+    background-color: #f3f3f3;
+    padding: 16px 0 16px 8px;
+}
+
+    #WF_EXCEPTION1_PANEL div[id^=detailkeybox1],
+    #WF_EXCEPTION2_PANEL div[id^=detailkeybox2] {
+        width: 100%;
+        box-sizing: border-box;
+        padding-left: 0.7em;
+    }
+
+/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+#detailkeybox1 p[id^=KEY_LINE_] > span > :nth-child(3n+2),
+#detailkeybox2 p[id^=KEY_LINE_] > span > :nth-child(3n+2) {
+    display: inline-block;
+    width: 175px;
+}
+
+#WF_EXCEPTION1_L,
+#WF_EXCEPTION2_L {
+    padding-left: 0.4em;
+}
+
+.textbox_right {
+    text-align: right;
+}
+
+

@@ -1,0 +1,902 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 32px;
+    left:0px;
+    font-size: 16px;
+    font-weight: bold;
+    box-sizing: border-box;
+    padding: 0;
+    text-align: left;
+    border-radius: 0;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 7px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 7px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+#divContensbox{
+    overflow: hidden;
+}
+ /* コンテンツの最小横幅 */
+.headerbox {
+    min-width: 1220px;
+}
+
+.headerbox a {
+    font-size: 0.8em;
+}
+
+/*検索件数*/
+.actionButtonBox .leftSide {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* 担当者、確認者 */
+.rgstaff {
+    width: 160px;
+}
+.rgstaff input {
+    border-radius: 0;
+    background-color: #fff;
+    padding-left: 8px;
+    font-weight: normal;
+}
+
+/* 項目DIV */
+.divItem {
+    width: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 8px;
+}
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/* 戻るボタン */
+/* メニューボタンのみを表示するために定義 */
+.btn-back {
+    display: none;
+}
+
+/* 検索のボタン */
+.divBtnRight {
+    margin-left: auto;
+    padding: 0 16px 0 24px;
+}
+
+.btn-stickySearch {
+    text-decoration: none;
+    width: 100px;
+    height: 32px;
+    line-height: 23px;
+    text-align: center;
+    color: #fff;
+    background-color: #0d6efd;
+    border: solid 1px #0d6efd;
+    font-size: 14px;
+    padding: 2px 16px;
+    outline: none;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+.btn-stickySearch:hover {
+    background-color: #589cff;
+    border: 1px solid #589cff;
+}
+
+/* 一覧操作ボタン */
+.btn-sticky {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* ページ上部（一覧操作ボタン） */
+.actionButtonBox .rightSide .btn-sticky {
+    padding: 2px 16px;
+}
+
+/*選択エリアボタン*/
+.selectFrame .btn-sticky{
+    height: 32px;
+    font-size: 16px;
+}
+
+/* 明細のボタン */
+.btn-stickyDetail {
+    text-decoration: none;
+    height: 30px;
+    width: 60px;
+    line-height: 23px;
+    text-align: center;
+    color: #2bb6c1;
+    border: solid 1px #2bb6c1;
+    transition: 0.3s;
+    font-size: 14.5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+}
+
+    .btn-stickyDetail:hover {
+        background: #2bb6c1;
+        color: #fff;
+    }
+
+    .btn-stickyDetail:disabled {
+        background-image: none;
+        background-color: #ccc;
+        border-color: #ccc;
+        color: #2bb6c1;
+    }
+
+/* ui-multiselect*/
+.ui-multiselect {
+    height: 32px;
+    border-color: #cfcfcf;
+    border-radius: 0;
+    color: #333;
+    font-weight: normal;
+    font-size: 16px;
+}
+.ui-state-default .ui-icon {
+    margin-top: 4px;
+}
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+.selectFrame {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #cfcfcf;
+    background-color: #fff;
+    margin: 0 16px 8px;
+    padding: 8px 0 8px 16px;
+    overflow-x: auto;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .selectFrame {
+        margin: 0 3vw 8px;
+    }
+}
+
+#detailbox {
+    min-width: 1220px;
+    width: 100%;
+    height: calc(100% - 2.4em - 1.4em);
+    background-color: rgb(237,237,237);
+    position: relative;
+    overflow: auto;
+}
+
+.detailbox a {
+    font-size:14.5px;
+    align-items: flex-end;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: flex;
+    flex-wrap: wrap;
+    height: 8px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+.detailboxLineBlank2 {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 10px;
+    box-sizing: border-box;
+    margin-top:20px;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 26px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+
+/* 担当者、確認者 */
+.detailboxLineLabel > div.divLblStaff {
+    width: 200px;
+    height: 24px;
+}
+
+.divLblStaff input.txtlblbox {
+    text-align: left;
+    border: none;
+    width: 74px;
+    vertical-align: middle;
+    background: transparent;
+}
+.divLblStaff:nth-of-type(2) input.txtlblbox {
+    width: 54px;
+}
+
+.divLblStaff input.txtlblbox:hover {
+    background: transparent;
+    color: #333;
+}
+
+/* 左位置を合わせる用の空白 */
+.detailboxLineLabel > span.spanLeft {
+    width: 46px;
+    height:24px;
+}
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width: 17px;
+    height:24px;
+}
+
+.detailboxLineLabel > span.span2 {
+    width: 45px;
+    height: 24px;
+}
+
+.detailboxLineLabel > div.divLbl {
+    width: 200px;
+    height: 24px;
+}
+
+.divLbl input.txtlblbox {
+    text-align: left;
+    border: none;
+    width: 74px;
+    height: 32px;
+    vertical-align: middle;
+    background: transparent;
+}
+.divLbl input.txtlblbox:hover {
+    background: transparent;
+    color: #333;
+}
+
+.divLbl input.txtlblbox.width50 {
+    width: 50px;
+}
+
+.divLbl input.txtlblbox2 {
+    text-align: left;
+    border: none;
+    width: 100px;
+    height: 30px;
+    vertical-align: middle;
+    background: transparent;
+}
+.divLbl input.txtlblbox2:hover {
+    background: transparent;
+    color: #333;
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.detailboxLineInput {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.detailboxLineInput > * {
+    flex-shrink: 0;
+}
+
+/* 請求先 */
+.deptrustee {
+    width: 400px;
+    height: 30px;
+}
+
+
+
+/* 1項目のサイズ */
+.detailboxLineInput > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineInput > span.spanLeft {
+    width: 46px;
+    height:30px;
+}
+/* 空白 最小 */
+span.span0 {
+    width: 8px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span1 {
+    width: 10px;
+    height:30px;
+}
+.detailboxLineInput > span.span2 {
+    width: 24px;
+    height: 30px;
+}
+/*span.span3 {
+    width: 14px;
+    height: 30px;
+}*/
+.detailboxLineInput > span.span4 {
+    width: 146px;
+    height: 30px;
+}
+.detailboxLineInput > span.span5 {
+    width: 24px;
+    height: 30px;
+}
+/*.detailboxLineInput > span.span6 {
+    width: 10px;
+    height: 30px;
+}*/
+/*.detailboxLineInput > span.span7 {
+    width: 21px;
+    height: 30px;
+}*/
+/*.detailboxLineInput > span.span8 {
+    width: 149px;
+    height: 30px;
+}*/
+.detailboxLineInput > span.span9 {
+    width: 24px;
+    height: 30px;
+}
+.detailboxLineInput > span.span10 {
+    width: 5px;
+    height: 30px;
+}
+/*.detailboxLineInput > span.span11 {
+    width: 95px;
+    height: 30px;
+}*/
+/*.detailboxLineInput > span.span12 {
+    width: 23px;
+    height: 30px;
+}*/
+.detailboxLineInput > span.span13 {
+    width: 124px;
+    height: 30px;
+}
+span.span14 {
+    width: 18px;
+    height: 30px;
+}
+/*span.span15 {
+    width: 10px;
+    height: 30px;
+}*/
+
+/*span.span16 {
+    width: 139px;
+    height: 30px;
+}*/
+
+span.span17 {
+    width: 37px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span18 {
+    width: 69px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span19 {
+    width: 73px;
+    height: 30px;
+}
+
+span.span20 {
+    width: 22px;
+    height: 30px;
+}
+
+/* ************************** */
+/* コンボボックス             */
+/* ************************** */
+/* 計上年月 */
+.divDdlArea select.ddlSelectKeijoYm {
+    height: 30px;
+    width: 150px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+.divDdlArea input.TxtSelectKeijoYm {
+    height: 32px;
+    width: 120px;
+    padding: 2px 8px;
+    font-weight: normal;
+    font-size: 14px;
+    border-radius: 0;
+}
+
+/* 管轄支店 */
+.divDdlArea select.ddlSelectControl {
+    height: 32px;
+    width: 150px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea input.txtlblbox {
+    text-align: left;
+    border: none;
+    width: 85px;
+    height: 30px;
+    vertical-align: middle;
+    background: transparent;
+}
+.divDdlArea input.txtlblbox:hover {
+    background: transparent;
+    color: #333;
+}
+
+.divDdlArea input.txtlblbox2 {
+    text-align: left;
+    border: none;
+    width: 70px;
+    height: 30px;
+    vertical-align: middle;
+    background: transparent;
+}
+.divDdlArea input.txtlblbox2:hover {
+    background: transparent;
+    color: #333;
+}
+
+/* ************************** */
+/* 選択                       */
+/* ************************** */
+/* 選択ボックス */
+div.singleInput > span {
+    display: block;
+}
+/* 選択ボックス */
+div.singleInput > .actionButtonBox {
+    padding-left: 0px;
+}
+/* 高さ指定 */
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label {
+    width: 55px;
+    height: 28px;
+}
+
+.grc0001Wrapper ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 200px;
+}
+
+.detailboxLineInput > div.singleInput.right-harf.grc0001Wrapper {
+    width: 25px;
+    height:30px;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label,
+.grc0001Wrapper input[type=radio]:disabled + label{
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectBox {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    /*justify-content: center;*/
+    white-space: nowrap;
+}
+
+.divSelectItem {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    height: 30px;
+    border: 1px solid rgba(225, 225, 225, 1);
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+select.Width90,
+input[type=text].Width90,
+textarea.Width90 {
+    width: 90%;
+}
+
+/* ************************** */
+/* スプレッド                 */
+/* ************************** */
+/* リース一覧部 */
+.detailboxLineIncomeManage {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1220px;
+    /*height: 369px;*/
+    height: 520px;
+    padding-left: 46px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* ************************** */
+/* グリッドエリア             */
+/* ************************** */
+
+div.tblWrapper {
+    display: flex;
+    margin: 0 16px;
+    padding: 16px 16px 0;
+    max-height: calc(100vh - 46px - 45px - 146px - 40px);
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+}
+
+    div.tblWrapper > div {
+        display: flex;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        max-height: 520px;
+        overflow: auto;
+    }
+
+table.tbl {
+    border-collapse: separate !important;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #cfcfcf;
+    border-right: 1px solid #cfcfcf;
+    z-index: 1;
+}
+
+table#contents1_gvLNT0007 {
+    table-layout: fixed;
+    width: 1210px;
+}
+
+table#contents1_gvLNT0007 input[type=button] {
+    width: 88%;
+}
+
+table.tbl th,
+table.tbl td {
+    /*height: 27px !important;*/
+    text-align: center;
+    font-size: 12px;
+    border-top: 1px solid #cfcfcf;
+    border-left: 1px solid #cfcfcf;
+    padding: 3px 0;
+}
+
+table.tbl th {
+    position: sticky;
+    top: 0;
+    background-color: #0f4493;
+    color: #FFFFFF;
+    font-weight: unset;
+    z-index: 200;
+}
+
+    table.tbl th:first-child,
+    table.tbl td:first-child {
+        border-left: 1px solid #cfcfcf;
+    }
+
+table.tbl > tbody > tr:not(:nth-child(1)):nth-child(2n) {
+    background-color: #e1eeff;
+}
+
+table.tbl > tbody > tr:not(:nth-child(1)):nth-child(2n+1) {
+    background-color: #FFFFFF;
+}
+
+/* 共通 */
+.display {
+    display:table-cell;
+}
+
+.width100 {
+    width: 100%;
+}
+
+.span290 {
+    margin-right: 290px;
+}
+
+.span282 {
+    margin-right: 282px;
+}
+
+#TxtDeptrusteeCode,
+#hdnSelectTori {
+    display: none;
+}
+
+.wInvoicecountpx {
+   width: 10px;
+}
+.w35px {
+    width: 35px;
+}
+
+.w40px {
+    width: 40px;
+}
+
+.w50px {
+    width: 50px;
+}
+
+.w60px {
+    width: 60px;
+}
+
+.w65px {
+    width: 65px;
+}
+
+.w70px {
+    width: 70px;
+}
+
+.w75px {
+    width: 75px;
+}
+
+.w80px {
+    width: 80px;
+}
+
+.w85px {
+    width: 85px;
+}
+
+.w95px {
+    width: 95px;
+}
+
+.w135px {
+    width: 135px;
+}
+
+.w330px {
+    width: 330px;
+}
+
+.w400px {
+    width: 400px;
+}
+
+.txt-l {
+    text-align: left !important;
+}
+
+.txt-r {
+    text-align: right !important;
+}
+
+.pl5px {
+    padding-left: 5px;
+}
+
+.pr5px {
+    padding-right: 5px;
+}
+
+.Ma-R7px {
+    margin-right: 7px;
+}
+
+.font16 {
+    font-size: 16px;
+}
+
+.font18 {
+    font-size: 18px;
+}
+
+.hovercoloer:hover {
+    background-color: #FFDADA !important;
+}
+
+.v-alignM {
+    vertical-align: -webkit-baseline-middle;
+}
+
+/* #region 明細ページング */
+div#pnlNoData {
+    margin: 5px 0px 5px 5px;
+    display: flex;
+    color: red;
+}
+
+div#pnlChangePage {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+    div#pnlChangePage input[id*='SelectPage'] {
+        width: 56px;
+        text-align: right;
+    }
+
+    div#pnlChangePage input[id*='RefreshPage'] {
+        width: 44px;
+        border-radius: 0;
+        font-size: 14px;
+    }
+
+    div#pnlChangePage input[type=text][id*="Page"]:disabled {
+        background-color: #f3f3f3;
+    }
+
+    div#pnlChangePage input[id*='SelectPage'].error {
+        border-color: red;
+    }
+
+    .arrowFirstPage,
+    .arrowPreviousPage,
+    .arrowNextPage,
+    .arrowLastPage {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #cfcfcf;
+        box-sizing: border-box;
+        border-radius: 6px;
+        position: relative;
+    }
+
+    .arrowFirstPage input,
+    .arrowPreviousPage input,
+    .arrowNextPage input,
+    .arrowLastPage input {
+        width: 100%;
+        height: auto;
+        opacity: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .arrowFirstPage::before,
+    .arrowFirstPage::after,
+    .arrowPreviousPage::before,
+    .arrowNextPage::before,
+    .arrowLastPage::before,
+    .arrowLastPage::after {
+        display: block;
+        content: "";
+        background-color: #333;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        z-index: 0;
+    }
+    .arrowFirstPage::before {
+        width: 2px;
+        height: 14px;
+        margin-left: -8px;
+    }
+    .arrowFirstPage::after {
+        clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+        width: 14px;
+        height: 14px;
+        margin-left: 2px;
+    }
+    .arrowPreviousPage::before {
+        clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+        width: 14px;
+        height: 14px;
+        margin-left: -1px;
+    }
+    .arrowNextPage::before {
+        clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+        width: 14px;
+        height: 14px;
+        margin-left: 1px;
+    }
+    .arrowLastPage::before {
+        clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+        width: 14px;
+        height: 14px;
+        margin-left: -2px;
+    }
+    .arrowLastPage::after {
+        width: 2px;
+        height: 14px;
+        margin-left: 8px;
+    }
+
+    .arrowFirstPage:has(input:not(:disabled)):hover,
+    .arrowPreviousPage:has(input:not(:disabled)):hover,
+    .arrowNextPage:has(input:not(:disabled)):hover,
+    .arrowLastPage:has(input:not(:disabled)):hover {
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+    }
+
+    .arrowFirstPage:has(input:not(:disabled)):hover::before,
+    .arrowFirstPage:has(input:not(:disabled)):hover::after,
+    .arrowPreviousPage:has(input:not(:disabled)):hover::before,
+    .arrowNextPage:has(input:not(:disabled)):hover::before,
+    .arrowLastPage:has(input:not(:disabled)):hover::before,
+    .arrowLastPage:has(input:not(:disabled)):hover::after {
+        background-color: #0d6efd;
+    }
+
+    .arrowFirstPage:has(input:disabled),
+    .arrowPreviousPage:has(input:disabled),
+    .arrowNextPage:has(input:disabled),
+    .arrowLastPage:has(input:disabled) {
+        background-color: #f3f3f3;
+    }
+
+    .arrowFirstPage:has(input:disabled)::before,
+    .arrowFirstPage:has(input:disabled)::after,
+    .arrowPreviousPage:has(input:disabled)::before,
+    .arrowNextPage:has(input:disabled)::before,
+    .arrowLastPage:has(input:disabled)::before,
+    .arrowLastPage:has(input:disabled)::after {
+        background-color: #aaa;
+        cursor: default;
+    }
+
+    .arrowPreviousPage + div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        column-gap: 2px;
+        background-color: #f3f3f3;
+        min-width: 62px;
+        height: 32px;
+        margin: 0 5px;
+        padding: 0 8px;
+    }

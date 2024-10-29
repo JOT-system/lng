@@ -1,0 +1,36 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+/* 条件画面 チェックボックス */
+#ChkDelDataFlg {
+    vertical-align: text-bottom
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG label {
+    padding-top: 1px;
+}
+
+.TxtDate {
+    width: 180px;
+    height: 40px;
+    font-size: 16px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    ime-mode: inactive;
+    /* color: #000000; /* 黒 */
+    /* color: #737373; */ /* 4/14変更前 */
+    color: #404040;
+    padding: 6px 4px 6px 4px; /* Top Right Bottom Left */
+    /* border-color: rgba(176, 176, 276, 0.6); */
+    border-color: #cfcfcf;
+    border-style: solid;
+    border-width: thin;
+}

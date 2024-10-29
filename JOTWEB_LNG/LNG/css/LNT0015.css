@@ -1,0 +1,91 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+.searchbox .inputBox {
+    width: 610px;
+}
+
+/* ************************** */
+/* ドロップダウンリスト       */
+/* ************************** */
+/* 年月 */
+.DDLYMArea select.ddlYm {
+    height: 40px;
+    width: 180px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+.right-harf {
+    margin-bottom: 15px;
+}
+
+#WF_ORGCODE_ALL_SELECT {
+    margin-bottom: 8px;
+}
+
+.searchbox .inputItem {
+    align-items: center;
+    margin-bottom: 0;
+}
+.searchbox .inputItem:first-of-type {
+    margin-bottom: 8px;
+}
+
+.searchbox #WF_DATE.inputItem {
+    margin-bottom: 16px;
+}
+
+.searchbox .inputItem a:nth-child(3) {
+    padding: 2px 8px;
+    min-height: 25px;
+    font-size: 14px;
+}
+
+#WF_ORG_LABEL {
+    font-weight: bold;
+}
+
+.grc0001Wrapper ul {
+    width: 580px;
+    gap: 8px;
+}
+
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label {
+    width: 125px;
+    border: 1px solid #cfcfcf;
+    color: #333;
+    margin-right: 0;
+    margin-bottom: 0;
+    height: 32px;
+    border-radius: 6px;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+#WF_ORGCODE_SELECT {
+    margin-bottom: 16px;
+}
+
+#WF_INVOICE_TYPE {
+    margin-bottom: 8px;
+}

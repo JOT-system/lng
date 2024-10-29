@@ -1,0 +1,27 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+/* 条件画面 チェックボックス */
+#ChkDelDataFlg {
+    vertical-align: text-bottom
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG label {
+    padding-top: 1px;
+}
+
+.searchbox .inputItem:first-of-type {
+    margin-bottom: 5px;
+}
+
+.searchbox .inputItem:nth-of-type(2) a{
+    font-weight: normal !important;
+    font-size: 12px;
+}

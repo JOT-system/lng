@@ -1,0 +1,131 @@
+﻿<%@ Master Language="VB" AutoEventWireup="false" CodeBehind="LNGMasterPage.Master.vb" Inherits="JOTWEB_LNG.LNGMasterPage" %>
+<%@ register src="~/inc/GRIS0001Title.ascx" tagname="title" tagprefix="MSINC" %>
+<%@ register src="~/inc/GRIS0002Footer.ascx" tagname="footer" tagprefix="MSINC" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="google" content="notranslate"/> <%-- Chrome翻訳機能抑止 --%>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title></title>
+    <%--全画面共通のスタイルシート --%>
+    <link href="~/css/common.css" rel="stylesheet" type="text/css"/>
+    <link href="<%=ResolveUrl("~/LNG/css/M00001.css")%>" rel="stylesheet" type="text/css" />
+    <link href="<%= ResolveUrl("~/css/jquery-ui-1.10.4.custom.min.css")%>" rel="stylesheet" type="text/css"/>
+    <link href="<%= ResolveUrl("~/css/jquery.multiselect.css")%>" rel="stylesheet" type="text/css"/>
+    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon2.ico" />
+
+    <%--個別のスタイルは以下に記載 OR 外部ファイルに逃す --%>
+    <%--共通利用するJavaScript --%>
+    <script src='<%= ResolveUrl("~/script/common.js")%>' type="text/javascript" charset="utf-8"></script>
+    <script src='<%= ResolveUrl("~/script/event.js")%>' type="text/javascript" charset="utf-8"></script>
+    <script src="<%= ResolveUrl("~/LNG/script/M00001.js")%>" type="text/javascript" charset="utf-8"></script>
+    <script src='<%= ResolveUrl("~/script/jquery-3.6.0.min.js")%>'></script>
+    <script src='<%= ResolveUrl("~/script/jquery-1.10.2.js")%>'></script>
+    <script src='<%= ResolveUrl("~/script/jquery-ui-1.10.4.custom.min.js")%>'></script>
+    <script src='<%= ResolveUrl("~/script/jquery.multiselect.js")%>'></script>
+    <script src='<%= ResolveUrl("~/script/prettify.js")%>'></script>
+    <%-- 左ボックスカレンダー使用の場合のスクリプト --%>
+    <script src='<%= ResolveUrl("~/script/calendar.js")%>' type="text/javascript" charset="utf-8"></script>
+    <%-- コンテンツ領域 --%>
+    <asp:ContentPlaceHolder ID="head" runat="server" />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NECGFEWK93"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-NECGFEWK93');
+    </script>
+
+</head>
+
+<body spellcheck="false">
+
+    <form id="LNGMasterPage" runat="server"
+                ondragstart="f_dragEventCancel(event)"
+                ondrag="f_dragEventCancel(event)"
+                ondragend="f_dragEventCancel(event)" 
+                ondragenter="f_dragEventCancel(event)"
+                ondragleave="f_dragEventCancel(event)" 
+                ondragover="f_dragEventCancel(event)"  
+                ondrop="f_dragEventCancel(event)">    <%-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 --%>
+        <div id="divContainer"> <%-- 全体をくくるDIVこれが無いと疑似フレームレイアウトはうまくいかない --%>
+            <%-- 全体レイアウト　titlebox --%>
+            <MSINC:title id="title" runat="server" />
+
+            <%-- コンテンツ領域 --%>
+            <div id="divContensbox">
+                <asp:ContentPlaceHolder ID="contents1" runat="server" />
+                <%-- 共通ポップアップ用 --%>
+                <div id="divContentsPopUpWrapper">
+                    <div id="divContentsPopUp">
+                        <div class="popUpTitle"><asp:ContentPlaceHolder ID="contentsPopUpTitle" runat="server"></asp:ContentPlaceHolder></div>
+                        <div class="popUpButtons">
+                            <input type="button" id="WF_ButtonOkCommonPopUp"     class="btn-sticky" value="OK"  onclick="ButtonClick('WF_ButtonOkCommonPopUp');" />
+                            <input type="button" id="WF_ButtonCancelCommonPopUp" class="btn-sticky" value="閉じる" onclick="commonHideCustomPopup();" />
+                        </div>
+                        <div class="popUpContents">
+                            <asp:ContentPlaceHolder ID="contentsPopUpInside" runat="server"></asp:ContentPlaceHolder>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%-- FOOTER --%>
+            <MSINC:footer id="footer" runat="server" />
+            <div id="divHidden">
+                <asp:HiddenField ID="MF_USERID" runat="server" />                   <%-- ユーザID              --%>
+                <asp:HiddenField ID="MF_USERCAMP" runat="server" />                 <%-- ユーザ所属会社        --%>
+                <asp:HiddenField ID="MF_COMP_ROLE" runat="server" />                <%-- 会社権限ロール        --%>
+                <asp:HiddenField ID="MF_ORG_ROLE" runat="server" />                 <%-- 組織権限ロール        --%>
+                <asp:HiddenField ID="MF_MENU_ROLE" runat="server" />                <%-- メニュー権限ロール    --%>
+                <asp:HiddenField ID="MF_MAP_ROLE" runat="server" />                 <%-- 更新権限ロール        --%>
+                <asp:HiddenField ID="MF_VIEWPROF_ROLE" runat="server" />            <%-- 画面表示権限ロール    --%>
+                <asp:HiddenField ID="MF_RPRTPROF_ROLE" runat="server" />            <%-- エクセル出力権限ロール--%>
+                <asp:HiddenField ID="MF_APPROVALID_ROLE" runat="server" />          <%-- 承認権限ロール        --%>
+                <asp:HiddenField ID="MF_PROF_VIEW" runat="server" />                <%-- 画面プロフID          --%>
+                <asp:HiddenField ID="MF_PROF_REPORT" runat="server" />              <%-- 帳票プロフID          --%>
+                <asp:HiddenField ID="MF_USER_ORG" runat="server" />                 <%-- ユーザ管轄支店        --%>
+                <asp:HiddenField ID="MF_USER_ORGNAME" runat="server" />             <%-- ユーザ管轄支店名称    --%>
+                <asp:HiddenField ID="MF_USERTERMID" runat="server" />               <%-- ユーザ所属サーバ      --%>
+                <asp:HiddenField ID="MF_USER_AFFILIATION" runat="server" />         <%-- ユーザ所属部署        --%>
+                <asp:HiddenField ID="MF_POSIROW" runat="server" />                  <%-- メニュー位置(縦)      --%>
+                <asp:HiddenField ID="MF_POSICOL" runat="server" />                  <%-- メニュー位置(横)      --%>
+
+                <asp:HiddenField ID="MF_MAPID" runat="server" value="" />           <%-- MAPID           --%>
+                <asp:HiddenField ID="MF_MAPvariant" runat="server" />               <%-- MAP変数         --%>
+                <asp:HiddenField ID="MF_MAPpermitcode" runat="server" />            <%-- MAP権限         --%>
+
+                <asp:HiddenField ID="MF_VIEWID" runat="server"/>                    <%-- 画面　          --%>
+                <asp:HiddenField ID="MF_XMLsaveF" runat="server"/>                  <%-- 画面情報退避F　 --%>
+                <asp:HiddenField ID="MF_HELP" runat="server" />                     <%-- 画面HELP有無    --%>
+                <asp:HiddenField ID="MF_DROP" runat="server" Value="FALSE" />       <%-- 画面D&D有無     --%>
+
+                <asp:HiddenField ID="MF_SUBMIT" runat="server" value="FALSE" />     <%-- サーバー処理中（TRUE:実行中、FALSE:未実行） --%>
+
+                <asp:HiddenField ID="MF_AGAIN" runat="server" Value="FALSE" />      <%-- 確認ポップアップ再実行イベント --%>
+                <asp:HiddenField ID="MF_ALT_MSG" runat="server" Value="FALSE" />    <%-- 確認ポップアップ表示メッセージ --%>
+                <asp:HiddenField ID="MF_ALERT" runat="server" Value="FALSE" />      <%-- 確認ポップアップ処理可能 --%>
+
+                <asp:HiddenField ID="MF_SHOWCUSTOMOPOUP" runat="server" Value="0" />      <%-- カスタムポップアップ表示(0:非表示,1:表示) --%>
+                
+                <asp:HiddenField ID="MF_CommonDeleteItemName" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象名称（共通処理一覧表内部のテキストの場合フィールド名、それ以外はID) --%>
+                <asp:HiddenField ID="MF_CommonDeleteRow" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象行（共通処理一覧表内部のテキストの場合LINECNT、それ以外は未設定) --%>
+                <asp:HiddenField ID="MF_CommonDeleteListId" runat="server" Value="" EnableViewState="false" /> <%-- 削除アイコン押下時の対象表ID（共通処理一覧表内部のテキストの場合表ID（パネルID）、それ以外は未設定) --%>
+
+                <!-- 左ナビでクリックしたボタンにつきサーバー保持の遷移先情報を特定するためのキーを格納 -->
+                <asp:HiddenField ID="hdnPosiCol" runat="server" Value="" />
+                <asp:HiddenField ID="hdnRowLine" runat="server" Value="" /> 
+
+                <!-- ボックス表示のためクリックした位置を格納 -->
+                <asp:HiddenField ID="WF_saveTop" runat="server" Value="" />
+                <asp:HiddenField ID="WF_saveLeft" runat="server" Value="" />
+            </div>
+        </div>
+    </form>
+</body>
+</html>

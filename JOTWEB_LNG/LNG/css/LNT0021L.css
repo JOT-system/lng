@@ -1,0 +1,1133 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+#divContensbox{
+    overflow: hidden;
+}
+ /* コンテンツの最小横幅 */
+.headerbox {
+    min-width: 1220px;
+}
+
+.headerbox a {
+    font-size: 0.8em;
+}
+.actionButtonBox {
+    margin: 0 16px;
+    padding: 8px 0;
+    width: auto;
+    column-gap: 8px;
+}
+
+    .actionButtonBox > span.spanLeft {
+        width: 15px;
+        height: 24px;
+    }
+
+    .actionButtonBox > span.span1 {
+        width: 16px;
+        height: 24px;
+    }
+
+    .actionButtonBox > div.divLblCalcInfo {
+        width: 220px;
+        height: 28px;
+        font-size: 16px;
+        border: none;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    .actionButtonBox > div.divLblCalcInfodate {
+        width: 100px;
+        height: 22px;
+        font-size: 16px;
+        border: none;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/* 戻るボタン */
+/* メニューボタンのみを表示するために定義 */
+.btn-back {
+    display: none;
+}
+
+/* 検索のボタン */
+.btn-stickySearch {
+    height: 30px;
+    width: 75px;
+    line-height: 23px;
+    text-align: center;
+    color: #fff;
+    background-color: #0d6efd;
+    border: solid 1px #0d6efd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 2px 16px;
+    outline: none;
+}
+.btn-stickySearch:hover {
+    background-color: #589cff;
+    border: solid 1px #589cff;
+}
+
+/* 明細のボタン */
+.downloadbtn-sticky {
+    text-decoration: none;
+    height: 40px;
+    width: 140px;
+    line-height: 23px;
+    text-align: center;
+    color: #2bb6c1;
+    border: solid 1px #2bb6c1;
+    transition: 0.3s;
+    font-size: 14.5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+}
+
+.downloadbtn-sticky:hover {
+    background: #2bb6c1;
+    color: #fff;
+}
+
+.downloadbtn-sticky:disabled {
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+.btn-stickyCalc {
+    padding: 2px 16px;
+    line-height: 23px;
+    color: #333;
+    border: 1px solid #cfcfcf;
+    background-color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+    border-radius: 6px;
+}
+
+    .btn-stickyCalc:not(:disabled):hover {
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .btn-stickyCalc:disabled {
+        background-color: #f3f3f3;
+        color: #aaa;
+    }
+
+.btn-stickyMemo {
+    text-decoration: none;
+    height: 30px;
+    width: 100px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+}
+
+    .btn-stickyMemo:not(:disabled):hover {
+        background: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .btn-stickyMemo:disabled {
+        background-color: #f3f3f3;
+        color: #aaa;
+    }
+
+.btn-stickyFix {
+    text-decoration: none;
+    height: 30px;
+    width: 50px;
+    line-height: 23px;
+    text-align: center;
+    border: solid 1px #cfcfcf;
+    color: #333;
+}
+
+    .btn-stickyFix:not(:disabled):hover {
+        background: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .btn-stickyFix:disabled {
+        background-color: #f3f3f3;
+        color: #aaa;
+    }
+
+/* 削除アイコン */
+.delIconArea {
+    position: absolute;
+    display: table-cell;
+    top: 0;
+    right: 0;
+    padding-right: 5px;
+    width: 16px;
+    height: 100%;
+    vertical-align: middle;
+    z-index: 2;
+}
+
+    .delIconArea div {
+        width: 16px;
+        height: 16px;
+        margin-top: 0px;
+        font-size: 16px;
+        font-weight: bold;
+        color: red;
+        cursor: pointer;
+    }
+
+        .delIconArea div:after {
+            content: "×";
+        }
+
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+#detailbox {
+    /*min-width: 800px;*/
+    width: 100%;
+    height: 100%;
+    background-color: #f3f3f3;
+    position: relative;
+    overflow: auto;
+}
+
+.detailbox a {
+    font-size:14.5px;
+    align-items: flex-end;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 58px);
+    height: 15px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 空白行2行 */
+.detailboxLineBlank2 {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 58px);
+    height: 30px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+#Panel2.detailboxLineLabel,
+#Panel5.detailboxLineLabel {
+    margin-top: 16px;
+    font-weight: bold;
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineLabel > span.spanLeft {
+    width: 15px;
+    height:24px;
+}
+
+/* 文字間隔をあける空白 */
+    .detailboxLineLabel > span.spanLeft2 {
+        width: 669px;
+        height: 30px;
+    }
+
+/* 文字間隔をあける空白 */
+.detailboxLineLabel > span.spanLeft3 {
+    width: 20px;
+    height:30px;
+}
+
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width:17px;
+    height:24px;
+}
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* 計上年月 */
+.detailboxLineLabel > div.divKeijoYM {
+    width:110px;
+    height:24px;
+    margin-top: 5px;
+}
+
+    .detailboxLineLabel > div.divLblConfirmInfo {
+        display: flex;
+        align-items: center;
+        width: 220px;
+        height: 26px;
+        margin-right: 8px;
+        padding: 0 5px;
+        font-size: 16px;
+        border: none;
+        text-align: left;
+        vertical-align: middle;
+        background-color: #f3f3f3;
+        box-sizing: border-box;
+    }
+
+    .detailboxLineLabel > div.divLblConfirmInfodate {
+        display: flex;
+        align-items: center;
+        width: 100px;
+        height: 26px;
+        font-size: 16px;
+        border: none;
+        text-align: left;
+        vertical-align: middle;
+        padding: 0 5px;
+        background-color: #f3f3f3;
+        box-sizing: border-box;
+    }
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.detailboxLineheight {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 58px);
+    height: 5px;
+    box-sizing: border-box;
+}
+
+.detailboxLineInput {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+#Panel3.detailboxLineInput {
+    width: 930px;
+    margin-top: 16px;
+    gap: 16px;
+}
+
+/* 1項目のサイズ */
+.detailboxLineInput > span {
+    display: inline-block;
+    margin: 1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineInput > span.spanLeft {
+    width: 15px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span0 {
+    width: 9px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span1 {
+    width: 11px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span2 {
+    width: 34px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span3 {
+    width: 41px;
+    height: 30px;
+}
+
+.detailboxLineInput > span.span4 {
+    width: 67px;
+    height: 30px;
+}
+
+    .detailboxLineInput > div.divLblOrgcode {
+        width: 120px;
+        height: 30px;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .detailboxLineInput > div.divLblStockStatus {
+        width: 85px;
+        height: 30px;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .detailboxLineInput > div.divLblYM {
+        width: 80px;
+        height: 30px;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+input.divLblStockYM {
+    width: 210px;
+    height: 29px;
+    font-size: 18px;
+    font-weight: bold;
+    vertical-align: middle;
+    border: none;
+}
+input.divLblStockYM:hover {
+    color: #333;
+}
+
+/* 計上年月 */
+input.txtDownloadMonth {
+    width: 111px;
+    height: 30px;
+    color: black;
+    font-size: 1.4rem;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+}
+a.size {
+    font-size: 18px;
+}
+
+/* ************************** */
+/* コンボボックス             */
+/* ************************** */
+/* 計上年月 */
+.divDdlArea select.ddlSelectKeijoYm {
+    height: 30px;
+    width: 150px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+.divDdlArea input.TxtSelectKeijoYm {
+    height: 30px;
+    width: 95px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+.divDdlArea input.txtlblbox {
+    border: none;
+    width: 72px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+.divDdlArea input.txtlblbox:hover {
+    background-color: transparent;
+    color: #333;
+}
+
+.divDdlArea input.txtlblbox2 {
+    border: none;
+    width: 125px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+.divDdlArea input.txtlblbox2:hover {
+    background-color: transparent;
+    color: #333;
+}
+
+.divDdlArea input.txtlblbox3 {
+    border: none;
+    width: 106px;
+    height: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    vertical-align: middle;
+}
+.divDdlArea input.txtlblbox3:hover {
+    background-color: transparent;
+    color: #333;
+}
+
+.divDdlArea input.txtlblbox4 {
+    border: none;
+    width: 156px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+.divDdlArea input.txtlblbox4:hover {
+    background-color: transparent;
+    color: #333;
+}
+
+.divDdlArea > span.span1 {
+    width: 13px;
+    height: 30px;
+}
+
+/* 管轄支店 */
+.divDdlArea select.ddlSelectControl {
+    height: 30px;
+    width: 120px;
+    font-size: 12pt;
+    padding: 2px;
+}
+
+/* ************************** */
+/* 選択                       */
+/* ************************** */
+/* 選択ボックス */
+div.singleInput > span {
+    display: block;
+}
+/* 選択ボックス */
+div.singleInput > .actionButtonBox {
+    padding-left: 0px;
+}
+
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label {
+    height: 30px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    border-radius: 0;
+    color: #333;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label,
+.grc0001Wrapper input[type=radio]:disabled + label {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+select.Width90,
+input[type=text].Width90,
+textarea.Width90 {
+    width: 90%;
+}
+
+/* ************************** */
+/* 決済条件検索               */
+/* ************************** */
+#pnlKekkjSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlKekkjSrcArea {
+    /*height: 80%;*/
+    width: 60%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divKekkjSrcHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divKekkjSrcHeadLeft {
+    display: flex;
+    width: 230px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divKekkjSrcHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 90px;
+}
+
+.divKekkjSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 228px;
+}
+
+
+#divKekkjSrcButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnKekkjSrcCLOSE {
+    position: relative;
+    /*left: 294px;*/
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divKekkjSrcBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlKekkjSrc {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlKekkjSrc td, #pnlKekkjSrc th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* 決済条件一覧部 */
+.detailboxLineKekkjSrc {
+    display: flex;
+    flex-wrap: wrap;
+    width: 900px;
+    height: 435px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}
+
+/* ************************** */
+/* メモ                       */
+/* ************************** */
+#pnlRemarkRichTextWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlRemarkRichTextContents {
+    text-align: left;
+    left: calc(50% - 250px);
+    background-color: rgb(240,240,240);
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+    border-radius: 10px;
+}
+
+#pnlRemarkRichTextTitle {
+    width: calc(100% - 20px);
+    font-weight: bold;
+    padding: 10px;
+    height: 42px;
+    background: linear-gradient(to bottom, #8BACCD, rgb(240,240,240));
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.pnlRemarkRichTextTitleIcon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    background-image: url('../LNG/img/richText.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#pnlRemarkRichTextTitle input[type=button] {
+    font-size: 15px;
+    min-width: 100px;
+    margin-right: 10px;
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 30px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+#pnlRemarkRichTextArea {
+    padding: 0 10px 15px 15px;
+    min-height: 120px;
+}
+
+#txtRemarkRichText {
+    font-size: 19px;
+    min-width: 480px;
+    width: 100%;
+    min-height: 200px;
+    height: 100%;
+    border-radius: 5px;
+    resize: both;
+    max-height: calc(100vh - 100px);
+    max-width: calc(100vw - 60px);
+}
+
+
+/* ************************** */
+/* グリッドエリア             */
+/* ************************** */
+
+div.tblWrapper {
+    display: none;
+    max-width: 100%;
+}
+
+    div.tblWrapper > div {
+        display: flex;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        max-height: calc(100vh - 46px - 45px - 272px - 32px);
+        margin: 0 16px;
+        overflow: auto;
+    }
+
+table.tbl {
+    border-collapse: separate !important;
+    background-color: #fff;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    z-index: 1;
+}
+
+table#contents1_gvLNT0021_Control {
+    table-layout: fixed;
+    width: 1780px;
+}
+
+table#contents1_gvLNT0021_Approval {
+    table-layout: fixed;
+    width: 1780px;
+}
+
+    table.tbl th,
+    table.tbl td {
+        /*height: 27px !important;*/
+        text-align: center;
+        font-size: 12px;
+        border-top: 1px solid #cfcfcf;
+        border-left: 1px solid #cfcfcf;
+    }
+
+    table.tbl th {
+        position: sticky;
+        top: 0;
+        background-color: #0f4493;
+        color: #FFFFFF;
+        font-weight: unset;
+        z-index: 200;
+    }
+
+        table.tbl th:first-child,
+        table.tbl td:first-child {
+            border-left: 1px solid #cfcfcf;
+        }
+
+    table.tbl > tbody > tr:not(:nth-child(1)):nth-child(2n) {
+        background-color: #e1eeff;
+    }
+
+/* ************************** */
+/* メモ履歴                   */
+/* ************************** */
+#pnlMemoHistoryWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlMemoHistoryArea {
+    height: 80%;
+    width: 90%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divMemoHistoryHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divMemoHistoryHeadLeft {
+    display: flex;
+    width: 200px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divMemoHistoryHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 100px;
+}
+
+.divMemoHistoryHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 300px;
+}
+
+
+#divMemoHistoryButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnHistoryCLOSE {
+    position: relative;
+    left: 400px;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divMemoHistoryBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 99%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlMemoHistory {
+    position: relative;
+    top: 10px;
+    left: 20px;
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlMemoHistory td, #pnlMemoHistory th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* ************************** */
+/* 共通エリア                 */
+/* ************************** */
+.w39px {
+    width: 39px;
+}
+
+.w75px {
+    width: 75px;
+}
+
+.w50px {
+    width: 50px;
+}
+
+.w65px {
+    width: 65px;
+}
+
+.w70px {
+    width: 70px;
+}
+
+.w140px {
+    width: 90px;
+}
+
+.w100px {
+    width: 100px;
+}
+
+.w115px {
+    width: 115px;
+}
+
+.w130px {
+    width: 130px;
+}
+
+.w170px {
+    width: 150px;
+}
+
+.w200px {
+    width: 200px;
+}
+
+.w300px {
+    width: 300px;
+}
+
+.w350px {
+    width: 350px;
+}
+
+.w590px {
+    width: 530px;
+}
+
+.h27px {
+    height: 27px;
+}
+
+.txt-l {
+    text-align: left !important;
+}
+
+.txt-r {
+    text-align: right !important;
+}
+
+.pl5px {
+    padding-left: 5px;
+}
+
+.pr5px {
+    padding-right: 5px;
+}
+
+.ma-15px {
+    margin-left: 15px;
+}
+
+.ma-46px {
+    margin-left: 46px;
+}
+
+.v-alignM {
+    vertical-align: -webkit-baseline-middle;
+}
+
+.v-alignM2 {
+    vertical-align: middle
+}
+
+.readonly {
+    pointer-events: none;
+}
+
+input.orgcode {
+    height: 24px;
+    color: black;
+    background-color: #bed4e9;
+    font-weight: bold;
+    vertical-align: middle;
+    text-align: right;
+    border: none;
+}
+
+select.ddlStockStatus {
+    height: 30px;
+    width: 100%;
+    font-size: 12px;
+    padding: 2px;
+    border-color: #cfcfcf;
+}
+
+    select.ddlStockStatus:disabled {
+        background-image: none;
+        background-color: #ccc;
+        border-color: #ccc;
+        /*color: #2bb6c1;*/
+    }
+
+/* メッセージ */
+input.DetailInfo {
+    width: 400px;
+    height: 24px;
+    color: red;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    text-align: left;
+    vertical-align: middle;
+}
+
+input.toricode {
+    width: 90px;
+    height: 30px;
+    color: black;
+    font-size: 12px;
+    font-family: helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+    border: none;
+    text-align: center;
+    vertical-align: middle;
+    background: transparent;
+    pointer-events: none;
+}
+
+.selectFrame {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    margin: 0 16px 16px;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+#WF_SEARCH_LABEL,
+#WF_DTLTYPE_LABEL {
+    font-size: 16px;
+}
+
+table.tbl input[type=text] {
+    font-size: 14px;
+}

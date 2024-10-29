@@ -1,0 +1,1341 @@
+﻿/* ************************** */
+/* 支店・エリア・駅選択       */
+/* ************************** */
+#pnlDdlArea {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+}
+
+/* ドロップダウンリスト */
+.divDdlArea {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.divDdlAreaLeft,
+.divDdlAreaMiddle,
+.divDdlAreaRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-sizing: border-box;
+    position: relative;
+}
+.divDdlArea .divDdlAreaRight {
+    margin-left: 25px;
+}
+
+/*.SelectStationSpan {
+    width:86px;
+}*/
+
+    .divDdlAreaLeft b:nth-child(1),
+    .divDdlAreaRight b:nth-child(1) {
+        margin-top: 1px;
+    }
+
+.SelectChklFlagssSpan {
+    width: 32px;
+}
+
+.UpdInvoiceLabelSpan {
+    width: 120px;
+}
+
+.divDdlArea select.ddlSelect {
+    height: 32px;
+    width: 200px;
+    font-size: 16px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+/* 駅コード・名称 */
+.divDdlAreaStation {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-sizing: border-box;
+    width: 390px;
+}
+
+/* 駅コード */
+input.txtStationCode {
+    height: 32px;
+    width: 80px;
+    margin-left: 8px;
+    font-size: 16px;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+    border-radius: 0;
+    flex-shrink: 0;
+}
+
+/* 駅名称 */
+.LblStationName {
+    text-align: left;
+    font-size: 16px;
+    color: #737373;
+    margin-left: 5px;
+    width: 235px;
+}
+
+/* 駅コードの注意書き */
+.divLblStationNote {
+    position: absolute;
+    top: -21px;
+    left: 0;
+    font-size: 12px;
+    color: #de0000;
+}
+
+/* ************************** */
+/* タイトルエリア             */
+/* ************************** */
+#pnlTitle {
+    background: #0f4493;
+    color: #fff;
+    height: 40px;
+    margin: 0 16px;
+    padding: 0 16px;
+    display: flex;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    #pnlTitle {
+        margin: 0 3vw;
+    }
+}
+
+.divTitleLeft {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.divTitleRight {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btnTitleRefresh {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    user-select: none;
+    overflow: hidden;
+    position: relative;
+}
+
+.btnTitleRefresh:hover {
+    cursor: pointer;
+}
+
+.btnTitleRefresh:hover .btnRefreshImg {
+    animation: 3s linear infinite rotationIcon;
+}
+
+/* 再描画ボタンアイコン */
+.btnRefreshImg {
+    width: 100%;
+    height: 100%;
+    background: url('../img/google_font_icon_refresh.svg') no-repeat center center;
+    background-size: 24px 24px;
+    position: absolute;
+}
+
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectFrame {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    border-left: 1px solid #cfcfcf;
+    background-color: #fff;
+    margin: 0 16px 8px;
+    padding: 24px 0 16px 16px;
+    overflow-x: auto;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .selectFrame {
+        margin: 0 3vw 8px;
+    }
+}
+
+.selectBox {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.divSelectItem {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    height: 30px;
+    border: 1px solid rgba(225, 225, 225, 1);
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 65px;
+    margin-right: 15px;
+}
+
+.divSelectItem2 {
+    display: flex;
+    align-items: center;
+    margin-left: 24px;
+}
+
+    /* 各入力ボックス(名称） */
+    .divSelectItem a:nth-child(1),
+    .divSelectItem2 a:nth-child(1){
+        text-align: left;
+        width: 100%;
+    }
+
+.divListItem input[type=checkbox],
+.divListItem input[type=radio] {
+    display: none;
+}
+
+.divListItem input[type=checkbox] + label,
+.divListItem input[type=radio] + label {
+    display: flex;
+    width: 88px;
+    height: 32px;
+    padding: 3px 8px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #cfcfcf;
+    font-weight: bold;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.divListItem input[type=checkbox]:checked + label,
+.divListItem input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.divListItem input[type=checkbox]:checked + label:before,
+.divListItem input[type=radio]:checked + label:before {
+    position: absolute;
+    left: 2px;
+    content: "✔";
+    color: #0d6efd;
+}
+
+.divListItem input[type=checkbox]:not(:disabled) + label:hover,
+.divListItem input[type=radio]:not(:disabled) + label:hover {
+    cursor: pointer;
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.divListItem {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.divListItem ul {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.grc0001Settings {
+    display: none;
+}
+
+.divBtnRight {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    padding-right: 16px;
+}
+
+.divBtnArea {
+    padding-left: 10px;
+}
+
+#btnsearch,
+#btnclear,
+#btnreset,
+#btnall {
+    width: 100px;
+    height: 32px;
+}
+#btnsearch,
+#btnreset,
+#btnall {
+    background-color: #0d6efd;
+    border: solid 1px #0d6efd;
+    color: #fff;
+}
+#btnsearch:hover,
+#btnreset:hover,
+#btnall:hover {
+    background-color: #589cff;
+    border: solid 1px #589cff;
+}
+
+/* ************************** */
+/* 各表エリア               */
+/* ************************** */
+#pnlAllGridArea {
+    height:81%;
+}
+
+/* ************************** */
+/* 現況表エリア               */
+/* ************************** */
+#pnlSituationList {
+    margin-left: 16px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+/* iPad 768*1024対象 */
+@media screen and (min-width: 768px) and (max-width: 999px) {
+    #pnlSituationList {
+        margin: 0 16px;
+        overflow-x: scroll;
+    }
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    #pnlSituationList {
+        margin: 0 3vw;
+        overflow-x: scroll;
+    }
+}
+
+#btnCalculation {
+    position: relative;
+    height: 30px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+#divSituationListGrid {
+    display: flex;
+    align-items: flex-start;
+    transform-origin: left top;
+    min-height:160px;
+}
+/* モニター解像度1366*768対象 */
+@media screen and (min-width: 1281px) and (max-width:1366px) {
+    #divSituationListGrid,
+    .situationHeaderRow {
+        transform: scale(0.97);
+    }
+}
+/* モニター解像度1280*768対象 */
+@media screen and (min-width: 1025px) and (max-width: 1280px) {
+    #divSituationListGrid,
+    .situationHeaderRow {
+        transform: scale(0.94);
+    }
+}
+/* モニター解像度1024*768対象 */
+@media screen and (min-width: 1000px) and (max-width: 1024px) {
+    #divSituationListGrid {
+        overflow-x: scroll;
+    }
+}
+
+.divOpeSituationListHead {
+    display: flex;
+    align-items: center;
+}
+
+#contents1_lblColum01 {
+    margin-right: 16px;
+}
+
+#spanSelectDate {
+    width: 130px;
+}
+
+#txtSelectDate {
+    height: 30px;
+    font-size: 12px;
+}
+
+.divOpeSituationListHeadLeft {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#pnlShipmentsList {
+    flex-shrink: 0;
+    position: relative;
+    top: 8px;
+    left: 0px;
+    max-height: 626px;
+    width: 1306px;
+}
+
+/* テーブル */
+div[data-generated="1"] div[id$="_HL"] table,
+div[data-generated="1"] div[id$="_HR"] table, 
+div[data-generated="1"] div[id$="_DR"] table,
+div[data-generated="1"] div[id$="_DL"] table {
+    border-top: 1px solid #cfcfcf;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+}
+div[data-generated="1"] div[id$="_DL"] table,
+div[data-generated="1"] div[id$="_HR"] table {
+    border-left: 1px solid #cfcfcf;
+}
+
+#pnlShipmentsList td, #pnlShipmentsList th {
+    white-space: nowrap; /* 折り返させない */
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-size: 13px;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    border-left: none;
+    border-top: none;
+    box-sizing: border-box;
+    padding: 2px 3px;
+}
+
+/* 見出し行（固定項目部) */
+div[data-generated="1"] div[id$="pnlShipmentsList_HL"] table {
+    display: none;
+}
+
+/* データ行(奇数駅) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+1),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+2),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+3) {
+    background-color: #e1eeff;
+    font-weight: bold;
+}
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+1),
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+2),
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+3) {
+    background-color: #e1eeff;
+}
+
+/* データ行(偶数駅) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+4),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+5),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-child(6n+6) {
+    background-color: #e4f9eb;
+    font-weight: bold;
+}
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+4),
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+5),
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-child(6n+6) {
+    background-color: #e4f9eb;
+}
+
+/* データ行(合計行) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-last-child(3),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-last-child(2),
+div[data-generated="1"] div[id$="pnlShipmentsList_DL"] table tr:nth-last-child(1) {
+    background-color: #ba256c;
+    color: #fff;
+}
+
+/* データ行(積合計数) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-last-child(3) {
+    background-color: #ba256c;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* データ行(空合計数) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-last-child(2) {
+    background-color: #ba256c;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* データ行(合計) */
+div[data-generated="1"] div[id$="pnlShipmentsList_DR"] table tr:nth-last-child(1) {
+    background-color: #ba256c;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ************************** */
+/* 収支表エリア               */
+/* ************************** */
+#pnlIncomeExpenditure {
+    height: 418px;
+    margin: 8px 0 0 16px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+/* モニター解像度1280*768対象 */
+@media screen and (min-width: 1000px) and (max-width: 1280px) {
+    #pnlIncomeExpenditure {
+        overflow-x: scroll;
+    }
+}
+/* iPad 768*1024対象 */
+@media screen and (min-width: 768px) and (max-width: 999px) {
+    #pnlIncomeExpenditure {
+        margin: 8px 16px 0;
+        overflow-x: scroll;
+    }
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    #pnlIncomeExpenditure {
+        margin: 8px 3vw 0;
+        overflow-x: scroll;
+    }
+}
+
+.divIncomeExpenditureHead {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    width: 1254px;
+    margin-top: 8px;
+}
+.divIncomeExpenditureHead:first-of-type {
+    margin-top: 0;
+}
+
+.divSituationListHead {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    width: 550px
+}
+
+.divSituationListHeadLeft,
+.divIncomeExpenditureHeadLeft {
+display: flex;
+align-items: center;
+font-weight: bold;
+flex-shrink: 0;
+position: relative;
+left: 0;
+}
+
+.IncomeExpenditureHeadSpan {
+    width: 658px;
+}
+
+.IncomeExpenditureHeadSpan2 {
+    width: 430px;
+}
+
+#txtDateStart,
+#txtDateEnd,
+#txtDateStart2,
+#txtDateEnd2 {
+    height: 30px;
+    font-size: 12px;
+}
+
+/* 計算ボタンを配置する箱 */
+.divIncomeExpenditureButton {
+    box-sizing: border-box;
+    white-space: nowrap;     /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+    /* 左寄せの箱 */
+    .divIncomeExpenditureButton .leftSide {
+        box-sizing: border-box;
+        margin-right: 2px;
+    }
+
+    /* 右寄せの箱 */
+    .divIncomeExpenditureButton .rightSide {
+        margin-left: auto;     /* 右に寄せる為マージンで埋める */
+        box-sizing: border-box;
+    }
+
+/* 計算ボタンを配置する箱 */
+.divSituationListButton {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+    /* 左寄せの箱 */
+    .divSituationListButton .leftSide {
+        box-sizing: border-box;
+        margin-right: 2px;
+    }
+    /* 右寄せの箱 */
+    .divSituationListButton .rightSide {
+        margin-left: auto; /* 右に寄せる為マージンで埋める */
+        box-sizing: border-box;
+    }
+
+#btnCalculation2 {
+    position: relative;
+    height: 30px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+.divIncomeExpenditure {
+    width: 810px;
+}
+
+.divSituationList2 {
+    width: 300px;
+}
+
+#divIncomeExpenditureGrid {
+    display: flex;
+    align-items: flex-start;
+    width: 1254px;
+    height: 330px;
+    margin-top: 8px;
+}
+
+#divSituationListGrid2 {
+    display: flex;
+    align-items: flex-start;
+    height: 160px;
+    width: 540px;
+    margin-left: 10px;
+}
+
+#pnlIncomeExpenditureList {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 480px;
+    width: 840px;
+}
+
+#pnlIncomeExpenditureList td, #pnlIncomeExpenditureList th {
+    white-space: nowrap; /* 折り返させない */
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-size: 13px;
+    font-weight: bold;
+    box-sizing: border-box;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    border-top: none;
+    border-left: none;
+    padding: 2px 3px;
+}
+
+.divSituationListHeadMiddle,
+.divIncomeExpenditureHeadMiddle,
+.divIncomeExpenditureHeadRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+    .divSituationListHeadMiddle > span,
+    .divIncomeExpenditureHeadMiddle > span {
+        width: 136px;
+        box-sizing: border-box;
+    }
+
+/* 見出し行（固定項目部) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_HL"] table {
+    display: none;
+}
+
+/* データ行(収支表（発送個数）) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(1),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(2) {
+    background-color: #e1eeff;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(1),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(2) {
+    background-color: #e1eeff;
+}
+
+/* データ行(収支表（発送個数（達成率））) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(3) {
+    background-color: #e1eeff;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(3) {
+    background-color: #e1eeff;
+}
+
+/* データ行(収支表（売上）) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(4),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(5) {
+    background-color: #e4f9eb;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(4),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(5) {
+    background-color: #e4f9eb;
+}
+
+/* データ行(収支表（売上（達成率））) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(6) {
+    background-color: #e4f9eb;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(6) {
+    background-color: #e4f9eb;
+}
+
+/* データ行(収支表（回送個数）) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(7),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(8) {
+    background-color: #ffe3e3;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(7),
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(8) {
+    background-color: #ffe3e3;
+}
+
+/* データ行(収支表（回送個数（収益））) */
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DL"] table tr:nth-child(9) {
+    background-color: #ffe3e3;
+}
+
+div[data-generated="1"] div[id$="pnlIncomeExpenditureList_DR"] table tr:nth-child(9) {
+    background-color: #ffe3e3;
+}
+
+#pnlCalculationList {
+    flex-shrink: 0;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 330px;
+}
+
+#pnlCalculationList td, #pnlCalculationList th {
+    white-space: nowrap; /* 折り返させない */
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-size: 10pt;
+    font-weight: bold;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    border-top: none;
+    border-left: none;
+    padding: 2px 3px;
+    box-sizing: border-box;
+}
+
+/* 見出し行（固定項目部) */
+div[data-generated="1"] div[id$="pnlCalculationList_HL"] table {
+    display: none;
+}
+
+/* データ行(積数) */
+div[data-generated="1"] div[id$="pnlCalculationList_DL"] table tr:nth-child(1) {
+    background-color: #e1eeff;
+}
+
+div[data-generated="1"] div[id$="pnlCalculationList_DR"] table tr:nth-child(1) {
+    background-color: #e1eeff;
+}
+
+/* データ行(空数) */
+div[data-generated="1"] div[id$="pnlCalculationList_DL"] table tr:nth-child(2) {
+    background-color: #e4f9eb;
+}
+
+div[data-generated="1"] div[id$="pnlCalculationList_DR"] table tr:nth-child(2) {
+    background-color: #e4f9eb;
+}
+
+/* データ行(合計) */
+div[data-generated="1"] div[id$="pnlCalculationList_DL"] table tr:nth-child(3) {
+    background-color: #ba256c;
+    color: #fff;
+}
+
+div[data-generated="1"] div[id$="pnlCalculationList_DR"] table tr:nth-child(3) {
+    background-color: #ba256c;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ************************** */
+/* 発送個数累計グラフ         */
+/* ************************** */
+#pnlShippingTotal {
+    height: 550px;
+    margin: 8px 0 0 16px;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+/* iPad 768*1024対象 */
+@media screen and (min-width: 768px) and (max-width: 999px) {
+    #pnlShippingTotal {
+        margin: 8px 16px 0;
+    }
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    #pnlShippingTotal {
+        margin: 8px 3vw 0;
+        height: 80vh;
+    }
+}
+
+.divShippingTotalHead {
+    display: flex;
+    align-items: center;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .divShippingTotalHead {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+.divShippingTotalHeadLeft {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 0;
+    font-size: 16px;
+}
+
+.divShippingTotalHeadMiddle,
+.divShippingTotalHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 31px;
+    font-size: 16px;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .divShippingTotalHeadMiddle,
+    .divShippingTotalHeadRight {
+        left: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+.divShippingTotalHeadMiddle > span {
+    width: 18%;
+    box-sizing: border-box;
+    margin-left: 8px;
+}
+.divShippingTotalHeadMiddle > span:first-of-type {
+    margin-right: 32px;
+}
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .divShippingTotalHeadMiddle > span {
+        width: auto;
+        margin: 0;
+    }
+    .divShippingTotalHeadMiddle > span:first-of-type {
+        margin-right: 0;
+    }
+}
+
+#txtDateStart3,
+#txtDateEnd3 {
+    height: 30px;
+    font-size: 12px;
+}
+
+.divActualTraction {
+    position: relative;
+    top: 30px;
+    left: 70px;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+#chtActualTraction {
+    position: relative;
+    left: -51px;
+}
+/* iPad 768*1024 / スマホ対象 */
+@media screen and (max-width: 999px) {
+    #chtActualTraction {
+        max-width: 100%;
+        height: auto !important;
+        left: 0;
+    }
+}
+
+/* ************************** */
+/* 在庫シミュレーション       */
+/* ************************** */
+#pnlStockSimulation {
+    width: 99%;
+    height: 440px;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+.divStockSimulationHead {
+    display: flex;
+    align-items: center;
+    font-size: 14pt;
+}
+
+.divStockSimulationHeadLeft {
+    font-weight: bold;
+    position: relative;
+    left: 10px;
+}
+
+.divStockSimulationHeadMiddle {
+    font-weight: bold;
+}
+
+.divStockSimulationHeadRight {
+    font-weight: bold;
+}
+
+/* ボタンを配置する箱 */
+.divStockSimulationButton {
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+}
+    /* 左寄せの箱 */
+    .divStockSimulationButton .leftSide {
+        position: relative;
+        left: 10px;
+    }
+
+    /* 右寄せの箱 */
+    .divStockSimulationButton .rightSide {
+        display: flex;
+        align-items: center;
+        position: relative;
+        left: 750px;
+    }
+
+#btnSimulationInput {
+    position: relative;
+    margin-left: 5px;
+    height: 24px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+#btnSimulationCalc {
+    position: relative;
+    margin-left: 5px;
+    height: 24px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+#btnSimulationSave {
+    position: relative;
+    margin-left: 5px;
+    height: 24px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+#divStockSimulationGridArea {
+    overflow: auto;
+    margin-left: 10px;
+    height: 360px;
+    width: 98%;
+}
+
+#pnlStockSimulationList {
+    position: relative;
+    top: 10px;
+    left: 20px;
+    height: 350px;
+    width: 98%;
+}
+
+    #pnlStockSimulationList td, #pnlStockSimulationList th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* 見出し行（固定項目部) */
+div[data-generated="1"] div[id$="pnlStockSimulationList_HL"] table {
+    display: none;
+}
+
+/* データ行スタイル（在庫シミュレーション（デフォルト）） */
+div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr,
+div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr {
+    background-color: white;
+    color: black;
+}
+
+    /* データ行(在庫シミュレーション（朝総個数・夕総個数）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(1),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(9) {
+        background-color: rgb(255,0,102);
+        color: white;
+    }
+
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(1),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(9) {
+        background-color: rgb(255,204,255);
+        color: rgb(255,0,102);
+        font-weight: bold;
+    }
+
+    /* データ行(在庫シミュレーション（発送積数・空数）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(2),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(3) {
+        background-color: rgb(0,102,204);
+        color: white;
+    }
+
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(2),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(3) {
+        background-color: rgb(218,227,243);
+        color: rgb(46,117,182);
+    }
+
+    /* データ行(在庫シミュレーション（発送合計）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(4) {
+        background-color: rgb(0,102,204);
+        color: white;
+    }
+
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(4) {
+        background-color: rgb(218,227,243);
+        color: rgb(46,117,182);
+        font-weight: bold;
+    }
+
+    /* データ行(在庫シミュレーション（到着積数・空数）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(5),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(6) {
+        background-color: rgb(0,176,80);
+        color: white;
+    }
+
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(5),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(6) {
+        background-color: rgb(204,255,204);
+        color: rgb(0,176,80);
+    }
+
+    /* データ行(在庫シミュレーション（到着合計）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(7) {
+        background-color: rgb(0,176,80);
+        color: white;
+    }
+
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(7) {
+        background-color: rgb(204,255,204);
+        color: rgb(0,176,80);
+        font-weight: bold;
+    }
+
+    /* データ行(在庫シミュレーション（積発着差・保有率）) */
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(8),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(10) {
+        background-color: rgb(0, 32, 96);
+        color: white;
+    }
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(8),
+    div[data-generated="1"] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(10) {
+        background-color: rgb(149,179,215);
+        color: rgb(0, 32, 96);
+    }
+
+/*利用不可時（デフォルト）*/
+div[data-generated='1'] input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(149,179,215);
+    pointer-events: none;
+}
+
+/*利用不可時（朝総個数・夕総個数）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(1) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(9) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(255,0,102);
+    color: white;
+    font-weight: bold;
+    border: solid 0px;
+}
+
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(1) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(9) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(255,204,255);
+    color: rgb(255,0,102);
+    font-weight: bold;
+    border: solid 0px;
+}
+
+/*利用不可時（発送積数・空数）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(2) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(3) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(0,102,204);
+    color: white;
+    border: solid 0px;
+}
+
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(2) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(3) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(218,227,243);
+    color: rgb(46,117,182);
+    border: solid 0px;
+}
+
+/*利用不可時（発送合計）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(4) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(0,102,204);
+    color: white;
+    font-weight: bold;
+    border: solid 0px;
+}
+
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(4) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(218,227,243);
+    color: rgb(46,117,182);
+    font-weight: bold;
+    border: solid 0px;
+}
+
+/*利用不可時（到着積数・空数）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(5) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(6) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(0,176,80);
+    color: white;
+    border: solid 0px;
+}
+
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(5) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(6) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(204,255,204);
+    color: rgb(0,176,80);
+    border: solid 0px;
+}
+
+/*利用不可時（到着合計）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(7) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(0,176,80);
+    color: white;
+    font-weight: bold;
+    border: solid 0px;
+}
+
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(7) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(204,255,204);
+    color: rgb(0,176,80);
+    font-weight: bold;
+    border: solid 0px;
+}
+/*利用不可時（積発着差）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(8) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(8) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(149,179,215);
+    color: rgb(0, 32, 96);
+    border: solid 0px;
+}
+
+/*利用不可時（保有率）*/
+div[data-generated='1'] div[id$="pnlStockSimulationList_DR"] table tr:nth-child(10) input[type=text][readonly]:not(.iconOnly),
+div[data-generated='1'] div[id$="pnlStockSimulationList_DL"] table tr:nth-child(10) input[type=text][readonly]:not(.iconOnly) {
+    background-color: rgb(149,179,215);
+    color: rgb(0, 32, 96);
+    border: solid 0px;
+}
+
+/* ************************** */
+/* 共通エリア                 */
+/* ************************** */
+/* カレンダーアイコンの位置 */
+.calendarIconArea {
+    top: -4px;
+}
+
+/* 一覧表ヘッダー部の２行補正 */
+/* 左ヘッダー行スタイル,右ヘッダー行スタイル*/
+div[data-generated="1"] div[id$="_HR"] table tr,
+div[data-generated="1"] div[id$="_HL"] table tr {
+    height: 70px;
+}
+div[data-generated="1"] div[id$="_HR"] table tr {
+    background-color: #0f4493;
+}
+/* 左(固定データテーブル用)DIV,右(可変データテーブル用)DIV */
+div[data-generated="1"] div[id$="_DL"],
+div[data-generated="1"] div[id$="_DR"] {
+    top: 70px; /* ヘッダー行スタイルのheightに合わせる */
+}
+
+/* ------------------------------
+共通表マウスホバー時の色調整
+------------------------------ */
+div[data-generated="1"] tr.hover td,
+div[data-generated="1"] tr.hover th {
+    background-color: #dd67a0 !important;
+}
+
+.spreadStyle {
+    display: none;
+    height: 50%;
+    overflow: auto;
+}
+
+.ui-multiselect {
+    border-color: #cfcfcf;
+    border-radius: 0;
+    height: 32px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    color: #333;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.ui-state-default .ui-icon {
+    margin-top: 4px;
+}
+
+/* スマホ対象 */
+@media screen and (max-width: 767px) {
+    .Operation {
+        margin: 0 3vw;
+        overflow-x: scroll;
+    }
+}
+
+/* ************************ */
+/* (現況表)ヘルプマーク */
+/* ************************ */
+/* 行内のDivを横並びに */
+.situationHeaderRow {
+    display: flex;
+    height: 30px;
+    margin-bottom: -10px;
+    width: 1306px;
+    transform-origin: left top;
+}
+
+/* 幅：50px */
+.situationHeaderRow .headerwidth1 {
+    width: 50px;
+}
+
+/* 幅：66px */
+    .situationHeaderRow .headerwidth2 {
+        width: 66px;
+    }
+
+    /* ヘルプアイコンの設定 */
+    .situationHeaderRow .help {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+        .situationHeaderRow .help .helpWrapper1 {
+            width: 71%;
+            height: 45%;
+        }
+
+        .situationHeaderRow .help .helpWrapper2 {
+            width: 60%;
+            height: 69%;
+        }
+
+        .situationHeaderRow .help .helpIcon {
+            position: relative;
+        }
+
+        .situationHeaderRow .help .helpIconText {
+            position: absolute;
+            left: 0;
+            top: -36px;
+            transform: translateX(-50%);
+            background-color: #e5e5e5;
+            border-radius: 6px;
+            white-space: nowrap;
+            padding: 5px 16px 4px;
+            font-size: 13px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity .3s;
+        }
+        .situationHeaderRow .help:last-of-type .helpIconText {
+            left: inherit;
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .situationHeaderRow .help .helpIcon div:hover + .helpIconText {
+            opacity: 1;
+        }
+
+            .situationHeaderRow .help .helpIconText::before {
+                display: block;
+                content: "";
+                width: 10px;
+                height: 10px;
+                clip-path: polygon(0 0, 100% 0%, 50% 100%);
+                background-color: #e5e5e5;
+                position: absolute;
+                bottom: -7px;
+                left: 50%;
+                margin-left: 3px;
+            }
+
+            .situationHeaderRow .help:last-of-type .helpIconText::before {
+                left: inherit;
+                right: 22px;
+            }

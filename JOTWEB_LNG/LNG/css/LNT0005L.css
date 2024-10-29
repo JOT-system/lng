@@ -1,0 +1,423 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 32px;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    border-radius: 0;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 7px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 7px);
+}
+
+#divContensbox{
+    overflow: hidden;
+}
+ /* コンテンツの最小横幅 */
+.headerbox {
+    min-width: 1220px;
+}
+
+.headerbox a {
+    font-size: 0.8em;
+}
+
+.actionButtonBox .leftSide {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.selectFrame {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    margin: 0 16px;
+    padding: 16px 0 16px 16px;
+    overflow-x: auto;
+}
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/* 戻るボタン */
+/* メニューボタンのみを表示するために定義 */
+.btn-back {
+    display: none;
+}
+
+/* 検索のボタン */
+.divBtn {
+    margin-left: auto;
+    padding-right: 16px;
+}
+
+.btn-stickySearch {
+    text-decoration: none;
+    height: 32px;
+    width: 100px;
+    line-height: 23px;
+    text-align: center;
+    background-color: #0d6efd;
+    border: solid 1px #0d6efd;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    padding: 0 8px;
+    outline: none;
+}
+
+.btn-stickySearch:hover {
+    background: #2bb6c1;
+    color: #fff;
+}
+
+.btn-stickySearch:disabled {
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+
+/* 実行画面 ヘッダー部のみ */
+.headerboxOnly {
+    overflow: auto;
+}
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+#detailbox {
+    min-width: 1220px;
+    width: 100%;
+    height: calc(100% - 2.4em - 1.4em);
+    background-color: rgb(237,237,237);
+    position: relative;
+    overflow: auto;
+}
+
+.detailbox a {
+    font-size:14.5px;
+    align-items: flex-end;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: flex;
+    flex-wrap: wrap;
+    height: 8px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 26px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+    font-weight: bold;
+}
+
+.detailboxLineLabel > * {
+    flex-shrink: 0;
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineLabel > span.spanLeft {
+    width: 46px;
+    height:24px;
+}
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width: 24px;
+    height:24px;
+}
+
+/* 明細入力欄の項目名(ラベル用のdiv) ------------------------------------------------------------- */
+/* 計上年月 */
+.detailboxLineLabel > div.divKeijoYM {
+    width:111px;
+    height: 24px;
+}
+
+/* 請求先 */
+.detailboxLineLabel > div.divLblInvoice {
+    width:220px;
+    height: 24px;
+}
+
+/* 請求書出力先、計上先 */
+.detailboxLineLabel > div.divDownList {
+    width:150px;
+    height: 24px;
+}
+
+/* 契約形態 */
+.detailboxLineLabel > div.divContract {
+    width: 441px;
+    height: 24px;
+}
+
+/* コンテナ記号 */
+.detailboxLineLabel > div.divLblctnType {
+    width:111px;
+    height: 24px;
+}
+
+/* コンテナ番号 */
+.detailboxLineLabel > div.divLblctnNo {
+    width:130px;
+    height: 24px;
+}
+
+/* 状況 */
+.detailboxLineLabel > div.divStatus {
+    width:150px;
+    height: 24px;
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.detailboxLineInput {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 34px;
+    box-sizing: border-box;
+}
+
+.detailboxLineInput > * {
+    flex-shrink: 0;
+}
+
+/* 計上年月 */
+input.txtDownloadMonth {
+    width: 111px;
+    padding: 0 8px;
+    color: #333;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+input.txtDownloadMonth:hover {
+    cursor: pointer;
+}
+
+/* 請求先、請求書出力先、計上先 */
+.detailboxLineInput > a.invoice {
+    width: 400px;
+    height: 30px;
+}
+
+/* コンテナ記号 */
+.detailboxLineInput > a.ctnType {
+    width: 111px;
+    height: 30px;
+    margin-left: 16px;
+}
+
+/* コンテナ番号 */
+.detailboxLineInput > a.ctnNo {
+    width: 130px;
+    height: 30px;
+}
+
+/* 1項目のサイズ */
+.detailboxLineInput > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineInput > span.spanLeft {
+    width: 46px;
+    height:30px;
+}
+/* 空白 最小 */
+.detailboxLineInput > span.span1 {
+    width: 24px;
+    height:30px;
+}
+
+/* ************************** */
+/* コンボボックス             */
+/* ************************** */
+/* 更新期間 */
+.divDdlArea select.ddlSelectOrgCode {
+    height: 32px;
+    width: 150px;
+    font-size: 14px;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea select.ddlSelectOrgCode:hover {
+    cursor: pointer;
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* ************************** */
+/* 選択                       */
+/* ************************** */
+/* 選択ボックス */
+div.singleInput > span {
+    display: block;
+}
+/* 選択ボックス */
+div.singleInput > .actionButtonBox {
+    padding-left: 0px;
+}
+/* 高さ指定 */
+.grc0001Wrapper ul {
+    column-gap: 8px;
+}
+
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label{
+    width: 142px;
+    height:32px;
+    margin: 0;
+    border: 1px solid #cfcfcf;
+    border-radius: 0;
+    box-sizing: border-box;
+    color: #333;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.detailboxLineInput > div.singleInput.right-harf.grc0001Wrapper {
+    width: 146px;
+    height:30px;
+}
+
+.grc0001Wrapper input[type=checkbox]:disabled + label,
+.grc0001Wrapper input[type=radio]:disabled + label{
+    background-image: none;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2bb6c1;
+}
+
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectBox {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    /*justify-content: center;*/
+    white-space: nowrap;
+}
+
+.divSelectItem {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    height: 30px;
+    border: 1px solid rgba(225, 225, 225, 1);
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+select.Width90,
+input[type=text].Width90,
+textarea.Width90 {
+    width: 90%;
+}
+
+/* ************************** */
+/* スプレッド                 */
+/* ************************** */
+/* リース一覧部 */
+.detailboxLineLeaseList {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 16px 16px;
+    box-sizing: border-box;
+    overflow: auto;
+    height:800px;
+}
+
+#spdLeaseList {
+    border-color: #cfcfcf !important;
+    background-color: #fff;
+    padding: 16px !important;
+}
+
+table#spdLeaseList_cht td.s0s0,
+table#spdLeaseList_viewport td.s0s1 {
+    background-color: #0f4493 !important;
+    border-top-color: #cfcfcf !important;
+    border-left-color: #cfcfcf !important;
+    border-right-color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf !important;
+}
+
+table#spdLeaseList_viewport td.s0s2,
+table#spdLeaseList_viewport td.s0s2 + td,
+table#spdLeaseList_viewport td.s0s3 {
+    background-color: #e1eeff !important;
+    border-top-color: #cfcfcf !important;
+    border-left-color: #cfcfcf !important;
+    border-right-color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf !important;
+}
+
+table#spdLeaseList_viewport td.s1s4,
+table#spdLeaseList_viewport td.s1s4 + td,
+table#spdLeaseList_viewport td.s1s5 {
+    border-top-color: #cfcfcf !important;
+    border-left-color: #cfcfcf !important;
+    border-right-color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf !important;
+}
+
+DIV[FpSpread='Spread'] div.GrayAreaContainer > div {
+    background-color: #fff !important;
+}

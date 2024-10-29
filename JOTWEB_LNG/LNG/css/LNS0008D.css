@@ -1,0 +1,180 @@
+﻿body {
+}
+
+input[type=text][readonly] {
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=text][readonly].disabledcalendarIcon:not(.iconOnly) {
+    padding-left: 0.3em;
+}
+
+input[type=text].disabledcalendarIcon {
+    padding-left: 25px;
+}
+
+
+.detailboxOnly {
+    min-width: 1125px;
+}
+
+.delAttachment {
+    font-weight: bold;
+    color: red;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.attachmentCell hr {
+    margin: 8px 0;
+    border: 0;
+    height: 1px;
+    background-color: #cfcfcf;
+}
+
+table.input {
+    background-color: #fff;
+    border-spacing: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 1102px;
+    margin: 0 auto;
+}
+
+    table.input > tbody > tr > th,
+    table.input > tbody > tr > td {
+        padding: 8px;
+        border: 1px solid #cfcfcf;
+    }
+
+        table.input > tbody > tr > th.top {
+            vertical-align: top;
+            padding-top: 10px;
+        }
+
+    table.input > tbody > tr > th {
+        background-color: #e1eeff;
+        font-size: 14px;
+    }
+
+    table.input col:nth-child(1) {
+        width: 140px;
+    }
+
+    table.input col:nth-child(2) {
+        width: 200px;
+    }
+
+    table.input col:nth-child(3) {
+        width: 140px;
+    }
+
+    table.input col:nth-child(4) {
+        width: 612px;
+    }
+
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label {
+    height: 30px;
+    margin: 0;
+    border: 1px solid #cfcfcf;
+    border-radius: 0;
+    color: #333;
+}
+
+.grc0001Wrapper.type input[type=radio] + label {
+    width: 160px;
+    margin: 0;
+    border-radius: 0;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.grc0001Wrapper.type ul {
+    width: 600px;
+    gap: 8px;
+}
+
+.grc0001Wrapper.flags ul {
+    width: 900px;
+    gap: 8px;
+}
+
+#TxtTitle {
+    width: 100%;
+    border-radius: 0;
+}
+
+table.input textarea {
+    width: calc(100% - 5px);
+    min-height: 30px !important;
+    height: 120px;
+    resize: vertical;
+    border-radius: 0;
+}
+
+.calendarIconArea div {
+    margin-top: 0px;
+}
+
+#TxtFromYmd,
+#TxtEndYmd {
+    width: 185px !important;
+    border-radius: 0;
+}
+/* 添付ファイル欄 */
+.uploadLine {
+    /* //line-height:30px;*/
+}
+/* ファイルドラッグのスタイル */
+div.fileDrag {
+    border: 2px dashed transparent;
+    border-radius: 5px;
+    margin: -3px;
+    padding: 3px;
+    position: relative;
+}
+
+div.fileDrag.dragging {
+    border: 2px dashed darkgray;
+    color: darkgray;
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+    /* background-color:rgba(0,0,0,0.5);*/ 
+    cursor: default;
+}
+
+div.fileDrag.dragging:after {
+    display: block;
+    width: calc(100% - 30px);
+    margin-left: -3px;
+    height: calc(100% - 30px);
+    border-radius: 5px;
+    text-shadow: 2px 2px 2px 2px black;
+    top: 0;
+    content: "ここにドロップ";
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: white;
+    position: absolute;
+    background-color: rgba(0,0,0,0.2);
+    text-align: center;
+    padding: 15px;
+    z-index: 3;
+}
+
+#fupAttachment {
+    display: none;
+}

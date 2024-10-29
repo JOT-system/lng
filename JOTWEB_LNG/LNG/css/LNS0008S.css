@@ -1,0 +1,62 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+/* 条件画面 チェックボックス */
+#ChkDelDataFlg {
+    vertical-align: text-bottom
+}
+
+.searchbox .inputBox {
+    width: 610px;
+}
+
+.searchbox .inputItem:nth-of-type(3) a#WF_Test {
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.grc0001Wrapper ul {
+    width: 580px;
+    gap: 8px;
+}
+
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label {
+    width: 125px;
+    border: 1px solid #cfcfcf;
+    color: #333;
+    margin-right: 0;
+    margin-bottom: 0;
+    height: 32px;
+    border-radius: 6px;
+}
+
+.grc0001Wrapper input[type=checkbox]:not(:disabled) + label:hover,
+.grc0001Wrapper input[type=radio]:not(:disabled) + label:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label,
+.grc0001Wrapper input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.grc0001Wrapper input[type=checkbox]:checked + label:before,
+.grc0001Wrapper input[type=radio]:checked + label:before {
+    color: #0d6efd;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG label {
+    padding-top: 1px;
+}

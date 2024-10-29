@@ -1,0 +1,78 @@
+﻿input[type=text][readonly] {
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=text][readonly].disabledboxIcon:not(.iconOnly) {
+    padding-left: 0.3em;
+}
+
+input[type=text].disabledboxIcon {
+    padding-left: 25px;
+}
+
+#WF_EXCEPTION_PANEL {
+    margin-TOP: 5px;
+    font-weight: bold;
+    font-size: 16pt;
+    border-style: ridge;
+    border-radius: 5px;
+}
+
+#WF_EXCEPTION_PANEL div[id^=detailkeybox1] {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 0.7em;
+}
+
+/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+#detailkeybox1 p[id^=KEY_LINE_] > span > :nth-child(3n+2) {
+    display: inline-block;
+    width: 175px;
+}
+
+#WF_EXCEPTION_L {
+    padding-left: 0.4em;
+}
+
+input[type=Date],
+textarea {
+    font-size: 16px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    ime-mode: inactive;
+    color: #404040;
+    padding: 6px 4px 6px 4px;
+    border-color: skyblue;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
+    margin-left:-28px;
+}
+
+    input[type=Date]:hover,
+    textarea:hover {
+        background-image: linear-gradient(0deg, #B0C4DE, #B0C4DE);
+        border-color: #2c628b;
+    }
+
+    input[type=Date]:focus,
+    textarea:focus {
+        border-color: rgba(1,60,65, .5);
+        background-image: none;
+        outline: none;
+    }
+
+    input[type=Date][disabled]:hover,
+    textarea[disabled]:hover {
+        background-image: none;
+        border-color: skyblue;
+        box-shadow: none;
+    }
+
+.ddlSelectControl {
+    height: 30px;
+    width: 120px;
+    font-size: 12pt;
+    padding: 2px;
+}

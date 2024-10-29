@@ -1,0 +1,52 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+
+/* ************************** */
+/* ドロップダウンリスト       */
+/* ************************** */
+
+/* 明細入力欄の項目名(ラベル) ------------------------------------------------------------------ */
+/* ラベル行 */
+.detailboxLineLabel {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    height: 26px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄の項目名(ラベル用のspan) ----------------------------------------------------------- */
+/* 1項目のサイズ */
+.detailboxLineLabel > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 空白 最小 */
+.detailboxLineLabel > span.span1 {
+    width: 17px;
+    height:24px;
+}
+/* 年月 */
+.detailboxLineLabel > div.divKeijoYM {
+    width:111px;
+    height: 24px;
+}
+/* 年月 */
+input.txtDownloadMonth {
+    width: 180px;
+    color: black;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+}
+
+#WF_YM_LABEL {
+    font-weight: bold;
+}
+
+#pnlDetailboxLine2.detailboxLineInput {
+    margin-bottom: 14px;
+}

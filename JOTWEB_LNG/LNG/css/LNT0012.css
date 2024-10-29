@@ -1,0 +1,83 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+.searchbox .inputBox {
+    max-width: 760px;
+    width: 100%;
+}
+
+/* ************************** */
+/* ドロップダウンリスト       */
+/* ************************** */
+/* 帳票名 */
+.divDdlArea select.ddlSelectReport {
+    font-size: 12pt;
+    padding: 2px;
+}
+.searchbox .inputItem a:nth-child(2) select {
+    height: 35px;
+    width: calc(100%) !important;
+    font-size: 16px;
+    border-color: #cfcfcf;
+}
+
+.searchbox .inputItem2 a:nth-child(1),
+.searchbox .inputItem2 a:nth-child(2),
+.searchbox .inputItem2 a:nth-child(3) {
+    display: block;
+    text-align: left;
+    width: 180px;
+}
+
+#WF_FISCALYEAR {
+    width: 80px;
+    text-align: right;
+}
+
+#WF_PERIODTYPE_DDL {
+    width: 120px;
+    height: 30px;
+    font-size: 16px;
+    border-color: #cfcfcf;
+}
+
+#WF_FROM {
+    width: 140px;
+}
+
+#WF_PERIOD {
+    font-size: 25px;
+    width: 30px;
+}
+
+#WF_TO {
+    width: 140px;
+}
+#TxtToriCode,
+#hdnSelectTori {
+    display: none;
+}
+
+#WF_ACCOUNTINGASSETSKBN_DDL {
+    width: 180px;
+    height: 35px;
+    font-size: 16px;
+    border-color: #cfcfcf;
+}
+
+#LblPayeeName {
+    width: 100%;
+    border: none;
+    text-align: left;
+    vertical-align: middle;
+    overflow: hidden;
+    margin-top: 2px;
+    padding: 0;
+    pointer-events: none;
+    background: transparent;
+}
+
+.searchbox .inputItem a:nth-child(1) {
+    font-size: 14px;
+}

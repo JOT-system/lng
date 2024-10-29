@@ -1,0 +1,138 @@
+﻿#divContensbox{
+    background-color: #f3f3f3;
+}
+
+#detailbuttonbox {
+    margin: 0 16px;
+    padding: 8px 0;
+}
+
+.actionButtonBox {
+    width: auto;
+}
+
+.headerbox {
+    width: calc(100% - 32px);
+    margin: 0 16px;
+}
+
+.searchcondbox {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+}
+
+div#WF_SELECT_ITEM_AREA {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 16px;
+}
+
+div#WF_SELECT_ITEM_AREA > .WF_TEXT_CENTER {
+    padding-top: 4px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.WF_DROPDOWNLIST {
+    display: inline-block;
+    width: 80px;
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid #cfcfcf;
+    font-size: 16px;
+    outline: none;
+}
+
+.WF_DROPDOWNLIST:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+div#WF_SELECT_ITEM_AREA > label {
+    padding-top: 4px;
+    font-weight: bold;
+}
+
+div#WF_SELECT_ITEM_AREA > label + .WF_TEXT_CENTER {
+    margin-left: 16px;
+}
+
+#TxtKeijoOrgName {
+    height: 32px;
+    border-radius: 0;
+}
+
+div#WF_SELECT_ITEM_AREA > .btn-sticky {
+    height: 32px;
+    font-size: 16px;
+}
+
+#TxtKeijoOrgCd,
+#WF_ButtonEND {
+    display: none;
+}
+
+.headerbox + .WF_TEXT_CENTER {
+    display: block;
+    margin: 16px 16px 0;
+    padding: 16px 16px 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    background-color: #fff;
+    border-top: 1px solid #cfcfcf;
+    border-left: 1px solid #cfcfcf;
+    border-right: 1px solid #cfcfcf;
+}
+
+/* ************************** */
+/* スプレッドシート           */
+/* ************************** */
+.divSpreadArea {
+    margin: 0 16px 0 0;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.spreadStyle {
+    margin: 0 0 0 16px !important;
+    padding: 0 0 0 16px !important;
+    display: inline-block;
+    text-align: left;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-top: none !important;
+    border-color: #cfcfcf !important;
+}
+
+table#FpSpread1_cht {
+    border-left-color: #cfcfcf !important;
+}
+
+table#FpSpread1_cht td.s0s0,
+table#FpSpread1_viewport td.s0s1,
+table#FpSpread1_viewport td.s0s2,
+table#FpSpread1_viewport td.s1s3 {
+    border-right-color: #cfcfcf !important;
+    border-top-color: #cfcfcf !important;
+    border-bottom-color: #cfcfcf !important;
+}
+table#FpSpread1_cht td.s0s0,
+table#FpSpread1_viewport td.s0s1 {
+    background-color: #0f4493 !important;
+    border-left-color: #e1eeff !important;
+}
+table#FpSpread1_viewport td.s0s2 {
+    background-color: #e1eeff !important;
+}
+
+#FpSpread1_colHeader {
+    width: 100% !important;
+}
+
+#FpSpread1_view {
+    width: 100% !important;
+    height: 380px !important;
+}

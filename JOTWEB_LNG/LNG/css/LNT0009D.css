@@ -1,0 +1,134 @@
+﻿input[type=text] {
+    border-radius: 0;
+}
+
+#divContensbox {
+    background-color: #f3f3f3;
+    overflow: hidden;
+}
+
+.detailfield {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    padding: 16px 16px 8px;
+}
+
+.detailBoxArea {
+    margin: 0 16px 16px;
+}
+
+/* 項目名欄(n行目の入力欄の1,3,5,7・・・列に適用するスタイル) */
+.detailBoxArea > .detailfield > p[id^=ITEM_LINE_] > span > :nth-child(2n+1) {
+    display: inline-block;
+    width: 10em;
+}
+.detailBoxArea > .detailfield > p[id^=ITEM_LINE_] > span:nth-child(2) > span:first-child {
+    padding-left: 20px;
+}
+
+/* 入力欄(n行目の入力欄の2,4,6,8・・・列に適用するスタイル) */
+.detailBoxArea > .detailfield > p[id^=ITEM_LINE_] > span > :nth-child(2n+2) {
+    display: inline-block;
+    width: 10em;
+}
+
+.WF_TEXT_CENTER {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.flexible > span {
+    box-sizing: border-box;
+}
+
+.detailBoxArea > .detailfield > p[id^=ITEM_LINE_] {
+    margin-bottom: 8px;
+}
+
+.contractPeriod {
+    text-align: center;
+}
+
+.middleTextBox {
+    width: 10em;
+}
+
+.SmallTextBox {
+    height: 32px;
+    width: 5em;
+    background-color: #f3f3f3;
+}
+
+.middleTextBox,
+.LongTextBox {
+    height: 32px;
+    background-color: #f3f3f3;
+}
+
+.LeftAlignBox {
+    text-align: right;
+}
+
+/* ************************** */
+/* スプレッドシート           */
+/* ************************** */
+.detaildatabox {
+    height: calc(100vh - 46px - 45px - 226px - 28px);
+    margin: 0 16px;
+}
+
+.divSpreadArea {
+    height: 100%;
+}
+
+.spreadStyle {
+    height: 98%;
+    width: 100%;
+    display: inline-block;
+    text-align: left;
+    background-color: #fff;
+    border-color: #cfcfcf !important;
+}
+
+table#FpSpread1_cht {
+    border-width: 0 !important;
+}
+
+table#FpSpread1_cht td.s0s0,
+table#FpSpread1_cht td.s0s1,
+table#FpSpread1_cht td.s0s2,
+table#FpSpread1_viewport td.s0s3,
+table#FpSpread1_viewport td.s0s4,
+table#FpSpread1_viewport td.s84s6 {
+    border-left-width: 0 !important;
+    border-top-width: 0 !important;
+    border-right-color: #cfcfcf;
+    border-bottom-color: #cfcfcf;
+}
+table#FpSpread1_cht td.s0s0,
+table#FpSpread1_cht td.s0s1,
+table#FpSpread1_cht td.s0s2 {
+    background-color: #0f4493 !important;
+    color: #fff !important;
+}
+
+table#FpSpread1_viewport td.s10s5 {
+    border-left-width: 0 !important;
+    border-top-color: #cfcfcf;
+    border-right-color: #cfcfcf;
+    border-bottom-color: #cfcfcf;
+}
+
+table#FpSpread1_viewport tr {
+    border-right: 1px solid #cfcfcf;
+}
+
+table#FpSpread1_viewport tr:not(:last-child):nth-child(odd) >  td.s0s3,
+table#FpSpread1_viewport tr:not(:last-child):nth-child(odd) >  td.s10s5 {
+    background-color: #e1eeff !important;
+}
+
+table#FpSpread1_viewport tr:last-child td {
+    background-color: #ba256c !important;
+    color: #fff;
+}

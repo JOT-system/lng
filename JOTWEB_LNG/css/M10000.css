@@ -1,0 +1,154 @@
+﻿.logonbox {
+    width: 100%;
+    min-width: 400px;
+    height: 100%;
+    min-height:430px;
+    background-color: #f3f3f3;
+}
+
+.Operation {
+    /*   width: 350px; */
+    margin: 0 auto 0 auto;
+    position: relative;
+    z-index: 20;
+    height: 3em;
+}
+
+.logonkeybox {
+    width: 300px;
+    padding-top: 32px;
+    margin-right: auto;
+    margin-bottom: 0px;
+    margin-left: auto;
+}
+
+.logonkeybox .LINE_1 {
+    margin-bottom: 24px;
+}
+.logonkeybox .LINE_2 {
+    margin-bottom: 32px;
+}
+
+.logonkeybox span {
+    position: relative;
+    width: 80%;
+}
+
+.guidanceboxWrapper {
+    display: block;
+    width: 650px;
+    min-width: 350px;
+    height : 160px;
+    background-color: white;
+    margin: 60px auto 0;
+    padding: 24px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+    overflow-y: auto;
+}
+@media screen and (max-width: 767px) {
+    .guidanceboxWrapper {
+        width: auto;
+        margin: 60px 3vw 0;
+    }
+}
+#guidanceTitle {
+    word-spacing :2px;
+    font-weight:bold;
+    font-size:16px;
+}
+.ulGuidance {
+    display:flex;
+    flex-wrap:wrap;
+    list-style-type :none;
+    margin:1em 0 0;
+}
+.ulGuidance li{
+    display:flex;
+    width:100%;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+.ulGuidance li div.titleLine {
+    width:100%;
+    display:flex;
+    flex-wrap:nowrap;
+    line-height :18px;
+}
+.ulGuidance li div.entryDate {
+    width: 90px;
+}
+.ulGuidance li div.title {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    word-break:normal;
+    white-space :nowrap;
+    width:calc(100% - 90px);
+    font-weight:bold;
+}
+.ulGuidance li div.otherLine {
+    margin-left:90px;
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+}
+.ulGuidance li div.naiyo {
+    word-break:break-all;
+    margin-right:10px;
+}
+#OK {
+    /* input要素全部に対して装飾 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px; /* 角丸 */
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #0d6efd;
+    outline:none;
+    border:none;
+}
+
+#OK:hover {
+    /* マウスが上に載ったとき */
+    background-color: #589cff;
+}
+
+#OK:active {
+    /* 押されたとき */
+    background-color: #589cff;
+}
+
+#LogInImage {
+    margin-bottom: 32px;
+}
+
+#WF_LOGO {
+    display: block;
+    width: 70px;
+    height: 30px;
+    margin: 0 auto;
+}
+
+.Waku {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+/* ------------------------------
+    リニューアル
+------------------------------ */
+body {
+    background-color: #f3f3f3;
+}
+
+.LINE_1 span,
+.LINE_2 span{
+    font-size: 12px;
+}
+.LINE_1 span input,
+.LINE_2 span input {
+    margin-top: 5px;
+}

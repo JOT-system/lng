@@ -1,0 +1,353 @@
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+input[type=text] {
+    height: 2.2em;
+    left:0px;
+    font-size: 14.5px;
+    box-sizing: border-box;
+    padding-top:1px;
+    padding-left:0px;
+    padding-bottom:1px;
+    text-align: left;
+}
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+#divContensbox{
+    overflow: hidden;
+    background-color: #f3f3f3;
+}
+
+.actionButtonBox {
+    width: auto;
+    margin: 0 16px;
+    padding: 8px 0;
+}
+
+/* ************************** */
+/* ボタンの設定 */
+/* ************************** */
+/* 各ヘッダのボタン */
+.detailboxLineInput .btn-sticky {
+    width: 115px;
+    height: 32px;
+    padding: 0 5px;
+}
+
+/* 明細のボタン */
+.btn-stickyDetail {
+    text-decoration: none;
+    height: 30px;
+    width: 60%;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    background-color: #fff;
+    border: solid 1px #cfcfcf;
+    border-radius: 6px;
+    font-size: 14px;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+    vertical-align: middle;
+}
+
+.btn-stickyDetail:not(:disabled):hover {
+    border-color: #0d6efd;
+    background-color: #e1eeff;
+    color: #0d6efd;
+}
+
+.btn-stickyDetail:disabled {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+
+/* ************************** */
+/* 明細入力欄の全体の設定 */
+/* ************************** */
+#detailbox {
+    background-color: #f3f3f3;
+    position: relative;
+}
+
+/* 空白行 */
+.detailboxLineBlank {
+    display: flex;
+    flex-wrap: wrap;
+    height: 16px;
+    box-sizing: border-box;
+    text-overflow: ellipsis; /* 領域越を点々表示 */
+}
+
+/* 明細入力欄(INPUT)  -------------------------------------------------------------------------- */
+/* 明細入力欄 */
+.detailboxLineInput {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    margin: 0 16px;
+    padding: 16px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.detailboxLineInput .divLblAction {
+    font-weight: bold;
+}
+
+.detailboxLineInput a#btnArea {
+    display: flex !important;
+    column-gap: 8px;
+}
+
+/* 1項目のサイズ */
+.detailboxLineInput > span {
+    display:inline-block;
+    margin:1px;
+}
+/* 左位置を合わせる用の空白 */
+.detailboxLineInput > span.spanLeft {
+    width: 46px;
+    height:30px;
+}
+/* 空白 最小 */
+.detailboxLineInput > span.span1 {
+    width: 17px;
+    height:30px;
+}
+
+/* タイトル用 */
+.pnlSubTitle {
+    background: rgb(149,179,215);
+    color: rgb(0, 32, 96);
+    margin-TOP: 5px;
+    font-weight: bold;
+    font-size: 16pt;
+    border-radius: 5px;
+    width: 95%;
+}
+
+/* ************************** */
+/* スプレッド                 */
+/* ************************** */
+/* 明細一覧部(一覧用) */
+.detailboxLineList {
+    display: flex;
+    height: 464px;
+    margin: 0 16px;
+    box-sizing: border-box;
+}
+
+/* スプレッド */
+.spreadStyle {
+    display: flex;
+    flex-wrap: nowrap;
+    height: auto;
+    background-color: white;
+}
+
+table#spdDetailList_viewport0 td.s0s0,
+table#spdDetailList_viewport2 td.s2s1,
+table#spdDetailList_viewport2 td.s2s3,
+table#spdDetailList_viewport2 td.s81s7 {
+    background-color: #0f4493 !important;
+    color: #fff;
+    font-weight: bold;
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport1 td.s0s1,
+table#spdDetailList_viewport1 td.s1s2 {
+    background-color: #0f4493 !important;
+    color: #fff;
+}
+
+table#spdDetailList_viewport2 td.s51s2,
+table#spdDetailList_viewport2 td.s64s4 {
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s52s3,
+table#spdDetailList_viewport2 td.s52s5 {
+    background-color: #e1eeff !important;
+    text-align: center !important;
+    font-weight: bold;
+}
+
+table#spdDetailList_viewport2 td.s7s3 {
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s51s4,
+table#spdDetailList_viewport2 td.s64s6 {
+    font-weight: bold;
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s53s5 {
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s6s2,
+table#spdDetailList_viewport td.s9s7 {
+    background-color: #0f4493 !important;
+    font-weight: bold;
+    color: #fff;
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s51s3,
+table#spdDetailList_viewport2 td.s64s5 {
+    font-weight: bold;
+    text-align: center !important;
+}
+
+table#spdDetailList_viewport2 td.s52s4 {
+    background-color: #e1eeff !important;
+    text-align: center !important;
+    font-weight: bold;
+}
+
+/* ************************** */
+/* 受託人検索               */
+/* ************************** */
+#pnlTrusteeSrcWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlTrusteeSrcArea {
+    /*height: 80%;*/
+    width: 55%;
+    margin-top: 60px;
+    margin-left: 20px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 5px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+#divTrusteeSrcHead {
+    position: relative;
+    left: 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.divTrusteeSrcHeadLeft {
+    display: flex;
+    width: 230px;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 10px;
+}
+
+.divTrusteeSrcHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 90px;
+    width: 185px;
+}
+
+.divTrusteeSrcHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 185px;
+}
+
+
+#divTrusteeSrcButtonArea {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+
+#btnTrusteeSrcCLOSE {
+    position: relative;
+    /*left: 294px;*/
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 100%;
+    width: 100px;
+}
+
+#divTrusteeSrcBody {
+    position: relative;
+    top: 0px;
+    left: 5px;
+    width: 85%;
+    height: 450px;
+    align-items: center;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1);
+}
+
+#pnlTrusteeSrc {
+    position: relative;
+    top: 10px;
+    /*left: 20px;*/
+    width: 97%;
+    height: 90%;
+}
+
+    #pnlTrusteeSrc td, #pnlTrusteeSrc th {
+        white-space: nowrap; /* 折り返させない */
+        text-overflow: ellipsis; /* 領域越を点々表示 */
+        font-size: 10pt;
+    }
+
+/* 受託人一覧部 */
+.detailboxLineTrusteeSrc {
+    display: flex;
+    flex-wrap: wrap;
+    width: 955px;
+    height: 435px;
+    padding-left: 46px;
+    box-sizing: border-box;
+}

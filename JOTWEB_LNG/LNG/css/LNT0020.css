@@ -1,0 +1,27 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+/* ************************** */
+/* ドロップダウンリスト       */
+/* ************************** */
+.DdlAccount  {
+    width: 150px;
+    font-size: 16px;
+    height: 35px;
+    border-color: #cfcfcf;
+}
+.Year  {
+    width: 75px;
+}
+
+#WF_FROM {
+    width: 140px;
+}
+#WF_PERIOD {
+    font-size: 25px;
+    width: 30px;
+}
+#WF_TO {
+    width: 140px;
+}

@@ -1,0 +1,8 @@
+﻿/* 条件画面 チェックボックス */
+#ChkDelDataFlg {
+    vertical-align: text-bottom
+}
+#WF_TORICODE,
+#WF_CLIENTCODE {
+    width: 200px;
+}

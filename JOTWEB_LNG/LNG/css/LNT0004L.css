@@ -1,0 +1,737 @@
+﻿/* ************************** */
+/* 支店・エリア・駅選択       */
+/* ************************** */
+#pnlDdlArea {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+}
+
+/* ドロップダウンリスト */
+.divDdlArea {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.divDdlAreaLeft,
+.divDdlAreaMiddle,
+.divDdlAreaRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.divDdlAreaLeft b:nth-child(1),
+.divDdlAreaRight b:nth-child(1){
+    margin-top:1px;
+}
+
+.divDdlArea select.ddlSelect {
+    height: 32px;
+    width: 200px;
+    font-size: 16px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+/* ************************** */
+/* タイトルエリア             */
+/* ************************** */
+#pnlTitle {
+    background: #0f4493;
+    color: #fff;
+    height: 40px;
+    margin: 0 16px;
+    padding: 0 16px;
+    display: flex;
+}
+
+.divTitleLeft {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.divTitleRight {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btnTitleRefresh {
+    display: flex;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    user-select: none;
+    overflow: hidden;
+    position: relative;
+}
+
+.btnTitleRefresh:hover {
+    cursor: pointer;
+}
+
+.btnTitleRefresh:hover .btnRefreshImg {
+    animation: 3s linear infinite rotationIcon;
+}
+
+/* 再描画ボタンアイコン */
+.btnRefreshImg {
+    width: 100%;
+    height: 100%;
+    background: url('../img/google_font_icon_refresh.svg') no-repeat center center;
+    background-size: 24px 24px;
+    position: absolute;
+}
+
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectFrame {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    border-left: 1px solid #cfcfcf;
+    background-color: #fff;
+    margin: 0 16px;
+    padding: 24px 0 8px 16px;
+    overflow-x: auto;
+}
+
+.selectBox {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.divSelectItem {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    margin-left: 32px;
+}
+
+.divSelectItem2 {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-left: 16px;
+}
+
+.divSelectItem3 {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-left: 249px;
+}
+
+    /* 各入力ボックス(名称） */
+    .divSelectItem a:nth-child(1),
+    .divSelectItem2 a:nth-child(1),
+    .divSelectItem3 a:nth-child(1) {
+        text-align: left;
+        width: 100%;
+    }
+
+.divListItem input[type=checkbox],
+.divListItem input[type=radio] {
+    display: none;
+}
+
+.divListItem input[type=checkbox] + label,
+.divListItem input[type=radio] + label {
+    display: flex;
+    width: 88px;
+    height: 32px;
+    padding: 3px 8px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #cfcfcf;
+    font-weight: bold;
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+
+.divListItem input[type=checkbox]:checked + label,
+.divListItem input[type=radio]:checked + label {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.divListItem input[type=checkbox]:checked + label:before,
+.divListItem input[type=radio]:checked + label:before {
+    position: absolute;
+    left: 2px;
+    content: "✔";
+    color: #0d6efd;
+}
+
+.divListItem input[type=checkbox]:not(:disabled) + label:hover,
+.divListItem input[type=radio]:not(:disabled) + label:hover {
+    cursor: pointer;
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.divListItem {
+    display: flex;
+    align-items: center;
+}
+
+.divListItem ul {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-left: 8px;
+}
+
+.grc0001Settings {
+    display: none;
+}
+
+.divBtnRight {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    padding-right: 16px;
+}
+
+.divBtnArea {
+    padding-left: 8px;
+}
+
+#btnsearch,
+#btnreset,
+#btnall,
+#btnclear {
+    width: 100px;
+    height: 32px;
+}
+#btnsearch,
+#btnreset,
+#btnall {
+    background-color: #0d6efd;
+    border: solid 1px #0d6efd;
+    color: #fff;
+}
+#btnsearch:hover,
+#btnreset:hover,
+#btnall:hover {
+    background-color: #589cff;
+    border: solid 1px #589cff;
+}
+
+
+/* 積空区分 */
+/* 選択ボックス */
+div.singleInput > span {
+    display: block;
+}
+/* 選択ボックス */
+div.singleInput > .actionButtonBox {
+    padding-left: 0px;
+}
+/* 高さ指定 */
+.grc0001Wrapper input[type=checkbox] + label,
+.grc0001Wrapper input[type=radio] + label{
+    margin: 0;
+}
+
+/* 積空区分 */
+.grc0001Wrapper ul[id='WF_STACKFREEKBNLIST_chklGrc0001SelectionBox'] {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    margin-left: 0;
+}
+
+
+/* ************************** */
+/* 日付選択エリア             */
+/* ************************** */
+.pnlSelectDateArea {
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+.divSelectDateHead {
+    display: flex;
+    align-items: center;
+    font-size: 14pt;
+    margin-bottom: 8px;
+}
+
+.divSelectDateHeadLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+    .divSelectDateHeadLeft > span {
+        width: 25%;
+        box-sizing: border-box;
+    }
+
+.divSelectDateHeadMiddle {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.divSelectDateHeadRight {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    left: 450px;
+}
+
+#txtDateStart,
+#txtDateEnd {
+    height: 30px;
+    font-size: 12px;
+}
+
+/* 表示ボタンを配置する箱 */
+.divSelectDateButton {
+    box-sizing: border-box;
+    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    align-items: center;
+}
+    /* 左寄せの箱 */
+    .divSelectDateButton .leftSide {
+        box-sizing: border-box;
+        margin-right: 2px;
+    }
+    /* 右寄せの箱 */
+    .divSelectDateButton .rightSide {
+        margin-left: auto; /* 右に寄せる為マージンで埋める */
+        box-sizing: border-box;
+    }
+
+#btnDisplay {
+    position: relative;
+    margin-left: 5px;
+    height: 30px;
+    box-sizing: border-box;
+    width: 100px;
+}
+
+/* ************************** */
+/* 明細エリア                 */
+/* ************************** */
+#pnlDetailArea {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 0 16px;
+    height: calc(100vh - 300px);
+}
+@media screen and (767px) {
+    #pnlDetailArea {
+        padding: 0 3vw;
+    }
+}
+
+/* ************************** */
+/* 地図エリア                 */
+/* ************************** */
+#pnlMapArea {
+    position: relative;
+    width: 302px;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background-color: white;
+}
+@media screen and (max-width: 1000px) {
+    #pnlMapArea {
+        display: none;
+    }
+}
+/* 地図（共通） */
+.pnlMapImg0,
+.pnlMapImg1,
+.pnlMapImg2,
+.pnlMapImg4,
+.pnlMapImg5,
+.pnlMapImg6,
+.pnlMapImg7 {
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 100% auto;
+    width: 100%;
+    height: 336px;
+}
+/* 地図（全支店） */
+.pnlMapImg0 {
+    background-image: url('../img/map_japan_0.png');
+}
+/* 地図（北海道支店） */
+.pnlMapImg1 {
+    background-image: url('../img/map_japan_1.png');
+}
+/* 地図（東北支店） */
+.pnlMapImg2 {
+    background-image: url('../img/map_japan_2.png');
+}
+/* 地図（関東支店） */
+.pnlMapImg4 {
+    background-image: url('../img/map_japan_4.png');
+}
+/* 地図（関西支店） */
+.pnlMapImg5 {
+    background-image: url('../img/map_japan_5.png');
+}
+/* 地図（中部支店） */
+.pnlMapImg6 {
+    background-image: url('../img/map_japan_6.png');
+}
+/* 地図（九州支店） */
+.pnlMapImg7 {
+    background-image: url('../img/map_japan_7.png');
+}
+
+.btnMap {
+    width: auto;
+    height: auto;
+    color: black;
+    border: none;
+    outline: none;
+    background: transparent; /* 背景の灰色を消す */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: absolute;
+    font-weight: bold;
+}
+
+/* 北海道支店 */
+#btnDiv01 {
+    top: 55px;
+    left: 200px;
+}
+/* 東北支店 */
+#btnDiv02 {
+    top: 146px;
+    left: 183px;
+}
+/* 関東支店 */
+#btnDiv04 {
+    top: 228px;
+    left: 152px;
+}
+/* 中部支店 */
+#btnDiv05 {
+    top: 260px;
+    left: 126px;
+}
+/* 関西支店 */
+#btnDiv06 {
+    top: 266px;
+    left: 65px;
+}
+/* 九州支店 */
+#btnDiv07 {
+    top: 306px;
+    left: 3px;
+}
+
+/* ************************** */
+/* グリッドエリア             */
+/* ************************** */
+.divGridAreaDiv {
+    display: flex;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-left: 1px solid #cfcfcf;
+}
+
+#pnlGridArea {
+    width: calc(100vw - 302px - 8px);
+    padding: 8px;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background-color: #fff;
+    overflow: scroll;
+}
+@media screen and (max-width: 1000px) {
+    #pnlGridArea {
+        width: 100%;
+    }
+}
+
+.divGridAreaHead {
+    display: flex;
+    border-left: 1px solid #cfcfcf;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.lblText {
+    display: block;
+    text-align: center;
+}
+
+.divGridAreaTitle1,
+.divGridAreaTitle2A,
+.divGridAreaTitle2B,
+.divGridAreaTitle2C {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    height: 26px;
+    position: relative;
+    border-right: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    background: #0f4493;
+    color: #fff;
+    text-align: center;
+}
+.divGridAreaTitle1 {
+    width: 320px;
+}
+.divGridAreaTitle2A,
+.divGridAreaTitle2B {
+    width: 200px;
+}
+.divGridAreaTitle2C {
+    width: 124px;
+}
+
+.divGridAreaDetail1,
+.divGridAreaDetail2,
+.divGridAreaDetail3A,
+.divGridAreaDetail3B,
+.divGridAreaDetail3C {
+    position: relative;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+    box-sizing: border-box;
+}
+.divGridAreaDetail1 {
+    display: flex;
+    height: 72px;
+    width: 320px;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 16px;
+    border-top: 1px solid #cfcfcf;
+}
+.divGridAreaDetail2 {
+    width: 76px;
+    height: 72px;
+    border-top: 1px solid #cfcfcf;
+    text-align: center;
+    flex-shrink: 0;
+}
+.divGridAreaDetail3A,
+.divGridAreaDetail3B,
+.divGridAreaDetail3C {
+    width: 124px;
+    height: 24px;
+}
+.divGridAreaDetail3A {
+    background-color: #ffe3e3;
+}
+.divGridAreaDetail3B {
+    background-color: #e1eeff;
+}
+.divGridAreaDetail3C {
+    background-color: #e4f9eb;
+    border-top: 1px solid #cfcfcf;
+}
+
+.divGridAreaDetail4A,
+.divGridAreaDetail4B,
+.divGridAreaDetail4C {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    width: 100%;
+    height: 24px;
+    position: relative;
+    box-sizing: border-box;
+    text-align: center;
+}
+.divGridAreaDetail4A {
+    color: #822424;
+}
+.divGridAreaDetail4B {
+    color: #2544b2;
+}
+.divGridAreaDetail4C {
+    color: #185429;
+}
+
+.divGridAreaHead:not(:first-of-type) .divGridAreaDetail1,
+.divGridAreaHead:not(:first-of-type) .divGridAreaDetail2,
+.divGridAreaHead:not(:first-of-type) .divGridAreaDetail3C {
+    border-top: none;
+}
+.divGridAreaHead > div:last-child {
+    padding-right: 16px;
+}
+
+.txtQtyA {
+    width: 80px;
+    height: 20px;
+    text-align: right;
+    border: none !important;
+    box-sizing: border-box;
+    border-radius: 0px !important;
+    margin-top: -1px;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    background-color: transparent !important;
+    color: #822424 !important;
+    font-weight: bold !important;
+    font-size: 10pt !important;
+}
+
+.txtQtyB {
+    width: 80px;
+    height: 20px;
+    text-align: right;
+    border: none !important;
+    box-sizing: border-box;
+    border-radius: 0px !important;
+    margin-top: -1px;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    background-color: transparent !important;
+    color: #2544b2 !important;
+    font-weight: bold !important;
+    font-size: 10pt !important;
+}
+
+.txtQtyC {
+    width: 80px;
+    height: 20px;
+    text-align: right;
+    border: none !important;
+    box-sizing: border-box;
+    border-radius: 0px !important;
+    margin-top: -1px;
+    margin-left: -1px;
+    margin-bottom: -1px;
+    background-color: transparent !important;
+    color: #185429 !important;
+    font-weight: bold !important;
+    font-size: 10pt !important;
+}
+
+/* ************************** */
+/* 共通エリア                 */
+/* ************************** */
+/* カレンダーアイコンの位置 */
+.calendarIconArea {
+    top: -4px;
+}
+
+/* 各表ヘッダのボタン */
+/*.btn-sticky {
+    font-size: 100%;
+    width: 100%;
+    height: 100%;
+    padding-left: 5px;
+    padding-right: 5px;
+    outline: none;
+}*/
+
+.spreadStyle {
+    display: none;
+    height: 50%;
+    overflow: auto;
+}
+
+/* 駅コード・名称 */
+.divDdlAreaStation{
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    box-sizing: border-box;
+    width: 390px;
+}
+
+/* 駅コード */
+input.txtStationCode { 
+    height: 32px;
+    width:  80px;
+    margin-left: 8px;
+    font-size: 16px;
+    vertical-align: middle;
+    text-align: right;
+    overflow: hidden;
+    border-radius: 0;
+    flex-shrink: 0;
+}
+
+/* 駅名称 */
+.LblStationName {
+    text-align: left;
+    font-size: 16px;
+    color: #737373;
+    margin-left: 5px;
+}
+
+/* 駅コードの注意書き */
+.divLblStationNote {
+    position: absolute;
+    top: -21px;
+    left: 0;
+    font-size: 12px;
+    color: #de0000;
+}
+
+.ui-multiselect {
+    border-color: #cfcfcf;
+    border-radius: 0;
+    height: 32px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    color: #333;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.ui-state-default .ui-icon {
+    margin-top: 4px;
+}

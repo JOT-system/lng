@@ -1,0 +1,13 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.searchbox .inputItem a#WF_DELDATAFLG label {
+    padding-top: 1px;
+}

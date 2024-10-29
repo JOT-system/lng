@@ -1,0 +1,104 @@
+﻿body {
+}
+
+.flexible {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flexible > span {
+    width: 33%;
+    box-sizing: border-box;
+}
+
+#detailkeybox input[type='text'] {
+    width: 100% !important;
+    height: 38px;
+    font-size: 14px;
+}
+
+input[type=text][readonly] {
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=text][readonly].disabledboxIcon:not(.iconOnly) {
+    padding-left: 0.3em;
+}
+
+input[type=text].disabledboxIcon {
+    padding-left: 25px;
+}
+
+#detailkeybox p[id^=KEY_LINE_] > span {
+    display: inline-block;
+    /* min-width:400px; */
+    margin-bottom: 5px;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=KEY_LINE_] > span > :nth-child(1) {
+    display:inline-block;
+    width:21em;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=KEY_LINE_] > span > :nth-child(2) {
+    display:inline-block;
+    max-width: 122px;
+    font-size: 14px;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=KEY_LINE_] > span > :nth-child(3) {
+    display:inline-block;
+    width:14em;
+}
+
+#detailkeybox p[id^=DATA_LINE_] > span {
+    display: inline-block;
+    /* min-width:400px; */
+    margin-bottom: 5px;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(1) {
+    display:inline-block;
+    width:21em;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(2) {
+    display:inline-block;
+    max-width: 122px;
+    font-size: 14px;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(3) {
+    display:inline-block;
+    width:5em;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(4) {
+    display:inline-block;
+    width:14em;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(5) {
+    display:inline-block;
+    max-width: 122px;
+    font-size: 14px;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(6) {
+    display:inline-block;
+    width:5em;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(7) {
+    display:inline-block;
+    width:12em;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=DATA_LINE_] > span > :nth-child(8) {
+    display:inline-block;
+    max-width: 122px;
+    font-size: 14px;
+}

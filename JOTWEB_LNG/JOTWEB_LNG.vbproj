@@ -1,0 +1,1799 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>
+    </SchemaVersion>
+    <ProjectGuid>{4773EF56-9D2B-4E80-A7CE-FDC792FBC058}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>JOTWEB_LNG</RootNamespace>
+    <AssemblyName>JOTWEB_LNG</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <MyType>Custom</MyType>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>JOTWEB_LNG.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>JOTWEB_LNG.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.2\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.3.1\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="ClosedXML">
+      <HintPath>dll\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml">
+      <HintPath>dll\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelNumberFormat">
+      <HintPath>dll\ExcelNumberFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Protobuf, Version=3.26.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.26.1\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.DataVisualization.Chart, Version=0.4.76.0, Culture=neutral, PublicKeyToken=8dbeb54e07a9de91, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Excel.ja.5.1.1\lib\net461\GrapeCity.DataVisualization.Chart.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.Barcode, Version=5.1.0.791, Culture=neutral, PublicKeyToken=d55d733d2bfd5065, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Barcode.ja.5.1.0.791\lib\net461\GrapeCity.Documents.Barcode.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.DX.Windows, Version=5.1.0.791, Culture=neutral, PublicKeyToken=d55d733d2bfd5065, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.DX.Windows.ja.5.1.0.791\lib\net461\GrapeCity.Documents.DX.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.Excel, Version=5.1.1.0, Culture=neutral, PublicKeyToken=c57ae7fc6891b71d, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Excel.ja.5.1.1\lib\net461\GrapeCity.Documents.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.Imaging, Version=5.1.0.791, Culture=neutral, PublicKeyToken=d55d733d2bfd5065, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Imaging.ja.5.1.0.791\lib\net461\GrapeCity.Documents.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.Imaging.Windows, Version=5.1.0.791, Culture=neutral, PublicKeyToken=d55d733d2bfd5065, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Imaging.Windows.ja.5.1.0.791\lib\net461\GrapeCity.Documents.Imaging.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="GrapeCity.Documents.Pdf, Version=5.1.0.791, Culture=neutral, PublicKeyToken=d55d733d2bfd5065, processorArchitecture=MSIL">
+      <HintPath>..\packages\GrapeCity.DioDocs.Pdf.ja.5.1.0.791\lib\net461\GrapeCity.Documents.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Compression.LZ4, Version=1.3.8.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Compression.LZ4.1.3.8\lib\net462\K4os.Compression.LZ4.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Compression.LZ4.Streams, Version=1.3.8.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Compression.LZ4.Streams.1.3.8\lib\net462\K4os.Compression.LZ4.Streams.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Hash.xxHash, Version=1.0.8.0, Culture=neutral, PublicKeyToken=32cd54395057cec3, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Hash.xxHash.1.0.8\lib\net462\K4os.Hash.xxHash.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.7.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.7\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=9.0.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.9.0.0\lib\net48\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration.ConfigurationManager, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.8.0.0\lib\net462\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.5.0.2\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Packaging, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Packaging.4.5.0\lib\net46\System.IO.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Pipelines, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.5.0.2\lib\net461\System.IO.Pipelines.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.4.5.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Xml, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Xml.4.5.0\lib\net461\System.Security.Cryptography.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Permissions.4.5.0\lib\net461\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.4.5.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.5.0.2\lib\net461\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DataVisualization" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="ZstdSharp, Version=0.8.0.0, Culture=neutral, PublicKeyToken=8d151af33a4ad5cf, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZstdSharp.Port.0.8.0\lib\net462\ZstdSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.CSharp" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Collections.Specialized" />
+    <Import Include="System.Configuration" />
+    <Import Include="System.Text" />
+    <Import Include="System.Text.RegularExpressions" />
+    <Import Include="System.Web" />
+    <Import Include="System.Web.Caching" />
+    <Import Include="System.Web.SessionState" />
+    <Import Include="System.Web.Security" />
+    <Import Include="System.Web.Profile" />
+    <Import Include="System.Web.UI" />
+    <Import Include="System.Web.UI.WebControls" />
+    <Import Include="System.Web.UI.WebControls.WebParts" />
+    <Import Include="System.Web.UI.HtmlControls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\images\animated-overlay.gif" />
+    <Content Include="css\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="css\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="css\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="css\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="css\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="css\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="css\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="css\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="css\images\ui-icons_222222_256x240.png" />
+    <Content Include="css\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="css\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="css\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="css\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="css\jquery-ui-1.10.4.custom.min.css" />
+    <Content Include="css\jquery.multiselect.css" />
+    <Content Include="LNG\css\LNS0002D.css" />
+    <Content Include="LNG\css\LNS0002L.css" />
+    <Content Include="LNG\css\LNS0002S.css" />
+    <Content Include="LNG\css\LNS0008D.css" />
+    <Content Include="LNG\css\LNS0008L.css" />
+    <Content Include="LNG\css\LNS0008S.css" />
+    <Content Include="LNG\css\LNS0020D.css" />
+    <Content Include="LNG\css\LNS0020L.css" />
+    <Content Include="LNG\css\LNS0020S.css" />
+    <Content Include="LNG\css\LNS0030D.css" />
+    <Content Include="LNG\css\LNS0031D.css" />
+    <Content Include="LNG\css\LNT0001D.css" />
+    <Content Include="LNG\css\LNT0001L.css" />
+    <Content Include="LNG\css\LNT0002L.css" />
+    <Content Include="LNG\css\LNT0003L.css" />
+    <Content Include="LNG\css\LNT0004L.css" />
+    <Content Include="LNG\css\LNT0005B.css" />
+    <Content Include="LNG\css\LNT0005C.css" />
+    <Content Include="LNG\css\LNT0005D.css" />
+    <Content Include="LNG\css\LNT0005L.css" />
+    <Content Include="LNG\css\LNT0005N.css" />
+    <Content Include="LNG\css\LNT0006O.css" />
+    <Content Include="LNG\css\LNT0007D.css" />
+    <Content Include="LNG\css\LNT0007L.css" />
+    <Content Include="LNG\css\LNT0008D.css" />
+    <Content Include="LNG\css\LNT0008L.css" />
+    <Content Include="LNG\css\LNT0009D.css" />
+    <Content Include="LNG\css\LNT0009L.css" />
+    <Content Include="LNG\css\LNT0012.css" />
+    <Content Include="LNG\css\LNT0013D.css" />
+    <Content Include="LNG\css\LNT0013L.css" />
+    <Content Include="LNG\css\LNT0014.css" />
+    <Content Include="LNG\css\LNT0015.css" />
+    <Content Include="LNG\css\LNT0016.css" />
+    <Content Include="LNG\css\LNT0017.css" />
+    <Content Include="LNG\css\LNT0018.css" />
+    <Content Include="LNG\css\LNT0019S.css" />
+    <Content Include="LNG\css\LNT0020.css" />
+    <Content Include="LNG\css\LNT0021L.css" />
+    <Content Include="LNG\css\LNT0022C.css" />
+    <Content Include="LNG\css\LNT0023D.css" />
+    <Content Include="LNG\css\LNT0023H.css" />
+    <Content Include="LNG\css\LNT0023L.css" />
+    <Content Include="LNG\css\LNT0023S.css" />
+    <Content Include="LNG\css\LNM0002D.css" />
+    <Content Include="LNG\css\LNM0002H.css" />
+    <Content Include="LNG\css\LNM0003H.css" />
+    <Content Include="LNG\css\LNM0007H.css" />
+    <Content Include="LNG\css\LNM0008H.css" />
+    <Content Include="LNG\css\LNM0009D.css" />
+    <Content Include="LNG\css\LNM0009H.css" />
+    <Content Include="LNG\css\LNM0009L.css" />
+    <Content Include="LNG\css\LNM0009S.css" />
+    <Content Include="LNG\css\LNM0011D.css" />
+    <Content Include="LNG\css\LNM0011H.css" />
+    <Content Include="LNG\css\LNM0011L.css" />
+    <Content Include="LNG\css\LNM0011S.css" />
+    <Content Include="LNG\css\LNM0013H.css" />
+    <Content Include="LNG\css\LNM0013L.css" />
+    <Content Include="LNG\css\LNM0014D.css" />
+    <Content Include="LNG\css\LNM0014H.css" />
+    <Content Include="LNG\css\LNM0014L.css" />
+    <Content Include="LNG\css\LNM0014S.css" />
+    <Content Include="LNG\css\LNM0015D.css" />
+    <Content Include="LNG\css\LNM0015H.css" />
+    <Content Include="LNG\css\LNM0015L.css" />
+    <Content Include="LNG\css\LNM0015S.css" />
+    <Content Include="LNG\css\LNM0016H.css" />
+    <Content Include="LNG\css\LNM0017H.css" />
+    <Content Include="LNG\css\LNM0023D.css" />
+    <Content Include="LNG\css\LNM0023L.css" />
+    <Content Include="LNG\css\LNM0023S.css" />
+    <Content Include="LNG\css\LNM0008D.css" />
+    <Content Include="LNG\css\LNM0007D.css" />
+    <Content Include="LNG\css\LNM0003D.css" />
+    <Content Include="LNG\css\LNM0008L.css" />
+    <Content Include="LNG\css\LNM0007L.css" />
+    <Content Include="LNG\css\LNM0003L.css" />
+    <Content Include="LNG\css\LNM0008S.css" />
+    <Content Include="LNG\css\LNM0007S.css" />
+    <Content Include="LNG\css\LNM0003S.css" />
+    <Content Include="LNG\css\LNM0013D.css" />
+    <Content Include="LNG\css\LNM0013S.css" />
+    <Content Include="LNG\css\LNM0017D.css" />
+    <Content Include="LNG\css\LNM0016D.css" />
+    <Content Include="LNG\css\LNM0017L.css" />
+    <Content Include="LNG\css\LNM0016L.css" />
+    <Content Include="LNG\css\LNM0017S.css" />
+    <Content Include="LNG\css\LNM0016S.css" />
+    <Content Include="LNG\css\LNM0021D.css" />
+    <Content Include="LNG\css\LNM0002L.css" />
+    <Content Include="LNG\css\LNM0021L.css" />
+    <Content Include="LNG\css\LNM0002S.css" />
+    <Content Include="LNG\css\LNM0021S.css" />
+    <Content Include="LNG\css\LNM0024H.css" />
+    <Content Include="LNG\css\LNM0026D.css" />
+    <Content Include="LNG\css\LNM0024D.css" />
+    <Content Include="LNG\css\LNM0024L.css" />
+    <Content Include="LNG\css\LNM0024S.css" />
+    <Content Include="LNG\css\LNM0026L.css" />
+    <Content Include="LNG\css\LNM0026S.css" />
+    <Content Include="LNG\css\ex\error.css" />
+    <Content Include="LNG\ex\page_400.html" />
+    <Content Include="LNG\ex\page_401.html" />
+    <Content Include="LNG\ex\page_403.html" />
+    <Content Include="LNG\ex\page_500.html" />
+    <Content Include="LNG\ex\page_501.html" />
+    <Content Include="LNG\ex\page_503.html" />
+    <Content Include="LNG\img\iconArrowBack.png" />
+    <Content Include="LNG\img\iconArrowNext.png" />
+    <Content Include="LNG\img\iconSkipBack.png" />
+    <Content Include="LNG\img\iconSkipNext.png" />
+    <Content Include="LNG\img\img_error_cat01.png" />
+    <Content Include="LNG\img\img_error_cat02.png" />
+    <Content Include="LNG\img\img_error_cat03.png" />
+    <Content Include="LNG\img\img_error_cat04.png" />
+    <Content Include="LNG\img\img_error_cat05.png" />
+    <Content Include="LNG\img\img_error_cat06.png" />
+    <Content Include="LNG\img\img_error_cat07.png" />
+    <Content Include="LNG\img\img_error_cat08.png" />
+    <Content Include="LNG\img\img_error_cat09.png" />
+    <Content Include="LNG\img\img_error_cat10.png" />
+    <Content Include="LNG\img\img_error_cat11.png" />
+    <Content Include="LNG\img\img_error_cat12.png" />
+    <Content Include="LNG\img\img_error_cat13.png" />
+    <Content Include="LNG\img\img_error_cat14.png" />
+    <Content Include="LNG\img\img_error_cat15.png" />
+    <Content Include="LNG\img\img_error_cat16.png" />
+    <Content Include="LNG\img\Japan0.5.png" />
+    <Content Include="LNG\img\Japan0.png" />
+    <Content Include="LNG\img\Japan1.png" />
+    <Content Include="LNG\img\Japan2.png" />
+    <Content Include="LNG\img\Japan3.5.png" />
+    <Content Include="LNG\img\Japan3.png" />
+    <Content Include="LNG\img\Japan4.png" />
+    <Content Include="LNG\img\Japan5.png" />
+    <Content Include="LNG\img\Japan6.png" />
+    <Content Include="LNG\img\Japan7.png" />
+    <Content Include="LNG\img\master.png" />
+    <Content Include="LNG\img\menuPaneRefreshWhite.png" />
+    <Content Include="LNG\inc\LNS0020WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0009WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0011WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0014WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0015WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0008WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0007WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0003WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0013WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0017WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0016WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0021WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0002WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0024WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0026WRKINC.ascx" />
+    <Content Include="LNG\inc\LNS0002WRKINC.ascx" />
+    <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
+    <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
+    <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0002WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0003WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0004WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0005WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0006WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0007WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0008WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0009WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0012WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0013WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0014WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0015WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0016WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0017WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0018WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0019WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0020WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0021WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0022WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0023WRKINC.ascx" />
+    <Content Include="LNG\inv\LNT0022InspectManage.aspx" />
+    <Content Include="LNG\mas\LNM0002ReconmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0002ReconmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0003RekejmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0007Rect1mHistory.aspx" />
+    <Content Include="LNG\mas\LNM0008Rect2mHistory.aspx" />
+    <Content Include="LNG\mas\LNM0009RetinmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0009RetinmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0009RetinmList.aspx" />
+    <Content Include="LNG\mas\LNM0009RetinmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0011RekmtmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0011RekmtmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0011RekmtmList.aspx" />
+    <Content Include="LNG\mas\LNM0011RekmtmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0013RektrmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0014ReutrmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0014ReutrmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0014ReutrmList.aspx" />
+    <Content Include="LNG\mas\LNM0014ReutrmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0015ResrtmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0015ResrtmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0015ResrtmList.aspx" />
+    <Content Include="LNG\mas\LNM0015ResrtmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0016Rest1mHistory.aspx" />
+    <Content Include="LNG\mas\LNM0017Rest2mHistory.aspx" />
+    <Content Include="LNG\mas\LNM0023ShipperDetail.aspx" />
+    <Content Include="LNG\mas\LNM0023ShipperList.aspx" />
+    <Content Include="LNG\mas\LNM0023ShipperSearch.aspx" />
+    <Content Include="LNG\mas\LNM0007Rect1mDetail.aspx" />
+    <Content Include="LNG\mas\LNM0003RekejmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0008Rect2mDetail.aspx" />
+    <Content Include="LNG\mas\LNM0008Rect2mList.aspx" />
+    <Content Include="LNG\mas\LNM0007Rect1mList.aspx" />
+    <Content Include="LNG\mas\LNM0003RekejmList.aspx" />
+    <Content Include="LNG\mas\LNM0002ReconmList.aspx" />
+    <Content Include="LNG\mas\LNM0002ReconmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0008Rect2mSearch.aspx" />
+    <Content Include="LNG\mas\LNM0007Rect1mSearch.aspx" />
+    <Content Include="LNG\mas\LNM0003RekejmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0013RektrmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0013RektrmList.aspx" />
+    <Content Include="LNG\mas\LNM0013RektrmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0017Rest2mDetail.aspx" />
+    <Content Include="LNG\mas\LNM0016Rest1mDetail.aspx" />
+    <Content Include="LNG\mas\LNM0017Rest2mList.aspx" />
+    <Content Include="LNG\mas\LNM0016Rest1mList.aspx" />
+    <Content Include="LNG\mas\LNM0017Rest2mSearch.aspx" />
+    <Content Include="LNG\mas\LNM0016Rest1mSearch.aspx" />
+    <Content Include="LNG\mas\LNM0021ItemDetail.aspx" />
+    <Content Include="LNG\mas\LNM0021ItemList.aspx" />
+    <Content Include="LNG\mas\LNM0021ItemSearch.aspx" />
+    <Content Include="LNG\mas\LNM0024KekkjmDetail.aspx" />
+    <Content Include="LNG\mas\LNM0024KekkjmHistory.aspx" />
+    <Content Include="LNG\mas\LNM0024KekkjmList.aspx" />
+    <Content Include="LNG\mas\LNM0024KekkjmSearch.aspx" />
+    <Content Include="LNG\mas\LNM0026IncentiveDetail.aspx" />
+    <Content Include="LNG\mas\LNM0026IncentiveList.aspx" />
+    <Content Include="LNG\mas\LNM0026IncentiveSearch.aspx" />
+    <Content Include="LNG\mas\LNS0008GuidanceDetail.aspx" />
+    <Content Include="LNG\mas\LNS0002UserDetail.aspx" />
+    <Content Include="LNG\mas\LNS0008GuidanceDownload.aspx" />
+    <Content Include="LNG\mas\LNS0008GuidanceList.aspx" />
+    <Content Include="LNG\mas\LNS0002UserList.aspx" />
+    <Content Include="LNG\mas\LNS0008GuidanceSearch.aspx" />
+    <Content Include="LNG\mas\LNS0002UserSearch.aspx" />
+    <Content Include="LNG\ord\LNT0001OrderDetail.aspx" />
+    <Content Include="LNG\ord\LNT0001OrderList.aspx" />
+    <Content Include="LNG\ord\LNT0001OrderSearch.aspx" />
+    <Content Include="LNG\pay\LNT0019ClosingBranch.aspx" />
+    <Content Include="LNG\pay\LNT0023PayeeLinkDetail.aspx" />
+    <Content Include="LNG\pay\LNT0023PayeeLinkHistory.aspx" />
+    <Content Include="LNG\pay\LNT0023PayeeLinkList.aspx" />
+    <Content Include="LNG\pay\LNT0023PayeeLinkSearch.aspx" />
+    <Content Include="LNG\report\LNT0012ReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0016OperatinNumReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx" />
+    <Content Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx" />
+    <Content Include="LNG\script\LNS0020D.js" />
+    <Content Include="LNG\script\LNS0030D.js" />
+    <Content Include="LNG\script\LNS0031D.js" />
+    <Content Include="LNG\script\LNT0001D.js" />
+    <Content Include="LNG\script\LNT0001L.js" />
+    <Content Include="LNG\script\LNT0002L.js" />
+    <Content Include="LNG\script\LNT0003L.js" />
+    <Content Include="LNG\script\LNT0004L.js" />
+    <Content Include="LNG\script\LNT0005B.js" />
+    <Content Include="LNG\script\LNT0005C.js" />
+    <Content Include="LNG\script\LNT0005D.js" />
+    <Content Include="LNG\script\LNT0005L.js" />
+    <Content Include="LNG\script\LNT0005N.js" />
+    <Content Include="LNG\script\LNT0006O.js" />
+    <Content Include="LNG\script\LNT0007D.js" />
+    <Content Include="LNG\script\LNT0007L.js" />
+    <Content Include="LNG\script\LNT0008D.js" />
+    <Content Include="LNG\script\LNT0008L.js" />
+    <Content Include="LNG\script\LNT0009L.js" />
+    <Content Include="LNG\script\LNT0012S.js" />
+    <Content Include="LNG\script\LNT0013D.js" />
+    <Content Include="LNG\script\LNT0013L.js" />
+    <Content Include="LNG\script\LNT0014S.js" />
+    <Content Include="LNG\script\LNT0015S.js" />
+    <Content Include="LNG\script\LNT0016S.js" />
+    <Content Include="LNG\script\LNT0017S.js" />
+    <Content Include="LNG\script\LNT0018S.js" />
+    <Content Include="LNG\script\LNT0019S.js" />
+    <Content Include="LNG\script\LNT0020S.js" />
+    <Content Include="LNG\script\LNT0021L.js" />
+    <Content Include="LNG\script\LNT0022C.js" />
+    <Content Include="LNG\script\LNT0023D.js" />
+    <Content Include="LNG\script\LNT0023H.js" />
+    <Content Include="LNG\script\LNT0023L.js" />
+    <Content Include="LNG\script\LNM0002H.js" />
+    <Content Include="LNG\script\LNM0003H.js" />
+    <Content Include="LNG\script\LNM0007H.js" />
+    <Content Include="LNG\script\LNM0008H.js" />
+    <Content Include="LNG\script\LNM0009D.js" />
+    <Content Include="LNG\script\LNM0009H.js" />
+    <Content Include="LNG\script\LNM0009L.js" />
+    <Content Include="LNG\script\LNM0011D.js" />
+    <Content Include="LNG\script\LNM0011H.js" />
+    <Content Include="LNG\script\LNM0011L.js" />
+    <Content Include="LNG\script\LNM0013H.js" />
+    <Content Include="LNG\script\LNM0014H.js" />
+    <Content Include="LNG\script\LNM0015D.js" />
+    <Content Include="LNG\script\LNM0015H.js" />
+    <Content Include="LNG\script\LNM0015L.js" />
+    <Content Include="LNG\script\LNM0016H.js" />
+    <Content Include="LNG\script\LNM0017H.js" />
+    <Content Include="LNG\script\LNM0024D.js" />
+    <Content Include="LNG\script\LNM0024H.js" />
+    <Content Include="LNG\script\LNM0024L.js" />
+    <Content Include="LNG\script\LNM0026D.js" />
+    <Content Include="LNG\script\LNM0026L.js" />
+    <Content Include="LNG\script\LNM0014D.js" />
+    <Content Include="LNG\script\LNM0014L.js" />
+    <Content Include="LNG\script\LNM0021D.js" />
+    <Content Include="LNG\script\LNM0023D.js" />
+    <Content Include="LNG\script\LNM0003D.js" />
+    <Content Include="LNG\script\LNM0023L.js" />
+    <Content Include="LNG\script\LNM0008D.js" />
+    <Content Include="LNG\script\LNM0007D.js" />
+    <Content Include="LNG\script\LNM0008L.js" />
+    <Content Include="LNG\script\LNM0007L.js" />
+    <Content Include="LNG\script\LNM0003L.js" />
+    <Content Include="LNG\script\LNM0013D.js" />
+    <Content Include="LNG\script\LNM0013L.js" />
+    <Content Include="LNG\script\LNM0017D.js" />
+    <Content Include="LNG\script\LNM0016D.js" />
+    <Content Include="LNG\script\LNM0017L.js" />
+    <Content Include="LNG\script\LNM0016L.js" />
+    <Content Include="LNG\script\LNS0008D.js" />
+    <Content Include="LNG\script\LNS0002D.js" />
+    <Content Include="LNG\script\LNM0002D.js" />
+    <Content Include="LNG\script\LNM0002L.js" />
+    <Content Include="LNG\script\LNM0021L.js" />
+    <Content Include="LNG\script\LNS0008L.js" />
+    <Content Include="LNG\script\LNS0002L.js" />
+    <Content Include="img\ctnlogo.png" />
+    <Content Include="img\favicon2.ico" />
+    <Content Include="img\oil.ico" />
+    <Content Include="img\oillogo.png" />
+    <Content Include="img\right.png" />
+    <Content Include="img\tank2.png" />
+    <Content Include="LNG\css\M00001.css" />
+    <Content Include="LNG\css\M00002.css" />
+    <Content Include="LNG\ex\page_err_default.html" />
+    <Content Include="LNG\img\404cat.png" />
+    <Content Include="LNG\css\ex\bootstrap.min.css" />
+    <Content Include="css\common.css" />
+    <Content Include="css\M10000.css" />
+    <Content Include="LNG\css\ex\custom.min.css" />
+    <Content Include="img\logo.png" />
+    <Content Include="img\ヘルプ.jpg" />
+    <Content Include="img\先頭頁.png" />
+    <Content Include="img\最終頁.png" />
+    <Content Include="img\矢印L.png" />
+    <Content Include="img\矢印R.png" />
+    <Content Include="LNG\img\a_cat.png" />
+    <Content Include="LNG\img\calendar.png" />
+    <Content Include="LNG\img\caution.png" />
+    <Content Include="LNG\img\datalink.png" />
+    <Content Include="LNG\img\e_cat.png" />
+    <Content Include="LNG\img\guidanceIconE.png" />
+    <Content Include="LNG\img\guidanceIconI.png" />
+    <Content Include="LNG\img\guidanceIconW.png" />
+    <Content Include="LNG\img\iconError.png" />
+    <Content Include="LNG\img\IconHasAttach.png" />
+    <Content Include="LNG\img\iconInfo.png" />
+    <Content Include="LNG\img\iconWarn.png" />
+    <Content Include="LNG\img\lockKey.png" />
+    <Content Include="LNG\img\menuPaneRefresh.png" />
+    <Content Include="LNG\img\noicon.png" />
+    <Content Include="LNG\img\foward.png" />
+    <Content Include="LNG\img\leftbox.png" />
+    <Content Include="LNG\img\master2.png" />
+    <Content Include="LNG\img\oiltank.png" />
+    <Content Include="LNG\img\order.png" />
+    <Content Include="LNG\img\pay.png" />
+    <Content Include="LNG\img\q_cat.png" />
+    <Content Include="LNG\img\richText.png" />
+    <Content Include="LNG\img\statistics.png" />
+    <Content Include="LNG\img\suitekiEmptyIcon.png" />
+    <Content Include="LNG\img\suitekiIcon.png" />
+    <Content Include="LNG\img\tank.png" />
+    <Content Include="LNG\img\underArrow.png" />
+    <Content Include="LNG\img\unlockKey.png" />
+    <Content Include="LNG\img\warning.png" />
+    <Content Include="LNG\img\w_cat.png" />
+    <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
+    <Content Include="LNG\inc\GRM00002WRKINC.ascx" />
+    <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
+    <Content Include="inc\GRIS0001Title.ascx" />
+    <Content Include="inc\GRIS0002Footer.ascx" />
+    <Content Include="inc\GRIS0003SRightBox.ascx" />
+    <Content Include="inc\GRIS0004RightBox.ascx" />
+    <Content Include="inc\GRIS0005LeftBox.ascx" />
+    <Content Include="M10000LOGON.aspx" />
+    <Content Include="LNG\ex\page_404.html" />
+    <Content Include="LNG\M00001MENU.aspx" />
+    <Content Include="LNG\script\M00001.js" />
+    <Content Include="script\calendar.js" />
+    <Content Include="script\common.js" />
+    <Content Include="script\easyselectbox.min.js" />
+    <Content Include="script\event.js" />
+    <Content Include="script\fixed_midashi.js" />
+    <Content Include="script\jquery-1.10.2.js" />
+    <Content Include="script\jquery-3.6.0.min.js" />
+    <Content Include="script\jquery-ui-1.10.4.custom.min.js" />
+    <Content Include="script\jquery.multiselect.js" />
+    <Content Include="script\M10000.js" />
+    <Content Include="script\prettify.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="base\Const.vb" />
+    <Compile Include="base\CS\CS0001.vb" />
+    <Compile Include="base\CS\CS0007.vb" />
+    <Compile Include="base\CS\CS0009.vb" />
+    <Compile Include="base\CS\CS0010.vb" />
+    <Compile Include="base\CS\CS0011.vb" />
+    <Compile Include="base\CS\CS0023_DioDocs.vb" />
+    <Compile Include="base\CS\CS0030_DioDocs.vb" />
+    <Compile Include="base\CS\CS0047_DioDocs.vb" />
+    <Compile Include="base\CS\CS0013.vb" />
+    <Compile Include="base\CS\CS0015.vb" />
+    <Compile Include="base\CS\CS0016.vb" />
+    <Compile Include="base\CS\CS0017.vb" />
+    <Compile Include="base\CS\CS0020.vb" />
+    <Compile Include="base\CS\CS0021.vb" />
+    <Compile Include="base\CS\CS0025.vb" />
+    <Compile Include="base\CS\CS0029.vb" />
+    <Compile Include="base\CS\CS0031.vb" />
+    <Compile Include="base\CS\CS0032.vb" />
+    <Compile Include="base\CS\CS0036.vb" />
+    <Compile Include="base\CS\CS0050.vb" />
+    <Compile Include="base\CS\CS0051.vb" />
+    <Compile Include="base\CS\CS0053.vb" />
+    <Compile Include="base\CS\CS0052.vb" />
+    <Compile Include="base\GL\GL0000.vb" />
+    <Compile Include="base\GL\GL0001.vb" />
+    <Compile Include="base\GL\GL0026.vb" />
+    <Compile Include="base\GL\GL0024.vb" />
+    <Compile Include="base\GL\GL0023.vb" />
+    <Compile Include="base\GL\GL0022.vb" />
+    <Compile Include="base\GL\GL0021.vb" />
+    <Compile Include="base\GL\GL0020.vb" />
+    <Compile Include="base\GL\GL0017.vb" />
+    <Compile Include="base\GL\GL0016.vb" />
+    <Compile Include="base\GL\GL0002.vb" />
+    <Compile Include="base\GL\GL0003.vb" />
+    <Compile Include="base\GL\GL0015.vb" />
+    <Compile Include="base\GL\GL0014.vb" />
+    <Compile Include="base\GL\GL0012.vb" />
+    <Compile Include="base\GL\GL0018.vb" />
+    <Compile Include="base\GL\GL0019.vb" />
+    <Compile Include="base\GL\GL0025.vb" />
+    <Compile Include="base\GL\GL0027.vb" />
+    <Compile Include="base\GS\GS0000.vb" />
+    <Compile Include="base\GS\GS0001.vb" />
+    <Compile Include="base\GS\GS0003.vb" />
+    <Compile Include="base\GS\GS0004.vb" />
+    <Compile Include="base\GS\GS0005.vb" />
+    <Compile Include="base\GS\GS0006.vb" />
+    <Compile Include="base\GS\GS0007.vb" />
+    <Compile Include="base\GS\GS0032.vb" />
+    <Compile Include="base\Messages.vb" />
+    <Compile Include="base\PrevDispMap.vb" />
+    <Compile Include="base\PRT\CTT0010.vb" />
+    <Compile Include="base\PRT\PRT0000.vb" />
+    <Compile Include="base\PRT\PRT0001.vb" />
+    <Compile Include="base\PRT\PRT0002.vb" />
+    <Compile Include="base\PRT\PRT0003.vb" />
+    <Compile Include="base\PRT\PRT0004.vb" />
+    <Compile Include="base\PRT\PRT0006.vb" />
+    <Compile Include="base\SessionKey.vb" />
+    <Compile Include="base\StoredPGName.vb" />
+    <Compile Include="base\YDF.vb" />
+    <Compile Include="LNG\com\CmnLng.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\com\CmnCustomReport.vb" />
+    <Compile Include="LNG\com\CmnSearchSQL.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\com\CmnSetFmt.vb" />
+    <Compile Include="LNG\com\CsvCreate2.vb" />
+    <Compile Include="LNG\com\EntryAccountingData.vb" />
+    <Compile Include="LNG\com\EntryLeaseData.vb" />
+    <Compile Include="LNG\com\CmnGuidanceData.vb" />
+    <Compile Include="LNG\com\EntryPaymentData.vb" />
+    <Compile Include="LNG\com\EntrySeikyuData.vb" />
+    <Compile Include="LNG\com\EntryOrderData.vb" />
+    <Compile Include="LNG\com\EntrySeisanFData.vb" />
+    <Compile Include="LNG\inc\LNS0020WRKINC.ascx.designer.vb">
+      <DependentUpon>LNS0020WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0020WRKINC.ascx.vb">
+      <DependentUpon>LNS0020WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0009WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0009WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0009WRKINC.ascx.vb">
+      <DependentUpon>LNM0009WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0011WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0011WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0011WRKINC.ascx.vb">
+      <DependentUpon>LNM0011WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.vb">
+      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0015WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0015WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0015WRKINC.ascx.vb">
+      <DependentUpon>LNM0015WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0023WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0023WRKINC.ascx.vb">
+      <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0008WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0008WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0008WRKINC.ascx.vb">
+      <DependentUpon>LNM0008WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.vb">
+      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0003WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0003WRKINC.ascx.vb">
+      <DependentUpon>LNM0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0013WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0013WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0013WRKINC.ascx.vb">
+      <DependentUpon>LNM0013WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0017WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0017WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0017WRKINC.ascx.vb">
+      <DependentUpon>LNM0017WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0016WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0016WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0016WRKINC.ascx.vb">
+      <DependentUpon>LNM0016WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0021WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0021WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0021WRKINC.ascx.vb">
+      <DependentUpon>LNM0021WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0002WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0002WRKINC.ascx.vb">
+      <DependentUpon>LNM0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0024WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0024WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0024WRKINC.ascx.vb">
+      <DependentUpon>LNM0024WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0026WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0026WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0026WRKINC.ascx.vb">
+      <DependentUpon>LNM0026WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0002WRKINC.ascx.designer.vb">
+      <DependentUpon>LNS0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0002WRKINC.ascx.vb">
+      <DependentUpon>LNS0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0008FILEUPLOAD.ashx.vb">
+      <DependentUpon>LNS0008FILEUPLOAD.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0008WRKINC.ascx.designer.vb">
+      <DependentUpon>LNS0008WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNS0008WRKINC.ascx.vb">
+      <DependentUpon>LNS0008WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.designer.vb">
+      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.vb">
+      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0001WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0001WRKINC.ascx.vb">
+      <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.vb">
+      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0003WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0003WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0003WRKINC.ascx.vb">
+      <DependentUpon>LNT0003WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0004WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0004WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0004WRKINC.ascx.vb">
+      <DependentUpon>LNT0004WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0005WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0005WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0005WRKINC.ascx.vb">
+      <DependentUpon>LNT0005WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0006WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0006WRKINC.ascx.vb">
+      <DependentUpon>LNT0006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0007WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0007WRKINC.ascx.vb">
+      <DependentUpon>LNT0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0008WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0008WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0008WRKINC.ascx.vb">
+      <DependentUpon>LNT0008WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0009WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0009WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0009WRKINC.ascx.vb">
+      <DependentUpon>LNT0009WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0012WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0012WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0012WRKINC.ascx.vb">
+      <DependentUpon>LNT0012WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0013WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0013WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0013WRKINC.ascx.vb">
+      <DependentUpon>LNT0013WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0014WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0014WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0014WRKINC.ascx.vb">
+      <DependentUpon>LNT0014WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0015WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0015WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0015WRKINC.ascx.vb">
+      <DependentUpon>LNT0015WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0016WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0016WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0016WRKINC.ascx.vb">
+      <DependentUpon>LNT0016WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0017WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0017WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0017WRKINC.ascx.vb">
+      <DependentUpon>LNT0017WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0018WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0018WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0018WRKINC.ascx.vb">
+      <DependentUpon>LNT0018WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0019WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0019WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0019WRKINC.ascx.vb">
+      <DependentUpon>LNT0019WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0020WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0020WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0020WRKINC.ascx.vb">
+      <DependentUpon>LNT0020WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0021WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0021WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0021WRKINC.ascx.vb">
+      <DependentUpon>LNT0021WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0022WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0022WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0022WRKINC.ascx.vb">
+      <DependentUpon>LNT0022WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0023WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0023WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0023WRKINC.ascx.vb">
+      <DependentUpon>LNT0023WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inv\LNT0022InspectManage.aspx.designer.vb">
+      <DependentUpon>LNT0022InspectManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inv\LNT0022InspectManage.aspx.vb">
+      <DependentUpon>LNT0022InspectManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\lea\CreateLeviesList.vb" />
+    <Compile Include="LNG\lea\FinanceLeaseCheck.vb" />
+    <Compile Include="LNG\mas\LNM0002ReconmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0002ReconmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmDetail.aspx.vb">
+      <DependentUpon>LNM0002ReconmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0002ReconmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmHistory.aspx.vb">
+      <DependentUpon>LNM0002ReconmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0003RekejmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmHistory.aspx.vb">
+      <DependentUpon>LNM0003RekejmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mHistory.aspx.designer.vb">
+      <DependentUpon>LNM0007Rect1mHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mHistory.aspx.vb">
+      <DependentUpon>LNM0007Rect1mHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mHistory.aspx.designer.vb">
+      <DependentUpon>LNM0008Rect2mHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mHistory.aspx.vb">
+      <DependentUpon>LNM0008Rect2mHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0009RetinmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmDetail.aspx.vb">
+      <DependentUpon>LNM0009RetinmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0009RetinmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmHistory.aspx.vb">
+      <DependentUpon>LNM0009RetinmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmList.aspx.designer.vb">
+      <DependentUpon>LNM0009RetinmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmList.aspx.vb">
+      <DependentUpon>LNM0009RetinmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0009RetinmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0009RetinmSearch.aspx.vb">
+      <DependentUpon>LNM0009RetinmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0011RekmtmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmDetail.aspx.vb">
+      <DependentUpon>LNM0011RekmtmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0011RekmtmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmHistory.aspx.vb">
+      <DependentUpon>LNM0011RekmtmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmList.aspx.designer.vb">
+      <DependentUpon>LNM0011RekmtmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmList.aspx.vb">
+      <DependentUpon>LNM0011RekmtmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0011RekmtmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0011RekmtmSearch.aspx.vb">
+      <DependentUpon>LNM0011RekmtmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0013RektrmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmHistory.aspx.vb">
+      <DependentUpon>LNM0013RektrmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0014ReutrmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmDetail.aspx.vb">
+      <DependentUpon>LNM0014ReutrmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0014ReutrmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmHistory.aspx.vb">
+      <DependentUpon>LNM0014ReutrmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmList.aspx.designer.vb">
+      <DependentUpon>LNM0014ReutrmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmList.aspx.vb">
+      <DependentUpon>LNM0014ReutrmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0014ReutrmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0014ReutrmSearch.aspx.vb">
+      <DependentUpon>LNM0014ReutrmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0015ResrtmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmDetail.aspx.vb">
+      <DependentUpon>LNM0015ResrtmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0015ResrtmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmHistory.aspx.vb">
+      <DependentUpon>LNM0015ResrtmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmList.aspx.designer.vb">
+      <DependentUpon>LNM0015ResrtmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmList.aspx.vb">
+      <DependentUpon>LNM0015ResrtmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0015ResrtmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0015ResrtmSearch.aspx.vb">
+      <DependentUpon>LNM0015ResrtmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mHistory.aspx.designer.vb">
+      <DependentUpon>LNM0016Rest1mHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mHistory.aspx.vb">
+      <DependentUpon>LNM0016Rest1mHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mHistory.aspx.designer.vb">
+      <DependentUpon>LNM0017Rest2mHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mHistory.aspx.vb">
+      <DependentUpon>LNM0017Rest2mHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperDetail.aspx.designer.vb">
+      <DependentUpon>LNM0023ShipperDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperDetail.aspx.vb">
+      <DependentUpon>LNM0023ShipperDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperList.aspx.designer.vb">
+      <DependentUpon>LNM0023ShipperList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperList.aspx.vb">
+      <DependentUpon>LNM0023ShipperList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperSearch.aspx.designer.vb">
+      <DependentUpon>LNM0023ShipperSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0023ShipperSearch.aspx.vb">
+      <DependentUpon>LNM0023ShipperSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mDetail.aspx.designer.vb">
+      <DependentUpon>LNM0007Rect1mDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mDetail.aspx.vb">
+      <DependentUpon>LNM0007Rect1mDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0003RekejmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmDetail.aspx.vb">
+      <DependentUpon>LNM0003RekejmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mDetail.aspx.designer.vb">
+      <DependentUpon>LNM0008Rect2mDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mDetail.aspx.vb">
+      <DependentUpon>LNM0008Rect2mDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mList.aspx.designer.vb">
+      <DependentUpon>LNM0008Rect2mList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mList.aspx.vb">
+      <DependentUpon>LNM0008Rect2mList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mList.aspx.designer.vb">
+      <DependentUpon>LNM0007Rect1mList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mList.aspx.vb">
+      <DependentUpon>LNM0007Rect1mList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmList.aspx.designer.vb">
+      <DependentUpon>LNM0003RekejmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmList.aspx.vb">
+      <DependentUpon>LNM0003RekejmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmList.aspx.designer.vb">
+      <DependentUpon>LNM0002ReconmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmList.aspx.vb">
+      <DependentUpon>LNM0002ReconmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0002ReconmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0002ReconmSearch.aspx.vb">
+      <DependentUpon>LNM0002ReconmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mSearch.aspx.designer.vb">
+      <DependentUpon>LNM0008Rect2mSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0008Rect2mSearch.aspx.vb">
+      <DependentUpon>LNM0008Rect2mSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mSearch.aspx.designer.vb">
+      <DependentUpon>LNM0007Rect1mSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007Rect1mSearch.aspx.vb">
+      <DependentUpon>LNM0007Rect1mSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0003RekejmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0003RekejmSearch.aspx.vb">
+      <DependentUpon>LNM0003RekejmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0013RektrmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmDetail.aspx.vb">
+      <DependentUpon>LNM0013RektrmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmList.aspx.designer.vb">
+      <DependentUpon>LNM0013RektrmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmList.aspx.vb">
+      <DependentUpon>LNM0013RektrmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0013RektrmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0013RektrmSearch.aspx.vb">
+      <DependentUpon>LNM0013RektrmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mDetail.aspx.designer.vb">
+      <DependentUpon>LNM0017Rest2mDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mDetail.aspx.vb">
+      <DependentUpon>LNM0017Rest2mDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mDetail.aspx.designer.vb">
+      <DependentUpon>LNM0016Rest1mDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mDetail.aspx.vb">
+      <DependentUpon>LNM0016Rest1mDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mList.aspx.designer.vb">
+      <DependentUpon>LNM0017Rest2mList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mList.aspx.vb">
+      <DependentUpon>LNM0017Rest2mList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mList.aspx.designer.vb">
+      <DependentUpon>LNM0016Rest1mList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mList.aspx.vb">
+      <DependentUpon>LNM0016Rest1mList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mSearch.aspx.designer.vb">
+      <DependentUpon>LNM0017Rest2mSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0017Rest2mSearch.aspx.vb">
+      <DependentUpon>LNM0017Rest2mSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mSearch.aspx.designer.vb">
+      <DependentUpon>LNM0016Rest1mSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0016Rest1mSearch.aspx.vb">
+      <DependentUpon>LNM0016Rest1mSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemDetail.aspx.designer.vb">
+      <DependentUpon>LNM0021ItemDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemDetail.aspx.vb">
+      <DependentUpon>LNM0021ItemDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemList.aspx.designer.vb">
+      <DependentUpon>LNM0021ItemList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemList.aspx.vb">
+      <DependentUpon>LNM0021ItemList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemSearch.aspx.designer.vb">
+      <DependentUpon>LNM0021ItemSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0021ItemSearch.aspx.vb">
+      <DependentUpon>LNM0021ItemSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmDetail.aspx.designer.vb">
+      <DependentUpon>LNM0024KekkjmDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmDetail.aspx.vb">
+      <DependentUpon>LNM0024KekkjmDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmHistory.aspx.designer.vb">
+      <DependentUpon>LNM0024KekkjmHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmHistory.aspx.vb">
+      <DependentUpon>LNM0024KekkjmHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmList.aspx.designer.vb">
+      <DependentUpon>LNM0024KekkjmList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmList.aspx.vb">
+      <DependentUpon>LNM0024KekkjmList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmSearch.aspx.designer.vb">
+      <DependentUpon>LNM0024KekkjmSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0024KekkjmSearch.aspx.vb">
+      <DependentUpon>LNM0024KekkjmSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveDetail.aspx.designer.vb">
+      <DependentUpon>LNM0026IncentiveDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveDetail.aspx.vb">
+      <DependentUpon>LNM0026IncentiveDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveList.aspx.designer.vb">
+      <DependentUpon>LNM0026IncentiveList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveList.aspx.vb">
+      <DependentUpon>LNM0026IncentiveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveSearch.aspx.designer.vb">
+      <DependentUpon>LNM0026IncentiveSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0026IncentiveSearch.aspx.vb">
+      <DependentUpon>LNM0026IncentiveSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceDetail.aspx.designer.vb">
+      <DependentUpon>LNS0008GuidanceDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceDetail.aspx.vb">
+      <DependentUpon>LNS0008GuidanceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserDetail.aspx.designer.vb">
+      <DependentUpon>LNS0002UserDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserDetail.aspx.vb">
+      <DependentUpon>LNS0002UserDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceDownload.aspx.designer.vb">
+      <DependentUpon>LNS0008GuidanceDownload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceDownload.aspx.vb">
+      <DependentUpon>LNS0008GuidanceDownload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceList.aspx.designer.vb">
+      <DependentUpon>LNS0008GuidanceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceList.aspx.vb">
+      <DependentUpon>LNS0008GuidanceList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserList.aspx.designer.vb">
+      <DependentUpon>LNS0002UserList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserList.aspx.vb">
+      <DependentUpon>LNS0002UserList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceSearch.aspx.designer.vb">
+      <DependentUpon>LNS0008GuidanceSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0008GuidanceSearch.aspx.vb">
+      <DependentUpon>LNS0008GuidanceSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserSearch.aspx.designer.vb">
+      <DependentUpon>LNS0002UserSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0002UserSearch.aspx.vb">
+      <DependentUpon>LNS0002UserSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRCO0100XLSUP.ashx.vb">
+      <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\com\CsvCreate.vb" />
+    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\GRM00002WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\GRM00002WRKINC.ascx.vb">
+      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\M00001MENU.aspx.designer.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\M00001MENU.aspx.vb">
+      <DependentUpon>M00001MENU.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="LNG\LNGMasterPage.Master.designer.vb">
+      <DependentUpon>LNGMasterPage.Master</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\LNGMasterPage.Master.vb">
+      <DependentUpon>LNGMasterPage.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.designer.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0001Title.ascx.vb">
+      <DependentUpon>GRIS0001Title.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.designer.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0002Footer.ascx.vb">
+      <DependentUpon>GRIS0002Footer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0003SRightBox.ascx.vb">
+      <DependentUpon>GRIS0003SRightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.designer.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0004RightBox.ascx.vb">
+      <DependentUpon>GRIS0004RightBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.designer.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0005LeftBox.ascx.vb">
+      <DependentUpon>GRIS0005LeftBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\menupane\MP0000Base.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderDetail.aspx.designer.vb">
+      <DependentUpon>LNT0001OrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderDetail.aspx.vb">
+      <DependentUpon>LNT0001OrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderList.aspx.designer.vb">
+      <DependentUpon>LNT0001OrderList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderList.aspx.vb">
+      <DependentUpon>LNT0001OrderList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderSearch.aspx.designer.vb">
+      <DependentUpon>LNT0001OrderSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\ord\LNT0001OrderSearch.aspx.vb">
+      <DependentUpon>LNT0001OrderSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\pay\CPT0019_AccountingData_DIODOC.vb" />
+    <Compile Include="LNG\pay\LNT0019ClosingBranch.aspx.designer.vb">
+      <DependentUpon>LNT0019ClosingBranch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0019ClosingBranch.aspx.vb">
+      <DependentUpon>LNT0019ClosingBranch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkDetail.aspx.designer.vb">
+      <DependentUpon>LNT0023PayeeLinkDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkDetail.aspx.vb">
+      <DependentUpon>LNT0023PayeeLinkDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkHistory.aspx.designer.vb">
+      <DependentUpon>LNT0023PayeeLinkHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkHistory.aspx.vb">
+      <DependentUpon>LNT0023PayeeLinkHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkList.aspx.designer.vb">
+      <DependentUpon>LNT0023PayeeLinkList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkList.aspx.vb">
+      <DependentUpon>LNT0023PayeeLinkList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkSearch.aspx.designer.vb">
+      <DependentUpon>LNT0023PayeeLinkSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\pay\LNT0023PayeeLinkSearch.aspx.vb">
+      <DependentUpon>LNT0023PayeeLinkSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0003PresentState_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0004_DepartureArrivalDifferenceDailyList_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012ReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0012ReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0012ReportOutput.aspx.vb">
+      <DependentUpon>LNT0012ReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0012_AccountSummaryList_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_BILLINGACCOUNTBYDEPARTMENTLIST_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_DailyShipmentReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_FreeSendFeeReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_InterBranchChartAmountReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_InterBranchChartQuantityReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_LeaseExpirationList_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_LeaseFeeReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_MovementContainerReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_OtherStationReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_PutContainerReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_RentalCTNListReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_RessnfListReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_SalesResultsReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_TransportTotalPeriodReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_TransportTotalReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0012_UsefeeDetailReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0014ForwordDetailReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx.vb">
+      <DependentUpon>LNT0014ForwordDetailReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0014_ForwordDetailReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0015BillingLedgerReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx.vb">
+      <DependentUpon>LNT0015BillingLedgerReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0015_BillingLedgerReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0016OperatinNumReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0016OperatinNumReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0016OperatinNumReportOutput.aspx.vb">
+      <DependentUpon>LNT0016OperatinNumReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0016_OperatinNumReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0017TsptQuantityReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx.vb">
+      <DependentUpon>LNT0017TsptQuantityReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0017_TsptQuantityReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0018PaymentLedgerReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx.vb">
+      <DependentUpon>LNT0018PaymentLedgerReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0018_PaymentLedgerReport_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx.designer.vb">
+      <DependentUpon>LNT0020OperatIncomeReportOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx.vb">
+      <DependentUpon>LNT0020OperatIncomeReportOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\report\LNT0020_OperatIncome_Report_DIODOC.vb" />
+    <Compile Include="LNG\report\LNT0022_CustomReport.vb" />
+    <Compile Include="LNG\sal\LNT0010_SelesReport_ALL_DIODOC.vb" />
+    <Compile Include="LNG\sal\LNT0010_SelesReport_SHITEN_DIODOC.vb" />
+    <Compile Include="M10000LOGON.aspx.designer.vb">
+      <DependentUpon>M10000LOGON.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="M10000LOGON.aspx.vb">
+      <DependentUpon>M10000LOGON.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
+      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
+      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="LNG\LNGMasterPage.Master" />
+    <Content Include="inc\GRCO0100XLSUP.ashx" />
+    <Content Include="LNG\inc\LNS0008FILEUPLOAD.ashx" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\PublishProfiles\FolderProfile.pubxml" />
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

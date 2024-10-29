@@ -1,0 +1,21 @@
+﻿body {
+    background-color: #f3f3f3;
+}
+
+/* ************************** */
+/* ドロップダウンリスト       */
+/* ************************** */
+/* 出力大分類 */
+select.ddlSelectBigCtn {
+    height: 30px;
+    width: 220px;
+    font-size: 12pt;
+    padding: 2px;
+    vertical-align: middle;
+    text-align: left;
+    border-color: #cfcfcf;
+}
+
+.searchbox .inputItem:first-of-type {
+    margin-bottom: 0;
+}

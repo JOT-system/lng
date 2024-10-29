@@ -1,0 +1,34 @@
+﻿body {
+}
+
+.flexible {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+    .flexible > span {
+        width: 33%;
+        box-sizing: border-box;
+    }
+
+input[type=text][readonly] {
+    background-color: rgb(237, 237, 237);
+}
+
+input[type=text][readonly].disabledboxIcon:not(.iconOnly) {
+    padding-left: 0.3em;
+}
+
+input[type=text].disabledboxIcon {
+    padding-left: 25px;
+}
+
+.ddlSelectControl {
+    height: 30px;
+    width: 120px;
+    font-size: 12pt;
+    padding: 2px;
+}
+.span1{
+    width: 180px;
+}
