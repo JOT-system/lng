@@ -1,0 +1,276 @@
+﻿body {
+}
+
+input[type=text][readonly] {
+    padding-left: 4px !important;
+    background-color: rgb(237, 237, 237) !important;
+}
+
+    input[type=text][readonly].disabledcalendarIcon:not(.iconOnly) {
+        padding-left: 0.3em;
+    }
+
+input[type=text].disabledcalendarIcon {
+    padding-left: 25px;
+}
+
+input[type=password][readonly] {
+    background-color: rgb(237, 237, 237) !important;
+}
+
+input[type=date][readonly] {
+    background-color: rgb(237, 237, 237) !important;
+}
+
+#SetItemBox {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    margin: 24px 16px 0;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+    #SetItemBox div[id^=KEY_LINE_] {
+        display: flex;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+    }
+        /* ************************** */
+        /* 単票入力欄の列定義         */
+        /* ************************** */
+        /* 1項目(名称 文言 列幅) */
+        #SetItemBox div[id^=KEY_LINE_] > .divSelectItem {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+            /* 項目名欄(n行目の入力欄の1,3・・・列に適用するスタイル) */
+            #SetItemBox div[id^=KEY_LINE_] > .divSelectItem > :nth-child(2n+1) {
+                display: inline-block;
+                width: 7em;
+                padding-left: 16px;
+                font-weight: bold;
+                flex-shrink: 0;
+            }
+            /* 入力欄(n行目の入力欄の2,4・・・列に適用するスタイル) */
+            #SetItemBox div[id^=KEY_LINE_] > .divSelectItem > :nth-child(2n+2) {
+                display: inline-block;
+            }
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectBox {
+    margin-bottom: 16px;
+    font-weight: bold;
+}
+
+.divListItem input[type=checkbox],
+.divListItem2 input[type=checkbox] {
+    display: none;
+}
+
+    .divListItem input[type=checkbox] + label,
+    .divListItem2 input[type=checkbox] + label {
+        display: flex;
+        width: 75px;
+        padding-left: 5px;
+        padding-right: 5px;
+        height: 28px;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #cfcfcf;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        position: relative;
+    }
+
+    .divListItem input[type=checkbox]:checked + label,
+    .divListItem2 input[type=checkbox]:checked + label {
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .divListItem input[type=checkbox]:checked + label:before,
+    .divListItem2 input[type=checkbox]:checked + label:before {
+        position: absolute;
+        left: 2px;
+        content: "✔";
+        color: #0d6efd;
+    }
+
+    .divListItem input[type=checkbox]:not(:disabled) + label:hover,
+    .divListItem2 input[type=checkbox]:not(:disabled) + label:hover {
+        cursor: pointer;
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+.divListItem ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.divListItem2 ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+/* ************************** */
+/* 期間重複調整画面           */
+/* ************************** */
+#pnlOverlapPeriodsWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    opacity: 1;
+    z-index: 19;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlOverlapPeriodsContents {
+    text-align: left;
+    left: calc(50% - 250px);
+    background-color: rgb(240,240,240);
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
+    border-radius: 10px;
+}
+
+#pnlOverlapPeriodsMessageArea {
+    padding: 8px 0px 8px 8px;
+    margin: 10px 10px 10px 10px;
+    min-height: 30px;
+    font-size: 15px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+}
+#pnlOverlapPeriodsMessageArea div[id^=pnlOverlapPeriodsMessage_] {
+    font-weight: bolder;
+}
+
+#pnlOverlapPeriodsArea {
+    padding: 15px 10px 0px 0px;
+    margin: 10px 10px 15px 10px;
+    min-height: 120px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+}
+
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] {
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+/* 1項目(名称 文言) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span {
+    display: inline-block;
+    margin-bottom: 15px;
+}
+/* 項目名欄(1行目の入力欄の列に適用するスタイル) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span > :nth-child(2n+1) {
+    width: 7em;
+    padding-left: 20px;
+}
+/* 入力欄(2行目の入力欄の列に適用するスタイル) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span > :nth-child(2n+2) {
+    display: inline-block;
+    width: 10em;
+}
+
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] {
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+/* 1項目(名称 文言) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span {
+    display: inline-block;
+}
+/* 項目名欄(1行目の入力欄の列に適用するスタイル) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span > :nth-child(2n+1) {
+    width: 7em;
+    padding-left: 20px;
+}
+/* 入力欄(2行目の入力欄の列に適用するスタイル) */
+#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span > :nth-child(2n+2) {
+    display: inline-block;
+    width: 155px;
+    color: red;
+    font-size: 17.5px;
+    font-family: sans-serif;
+}
+
+#pnlTxtAdjustLastStYMD {
+    margin-left: 80px;
+}
+
+#pnlTxtAdjustLastEndYMD {
+    margin-left: 100px;
+}
+
+#pnlTxtAdjustNextStYMD {
+    margin-left: 100px;
+    margin-right: -21px;
+}
+
+#pnlTxtAdjustNextEndYMD {
+    margin-left: 80px;
+}
+
+#pnlOverlapPeriodsButton {
+    text-align: right;
+    padding-bottom: 10px;
+}
+
+#pnlOverlapPeriodsButton input[type=button] {
+    font-size: 15px;
+    min-width: 100px;
+    margin-right: 10px;
+    padding: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 30px;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+/* ************************** */
+/* カレンダーテキストボックス */
+/* ************************** */
+
+.TxtDate {
+    width: 180px;
+    height: 39px;
+    font-size: 16px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    ime-mode: inactive;
+    /* color: #000000; /* 黒 */
+    /* color: #737373; */ /* 4/14変更前 */
+    color: #404040;
+    padding: 6px 4px 6px 4px; /* Top Right Bottom Left */
+    /* border-color: rgba(176, 176, 276, 0.6); */
+    border-color: #cfcfcf;
+    border-style: solid;
+    border-width: thin;
+}

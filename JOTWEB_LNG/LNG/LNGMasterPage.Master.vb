@@ -68,10 +68,16 @@ Public Class LNGMasterPage
             Return
         End If
         'セッションタイムアウト判定
-        If IsNothing(Session(C_SESSION_KEY.USER_ID)) OrElse String.IsNullOrEmpty(Session(C_SESSION_KEY.USER_ID).ToString) Then
+        '2024/11/06　セッションタイムアウト後にログイン画面に戻らない対応　START
+        'セッション変数なし／セッション変数はあるが中身が空／「INIT」で初期化されている場合、ログイン画面に遷移する
+        'If IsNothing(Session(C_SESSION_KEY.USER_ID)) OrElse String.IsNullOrEmpty(Session(C_SESSION_KEY.USER_ID).ToString) Then
+        If IsNothing(Session(C_SESSION_KEY.USER_ID)) OrElse
+           String.IsNullOrEmpty(Session(C_SESSION_KEY.USER_ID).ToString) OrElse
+           Session(C_SESSION_KEY.USER_ID).ToString.Equals("INIT") Then
             Server.Transfer(C_URL.LOGIN)
             Exit Sub
         End If
+        '2024/11/06　セッションタイムアウト後にログイン画面に戻らない対応　END
 
         If IsPostBack Then
             'メッセージクリア
@@ -94,6 +100,11 @@ Public Class LNGMasterPage
     ''' <remarks>コンテンツページのロード処理後に実行される</remarks >
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
 
+        '2024/11/06 セッションタイムアウト後にログイン画面に戻らない対応　START
+        'ブラウザーバック等の操作時にキャッシュを利用せず、必ずPage_Loadが走るようにする
+        Response.Cache.SetCacheability(HttpCacheability.NoCache)
+        Response.Cache.SetNoStore()
+        '2024/11/06 セッションタイムアウト後にログイン画面に戻らない対応　END
         Try
 
             If IsPostBack Then

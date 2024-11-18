@@ -1,0 +1,595 @@
+﻿input[type=date]:focus,
+select:focus {
+    border-color: rgba(1, 60, 65, 0.5);
+    background-image: none;
+    outline: none;
+}
+
+div#divContensbox {
+    bottom: 0;
+    background-color: #f3f3f3;
+    overflow: hidden;
+}
+
+#detailbuttonbox {
+    padding: 8px 16px;
+}
+
+.headerbox {
+    width: auto;
+    margin: 0 16px;
+    padding: 16px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    overflow-x: auto;
+}
+
+div#detailbox {
+    width: auto;
+    height: calc(100vh - 46px - 48px - 66px - 67px);
+    margin: 16px 16px 0;
+    padding: 16px 0 16px 16px;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+}
+
+div#WF_SELECT_ITEM_AREA {
+    display: flex;
+    align-items: center;
+}
+
+div#WF_SELECT_ITEM_AREA > span {
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#WF_FileUpload {
+    display: none;
+}
+
+select#WF_STATUS {
+    display: inline-block;
+    width: 150px;
+    height: 32px;
+    margin-right: 16px;
+    text-align: left;
+    box-sizing: border-box;
+    border: 1px solid #cfcfcf;
+    font-size: 14px;
+    cursor: pointer;
+}
+select#WF_STATUS:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+select#WF_CTNTYPE {
+    display: inline-block;
+    width: 70px;
+    height: 32px;
+    text-align: left;
+    margin-right: 16px;
+    box-sizing: border-box;
+    border: 1px solid #cfcfcf;
+    font-size: 14px;
+    cursor: pointer;
+}
+select#WF_CTNTYPE:hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+input#WF_CTNNO,
+input#WF_STATION {
+    width: 76px;
+    height: 32px;
+    text-align: right;
+    border-radius: 0;
+}
+input#WF_CTNNO {
+    margin-right: 16px;
+}
+
+span#WF_STATIONNAME {
+    width: unset;
+    margin-right: unset;
+    margin-left: 5px;
+    text-align: left;
+}
+
+.actionButtonBox .rightSide .btn-sticky {
+    height: 32px;
+}
+
+#WF_ButtonEND {
+    display: none;
+}
+
+/* #region 共通 */
+.title1 {
+    font-weight: bold;
+    padding: 5px;
+    border-left: 10px solid #0f4493;
+    border-bottom: 1px solid #0f4493;
+}
+.w20px {
+    width: 20px;
+}
+.w30px {
+    width: 30px;
+}
+.w39px {
+    width: 39px;
+}
+.w40px {
+    width: 40px;
+}
+.w50px {
+    width: 50px;
+}
+.w69px {
+    width: 69px;
+}
+.w70px {
+    width: 70px;
+}
+.w100px {
+    width: 100px;
+}
+.w110px {
+    width: 110px;
+}
+.w130px {
+    width: 130px;
+}
+.w150px {
+    width: 150px;
+}
+.w170px {
+    width: 170px;
+}
+.w296px {
+    width: 296px;
+}
+.font16 {
+    font-size: 16px;
+}
+.font18 {
+    font-size: 18px;
+}
+.Ma-R7px {
+    margin-right: 7px;
+}
+
+/* #endregion 共通 */
+
+/* #region 明細ページング */
+div#pnlNoData {
+    margin: 5px 0px 5px 5px;
+    display: flex;
+    color: red;
+}
+div#pnlChangePage {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+div#pnlChangePage input[id*='SelectPage'] {
+    width: 50px;
+    height: 32px;
+    text-align: right;
+    border-radius: 0;
+}
+div#pnlChangePage input[id*='RefreshPage'] {
+    width: 44px;
+    height: 32px;
+    padding: 0;
+}
+div#pnlChangePage input[type=text][id*="Page"]:disabled {
+    background-color: lightgray;
+}
+div#pnlChangePage input[id*='SelectPage'].error {
+    border-color: red;
+}
+
+.arrowFirstPage,
+.arrowPreviousPage,
+.arrowNextPage,
+.arrowLastPage {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #cfcfcf;
+    box-sizing: border-box;
+    border-radius: 6px;
+    position: relative;
+}
+
+.arrowFirstPage input,
+.arrowPreviousPage input,
+.arrowNextPage input,
+.arrowLastPage input {
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.arrowFirstPage::before,
+.arrowFirstPage::after,
+.arrowPreviousPage::before,
+.arrowNextPage::before,
+.arrowLastPage::before,
+.arrowLastPage::after {
+    display: block;
+    content: "";
+    background-color: #333;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 0;
+}
+.arrowFirstPage::before {
+    width: 2px;
+    height: 14px;
+    margin-left: -8px;
+}
+.arrowFirstPage::after {
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+}
+.arrowPreviousPage::before {
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: -1px;
+}
+.arrowNextPage::before {
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: 1px;
+}
+.arrowLastPage::before {
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: -2px;
+}
+.arrowLastPage::after {
+    width: 2px;
+    height: 14px;
+    margin-left: 8px;
+}
+
+.arrowFirstPage:has(input:not(:disabled)):hover,
+.arrowPreviousPage:has(input:not(:disabled)):hover,
+.arrowNextPage:has(input:not(:disabled)):hover,
+.arrowLastPage:has(input:not(:disabled)):hover {
+    background-color: #e1eeff;
+    border-color: #0d6efd;
+}
+
+.arrowFirstPage:has(input:not(:disabled)):hover::before,
+.arrowFirstPage:has(input:not(:disabled)):hover::after,
+.arrowPreviousPage:has(input:not(:disabled)):hover::before,
+.arrowNextPage:has(input:not(:disabled)):hover::before,
+.arrowLastPage:has(input:not(:disabled)):hover::before,
+.arrowLastPage:has(input:not(:disabled)):hover::after {
+    background-color: #0d6efd;
+}
+
+.arrowFirstPage:has(input:disabled),
+.arrowPreviousPage:has(input:disabled),
+.arrowNextPage:has(input:disabled),
+.arrowLastPage:has(input:disabled) {
+    background-color: #f3f3f3;
+}
+
+.arrowFirstPage:has(input:disabled)::before,
+.arrowFirstPage:has(input:disabled)::after,
+.arrowPreviousPage:has(input:disabled)::before,
+.arrowNextPage:has(input:disabled)::before,
+.arrowLastPage:has(input:disabled)::before,
+.arrowLastPage:has(input:disabled)::after {
+    background-color: #aaa;
+    cursor: default;
+}
+
+.arrowPreviousPage + div {
+    display: flex;
+    align-items: center;
+    column-gap: 2px;
+    background-color: #f3f3f3;
+    height: 32px;
+    margin: 0 5px;
+    padding: 0 8px;
+}
+
+/* #endregion 明細ページング */
+
+/* #region 明細テーブル */
+div.tblWrapper {
+    display: flex;
+    max-width: 100%;
+    max-height: calc(100% - 36px);
+    margin-top: 16px;
+}
+div.tblWrapper > div {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    overflow: auto;
+}
+div.tblDialogHeadWrapper {
+    margin-top: 5px;
+    margin-left: 30px;
+}
+div.tblDialogRegularInspeLNSWrapper {
+    display: inline-block;
+    margin-top: 10px;
+    width: 100%;
+}
+div.tblDialogRegularInspeLNSWrapper > div {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    max-height: 225px;
+    overflow: auto;
+}
+div.tblDialogAdditionInspeLNSWrapper {
+    display: inline-block;
+    margin-top: 10px;
+    width: 100%;
+}
+div.tblDialogAdditionInspeLNSWrapper > div {
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    max-height: 225px;
+    overflow: auto;
+}
+
+table.tbl {
+    border-collapse: separate !important;
+    border-bottom: 1px solid #cfcfcf;
+    border-right: 1px solid #cfcfcf;
+}
+table#contents1_gvLNT0001 {
+    table-layout: fixed;
+    width: 2890px;
+}
+table.tbl th,
+table.tbl td {
+    text-align: center;
+    border-top: 1px solid #cfcfcf;
+    border-left: 1px solid #cfcfcf;
+}
+
+table.tbl td:nth-child(11),
+table.tbl td:nth-child(13),
+table.tbl td:nth-child(17),
+table.tbl td:nth-child(19),
+table.tbl td:nth-child(23),
+table.tbl td:nth-child(25),
+table.tbl td:nth-child(29),
+table.tbl td:nth-child(31) {
+    text-align: left;
+    padding-left: 3px;
+}
+
+table.tbl th {
+    height: 54px !important;
+    font-size: 15px;
+    background-color: #0f4493;
+    color: #FFFFFF;
+    font-weight: unset;
+}
+table.tbl td {
+    height: 27px !important;
+    font-size: 13px;
+    overflow: hidden;
+}
+table.tbl td.caution,
+table.tbl td input[type=date].caution,
+table.tbl td input[type=text].caution,
+table.tbl td select.caution {
+    background-color: #ffe3e3;
+    color: #333 !important;
+}
+table.tbl td.warning,
+table.tbl td input[type=date].warning,
+table.tbl td input[type=text].warning,
+table.tbl td select.warning {
+    background-color: #ffe3e3;
+}
+table.tbl td.registed,
+table.tbl td input[type=date].registed,
+table.tbl td input[type=text].registed,
+table.tbl td select.registed {
+    background-color: #FCE4D6;
+}
+table.tbl td input[type=text],
+table.tbl td select {
+    height: 100%;
+    width: 100%;
+    border: 1px solid skyblue;
+    text-align: left;
+    font-size: 13px;
+    padding: 2px 2px 2px 2px;
+    letter-spacing: 1px;
+}
+table.tbl td input[type=date] {
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+    border: 1px solid skyblue;
+    text-align: left;
+    font-size: 13px;
+    padding: 2px 2px 2px 2px;
+    letter-spacing: 1px;
+}
+
+table.tbl td input[type=date].error,
+table.tbl td input[type=text].error,
+table.tbl td select.error {
+    border-color : #FF0000;
+}
+table.tbl td input[type=date].warning.error,
+table.tbl td input[type=text].warning.error,
+table.tbl td select.warning.error {
+    border-color: #FFFF00;
+}
+
+table.tbl th:first-child,
+table.tbl td:first-child {
+    border-left: 1px solid #cfcfcf;
+}
+table.tbl.ctnlist th:nth-child(7),
+table.tbl.ctnlist td:nth-child(7) {
+    border-right: 1px solid #cfcfcf;
+}
+table.tbl.ctnlist th:nth-child(8),
+table.tbl.ctnlist td:nth-child(8) {
+    border-left: 0px;
+}
+table.tbl > tbody > tr:not(:nth-child(1)):nth-child(2n) {
+	background-color: #e1eeff;
+}
+table.tbl > tbody > tr:not(:nth-child(1)):nth-child(2n+1) {
+	background-color: #FFFFFF;
+}
+table.tbl td input[type=button] {
+    border: 1px solid #2bb6c1;
+    width: 100%;
+    height: 100%;
+    color: #2bb6c1;
+}
+table.tbl td input[id*='INSPECTYEAR'],
+table.tbl td select[id*='INSPECTCODE'] {
+    text-align: center;
+}
+table.tbl td input[id*='INSPECTNAME'] {
+    text-align : left;
+}
+
+table.tbl th.hidden {
+    visibility: hidden;
+}
+table.tbl.inspect th {
+    position: sticky;
+    top: 0;
+    height: 27px !important;
+    z-index: 200;
+}
+table.tbl.inspect td:first-child {
+    visibility: hidden;
+}
+table.tbl.inspect tr:last-child td:first-child {
+    visibility: unset;
+}
+table.tbl.inspect th:first-child,
+table.tbl.inspect th:last-child,
+table.tbl.inspect td:first-child,
+table.tbl.inspect td:last-child {
+    border-top: 0;
+    border-left-width: 0px;
+    background-color: #fff;
+}
+table.tbl.inspect th:nth-last-child(2),
+table.tbl.inspect td:nth-last-child(2) {
+    border-right: 1px solid #cfcfcf;
+}
+table.tbl.inspect {
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+}
+table.tbl.inspect tr:last-child td {
+    border-bottom: 1px solid #cfcfcf;
+}
+table.tbl.inspect tr:last-child td:first-child,
+table.tbl.inspect tr:last-child td:last-child {
+    border-bottom: 0;
+}
+table#contents1_gvDialogAdditionInspeLNS tr:last-child td:last-child input[type=button] {
+    visibility: hidden;
+}
+
+/* #endregion 明細テーブル */
+
+/* #region 検査登録ダイアログ */
+div#pnlInspectDialogWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+div#pnlInspectDialogArea {
+    display: inline-block;
+    width: 912px;
+    height: calc(100vh - 10px);
+    margin-top: 0px;
+    margin-left: 0px;
+    font-size: 12pt;
+    padding: 16px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+div#divInspectDialogHeader {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 5px;
+}
+div#divInspectDialogHeader > div {
+    display: inline-block;
+}
+div#divInspectDialogHeader > div.title1 {
+    width: 98%;
+}
+div#divInspectDialogBody {
+    display: inline-block;
+    height: calc(100% - 64px);
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+}
+div#divInspectDialogBody span.error {
+    color: red;
+}
+textarea#txtValidateMessage {
+    font-size: 13px;
+    color: red;
+    padding: 3px 3px 3px 3px;
+}
+textarea#txtValidateMessage.hidden {
+    visibility: hidden;
+}
+
+div#divValidateMessage {
+    margin-top: 10px;
+    height: 27px;
+}
+
+div#divInspectDialogFooter {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+/* #endregion 検査登録ダイアログ */

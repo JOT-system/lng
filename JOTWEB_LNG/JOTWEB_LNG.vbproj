@@ -241,101 +241,10 @@
     <Content Include="LNG\css\LNS0008D.css" />
     <Content Include="LNG\css\LNS0008L.css" />
     <Content Include="LNG\css\LNS0008S.css" />
-    <Content Include="LNG\css\LNS0020D.css" />
-    <Content Include="LNG\css\LNS0020L.css" />
-    <Content Include="LNG\css\LNS0020S.css" />
-    <Content Include="LNG\css\LNS0030D.css" />
-    <Content Include="LNG\css\LNS0031D.css" />
-    <Content Include="LNG\css\LNT0001D.css" />
-    <Content Include="LNG\css\LNT0001L.css" />
-    <Content Include="LNG\css\LNT0002L.css" />
-    <Content Include="LNG\css\LNT0003L.css" />
-    <Content Include="LNG\css\LNT0004L.css" />
-    <Content Include="LNG\css\LNT0005B.css" />
-    <Content Include="LNG\css\LNT0005C.css" />
-    <Content Include="LNG\css\LNT0005D.css" />
-    <Content Include="LNG\css\LNT0005L.css" />
-    <Content Include="LNG\css\LNT0005N.css" />
-    <Content Include="LNG\css\LNT0006O.css" />
-    <Content Include="LNG\css\LNT0007D.css" />
-    <Content Include="LNG\css\LNT0007L.css" />
-    <Content Include="LNG\css\LNT0008D.css" />
-    <Content Include="LNG\css\LNT0008L.css" />
-    <Content Include="LNG\css\LNT0009D.css" />
-    <Content Include="LNG\css\LNT0009L.css" />
-    <Content Include="LNG\css\LNT0012.css" />
-    <Content Include="LNG\css\LNT0013D.css" />
-    <Content Include="LNG\css\LNT0013L.css" />
-    <Content Include="LNG\css\LNT0014.css" />
-    <Content Include="LNG\css\LNT0015.css" />
-    <Content Include="LNG\css\LNT0016.css" />
-    <Content Include="LNG\css\LNT0017.css" />
-    <Content Include="LNG\css\LNT0018.css" />
-    <Content Include="LNG\css\LNT0019S.css" />
-    <Content Include="LNG\css\LNT0020.css" />
-    <Content Include="LNG\css\LNT0021L.css" />
-    <Content Include="LNG\css\LNT0022C.css" />
-    <Content Include="LNG\css\LNT0023D.css" />
-    <Content Include="LNG\css\LNT0023H.css" />
-    <Content Include="LNG\css\LNT0023L.css" />
-    <Content Include="LNG\css\LNT0023S.css" />
-    <Content Include="LNG\css\LNM0002D.css" />
-    <Content Include="LNG\css\LNM0002H.css" />
-    <Content Include="LNG\css\LNM0003H.css" />
-    <Content Include="LNG\css\LNM0007H.css" />
-    <Content Include="LNG\css\LNM0008H.css" />
-    <Content Include="LNG\css\LNM0009D.css" />
-    <Content Include="LNG\css\LNM0009H.css" />
-    <Content Include="LNG\css\LNM0009L.css" />
-    <Content Include="LNG\css\LNM0009S.css" />
-    <Content Include="LNG\css\LNM0011D.css" />
-    <Content Include="LNG\css\LNM0011H.css" />
-    <Content Include="LNG\css\LNM0011L.css" />
-    <Content Include="LNG\css\LNM0011S.css" />
-    <Content Include="LNG\css\LNM0013H.css" />
-    <Content Include="LNG\css\LNM0013L.css" />
-    <Content Include="LNG\css\LNM0014D.css" />
-    <Content Include="LNG\css\LNM0014H.css" />
-    <Content Include="LNG\css\LNM0014L.css" />
-    <Content Include="LNG\css\LNM0014S.css" />
-    <Content Include="LNG\css\LNM0015D.css" />
-    <Content Include="LNG\css\LNM0015H.css" />
-    <Content Include="LNG\css\LNM0015L.css" />
-    <Content Include="LNG\css\LNM0015S.css" />
-    <Content Include="LNG\css\LNM0016H.css" />
-    <Content Include="LNG\css\LNM0017H.css" />
+    <Content Include="LNG\css\LNT0001C.css" />
     <Content Include="LNG\css\LNM0023D.css" />
     <Content Include="LNG\css\LNM0023L.css" />
     <Content Include="LNG\css\LNM0023S.css" />
-    <Content Include="LNG\css\LNM0008D.css" />
-    <Content Include="LNG\css\LNM0007D.css" />
-    <Content Include="LNG\css\LNM0003D.css" />
-    <Content Include="LNG\css\LNM0008L.css" />
-    <Content Include="LNG\css\LNM0007L.css" />
-    <Content Include="LNG\css\LNM0003L.css" />
-    <Content Include="LNG\css\LNM0008S.css" />
-    <Content Include="LNG\css\LNM0007S.css" />
-    <Content Include="LNG\css\LNM0003S.css" />
-    <Content Include="LNG\css\LNM0013D.css" />
-    <Content Include="LNG\css\LNM0013S.css" />
-    <Content Include="LNG\css\LNM0017D.css" />
-    <Content Include="LNG\css\LNM0016D.css" />
-    <Content Include="LNG\css\LNM0017L.css" />
-    <Content Include="LNG\css\LNM0016L.css" />
-    <Content Include="LNG\css\LNM0017S.css" />
-    <Content Include="LNG\css\LNM0016S.css" />
-    <Content Include="LNG\css\LNM0021D.css" />
-    <Content Include="LNG\css\LNM0002L.css" />
-    <Content Include="LNG\css\LNM0021L.css" />
-    <Content Include="LNG\css\LNM0002S.css" />
-    <Content Include="LNG\css\LNM0021S.css" />
-    <Content Include="LNG\css\LNM0024H.css" />
-    <Content Include="LNG\css\LNM0026D.css" />
-    <Content Include="LNG\css\LNM0024D.css" />
-    <Content Include="LNG\css\LNM0024L.css" />
-    <Content Include="LNG\css\LNM0024S.css" />
-    <Content Include="LNG\css\LNM0026L.css" />
-    <Content Include="LNG\css\LNM0026S.css" />
     <Content Include="LNG\css\ex\error.css" />
     <Content Include="LNG\ex\page_400.html" />
     <Content Include="LNG\ex\page_401.html" />
@@ -375,104 +284,17 @@
     <Content Include="LNG\img\Japan7.png" />
     <Content Include="LNG\img\master.png" />
     <Content Include="LNG\img\menuPaneRefreshWhite.png" />
-    <Content Include="LNG\inc\LNS0020WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0009WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0011WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0014WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0015WRKINC.ascx" />
+    <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
+    <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
+    <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0008WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0007WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0003WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0013WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0017WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0016WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0021WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0002WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0024WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0026WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0002WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
-    <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0002WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0003WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0004WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0005WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0006WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0007WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0008WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0009WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0012WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0013WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0014WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0015WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0016WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0017WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0018WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0019WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0020WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0021WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0022WRKINC.ascx" />
-    <Content Include="LNG\inc\LNT0023WRKINC.ascx" />
-    <Content Include="LNG\inv\LNT0022InspectManage.aspx" />
-    <Content Include="LNG\mas\LNM0002ReconmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0002ReconmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0003RekejmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0007Rect1mHistory.aspx" />
-    <Content Include="LNG\mas\LNM0008Rect2mHistory.aspx" />
-    <Content Include="LNG\mas\LNM0009RetinmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0009RetinmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0009RetinmList.aspx" />
-    <Content Include="LNG\mas\LNM0009RetinmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0011RekmtmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0011RekmtmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0011RekmtmList.aspx" />
-    <Content Include="LNG\mas\LNM0011RekmtmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0013RektrmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0014ReutrmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0014ReutrmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0014ReutrmList.aspx" />
-    <Content Include="LNG\mas\LNM0014ReutrmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0015ResrtmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0015ResrtmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0015ResrtmList.aspx" />
-    <Content Include="LNG\mas\LNM0015ResrtmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0016Rest1mHistory.aspx" />
-    <Content Include="LNG\mas\LNM0017Rest2mHistory.aspx" />
+    <Content Include="LNG\zisseki\LNT0001ZissekiManage.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperDetail.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperList.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperSearch.aspx" />
-    <Content Include="LNG\mas\LNM0007Rect1mDetail.aspx" />
-    <Content Include="LNG\mas\LNM0003RekejmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0008Rect2mDetail.aspx" />
-    <Content Include="LNG\mas\LNM0008Rect2mList.aspx" />
-    <Content Include="LNG\mas\LNM0007Rect1mList.aspx" />
-    <Content Include="LNG\mas\LNM0003RekejmList.aspx" />
-    <Content Include="LNG\mas\LNM0002ReconmList.aspx" />
-    <Content Include="LNG\mas\LNM0002ReconmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0008Rect2mSearch.aspx" />
-    <Content Include="LNG\mas\LNM0007Rect1mSearch.aspx" />
-    <Content Include="LNG\mas\LNM0003RekejmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0013RektrmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0013RektrmList.aspx" />
-    <Content Include="LNG\mas\LNM0013RektrmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0017Rest2mDetail.aspx" />
-    <Content Include="LNG\mas\LNM0016Rest1mDetail.aspx" />
-    <Content Include="LNG\mas\LNM0017Rest2mList.aspx" />
-    <Content Include="LNG\mas\LNM0016Rest1mList.aspx" />
-    <Content Include="LNG\mas\LNM0017Rest2mSearch.aspx" />
-    <Content Include="LNG\mas\LNM0016Rest1mSearch.aspx" />
-    <Content Include="LNG\mas\LNM0021ItemDetail.aspx" />
-    <Content Include="LNG\mas\LNM0021ItemList.aspx" />
-    <Content Include="LNG\mas\LNM0021ItemSearch.aspx" />
-    <Content Include="LNG\mas\LNM0024KekkjmDetail.aspx" />
-    <Content Include="LNG\mas\LNM0024KekkjmHistory.aspx" />
-    <Content Include="LNG\mas\LNM0024KekkjmList.aspx" />
-    <Content Include="LNG\mas\LNM0024KekkjmSearch.aspx" />
-    <Content Include="LNG\mas\LNM0026IncentiveDetail.aspx" />
-    <Content Include="LNG\mas\LNM0026IncentiveList.aspx" />
-    <Content Include="LNG\mas\LNM0026IncentiveSearch.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceDetail.aspx" />
     <Content Include="LNG\mas\LNS0002UserDetail.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceDownload.aspx" />
@@ -480,99 +302,11 @@
     <Content Include="LNG\mas\LNS0002UserList.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceSearch.aspx" />
     <Content Include="LNG\mas\LNS0002UserSearch.aspx" />
-    <Content Include="LNG\ord\LNT0001OrderDetail.aspx" />
-    <Content Include="LNG\ord\LNT0001OrderList.aspx" />
-    <Content Include="LNG\ord\LNT0001OrderSearch.aspx" />
-    <Content Include="LNG\pay\LNT0019ClosingBranch.aspx" />
-    <Content Include="LNG\pay\LNT0023PayeeLinkDetail.aspx" />
-    <Content Include="LNG\pay\LNT0023PayeeLinkHistory.aspx" />
-    <Content Include="LNG\pay\LNT0023PayeeLinkList.aspx" />
-    <Content Include="LNG\pay\LNT0023PayeeLinkSearch.aspx" />
-    <Content Include="LNG\report\LNT0012ReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0016OperatinNumReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx" />
-    <Content Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx" />
-    <Content Include="LNG\script\LNS0020D.js" />
-    <Content Include="LNG\script\LNS0030D.js" />
-    <Content Include="LNG\script\LNS0031D.js" />
-    <Content Include="LNG\script\LNT0001D.js" />
-    <Content Include="LNG\script\LNT0001L.js" />
-    <Content Include="LNG\script\LNT0002L.js" />
-    <Content Include="LNG\script\LNT0003L.js" />
-    <Content Include="LNG\script\LNT0004L.js" />
-    <Content Include="LNG\script\LNT0005B.js" />
-    <Content Include="LNG\script\LNT0005C.js" />
-    <Content Include="LNG\script\LNT0005D.js" />
-    <Content Include="LNG\script\LNT0005L.js" />
-    <Content Include="LNG\script\LNT0005N.js" />
-    <Content Include="LNG\script\LNT0006O.js" />
-    <Content Include="LNG\script\LNT0007D.js" />
-    <Content Include="LNG\script\LNT0007L.js" />
-    <Content Include="LNG\script\LNT0008D.js" />
-    <Content Include="LNG\script\LNT0008L.js" />
-    <Content Include="LNG\script\LNT0009L.js" />
-    <Content Include="LNG\script\LNT0012S.js" />
-    <Content Include="LNG\script\LNT0013D.js" />
-    <Content Include="LNG\script\LNT0013L.js" />
-    <Content Include="LNG\script\LNT0014S.js" />
-    <Content Include="LNG\script\LNT0015S.js" />
-    <Content Include="LNG\script\LNT0016S.js" />
-    <Content Include="LNG\script\LNT0017S.js" />
-    <Content Include="LNG\script\LNT0018S.js" />
-    <Content Include="LNG\script\LNT0019S.js" />
-    <Content Include="LNG\script\LNT0020S.js" />
-    <Content Include="LNG\script\LNT0021L.js" />
-    <Content Include="LNG\script\LNT0022C.js" />
-    <Content Include="LNG\script\LNT0023D.js" />
-    <Content Include="LNG\script\LNT0023H.js" />
-    <Content Include="LNG\script\LNT0023L.js" />
-    <Content Include="LNG\script\LNM0002H.js" />
-    <Content Include="LNG\script\LNM0003H.js" />
-    <Content Include="LNG\script\LNM0007H.js" />
-    <Content Include="LNG\script\LNM0008H.js" />
-    <Content Include="LNG\script\LNM0009D.js" />
-    <Content Include="LNG\script\LNM0009H.js" />
-    <Content Include="LNG\script\LNM0009L.js" />
-    <Content Include="LNG\script\LNM0011D.js" />
-    <Content Include="LNG\script\LNM0011H.js" />
-    <Content Include="LNG\script\LNM0011L.js" />
-    <Content Include="LNG\script\LNM0013H.js" />
-    <Content Include="LNG\script\LNM0014H.js" />
-    <Content Include="LNG\script\LNM0015D.js" />
-    <Content Include="LNG\script\LNM0015H.js" />
-    <Content Include="LNG\script\LNM0015L.js" />
-    <Content Include="LNG\script\LNM0016H.js" />
-    <Content Include="LNG\script\LNM0017H.js" />
-    <Content Include="LNG\script\LNM0024D.js" />
-    <Content Include="LNG\script\LNM0024H.js" />
-    <Content Include="LNG\script\LNM0024L.js" />
-    <Content Include="LNG\script\LNM0026D.js" />
-    <Content Include="LNG\script\LNM0026L.js" />
-    <Content Include="LNG\script\LNM0014D.js" />
-    <Content Include="LNG\script\LNM0014L.js" />
-    <Content Include="LNG\script\LNM0021D.js" />
+    <Content Include="LNG\script\LNT0001C.js" />
     <Content Include="LNG\script\LNM0023D.js" />
-    <Content Include="LNG\script\LNM0003D.js" />
     <Content Include="LNG\script\LNM0023L.js" />
-    <Content Include="LNG\script\LNM0008D.js" />
-    <Content Include="LNG\script\LNM0007D.js" />
-    <Content Include="LNG\script\LNM0008L.js" />
-    <Content Include="LNG\script\LNM0007L.js" />
-    <Content Include="LNG\script\LNM0003L.js" />
-    <Content Include="LNG\script\LNM0013D.js" />
-    <Content Include="LNG\script\LNM0013L.js" />
-    <Content Include="LNG\script\LNM0017D.js" />
-    <Content Include="LNG\script\LNM0016D.js" />
-    <Content Include="LNG\script\LNM0017L.js" />
-    <Content Include="LNG\script\LNM0016L.js" />
     <Content Include="LNG\script\LNS0008D.js" />
     <Content Include="LNG\script\LNS0002D.js" />
-    <Content Include="LNG\script\LNM0002D.js" />
-    <Content Include="LNG\script\LNM0002L.js" />
-    <Content Include="LNG\script\LNM0021L.js" />
     <Content Include="LNG\script\LNS0008L.js" />
     <Content Include="LNG\script\LNS0002L.js" />
     <Content Include="img\ctnlogo.png" />
@@ -626,9 +360,6 @@
     <Content Include="LNG\img\unlockKey.png" />
     <Content Include="LNG\img\warning.png" />
     <Content Include="LNG\img\w_cat.png" />
-    <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
-    <Content Include="LNG\inc\GRM00002WRKINC.ascx" />
-    <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="inc\GRIS0001Title.ascx" />
     <Content Include="inc\GRIS0002Footer.ascx" />
     <Content Include="inc\GRIS0003SRightBox.ascx" />
@@ -676,6 +407,7 @@
     <Compile Include="base\CS\CS0036.vb" />
     <Compile Include="base\CS\CS0050.vb" />
     <Compile Include="base\CS\CS0051.vb" />
+    <Compile Include="base\CS\CS0054.vb" />
     <Compile Include="base\CS\CS0053.vb" />
     <Compile Include="base\CS\CS0052.vb" />
     <Compile Include="base\GL\GL0000.vb" />
@@ -707,13 +439,6 @@
     <Compile Include="base\GS\GS0032.vb" />
     <Compile Include="base\Messages.vb" />
     <Compile Include="base\PrevDispMap.vb" />
-    <Compile Include="base\PRT\CTT0010.vb" />
-    <Compile Include="base\PRT\PRT0000.vb" />
-    <Compile Include="base\PRT\PRT0001.vb" />
-    <Compile Include="base\PRT\PRT0002.vb" />
-    <Compile Include="base\PRT\PRT0003.vb" />
-    <Compile Include="base\PRT\PRT0004.vb" />
-    <Compile Include="base\PRT\PRT0006.vb" />
     <Compile Include="base\SessionKey.vb" />
     <Compile Include="base\StoredPGName.vb" />
     <Compile Include="base\YDF.vb" />
@@ -733,39 +458,25 @@
     <Compile Include="LNG\com\EntrySeikyuData.vb" />
     <Compile Include="LNG\com\EntryOrderData.vb" />
     <Compile Include="LNG\com\EntrySeisanFData.vb" />
-    <Compile Include="LNG\inc\LNS0020WRKINC.ascx.designer.vb">
-      <DependentUpon>LNS0020WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\inc\LNS0020WRKINC.ascx.vb">
-      <DependentUpon>LNS0020WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.vb">
+      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\LNM0009WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0009WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.designer.vb">
+      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\inc\LNM0009WRKINC.ascx.vb">
-      <DependentUpon>LNM0009WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.vb">
+      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\LNM0011WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0011WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.designer.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\inc\LNM0011WRKINC.ascx.vb">
-      <DependentUpon>LNM0011WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.vb">
-      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0015WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0015WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0015WRKINC.ascx.vb">
-      <DependentUpon>LNM0015WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.vb">
+      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\inc\LNM0023WRKINC.ascx.designer.vb">
@@ -773,76 +484,6 @@
     </Compile>
     <Compile Include="LNG\inc\LNM0023WRKINC.ascx.vb">
       <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0008WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0008WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0008WRKINC.ascx.vb">
-      <DependentUpon>LNM0008WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.vb">
-      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0003WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0003WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0003WRKINC.ascx.vb">
-      <DependentUpon>LNM0003WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0013WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0013WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0013WRKINC.ascx.vb">
-      <DependentUpon>LNM0013WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0017WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0017WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0017WRKINC.ascx.vb">
-      <DependentUpon>LNM0017WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0016WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0016WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0016WRKINC.ascx.vb">
-      <DependentUpon>LNM0016WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0021WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0021WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0021WRKINC.ascx.vb">
-      <DependentUpon>LNM0021WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0002WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0002WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0002WRKINC.ascx.vb">
-      <DependentUpon>LNM0002WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0024WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0024WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0024WRKINC.ascx.vb">
-      <DependentUpon>LNM0024WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0026WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0026WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNM0026WRKINC.ascx.vb">
-      <DependentUpon>LNM0026WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\inc\LNS0002WRKINC.ascx.designer.vb">
@@ -862,13 +503,6 @@
       <DependentUpon>LNS0008WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.designer.vb">
-      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx.vb">
-      <DependentUpon>GRC0002SELECTIONPOPUPWORKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="LNG\inc\LNT0001WRKINC.ascx.designer.vb">
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
     </Compile>
@@ -876,321 +510,11 @@
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.vb">
-      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0003WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0003WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0003WRKINC.ascx.vb">
-      <DependentUpon>LNT0003WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0004WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0004WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0004WRKINC.ascx.vb">
-      <DependentUpon>LNT0004WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0005WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0005WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0005WRKINC.ascx.vb">
-      <DependentUpon>LNT0005WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0006WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0006WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0006WRKINC.ascx.vb">
-      <DependentUpon>LNT0006WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0007WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0007WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0007WRKINC.ascx.vb">
-      <DependentUpon>LNT0007WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0008WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0008WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0008WRKINC.ascx.vb">
-      <DependentUpon>LNT0008WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0009WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0009WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0009WRKINC.ascx.vb">
-      <DependentUpon>LNT0009WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0012WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0012WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0012WRKINC.ascx.vb">
-      <DependentUpon>LNT0012WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0013WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0013WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0013WRKINC.ascx.vb">
-      <DependentUpon>LNT0013WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0014WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0014WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0014WRKINC.ascx.vb">
-      <DependentUpon>LNT0014WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0015WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0015WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0015WRKINC.ascx.vb">
-      <DependentUpon>LNT0015WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0016WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0016WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0016WRKINC.ascx.vb">
-      <DependentUpon>LNT0016WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0017WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0017WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0017WRKINC.ascx.vb">
-      <DependentUpon>LNT0017WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0018WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0018WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0018WRKINC.ascx.vb">
-      <DependentUpon>LNT0018WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0019WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0019WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0019WRKINC.ascx.vb">
-      <DependentUpon>LNT0019WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0020WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0020WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0020WRKINC.ascx.vb">
-      <DependentUpon>LNT0020WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0021WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0021WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0021WRKINC.ascx.vb">
-      <DependentUpon>LNT0021WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0022WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0022WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0022WRKINC.ascx.vb">
-      <DependentUpon>LNT0022WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0023WRKINC.ascx.designer.vb">
-      <DependentUpon>LNT0023WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\LNT0023WRKINC.ascx.vb">
-      <DependentUpon>LNT0023WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inv\LNT0022InspectManage.aspx.designer.vb">
-      <DependentUpon>LNT0022InspectManage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inv\LNT0022InspectManage.aspx.vb">
-      <DependentUpon>LNT0022InspectManage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\lea\CreateLeviesList.vb" />
-    <Compile Include="LNG\lea\FinanceLeaseCheck.vb" />
-    <Compile Include="LNG\mas\LNM0002ReconmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0002ReconmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmDetail.aspx.vb">
-      <DependentUpon>LNM0002ReconmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0002ReconmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmHistory.aspx.vb">
-      <DependentUpon>LNM0002ReconmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0003RekejmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmHistory.aspx.vb">
-      <DependentUpon>LNM0003RekejmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mHistory.aspx.designer.vb">
-      <DependentUpon>LNM0007Rect1mHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mHistory.aspx.vb">
-      <DependentUpon>LNM0007Rect1mHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mHistory.aspx.designer.vb">
-      <DependentUpon>LNM0008Rect2mHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mHistory.aspx.vb">
-      <DependentUpon>LNM0008Rect2mHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0009RetinmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmDetail.aspx.vb">
-      <DependentUpon>LNM0009RetinmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0009RetinmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmHistory.aspx.vb">
-      <DependentUpon>LNM0009RetinmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmList.aspx.designer.vb">
-      <DependentUpon>LNM0009RetinmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmList.aspx.vb">
-      <DependentUpon>LNM0009RetinmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0009RetinmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0009RetinmSearch.aspx.vb">
-      <DependentUpon>LNM0009RetinmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0011RekmtmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmDetail.aspx.vb">
-      <DependentUpon>LNM0011RekmtmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0011RekmtmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmHistory.aspx.vb">
-      <DependentUpon>LNM0011RekmtmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmList.aspx.designer.vb">
-      <DependentUpon>LNM0011RekmtmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmList.aspx.vb">
-      <DependentUpon>LNM0011RekmtmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0011RekmtmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0011RekmtmSearch.aspx.vb">
-      <DependentUpon>LNM0011RekmtmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0013RektrmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmHistory.aspx.vb">
-      <DependentUpon>LNM0013RektrmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0014ReutrmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmDetail.aspx.vb">
-      <DependentUpon>LNM0014ReutrmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0014ReutrmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmHistory.aspx.vb">
-      <DependentUpon>LNM0014ReutrmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmList.aspx.designer.vb">
-      <DependentUpon>LNM0014ReutrmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmList.aspx.vb">
-      <DependentUpon>LNM0014ReutrmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0014ReutrmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0014ReutrmSearch.aspx.vb">
-      <DependentUpon>LNM0014ReutrmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0015ResrtmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmDetail.aspx.vb">
-      <DependentUpon>LNM0015ResrtmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0015ResrtmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmHistory.aspx.vb">
-      <DependentUpon>LNM0015ResrtmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmList.aspx.designer.vb">
-      <DependentUpon>LNM0015ResrtmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmList.aspx.vb">
-      <DependentUpon>LNM0015ResrtmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0015ResrtmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0015ResrtmSearch.aspx.vb">
-      <DependentUpon>LNM0015ResrtmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mHistory.aspx.designer.vb">
-      <DependentUpon>LNM0016Rest1mHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mHistory.aspx.vb">
-      <DependentUpon>LNM0016Rest1mHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mHistory.aspx.designer.vb">
-      <DependentUpon>LNM0017Rest2mHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mHistory.aspx.vb">
-      <DependentUpon>LNM0017Rest2mHistory.aspx</DependentUpon>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiManage.aspx.designer.vb">
+      <DependentUpon>LNT0001ZissekiManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiManage.aspx.vb">
+      <DependentUpon>LNT0001ZissekiManage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNM0023ShipperDetail.aspx.designer.vb">
@@ -1212,216 +536,6 @@
     </Compile>
     <Compile Include="LNG\mas\LNM0023ShipperSearch.aspx.vb">
       <DependentUpon>LNM0023ShipperSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mDetail.aspx.designer.vb">
-      <DependentUpon>LNM0007Rect1mDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mDetail.aspx.vb">
-      <DependentUpon>LNM0007Rect1mDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0003RekejmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmDetail.aspx.vb">
-      <DependentUpon>LNM0003RekejmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mDetail.aspx.designer.vb">
-      <DependentUpon>LNM0008Rect2mDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mDetail.aspx.vb">
-      <DependentUpon>LNM0008Rect2mDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mList.aspx.designer.vb">
-      <DependentUpon>LNM0008Rect2mList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mList.aspx.vb">
-      <DependentUpon>LNM0008Rect2mList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mList.aspx.designer.vb">
-      <DependentUpon>LNM0007Rect1mList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mList.aspx.vb">
-      <DependentUpon>LNM0007Rect1mList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmList.aspx.designer.vb">
-      <DependentUpon>LNM0003RekejmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmList.aspx.vb">
-      <DependentUpon>LNM0003RekejmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmList.aspx.designer.vb">
-      <DependentUpon>LNM0002ReconmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmList.aspx.vb">
-      <DependentUpon>LNM0002ReconmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0002ReconmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0002ReconmSearch.aspx.vb">
-      <DependentUpon>LNM0002ReconmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mSearch.aspx.designer.vb">
-      <DependentUpon>LNM0008Rect2mSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0008Rect2mSearch.aspx.vb">
-      <DependentUpon>LNM0008Rect2mSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mSearch.aspx.designer.vb">
-      <DependentUpon>LNM0007Rect1mSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0007Rect1mSearch.aspx.vb">
-      <DependentUpon>LNM0007Rect1mSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0003RekejmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0003RekejmSearch.aspx.vb">
-      <DependentUpon>LNM0003RekejmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0013RektrmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmDetail.aspx.vb">
-      <DependentUpon>LNM0013RektrmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmList.aspx.designer.vb">
-      <DependentUpon>LNM0013RektrmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmList.aspx.vb">
-      <DependentUpon>LNM0013RektrmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0013RektrmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0013RektrmSearch.aspx.vb">
-      <DependentUpon>LNM0013RektrmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mDetail.aspx.designer.vb">
-      <DependentUpon>LNM0017Rest2mDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mDetail.aspx.vb">
-      <DependentUpon>LNM0017Rest2mDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mDetail.aspx.designer.vb">
-      <DependentUpon>LNM0016Rest1mDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mDetail.aspx.vb">
-      <DependentUpon>LNM0016Rest1mDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mList.aspx.designer.vb">
-      <DependentUpon>LNM0017Rest2mList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mList.aspx.vb">
-      <DependentUpon>LNM0017Rest2mList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mList.aspx.designer.vb">
-      <DependentUpon>LNM0016Rest1mList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mList.aspx.vb">
-      <DependentUpon>LNM0016Rest1mList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mSearch.aspx.designer.vb">
-      <DependentUpon>LNM0017Rest2mSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0017Rest2mSearch.aspx.vb">
-      <DependentUpon>LNM0017Rest2mSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mSearch.aspx.designer.vb">
-      <DependentUpon>LNM0016Rest1mSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0016Rest1mSearch.aspx.vb">
-      <DependentUpon>LNM0016Rest1mSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemDetail.aspx.designer.vb">
-      <DependentUpon>LNM0021ItemDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemDetail.aspx.vb">
-      <DependentUpon>LNM0021ItemDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemList.aspx.designer.vb">
-      <DependentUpon>LNM0021ItemList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemList.aspx.vb">
-      <DependentUpon>LNM0021ItemList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemSearch.aspx.designer.vb">
-      <DependentUpon>LNM0021ItemSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0021ItemSearch.aspx.vb">
-      <DependentUpon>LNM0021ItemSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmDetail.aspx.designer.vb">
-      <DependentUpon>LNM0024KekkjmDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmDetail.aspx.vb">
-      <DependentUpon>LNM0024KekkjmDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmHistory.aspx.designer.vb">
-      <DependentUpon>LNM0024KekkjmHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmHistory.aspx.vb">
-      <DependentUpon>LNM0024KekkjmHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmList.aspx.designer.vb">
-      <DependentUpon>LNM0024KekkjmList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmList.aspx.vb">
-      <DependentUpon>LNM0024KekkjmList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmSearch.aspx.designer.vb">
-      <DependentUpon>LNM0024KekkjmSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0024KekkjmSearch.aspx.vb">
-      <DependentUpon>LNM0024KekkjmSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveDetail.aspx.designer.vb">
-      <DependentUpon>LNM0026IncentiveDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveDetail.aspx.vb">
-      <DependentUpon>LNM0026IncentiveDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveList.aspx.designer.vb">
-      <DependentUpon>LNM0026IncentiveList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveList.aspx.vb">
-      <DependentUpon>LNM0026IncentiveList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveSearch.aspx.designer.vb">
-      <DependentUpon>LNM0026IncentiveSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0026IncentiveSearch.aspx.vb">
-      <DependentUpon>LNM0026IncentiveSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNS0008GuidanceDetail.aspx.designer.vb">
@@ -1477,20 +591,6 @@
       <DependentUpon>GRCO0100XLSUP.ashx</DependentUpon>
     </Compile>
     <Compile Include="LNG\com\CsvCreate.vb" />
-    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
-      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.vb">
-      <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\GRM00002WRKINC.ascx.designer.vb">
-      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\GRM00002WRKINC.ascx.vb">
-      <DependentUpon>GRM00002WRKINC.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="LNG\M00001MENU.aspx.designer.vb">
       <DependentUpon>M00001MENU.aspx</DependentUpon>
     </Compile>
@@ -1503,13 +603,6 @@
     </Compile>
     <Compile Include="LNG\LNGMasterPage.Master.vb">
       <DependentUpon>LNGMasterPage.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.designer.vb">
-      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\inc\GRM00001WRKINC.ascx.vb">
-      <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="inc\GRIS0001Title.ascx.designer.vb">
@@ -1550,140 +643,6 @@
     <Compile Include="LNG\menupane\MP0000Base.vb">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderDetail.aspx.designer.vb">
-      <DependentUpon>LNT0001OrderDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderDetail.aspx.vb">
-      <DependentUpon>LNT0001OrderDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderList.aspx.designer.vb">
-      <DependentUpon>LNT0001OrderList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderList.aspx.vb">
-      <DependentUpon>LNT0001OrderList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderSearch.aspx.designer.vb">
-      <DependentUpon>LNT0001OrderSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\ord\LNT0001OrderSearch.aspx.vb">
-      <DependentUpon>LNT0001OrderSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\pay\CPT0019_AccountingData_DIODOC.vb" />
-    <Compile Include="LNG\pay\LNT0019ClosingBranch.aspx.designer.vb">
-      <DependentUpon>LNT0019ClosingBranch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0019ClosingBranch.aspx.vb">
-      <DependentUpon>LNT0019ClosingBranch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkDetail.aspx.designer.vb">
-      <DependentUpon>LNT0023PayeeLinkDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkDetail.aspx.vb">
-      <DependentUpon>LNT0023PayeeLinkDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkHistory.aspx.designer.vb">
-      <DependentUpon>LNT0023PayeeLinkHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkHistory.aspx.vb">
-      <DependentUpon>LNT0023PayeeLinkHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkList.aspx.designer.vb">
-      <DependentUpon>LNT0023PayeeLinkList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkList.aspx.vb">
-      <DependentUpon>LNT0023PayeeLinkList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkSearch.aspx.designer.vb">
-      <DependentUpon>LNT0023PayeeLinkSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\pay\LNT0023PayeeLinkSearch.aspx.vb">
-      <DependentUpon>LNT0023PayeeLinkSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0003PresentState_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0004_DepartureArrivalDifferenceDailyList_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012ReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0012ReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0012ReportOutput.aspx.vb">
-      <DependentUpon>LNT0012ReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0012_AccountSummaryList_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_BILLINGACCOUNTBYDEPARTMENTLIST_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_DailyShipmentReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_FreeSendFeeReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_InterBranchChartAmountReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_InterBranchChartQuantityReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_LeaseExpirationList_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_LeaseFeeReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_MovementContainerReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_OtherStationReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_PutContainerReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_RentalCTNListReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_RessnfListReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_SalesResultsReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_TransportTotalPeriodReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_TransportTotalReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0012_UsefeeDetailReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0014ForwordDetailReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0014ForwordDetailReportOutput.aspx.vb">
-      <DependentUpon>LNT0014ForwordDetailReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0014_ForwordDetailReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0015BillingLedgerReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0015BillingLedgerReportOutput.aspx.vb">
-      <DependentUpon>LNT0015BillingLedgerReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0015_BillingLedgerReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0016OperatinNumReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0016OperatinNumReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0016OperatinNumReportOutput.aspx.vb">
-      <DependentUpon>LNT0016OperatinNumReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0016_OperatinNumReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0017TsptQuantityReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0017TsptQuantityReportOutput.aspx.vb">
-      <DependentUpon>LNT0017TsptQuantityReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0017_TsptQuantityReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0018PaymentLedgerReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0018PaymentLedgerReportOutput.aspx.vb">
-      <DependentUpon>LNT0018PaymentLedgerReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0018_PaymentLedgerReport_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx.designer.vb">
-      <DependentUpon>LNT0020OperatIncomeReportOutput.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\report\LNT0020OperatIncomeReportOutput.aspx.vb">
-      <DependentUpon>LNT0020OperatIncomeReportOutput.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\report\LNT0020_OperatIncome_Report_DIODOC.vb" />
-    <Compile Include="LNG\report\LNT0022_CustomReport.vb" />
-    <Compile Include="LNG\sal\LNT0010_SelesReport_ALL_DIODOC.vb" />
-    <Compile Include="LNG\sal\LNT0010_SelesReport_SHITEN_DIODOC.vb" />
     <Compile Include="M10000LOGON.aspx.designer.vb">
       <DependentUpon>M10000LOGON.aspx</DependentUpon>
     </Compile>

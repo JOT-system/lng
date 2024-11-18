@@ -303,84 +303,84 @@ Public Class M00001MENU
         End If
 
         If menuItm.Reportflg = "1" Then
-            '★★★ ボタン押下時、帳票出力 ★★★
-            Dim WW_DATE As Date = Date.Now.AddDays(-1)
-            Dim WW_WORKINGDATE As Date = Nothing
-            Dim daycount As Integer = 0
-            '前稼働日取得
-            Using sqlCon As MySqlConnection = CS0050Session.getConnection
-                Try
-                    sqlCon.Open()
-                    WW_WORKINGDATE = GetWorkingDate(sqlCon, WW_DATE)
+            '    '★★★ ボタン押下時、帳票出力 ★★★
+            '    Dim WW_DATE As Date = Date.Now.AddDays(-1)
+            '    Dim WW_WORKINGDATE As Date = Nothing
+            '    Dim daycount As Integer = 0
+            '    '前稼働日取得
+            '    Using sqlCon As MySqlConnection = CS0050Session.getConnection
+            '        Try
+            '            sqlCon.Open()
+            '            WW_WORKINGDATE = GetWorkingDate(sqlCon, WW_DATE)
 
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "前稼働日の取得に失敗しました。", needsPopUp:=True)
+            '        Catch ex As Exception
+            '            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "前稼働日の取得に失敗しました。", needsPopUp:=True)
 
-                    CS0011LOGWRITE.INFSUBCLASS = "Main"
-                    CS0011LOGWRITE.INFPOSI = "LNS0021_CALENDAR SELECT"
-                    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWRITE.TEXT = ex.ToString()
-                    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWRITE.CS0011LOGWrite()
-                    Return
-                End Try
-            End Using
+            '            CS0011LOGWRITE.INFSUBCLASS = "Main"
+            '            CS0011LOGWRITE.INFPOSI = "LNS0021_CALENDAR SELECT"
+            '            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            '            CS0011LOGWRITE.TEXT = ex.ToString()
+            '            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            '            CS0011LOGWRITE.CS0011LOGWrite()
+            '            Return
+            '        End Try
+            '    End Using
 
-            daycount = (WW_DATE.Date - WW_WORKINGDATE.Date).Days
+            '    daycount = (WW_DATE.Date - WW_WORKINGDATE.Date).Days
 
-            Dim PRT0000ReportCall As New PRT0000ReportCall
-            Dim PrintCount As Integer = 0
-            ClearURLValue()
-            Dim FirstFLG As String = "0"
-            Dim LastFLG As String = "0"
-            Dim ALLDT As DataTable = Nothing
-            Dim ALLDT2 As DataTable = Nothing
+            '    Dim PRT0000ReportCall As New PRT0000ReportCall
+            '    Dim PrintCount As Integer = 0
+            '    ClearURLValue()
+            '    Dim FirstFLG As String = "0"
+            '    Dim LastFLG As String = "0"
+            '    Dim ALLDT As DataTable = Nothing
+            '    Dim ALLDT2 As DataTable = Nothing
 
-            For i As Integer = 0 To daycount
-                If i = daycount Then
-                    If daycount = 0 Then
-                        FirstFLG = "1"
-                        LastFLG = "1"
-                    Else
-                        FirstFLG = "0"
-                        LastFLG = "1"
-                    End If
-                ElseIf i = 0 Then
-                    FirstFLG = "1"
-                    LastFLG = "0"
-                Else
-                    FirstFLG = "0"
-                    LastFLG = "0"
-                End If
-                PRT0000ReportCall.REPORTID = menuItm.Reportid
-                PRT0000ReportCall.TARGETDATE = WW_WORKINGDATE
-                PRT0000ReportCall.CAMPCODE = Master.USERCAMP
-                PRT0000ReportCall.BRANCHCODE = Master.USER_AFFILIATION
-                PRT0000ReportCall.USERID = Master.USERID
-                PRT0000ReportCall.TERMID = Master.USERTERMID
-                PRT0000ReportCall.ALLDT = ALLDT
-                PRT0000ReportCall.ALLDT2 = ALLDT2
-                PRT0000ReportCall.ReportCall(LastFLG, FirstFLG, ALLDT, ALLDT2)
-                ALLDT = PRT0000ReportCall.ALLDT
-                ALLDT2 = PRT0000ReportCall.ALLDT2
-                If isNormal(PRT0000ReportCall.ERR) Then
-                    PrintCount += 1
-                    SetURLValue(PRT0000ReportCall.URL1, PrintCount)
-                    If PRT0000ReportCall.URL2 <> "" Then
-                        PrintCount += 1
-                        SetURLValue(PRT0000ReportCall.URL2, PrintCount)
-                    End If
-                End If
-                If menuItm.Reportid = "PRT0006" Then
-                    Exit For
-                End If
-                WW_WORKINGDATE = WW_WORKINGDATE.AddDays(1)
-            Next
-            If PrintCount > 0 Then
-                ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelDownload();", True)
-            Else
-                Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績", needsPopUp:=True)
-            End If
+            '    For i As Integer = 0 To daycount
+            '        If i = daycount Then
+            '            If daycount = 0 Then
+            '                FirstFLG = "1"
+            '                LastFLG = "1"
+            '            Else
+            '                FirstFLG = "0"
+            '                LastFLG = "1"
+            '            End If
+            '        ElseIf i = 0 Then
+            '            FirstFLG = "1"
+            '            LastFLG = "0"
+            '        Else
+            '            FirstFLG = "0"
+            '            LastFLG = "0"
+            '        End If
+            '        PRT0000ReportCall.REPORTID = menuItm.Reportid
+            '        PRT0000ReportCall.TARGETDATE = WW_WORKINGDATE
+            '        PRT0000ReportCall.CAMPCODE = Master.USERCAMP
+            '        PRT0000ReportCall.BRANCHCODE = Master.USER_AFFILIATION
+            '        PRT0000ReportCall.USERID = Master.USERID
+            '        PRT0000ReportCall.TERMID = Master.USERTERMID
+            '        PRT0000ReportCall.ALLDT = ALLDT
+            '        PRT0000ReportCall.ALLDT2 = ALLDT2
+            '        PRT0000ReportCall.ReportCall(LastFLG, FirstFLG, ALLDT, ALLDT2)
+            '        ALLDT = PRT0000ReportCall.ALLDT
+            '        ALLDT2 = PRT0000ReportCall.ALLDT2
+            '        If isNormal(PRT0000ReportCall.ERR) Then
+            '            PrintCount += 1
+            '            SetURLValue(PRT0000ReportCall.URL1, PrintCount)
+            '            If PRT0000ReportCall.URL2 <> "" Then
+            '                PrintCount += 1
+            '                SetURLValue(PRT0000ReportCall.URL2, PrintCount)
+            '            End If
+            '        End If
+            '        If menuItm.Reportid = "PRT0006" Then
+            '            Exit For
+            '        End If
+            '        WW_WORKINGDATE = WW_WORKINGDATE.AddDays(1)
+            '    Next
+            '    If PrintCount > 0 Then
+            '        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelDownload();", True)
+            '    Else
+            '        Master.Output(C_MESSAGE_NO.NO_REPORT_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ABORT, I_PARA01:="期間内で", I_PARA02:="実績", needsPopUp:=True)
+            '    End If
 
 
         Else
