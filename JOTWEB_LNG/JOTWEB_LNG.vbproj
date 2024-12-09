@@ -235,9 +235,11 @@
     <Content Include="css\images\ui-icons_ffffff_256x240.png" />
     <Content Include="css\jquery-ui-1.10.4.custom.min.css" />
     <Content Include="css\jquery.multiselect.css" />
-    <Content Include="LNG\css\LNS0002D.css" />
-    <Content Include="LNG\css\LNS0002L.css" />
-    <Content Include="LNG\css\LNS0002S.css" />
+    <Content Include="img\kronos_logo.svg" />
+    <Content Include="LNG\css\LNS0001D.css" />
+    <Content Include="LNG\css\LNS0001H.css" />
+    <Content Include="LNG\css\LNS0001L.css" />
+    <Content Include="LNG\css\LNS0001S.css" />
     <Content Include="LNG\css\LNS0008D.css" />
     <Content Include="LNG\css\LNS0008L.css" />
     <Content Include="LNG\css\LNS0008S.css" />
@@ -288,27 +290,29 @@
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
-    <Content Include="LNG\inc\LNS0002WRKINC.ascx" />
+    <Content Include="LNG\inc\LNS0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
+    <Content Include="LNG\mas\LNS0001UserDetail.aspx" />
+    <Content Include="LNG\mas\LNS0001UserHistory.aspx" />
+    <Content Include="LNG\mas\LNS0001UserList.aspx" />
+    <Content Include="LNG\mas\LNS0001UserSearch.aspx" />
+    <Content Include="LNG\script\LNS0001D.js" />
+    <Content Include="LNG\script\LNS0001H.js" />
+    <Content Include="LNG\script\LNS0001L.js" />
     <Content Include="LNG\zisseki\LNT0001ZissekiManage.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperDetail.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperList.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperSearch.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceDetail.aspx" />
-    <Content Include="LNG\mas\LNS0002UserDetail.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceDownload.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceList.aspx" />
-    <Content Include="LNG\mas\LNS0002UserList.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceSearch.aspx" />
-    <Content Include="LNG\mas\LNS0002UserSearch.aspx" />
     <Content Include="LNG\script\LNT0001C.js" />
     <Content Include="LNG\script\LNM0023D.js" />
     <Content Include="LNG\script\LNM0023L.js" />
     <Content Include="LNG\script\LNS0008D.js" />
-    <Content Include="LNG\script\LNS0002D.js" />
     <Content Include="LNG\script\LNS0008L.js" />
-    <Content Include="LNG\script\LNS0002L.js" />
     <Content Include="img\ctnlogo.png" />
     <Content Include="img\favicon2.ico" />
     <Content Include="img\oil.ico" />
@@ -486,11 +490,11 @@
       <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\LNS0002WRKINC.ascx.designer.vb">
-      <DependentUpon>LNS0002WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\LNS0001WRKINC.ascx.designer.vb">
+      <DependentUpon>LNS0001WRKINC.ascx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\inc\LNS0002WRKINC.ascx.vb">
-      <DependentUpon>LNS0002WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\LNS0001WRKINC.ascx.vb">
+      <DependentUpon>LNS0001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\inc\LNS0008FILEUPLOAD.ashx.vb">
@@ -508,6 +512,34 @@
     </Compile>
     <Compile Include="LNG\inc\LNT0001WRKINC.ascx.vb">
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserDetail.aspx.designer.vb">
+      <DependentUpon>LNS0001UserDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserDetail.aspx.vb">
+      <DependentUpon>LNS0001UserDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserHistory.aspx.designer.vb">
+      <DependentUpon>LNS0001UserHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserHistory.aspx.vb">
+      <DependentUpon>LNS0001UserHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserList.aspx.designer.vb">
+      <DependentUpon>LNS0001UserList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserList.aspx.vb">
+      <DependentUpon>LNS0001UserList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserSearch.aspx.designer.vb">
+      <DependentUpon>LNS0001UserSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNS0001UserSearch.aspx.vb">
+      <DependentUpon>LNS0001UserSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\zisseki\LNT0001ZissekiManage.aspx.designer.vb">
@@ -545,13 +577,6 @@
       <DependentUpon>LNS0008GuidanceDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\mas\LNS0002UserDetail.aspx.designer.vb">
-      <DependentUpon>LNS0002UserDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNS0002UserDetail.aspx.vb">
-      <DependentUpon>LNS0002UserDetail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="LNG\mas\LNS0008GuidanceDownload.aspx.designer.vb">
       <DependentUpon>LNS0008GuidanceDownload.aspx</DependentUpon>
     </Compile>
@@ -566,25 +591,11 @@
       <DependentUpon>LNS0008GuidanceList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\mas\LNS0002UserList.aspx.designer.vb">
-      <DependentUpon>LNS0002UserList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNS0002UserList.aspx.vb">
-      <DependentUpon>LNS0002UserList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="LNG\mas\LNS0008GuidanceSearch.aspx.designer.vb">
       <DependentUpon>LNS0008GuidanceSearch.aspx</DependentUpon>
     </Compile>
     <Compile Include="LNG\mas\LNS0008GuidanceSearch.aspx.vb">
       <DependentUpon>LNS0008GuidanceSearch.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNS0002UserSearch.aspx.designer.vb">
-      <DependentUpon>LNS0002UserSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNS0002UserSearch.aspx.vb">
-      <DependentUpon>LNS0002UserSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="inc\GRCO0100XLSUP.ashx.vb">

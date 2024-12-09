@@ -110,10 +110,10 @@ Public Module SessionKey
         ''' エクセル出力権限
         ''' </summary>
         Public Const MAPPING_USER_RPRTPROF_MODE As String = "MAPRprtProfmode"
-        ''' <summary>
-        ''' 承認権限
-        ''' </summary>
-        Public Const MAPPING_USER_APPROVALID As String = "MAPApprovalID"
+        '''' <summary>
+        '''' 承認権限
+        '''' </summary>
+        'Public Const MAPPING_USER_APPROVALID As String = "MAPApprovalID"
         ''' <summary>
         ''' 画面表示バリアント
         ''' </summary>

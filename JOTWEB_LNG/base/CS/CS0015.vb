@@ -94,7 +94,7 @@ Public Class CS0015TITLEcamp
                    & " INNER JOIN COM.LNS0005_ROLE B ON " _
                    & "       B.PERMITCODE >= 1 " _
                    & "   and B.DELFLG  <> @P5 " _
-                   & " INNER JOIN COM.LNS0002_USER C  ON " _
+                   & " INNER JOIN COM.lns0001_user C  ON " _
                    & "       C.USERID   = @P1 " _
                    & "   and C.CAMPCODE = A.CAMPCODE " _
                    & "   and C.MENUROLE = B.ROLE " _

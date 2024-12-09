@@ -11,79 +11,79 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNS0002UserList
+Partial Public Class LNS0001UserSearch
     
     '''<summary>
-    '''ListCount コントロール。
+    '''WF_CAMPCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_CAMPCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''inpFileUpload コントロール。
+    '''TxtCampCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents inpFileUpload As Global.System.Web.UI.WebControls.FileUpload
+    Protected WithEvents TxtCampCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''txtFileName コントロール。
+    '''LblCampCodeName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents txtFileName As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents LblCampCodeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_ButtonDL コントロール。
+    '''TxtStYMDCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonDL As Global.System.Web.UI.WebControls.Button
+    Protected WithEvents TxtStYMDCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ButtonPDF コントロール。
+    '''TxtEndYMDCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonPDF As Global.System.Web.UI.WebControls.Button
+    Protected WithEvents TxtEndYMDCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ButtonFIRST コントロール。
+    '''TxtOrgCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents TxtOrgCode As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ButtonLAST コントロール。
+    '''LblOrgName コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents LblOrgName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''pnlListArea コントロール。
+    '''ChkDelDataFlg コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents pnlListArea As Global.System.Web.UI.WebControls.Panel
+    Protected WithEvents ChkDelDataFlg As Global.System.Web.UI.WebControls.CheckBox
     
     '''<summary>
     '''rightview コントロール。
@@ -92,7 +92,7 @@ Partial Public Class LNS0002UserList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents rightview As Global.JOTWEB_LNG.GRIS0004RightBox
+    Protected WithEvents rightview As Global.JOTWEB_LNG.GRIS0003SRightBox
     
     '''<summary>
     '''leftview コントロール。
@@ -110,25 +110,7 @@ Partial Public Class LNS0002UserList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNS0002WRKINC
-    
-    '''<summary>
-    '''WF_GridDBclick コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_GridPosition コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents work As Global.JOTWEB_LNG.LNS0001WRKINC
     
     '''<summary>
     '''WF_FIELD コントロール。
@@ -140,15 +122,6 @@ Partial Public Class LNS0002UserList
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_FIELD_REP コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
     '''<remarks>
@@ -156,15 +129,6 @@ Partial Public Class LNS0002UserList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_LeftMViewChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_LeftboxOpen コントロール。
@@ -176,15 +140,6 @@ Partial Public Class LNS0002UserList
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_RightViewChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
     '''<remarks>
@@ -194,22 +149,13 @@ Partial Public Class LNS0002UserList
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_PrintURL コントロール。
+    '''WF_LeftMViewChange コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_BOXChange コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_ButtonClick コントロール。
@@ -219,15 +165,6 @@ Partial Public Class LNS0002UserList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_MAPpermitcode コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

@@ -1,11 +1,11 @@
 ﻿''************************************************************
 ' ユーザーマスタメンテ登録画面
-' 作成日 2021/12/24
+' 作成日 2024/12/02
 ' 更新日 
-' 作成者 名取
+' 作成者 大浜
 ' 更新者 
 '
-' 修正履歴 : 2021/12/24 新規作成
+' 修正履歴 : 2024/12/02 新規作成
 '          : 
 ''************************************************************
 Imports MySQL.Data.MySqlClient
@@ -15,7 +15,7 @@ Imports JOTWEB_LNG.GRIS0005LeftBox
 ''' ユーザーマスタ登録（実行）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class LNS0002UserDetail
+Public Class LNS0001UserDetail
     Inherits Page
 
     ''' <summary>
@@ -24,9 +24,9 @@ Public Class LNS0002UserDetail
     Private CS0051UserInfo As New CS0051UserInfo                    'ユーザー情報取得
 
     '○ 検索結果格納Table
-    Private LNS0002tbl As DataTable                                 '一覧格納用テーブル
-    Private LNS0002INPtbl As DataTable                              'チェック用テーブル
-    Private LNS0002UPDtbl As DataTable                              '更新用テーブル
+    Private LNS0001tbl As DataTable                                 '一覧格納用テーブル
+    Private LNS0001INPtbl As DataTable                              'チェック用テーブル
+    Private LNS0001UPDtbl As DataTable                              '更新用テーブル
 
     '○ データOPERATION用
     Private Const CONST_INSERT As String = "Insert"                 'データ追加
@@ -60,7 +60,7 @@ Public Class LNS0002UserDetail
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(LNS0002tbl, work.WF_SEL_INPTBL.Text)
+                    Master.RecoverTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonUPDATE"          '更新ボタン押下
@@ -87,9 +87,6 @@ Public Class LNS0002UserDetail
                     End Select
                 End If
             Else
-                '○ セレクトボックス初期化処理
-                selectBoxInitialize()
-
                 '○ 初期化処理
                 Initialize()
             End If
@@ -105,331 +102,26 @@ Public Class LNS0002UserDetail
 
         Finally
             '○ 格納Table Close
-            If Not IsNothing(LNS0002tbl) Then
-                LNS0002tbl.Clear()
-                LNS0002tbl.Dispose()
-                LNS0002tbl = Nothing
+            If Not IsNothing(LNS0001tbl) Then
+                LNS0001tbl.Clear()
+                LNS0001tbl.Dispose()
+                LNS0001tbl = Nothing
             End If
 
-            If Not IsNothing(LNS0002INPtbl) Then
-                LNS0002INPtbl.Clear()
-                LNS0002INPtbl.Dispose()
-                LNS0002INPtbl = Nothing
+            If Not IsNothing(LNS0001INPtbl) Then
+                LNS0001INPtbl.Clear()
+                LNS0001INPtbl.Dispose()
+                LNS0001INPtbl = Nothing
             End If
 
-            If Not IsNothing(LNS0002UPDtbl) Then
-                LNS0002UPDtbl.Clear()
-                LNS0002UPDtbl.Dispose()
-                LNS0002UPDtbl = Nothing
+            If Not IsNothing(LNS0001UPDtbl) Then
+                LNS0001UPDtbl.Clear()
+                LNS0001UPDtbl.Dispose()
+                LNS0001UPDtbl = Nothing
             End If
         End Try
 
     End Sub
-
-    ''' <summary>
-    ''' セレクトボックス初期化処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub selectBoxInitialize()
-
-        '○ 現況表初期設定
-        'If String.IsNullOrEmpty(work.WF_SEL_CSTCTN_LIST.Text) Then
-        Dim chklList = LNS0002WRKINC.GetNewDisplayFlags()                  'コンテナ種別List
-        Dim CSTCTNData As DataTable                                        'ユーザマスタ現況表データ
-        If chklList IsNot Nothing AndAlso chklList.Count <> 0 Then
-            chklList = (From itm In chklList Order By itm.DispOrder).ToList
-        End If
-
-        ChklFlags.DataSource = chklList
-        ChklFlags.DataTextField = "DispName"
-        ChklFlags.DataValueField = "FieldName"
-        ChklFlags.DataBind()
-
-        '〇 ユーザマスタ現況表データ取得
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            ' DataBase接続
-            SQLcon.Open()
-            ' 現況表データ取得
-            CSTCTNData = GetCSTCTNData(SQLcon)
-        End Using
-
-        '○ チェック状態設定
-        If CSTCTNData IsNot Nothing And CSTCTNData.Rows.Count <> 0 Then
-            Dim i As Integer = 0
-            For Each CSTCTNRow As DataRow In CSTCTNData.Rows
-                For Each item As LNS0002WRKINC.DisplayFlag In chklList
-                    ChklFlags.Items(item.DispOrder).Selected = Not IsDBNull(CSTCTNRow.Item(i))
-                    i += 1
-                Next
-            Next
-        End If
-        work.WF_SEL_CSTCTN_LIST.Text = work.EncodeDisplayFlags(chklList)
-        'End If
-
-
-        '○ 運用状況表初期設定
-        'If String.IsNullOrEmpty(work.WF_SEL_OSTCTN_LIST.Text) Then
-        Dim chklList2 = LNS0002WRKINC.GetNewDisplayFlags()                  'コンテナ種別List
-        Dim OSTCTNData As DataTable                                         'ユーザマスタ運用状況表データ
-        If chklList2 IsNot Nothing AndAlso chklList2.Count <> 0 Then
-            chklList2 = (From itm In chklList2 Order By itm.DispOrder).ToList
-        End If
-
-        ChklFlags2.DataSource = chklList2
-        ChklFlags2.DataTextField = "DispName"
-        ChklFlags2.DataValueField = "FieldName"
-        ChklFlags2.DataBind()
-
-        '〇 ユーザマスタ運用状況表データ取得
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            ' DataBase接続
-            SQLcon.Open()
-            ' 現況表データ取得
-            OSTCTNData = GetOSTCTNData(SQLcon)
-        End Using
-
-        '○ チェック状態設定
-        If OSTCTNData IsNot Nothing And OSTCTNData.Rows.Count <> 0 Then
-            Dim i As Integer = 0
-            For Each OSTCTNRow As DataRow In OSTCTNData.Rows
-                For Each item As LNS0002WRKINC.DisplayFlag In chklList2
-                    ChklFlags2.Items(item.DispOrder).Selected = Not IsDBNull(OSTCTNRow.Item(i))
-                    i += 1
-                Next
-            Next
-        End If
-        work.WF_SEL_OSTCTN_LIST.Text = work.EncodeDisplayFlags(chklList2)
-        'End If
-
-        '○ 発着差初期設定
-        'If String.IsNullOrEmpty(work.WF_SEL_DAADCTN_LIST.Text) Then
-
-        Dim chklList3 = LNS0002WRKINC.GetNewDisplayFlags()                  'コンテナ種別List
-        Dim DAADCTNData As DataTable                                        'ユーザマスタ発着差データ
-        If chklList3 IsNot Nothing AndAlso chklList3.Count <> 0 Then
-            chklList3 = (From itm In chklList3 Order By itm.DispOrder).ToList
-        End If
-
-        ChklFlags3.DataSource = chklList3
-        ChklFlags3.DataTextField = "DispName"
-        ChklFlags3.DataValueField = "FieldName"
-        ChklFlags3.DataBind()
-
-        '〇 ユーザマスタ発着差データ取得
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            ' DataBase接続
-            SQLcon.Open()
-            ' 発着差データ取得
-            DAADCTNData = GetDAADCTNData(SQLcon)
-        End Using
-
-        '○ チェック状態設定
-        If DAADCTNData IsNot Nothing And DAADCTNData.Rows.Count <> 0 Then
-            Dim i As Integer = 0
-            For Each DAADCTNRow As DataRow In DAADCTNData.Rows
-                For Each item As LNS0002WRKINC.DisplayFlag In chklList3
-                    ChklFlags3.Items(item.DispOrder).Selected = Not IsDBNull(DAADCTNRow.Item(i))
-                    i += 1
-                Next
-            Next
-        End If
-        work.WF_SEL_DAADCTN_LIST.Text = work.EncodeDisplayFlags(chklList3)
-        'End If
-
-    End Sub
-
-    ''' <summary>
-    ''' 現況表データチェック
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    Public Function GetCSTCTNData(ByVal SQLcon As MySqlConnection) As DataTable
-
-        Dim retTable As New DataTable
-
-        '○ 対象データ取得
-        Dim SQLStr As String =
-              " SELECT                   " _
-            & "     INITIALDISPLAYKBN01  " _
-            & "   , INITIALDISPLAYKBN02  " _
-            & "   , INITIALDISPLAYKBN03  " _
-            & "   , INITIALDISPLAYKBN04  " _
-            & "   , INITIALDISPLAYKBN05  " _
-            & "   , INITIALDISPLAYKBN06  " _
-            & "   , INITIALDISPLAYKBN07  " _
-            & "   , INITIALDISPLAYKBN08  " _
-            & " FROM                     " _
-            & "     COM.LNS0002_USER     " _
-            & " WHERE                    " _
-            & "         USERID  = @P1    " _
-            & "     AND STYMD   = @P2    "
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 20) 'ユーザーID
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20) '利用開始日
-
-                PARA1.Value = work.WF_SEL_USERID.Text 'ユーザーID
-                PARA2.Value = work.WF_SEL_STYMD2.Text '利用開始日
-
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-
-                    If SQLdr.HasRows = False Then
-                        Return retTable
-                    End If
-
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        retTable.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-
-                    '○ テーブル検索結果をテーブル格納
-                    retTable.Load(SQLdr)
-
-                End Using
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D GetCSTCTNData")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D GetCSTCTNData"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-        End Try
-
-        Return retTable
-
-    End Function
-
-    ''' <summary>
-    ''' 運用状況表データ取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    Public Function GetOSTCTNData(ByVal SQLcon As MySqlConnection) As DataTable
-
-        Dim retTable As New DataTable
-
-        '○ 対象データ取得
-        Dim SQLStr As String =
-              " SELECT                   " _
-            & "     INITIALDISPLAYKBN11  " _
-            & "   , INITIALDISPLAYKBN12  " _
-            & "   , INITIALDISPLAYKBN13  " _
-            & "   , INITIALDISPLAYKBN14  " _
-            & "   , INITIALDISPLAYKBN15  " _
-            & "   , INITIALDISPLAYKBN16  " _
-            & "   , INITIALDISPLAYKBN17  " _
-            & "   , INITIALDISPLAYKBN18  " _
-            & " FROM                     " _
-            & "     COM.LNS0002_USER     " _
-            & " WHERE                    " _
-            & "         USERID  = @P1    " _
-            & "     AND STYMD   = @P2    "
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 20) 'ユーザーID
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20) '利用開始日
-
-                PARA1.Value = work.WF_SEL_USERID.Text 'ユーザーID
-                PARA2.Value = work.WF_SEL_STYMD2.Text '利用開始日
-
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-
-                    If SQLdr.HasRows = False Then
-                        Return retTable
-                    End If
-
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        retTable.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-
-                    '○ テーブル検索結果をテーブル格納
-                    retTable.Load(SQLdr)
-
-                End Using
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D GetOSTCTNData")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D GetOSTCTNData"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-        End Try
-
-        Return retTable
-
-    End Function
-
-    ''' <summary>
-    ''' 発着差データ取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    Public Function GetDAADCTNData(ByVal SQLcon As MySqlConnection) As DataTable
-
-        Dim retTable As New DataTable
-
-        '○ 対象データ取得
-        Dim SQLStr As String =
-              " SELECT                   " _
-            & "     INITIALDISPLAYKBN21  " _
-            & "   , INITIALDISPLAYKBN22  " _
-            & "   , INITIALDISPLAYKBN23  " _
-            & "   , INITIALDISPLAYKBN24  " _
-            & "   , INITIALDISPLAYKBN25  " _
-            & "   , INITIALDISPLAYKBN26  " _
-            & "   , INITIALDISPLAYKBN27  " _
-            & "   , INITIALDISPLAYKBN28  " _
-            & " FROM                     " _
-            & "     COM.LNS0002_USER     " _
-            & " WHERE                    " _
-            & "         USERID  = @P1    " _
-            & "     AND STYMD   = @P2    "
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 20) 'ユーザーID
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20) '利用開始日
-
-                PARA1.Value = work.WF_SEL_USERID.Text 'ユーザーID
-                PARA2.Value = work.WF_SEL_STYMD2.Text '利用開始日
-
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-
-                    If SQLdr.HasRows = False Then
-                        Return retTable
-                    End If
-
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        retTable.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-
-                    '○ テーブル検索結果をテーブル格納
-                    retTable.Load(SQLdr)
-
-                End Using
-            End Using
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D GetDAADCTNData")
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D GetDAADCTNData"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-        End Try
-
-        Return retTable
-
-    End Function
-
 
     ''' <summary>
     ''' 初期化処理
@@ -438,7 +130,7 @@ Public Class LNS0002UserDetail
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = LNS0002WRKINC.MAPIDD
+        Master.MAPID = LNS0001WRKINC.MAPIDD
         '○ HELP表示有無設定
         Master.dispHelp = False
         '○ D&D有無設定
@@ -471,7 +163,7 @@ Public Class LNS0002UserDetail
     Protected Sub WW_MAPValueSet()
 
         '○ 検索画面からの遷移
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0002L Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Then
             ' Grid情報保存先のファイル名
             Master.CreateXMLSaveFile()
         End If
@@ -520,9 +212,9 @@ Public Class LNS0002UserDetail
         CODENAME_get("XML", TxtRprtProfId.Text, LblRprtProfIdName.Text, WW_Dummy)
         '画面初期値ロール
         TxtVariant.Text = work.WF_SEL_VARIANT.Text
-        '承認権限ロール
-        TxtApproValid.Text = work.WF_SEL_APPROVALID.Text
-        CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
+        ''承認権限ロール
+        'TxtApproValid.Text = work.WF_SEL_APPROVALID.Text
+        'CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
         '削除
         TxtDelFlg.Text = work.WF_SEL_DELFLG.Text
         CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
@@ -558,7 +250,7 @@ Public Class LNS0002UserDetail
                 TxtViewProfId.Enabled = False
                 TxtRprtProfId.Enabled = False
                 TxtVariant.Enabled = False
-                TxtApproValid.Enabled = False
+                'TxtApproValid.Enabled = False
             End If
             'ログインユーザーと同じ場合パスワードのみ入力可能
             If TxtUserId.Text <> Master.USERID Then
@@ -573,47 +265,55 @@ Public Class LNS0002UserDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="O_MESSAGENO"></param>
-    Protected Sub UniqueKeyCheck(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String, Optional ByVal StYMD As String = "")
+    Protected Sub UniqueKeyCheck(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String,
+                                 Optional ByVal StYMD As String = "", Optional ByVal EnYMD As String = "")
 
         '○ 対象データ取得
-        Dim SQLStr As String =
-              " SELECT                 " _
-            & "     USERID             " _
-            & "   , STYMD              " _
-            & " FROM                   " _
-            & "     COM.LNS0002_USER   " _
-            & " WHERE                  " _
-            & "         USERID  = @P1  " _
-            & "     AND STYMD   = @P2  " _
-            & "     AND DELFLG <> @P3  "
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT                 ")
+        SQLStr.AppendLine("     USERID             ")
+        SQLStr.AppendLine("   , STYMD              ")
+        SQLStr.AppendLine(" FROM                   ")
+        SQLStr.AppendLine("     COM.lns0001_user   ")
+        SQLStr.AppendLine(" WHERE                  ")
+        SQLStr.AppendLine("         USERID  = @USERID  ")
+        SQLStr.AppendLine("     AND STYMD   = @STYMD  ")
+        SQLStr.AppendLine("     AND ENDYMD   = @ENDYMD  ")
+        SQLStr.AppendLine("     AND DELFLG <> @DELFLG  ")
 
         Try
-            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 20) 'ユーザーID
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20) '利用開始日
-                Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.VarChar, 1)  '削除フラグ
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20) 'ユーザーID
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.VarChar, 20) '開始年月日
+                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.VarChar, 20) '終了年月日
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)  '削除フラグ
 
-                PARA1.Value = TxtUserId.Text       'ユーザーID
+                P_USERID.Value = TxtUserId.Text       'ユーザーID
                 If StYMD = "" Then
-                    PARA2.Value = TxtStYMD.Text    '利用開始日
+                    P_STYMD.Value = TxtStYMD.Text    '開始年月日
                 Else
-                    PARA2.Value = StYMD            '利用開始日
+                    P_STYMD.Value = StYMD            '開始年月日
                 End If
-                PARA3.Value = C_DELETE_FLG.DELETE  '削除フラグ
+                If EnYMD = "" Then
+                    P_ENDYMD.Value = TxtEndYMD.Text    '終了年月日
+                Else
+                    P_ENDYMD.Value = EnYMD            '終了年月日
+                End If
+                P_DELFLG.Value = C_DELETE_FLG.DELETE  '削除フラグ
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
-                    Dim LNS0002Chk = New DataTable
+                    Dim LNS0001Chk = New DataTable
 
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        LNS0002Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        LNS0001Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    LNS0002Chk.Load(SQLdr)
+                    LNS0001Chk.Load(SQLdr)
 
-                    If LNS0002Chk.Rows.Count > 0 Then
+                    If LNS0001Chk.Rows.Count > 0 Then
                         ' 重複データエラー
                         O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_PRIMARYKEY_REPEAT_ERROR
                     Else
@@ -623,10 +323,10 @@ Public Class LNS0002UserDetail
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D UPDATE_INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D UPDATE_INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D UPDATE_INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001D UPDATE_INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -672,7 +372,7 @@ Public Class LNS0002UserDetail
             & "   ,STYMD            " _
             & "   ,ENDYMD           " _
             & "FROM                 " _
-            & "    COM.LNS0002_USER " _
+            & "    COM.lns0001_user " _
             & "WHERE                " _
             & "    USERID  = @P1    " _
             & "AND DELFLG  = @P2    " _
@@ -694,27 +394,27 @@ Public Class LNS0002UserDetail
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
-                    Dim LNS0002Chk = New DataTable
+                    Dim LNS0001Chk = New DataTable
 
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        LNS0002Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        LNS0001Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    LNS0002Chk.Load(SQLdr)
+                    LNS0001Chk.Load(SQLdr)
 
-                    If LNS0002Chk.Rows.Count <> 0 Then
-                        Dim LastLNS0002row As DataRow = LNS0002Chk.Rows(0)
+                    If LNS0001Chk.Rows.Count <> 0 Then
+                        Dim LastLNS0001row As DataRow = LNS0001Chk.Rows(0)
                         ' 期間重複が同じデータで無い場合のみ次回情報を表示
-                        If TxtStYMD.Text <> CDate(LastLNS0002row("STYMD")).ToString("yyyy-MM-dd") Then
+                        If TxtStYMD.Text <> CDate(LastLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
                             flg = 1
                             DisabledKey_OverlapPeriodsInput_Start.Value = ""
-                            pnlTxtAdjustLastStYMD.Text = CDate(LastLNS0002row("STYMD")).ToString("yyyy/MM/dd")
-                            pnlTxtAdjustLastEndYMD.Text = CDate(LastLNS0002row("ENDYMD")).ToString("yyyy/MM/dd")
+                            pnlTxtAdjustLastStYMD.Text = CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd")
+                            pnlTxtAdjustLastEndYMD.Text = CDate(LastLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
                             pnlTxtInputStYMD.Text = TxtStYMD.Text
                             pnlTxtInputEndYMD.Text = TxtEndYMD.Text
-                            pnlTxtLastStYMD.Text = CDate(LastLNS0002row("STYMD")).ToString("yyyy/MM/dd")
+                            pnlTxtLastStYMD.Text = CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd")
                             If pnlTxtInputStYMD.Text = pnlTxtLastStYMD.Text Then
                                 pnlTxtLastEndYMD.Text = pnlTxtLastStYMD.Text
                             Else
@@ -729,10 +429,10 @@ Public Class LNS0002UserDetail
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D OverlapPeriodsCheck")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D OverlapPeriodsCheck")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D OverlapPeriodsCheck"
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001D OverlapPeriodsCheck"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -747,7 +447,7 @@ Public Class LNS0002UserDetail
             & "   ,STYMD            " _
             & "   ,ENDYMD           " _
             & "FROM                 " _
-            & "    COM.LNS0002_USER " _
+            & "    COM.lns0001_user " _
             & "WHERE                " _
             & "    USERID = @P1     " _
             & "AND DELFLG = @P2     " _
@@ -768,29 +468,29 @@ Public Class LNS0002UserDetail
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
-                    Dim LNS0002Chk = New DataTable
+                    Dim LNS0001Chk = New DataTable
 
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        LNS0002Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        LNS0001Chk.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    LNS0002Chk.Load(SQLdr)
+                    LNS0001Chk.Load(SQLdr)
 
-                    If LNS0002Chk.Rows.Count <> 0 Then
-                        Dim NextLNS0002row As DataRow = LNS0002Chk.Rows(0)
-                        If TxtEndYMD.Text >= CDate(NextLNS0002row("STYMD")).ToString("yyyy-MM-dd") Or flg = 1 Then
+                    If LNS0001Chk.Rows.Count <> 0 Then
+                        Dim NextLNS0001row As DataRow = LNS0001Chk.Rows(0)
+                        If TxtEndYMD.Text >= CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd") Or flg = 1 Then
                             flg = 1
                             ' 期間重複が同じデータで無い場合のみ次回情報を表示
-                            If pnlTxtLastStYMD.Text <> CDate(NextLNS0002row("STYMD")).ToString("yyyy-MM-dd") Then
+                            If pnlTxtLastStYMD.Text <> CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
                                 DisabledKey_OverlapPeriodsInput_End.Value = ""
-                                pnlTxtAdjustNextStYMD.Text = CDate(NextLNS0002row("STYMD")).ToString("yyyy/MM/dd")
-                                pnlTxtAdjustNextEndYMD.Text = CDate(NextLNS0002row("ENDYMD")).ToString("yyyy/MM/dd")
+                                pnlTxtAdjustNextStYMD.Text = CDate(NextLNS0001row("STYMD")).ToString("yyyy/MM/dd")
+                                pnlTxtAdjustNextEndYMD.Text = CDate(NextLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
                                 pnlTxtInputStYMD.Text = TxtStYMD.Text
                                 pnlTxtInputEndYMD.Text = TxtEndYMD.Text
-                                pnlTxtNextStYMD.Text = CDate(NextLNS0002row("STYMD")).ToString("yyyy-MM-dd")
-                                pnlTxtNextEndYMD.Text = CDate(NextLNS0002row("ENDYMD")).ToString("yyyy/MM/dd")
+                                pnlTxtNextStYMD.Text = CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd")
+                                pnlTxtNextEndYMD.Text = CDate(NextLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
                                 If pnlTxtInputEndYMD.Text = pnlTxtNextEndYMD.Text Then
                                     pnlTxtNextStYMD.Text = pnlTxtNextEndYMD.Text
                                 ElseIf CDate(pnlTxtInputEndYMD.Text) < CDate(pnlTxtNextEndYMD.Text) Then
@@ -808,10 +508,10 @@ Public Class LNS0002UserDetail
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D OverlapPeriodsCheck")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D OverlapPeriodsCheck")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D OverlapPeriodsCheck"
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001D OverlapPeriodsCheck"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -834,7 +534,7 @@ Public Class LNS0002UserDetail
 
         '○ DB更新SQL(ユーザーマスタ)
         Dim SQLStr As String =
-              "     INSERT INTO COM.LNS0002_USER            " _
+              "     INSERT INTO COM.lns0001_user            " _
             & "        (DELFLG                              " _
             & "       , USERID                              " _
             & "       , STAFFNAMES                          " _
@@ -850,7 +550,6 @@ Public Class LNS0002UserDetail
             & "       , VIEWPROFID                          " _
             & "       , RPRTPROFID                          " _
             & "       , VARIANT                             " _
-            & "       , APPROVALID                          " _
             & "       , INITYMD                             " _
             & "       , INITUSER                            " _
             & "       , INITTERMID                          " _
@@ -859,37 +558,7 @@ Public Class LNS0002UserDetail
             & "       , UPDUSER                             " _
             & "       , UPDTERMID                           " _
             & "       , UPDPGID                             " _
-            & "       , RECEIVEYMD                          " _
-            & "       , INITIALDISPLAYKBN01                 " _
-            & "       , INITIALDISPLAYKBN02                 " _
-            & "       , INITIALDISPLAYKBN03                 " _
-            & "       , INITIALDISPLAYKBN04                 " _
-            & "       , INITIALDISPLAYKBN05                 " _
-            & "       , INITIALDISPLAYKBN06                 " _
-            & "       , INITIALDISPLAYKBN07                 " _
-            & "       , INITIALDISPLAYKBN08                 " _
-            & "       , INITIALDISPLAYKBN09                 " _
-            & "       , INITIALDISPLAYKBN10                 " _
-            & "       , INITIALDISPLAYKBN11                 " _
-            & "       , INITIALDISPLAYKBN12                 " _
-            & "       , INITIALDISPLAYKBN13                 " _
-            & "       , INITIALDISPLAYKBN14                 " _
-            & "       , INITIALDISPLAYKBN15                 " _
-            & "       , INITIALDISPLAYKBN16                 " _
-            & "       , INITIALDISPLAYKBN17                 " _
-            & "       , INITIALDISPLAYKBN18                 " _
-            & "       , INITIALDISPLAYKBN19                 " _
-            & "       , INITIALDISPLAYKBN20                 " _
-            & "       , INITIALDISPLAYKBN21                 " _
-            & "       , INITIALDISPLAYKBN22                 " _
-            & "       , INITIALDISPLAYKBN23                 " _
-            & "       , INITIALDISPLAYKBN24                 " _
-            & "       , INITIALDISPLAYKBN25                 " _
-            & "       , INITIALDISPLAYKBN26                 " _
-            & "       , INITIALDISPLAYKBN27                 " _
-            & "       , INITIALDISPLAYKBN28                 " _
-            & "       , INITIALDISPLAYKBN29                 " _
-            & "       , INITIALDISPLAYKBN30)                " _
+            & "       , RECEIVEYMD)                         " _
             & "     VALUES                                  " _
             & "        (@P00                                " _
             & "       , @P01                                " _
@@ -906,7 +575,6 @@ Public Class LNS0002UserDetail
             & "       , @P15                                " _
             & "       , @P16                                " _
             & "       , @P17                                " _
-            & "       , @P18                                " _
             & "       , @P19                                " _
             & "       , @P20                                " _
             & "       , @P21                                " _
@@ -915,37 +583,7 @@ Public Class LNS0002UserDetail
             & "       , @P24                                " _
             & "       , @P25                                " _
             & "       , @P26                                " _
-            & "       , @P27                                " _
-            & "       , @P28                                " _
-            & "       , @P29                                " _
-            & "       , @P30                                " _
-            & "       , @P31                                " _
-            & "       , @P32                                " _
-            & "       , @P33                                " _
-            & "       , @P34                                " _
-            & "       , @P35                                " _
-            & "       , @P36                                " _
-            & "       , @P37                                " _
-            & "       , @P38                                " _
-            & "       , @P39                                " _
-            & "       , @P40                                " _
-            & "       , @P41                                " _
-            & "       , @P42                                " _
-            & "       , @P43                                " _
-            & "       , @P44                                " _
-            & "       , @P45                                " _
-            & "       , @P46                                " _
-            & "       , @P47                                " _
-            & "       , @P48                                " _
-            & "       , @P49                                " _
-            & "       , @P50                                " _
-            & "       , @P51                                " _
-            & "       , @P52                                " _
-            & "       , @P53                                " _
-            & "       , @P54                                " _
-            & "       , @P55                                " _
-            & "       , @P56                                " _
-            & "       , @P57)                               " _
+            & "       , @P27)                               " _
             & "     ON DUPLICATE KEY UPDATE                 " _
             & "         DELFLG     = @P00                   " _
             & "       , STAFFNAMES = @P02                   " _
@@ -959,42 +597,11 @@ Public Class LNS0002UserDetail
             & "       , VIEWPROFID = @P15                   " _
             & "       , RPRTPROFID = @P16                   " _
             & "       , VARIANT    = @P17                   " _
-            & "       , APPROVALID = @P18                   " _
             & "       , UPDYMD     = @P23                   " _
             & "       , UPDUSER    = @P24                   " _
             & "       , UPDTERMID  = @P25                   " _
             & "       , UPDPGID    = @P26                   " _
             & "       , RECEIVEYMD = @P27                   " _
-            & "       , INITIALDISPLAYKBN01 = @P28          " _
-            & "       , INITIALDISPLAYKBN02 = @P29          " _
-            & "       , INITIALDISPLAYKBN03 = @P30          " _
-            & "       , INITIALDISPLAYKBN04 = @P31          " _
-            & "       , INITIALDISPLAYKBN05 = @P32          " _
-            & "       , INITIALDISPLAYKBN06 = @P33          " _
-            & "       , INITIALDISPLAYKBN07 = @P34          " _
-            & "       , INITIALDISPLAYKBN08 = @P35          " _
-            & "       , INITIALDISPLAYKBN09 = @P36          " _
-            & "       , INITIALDISPLAYKBN10 = @P37          " _
-            & "       , INITIALDISPLAYKBN11 = @P38          " _
-            & "       , INITIALDISPLAYKBN12 = @P39          " _
-            & "       , INITIALDISPLAYKBN13 = @P40          " _
-            & "       , INITIALDISPLAYKBN14 = @P41          " _
-            & "       , INITIALDISPLAYKBN15 = @P42          " _
-            & "       , INITIALDISPLAYKBN16 = @P43          " _
-            & "       , INITIALDISPLAYKBN17 = @P44          " _
-            & "       , INITIALDISPLAYKBN18 = @P45          " _
-            & "       , INITIALDISPLAYKBN19 = @P46          " _
-            & "       , INITIALDISPLAYKBN20 = @P47          " _
-            & "       , INITIALDISPLAYKBN21 = @P48          " _
-            & "       , INITIALDISPLAYKBN22 = @P49          " _
-            & "       , INITIALDISPLAYKBN23 = @P50          " _
-            & "       , INITIALDISPLAYKBN24 = @P51          " _
-            & "       , INITIALDISPLAYKBN25 = @P52          " _
-            & "       , INITIALDISPLAYKBN26 = @P53          " _
-            & "       , INITIALDISPLAYKBN27 = @P54          " _
-            & "       , INITIALDISPLAYKBN28 = @P55          " _
-            & "       , INITIALDISPLAYKBN29 = @P56          " _
-            & "       , INITIALDISPLAYKBN30 = @P57          " _
 
         '○ 更新ジャーナル出力SQL
         Dim SQLJnl As String =
@@ -1014,7 +621,6 @@ Public Class LNS0002UserDetail
             & "   , VIEWPROFID                             " _
             & "   , RPRTPROFID                             " _
             & "   , VARIANT                                " _
-            & "   , APPROVALID                             " _
             & "   , INITYMD                                " _
             & "   , INITUSER                               " _
             & "   , INITTERMID                             " _
@@ -1025,41 +631,12 @@ Public Class LNS0002UserDetail
             & "   , UPDPGID                                " _
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
-            & "   , INITIALDISPLAYKBN01                    " _
-            & "   , INITIALDISPLAYKBN02                    " _
-            & "   , INITIALDISPLAYKBN03                    " _
-            & "   , INITIALDISPLAYKBN04                    " _
-            & "   , INITIALDISPLAYKBN05                    " _
-            & "   , INITIALDISPLAYKBN06                    " _
-            & "   , INITIALDISPLAYKBN07                    " _
-            & "   , INITIALDISPLAYKBN08                    " _
-            & "   , INITIALDISPLAYKBN09                    " _
-            & "   , INITIALDISPLAYKBN10                    " _
-            & "   , INITIALDISPLAYKBN11                    " _
-            & "   , INITIALDISPLAYKBN12                    " _
-            & "   , INITIALDISPLAYKBN13                    " _
-            & "   , INITIALDISPLAYKBN14                    " _
-            & "   , INITIALDISPLAYKBN15                    " _
-            & "   , INITIALDISPLAYKBN16                    " _
-            & "   , INITIALDISPLAYKBN17                    " _
-            & "   , INITIALDISPLAYKBN18                    " _
-            & "   , INITIALDISPLAYKBN19                    " _
-            & "   , INITIALDISPLAYKBN20                    " _
-            & "   , INITIALDISPLAYKBN21                    " _
-            & "   , INITIALDISPLAYKBN22                    " _
-            & "   , INITIALDISPLAYKBN23                    " _
-            & "   , INITIALDISPLAYKBN24                    " _
-            & "   , INITIALDISPLAYKBN25                    " _
-            & "   , INITIALDISPLAYKBN26                    " _
-            & "   , INITIALDISPLAYKBN27                    " _
-            & "   , INITIALDISPLAYKBN28                    " _
-            & "   , INITIALDISPLAYKBN29                    " _
-            & "   , INITIALDISPLAYKBN30                    " _
             & " FROM                                       " _
-            & "     COM.LNS0002_USER                       " _
+            & "     COM.lns0001_user                       " _
             & " WHERE                                      " _
             & "         USERID = @P01                      " _
-            & "     AND STYMD  = @P08                      "
+            & "     AND STYMD  = @P08                      " _
+            & "     AND ENDYMD  = @P09                      "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon), SQLcmdJnl As New MySqlCommand(SQLJnl, SQLcon)
@@ -1079,7 +656,7 @@ Public Class LNS0002UserDetail
                 Dim PARA15 As MySqlParameter = SQLcmd.Parameters.Add("@P15", MySqlDbType.VarChar, 20)        '画面表示項目制御ロール
                 Dim PARA16 As MySqlParameter = SQLcmd.Parameters.Add("@P16", MySqlDbType.VarChar, 20)        'エクセル出力制御ロール
                 Dim PARA17 As MySqlParameter = SQLcmd.Parameters.Add("@P17", MySqlDbType.VarChar, 20)        '画面初期値ロール
-                Dim PARA18 As MySqlParameter = SQLcmd.Parameters.Add("@P18", MySqlDbType.VarChar, 20)        '承認権限ロール
+                'Dim PARA18 As MySqlParameter = SQLcmd.Parameters.Add("@P18", MySqlDbType.VarChar, 20)        '承認権限ロール
                 Dim PARA19 As MySqlParameter = SQLcmd.Parameters.Add("@P19", MySqlDbType.DateTime)            '登録年月日
                 Dim PARA20 As MySqlParameter = SQLcmd.Parameters.Add("@P20", MySqlDbType.VarChar, 20)        '登録ユーザーＩＤ
                 Dim PARA21 As MySqlParameter = SQLcmd.Parameters.Add("@P21", MySqlDbType.VarChar, 20)        '登録端末
@@ -1089,71 +666,42 @@ Public Class LNS0002UserDetail
                 Dim PARA25 As MySqlParameter = SQLcmd.Parameters.Add("@P25", MySqlDbType.VarChar, 20)        '更新端末
                 Dim PARA26 As MySqlParameter = SQLcmd.Parameters.Add("@P26", MySqlDbType.VarChar, 40)        '更新プログラムＩＤ
                 Dim PARA27 As MySqlParameter = SQLcmd.Parameters.Add("@P27", MySqlDbType.DateTime)            '集信日時
-                Dim PARA28 As MySqlParameter = SQLcmd.Parameters.Add("@P28", MySqlDbType.VarChar, 1)         '初期表示設定　現況表01　通風
-                Dim PARA29 As MySqlParameter = SQLcmd.Parameters.Add("@P29", MySqlDbType.VarChar, 1)         '初期表示設定　現況表02　冷蔵
-                Dim PARA30 As MySqlParameter = SQLcmd.Parameters.Add("@P30", MySqlDbType.VarChar, 1)         '初期表示設定　現況表03　スーパーUR
-                Dim PARA31 As MySqlParameter = SQLcmd.Parameters.Add("@P31", MySqlDbType.VarChar, 1)         '初期表示設定　現況表04　冷凍
-                Dim PARA32 As MySqlParameter = SQLcmd.Parameters.Add("@P32", MySqlDbType.VarChar, 1)         '初期表示設定　現況表05　L10屯
-                Dim PARA33 As MySqlParameter = SQLcmd.Parameters.Add("@P33", MySqlDbType.VarChar, 1)         '初期表示設定　現況表06　ウイング
-                Dim PARA34 As MySqlParameter = SQLcmd.Parameters.Add("@P34", MySqlDbType.VarChar, 1)         '初期表示設定　現況表07　有蓋
-                Dim PARA35 As MySqlParameter = SQLcmd.Parameters.Add("@P35", MySqlDbType.VarChar, 1)         '初期表示設定　現況表08　無蓋
-                Dim PARA36 As MySqlParameter = SQLcmd.Parameters.Add("@P36", MySqlDbType.VarChar, 1)         '初期表示設定　現況表09　予備
-                Dim PARA37 As MySqlParameter = SQLcmd.Parameters.Add("@P37", MySqlDbType.VarChar, 1)         '初期表示設定　現況表10　予備
-                Dim PARA38 As MySqlParameter = SQLcmd.Parameters.Add("@P38", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表01　通風
-                Dim PARA39 As MySqlParameter = SQLcmd.Parameters.Add("@P39", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表02　冷蔵
-                Dim PARA40 As MySqlParameter = SQLcmd.Parameters.Add("@P40", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表03　スーパーUR
-                Dim PARA41 As MySqlParameter = SQLcmd.Parameters.Add("@P41", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表04　冷凍
-                Dim PARA42 As MySqlParameter = SQLcmd.Parameters.Add("@P42", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表05　L10屯
-                Dim PARA43 As MySqlParameter = SQLcmd.Parameters.Add("@P43", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表06　ウイング
-                Dim PARA44 As MySqlParameter = SQLcmd.Parameters.Add("@P44", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表07　有蓋
-                Dim PARA45 As MySqlParameter = SQLcmd.Parameters.Add("@P45", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表08　無蓋
-                Dim PARA46 As MySqlParameter = SQLcmd.Parameters.Add("@P46", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表09　予備
-                Dim PARA47 As MySqlParameter = SQLcmd.Parameters.Add("@P47", MySqlDbType.VarChar, 1)         '初期表示設定　運用状況表10　予備
-                Dim PARA48 As MySqlParameter = SQLcmd.Parameters.Add("@P48", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表01　通風
-                Dim PARA49 As MySqlParameter = SQLcmd.Parameters.Add("@P49", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表02　冷蔵
-                Dim PARA50 As MySqlParameter = SQLcmd.Parameters.Add("@P50", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表03　スーパーUR
-                Dim PARA51 As MySqlParameter = SQLcmd.Parameters.Add("@P51", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表04　冷凍
-                Dim PARA52 As MySqlParameter = SQLcmd.Parameters.Add("@P52", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表05　L10屯
-                Dim PARA53 As MySqlParameter = SQLcmd.Parameters.Add("@P53", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表06　ウイング
-                Dim PARA54 As MySqlParameter = SQLcmd.Parameters.Add("@P54", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表07　有蓋
-                Dim PARA55 As MySqlParameter = SQLcmd.Parameters.Add("@P55", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表08　無蓋
-                Dim PARA56 As MySqlParameter = SQLcmd.Parameters.Add("@P56", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表09　予備
-                Dim PARA57 As MySqlParameter = SQLcmd.Parameters.Add("@P57", MySqlDbType.VarChar, 1)         '初期表示設定　発着差実績表10　予備
 
                 ' 更新ジャーナル出力用パラメータ
                 Dim JPARA01 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P01", MySqlDbType.VarChar, 20)    'ユーザーID
                 Dim JPARA08 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P08", MySqlDbType.Date)            '開始年月日
+                Dim JPARA09 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P09", MySqlDbType.Date)               '終了年月日
 
-                Dim LNS0002row As DataRow = LNS0002INPtbl.Rows(0)
+                Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
 
                 Dim WW_DateNow As DateTime = Date.Now
 
                 ' DB更新
 
-                PARA00.Value = LNS0002row("DELFLG")                            '削除フラグ
-                PARA01.Value = LNS0002row("USERID")                            'ユーザーID
-                PARA02.Value = LNS0002row("STAFFNAMES")                        '社員名（短）
-                PARA03.Value = LNS0002row("STAFFNAMEL")                        '社員名（長）
-                PARA04.Value = LNS0002row("MAPID")                             '画面ＩＤ
-                If Not String.IsNullOrEmpty(RTrim(LNS0002row("STYMD"))) Then   '開始年月日
-                    PARA08.Value = RTrim(LNS0002row("STYMD"))
+                PARA00.Value = LNS0001row("DELFLG")                            '削除フラグ
+                PARA01.Value = LNS0001row("USERID")                            'ユーザーID
+                PARA02.Value = LNS0001row("STAFFNAMES")                        '社員名（短）
+                PARA03.Value = LNS0001row("STAFFNAMEL")                        '社員名（長）
+                PARA04.Value = LNS0001row("MAPID")                             '画面ＩＤ
+                If Not String.IsNullOrEmpty(RTrim(LNS0001row("STYMD"))) Then   '開始年月日
+                    PARA08.Value = RTrim(LNS0001row("STYMD"))
                 Else
                     PARA08.Value = C_DEFAULT_YMD
                 End If
-                If Not String.IsNullOrEmpty(RTrim(LNS0002row("ENDYMD"))) Then  '終了年月日
-                    PARA09.Value = RTrim(LNS0002row("ENDYMD"))
+                If Not String.IsNullOrEmpty(RTrim(LNS0001row("ENDYMD"))) Then  '終了年月日
+                    PARA09.Value = RTrim(LNS0001row("ENDYMD"))
                 Else
                     PARA09.Value = C_DEFAULT_YMD
                 End If
-                PARA10.Value = LNS0002row("CAMPCODE")                          '会社コード
-                PARA11.Value = LNS0002row("ORG")                               '組織コード
-                PARA12.Value = LNS0002row("EMAIL")                             'メールアドレス
-                PARA13.Value = LNS0002row("MENUROLE")                          'メニュー表示制御ロール
-                PARA14.Value = LNS0002row("MAPROLE")                           '画面参照更新制御ロール
-                PARA15.Value = LNS0002row("VIEWPROFID")                        '画面表示項目制御ロール
-                PARA16.Value = LNS0002row("RPRTPROFID")                        'エクセル出力制御ロール
-                PARA17.Value = LNS0002row("VARIANT")                           '画面初期値ロール
-                PARA18.Value = LNS0002row("APPROVALID")                        '承認権限ロール
+                PARA10.Value = LNS0001row("CAMPCODE")                          '会社コード
+                PARA11.Value = LNS0001row("ORG")                               '組織コード
+                PARA12.Value = LNS0001row("EMAIL")                             'メールアドレス
+                PARA13.Value = LNS0001row("MENUROLE")                          'メニュー表示制御ロール
+                PARA14.Value = LNS0001row("MAPROLE")                           '画面参照更新制御ロール
+                PARA15.Value = LNS0001row("VIEWPROFID")                        '画面表示項目制御ロール
+                PARA16.Value = LNS0001row("RPRTPROFID")                        'エクセル出力制御ロール
+                PARA17.Value = LNS0001row("VARIANT")                           '画面初期値ロール
+                'PARA18.Value = LNS0001row("APPROVALID")                        '承認権限ロール
                 PARA19.Value = WW_DateNow                                      '登録年月日
                 PARA20.Value = Master.USERID                                   '登録ユーザーＩＤ
                 PARA21.Value = Master.USERTERMID                               '登録端末
@@ -1164,210 +712,39 @@ Public Class LNS0002UserDetail
                 PARA26.Value = Me.GetType().BaseType.Name                      '更新プログラムＩＤ
                 PARA27.Value = C_DEFAULT_YMD                                   '集信日時
 
-                Dim i As Integer = 0
-
-                For Each Item As ListItem In ChklFlags.Items
-                    Select Case i
-                        Case 0
-                            If Item.Selected = True Then
-                                PARA28.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA28.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 1
-                            If Item.Selected = True Then
-                                PARA29.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA29.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 2
-                            If Item.Selected = True Then
-                                PARA30.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA30.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 3
-                            If Item.Selected = True Then
-                                PARA31.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA31.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 4
-                            If Item.Selected = True Then
-                                PARA32.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA32.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 5
-                            If Item.Selected = True Then
-                                PARA33.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA33.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 6
-                            If Item.Selected = True Then
-                                PARA34.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA34.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                        Case 7
-                            If Item.Selected = True Then
-                                PARA35.Value = "1"                             '初期表示設定 現況表
-                            Else
-                                PARA35.Value = DBNull.Value                    '初期表示設定 現況表
-                            End If
-                    End Select
-                    i += 1
-                Next
-
-                PARA36.Value = DBNull.Value                                     '初期表示設定 現況表 予備
-                PARA37.Value = DBNull.Value                                     '初期表示設定 現況表 予備
-
-                i = 0
-                For Each Item As ListItem In ChklFlags2.Items
-                    Select Case i
-                        Case 0
-                            If Item.Selected = True Then
-                                PARA38.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA38.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 1
-                            If Item.Selected = True Then
-                                PARA39.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA39.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 2
-                            If Item.Selected = True Then
-                                PARA40.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA40.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 3
-                            If Item.Selected = True Then
-                                PARA41.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA41.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 4
-                            If Item.Selected = True Then
-                                PARA42.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA42.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 5
-                            If Item.Selected = True Then
-                                PARA43.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA43.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 6
-                            If Item.Selected = True Then
-                                PARA44.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA44.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                        Case 7
-                            If Item.Selected = True Then
-                                PARA45.Value = "1"                             '初期表示設定 運用状況表
-                            Else
-                                PARA45.Value = DBNull.Value                    '初期表示設定 運用状況表
-                            End If
-                    End Select
-                    i += 1
-                Next
-
-                PARA46.Value = DBNull.Value                                    '初期表示設定 運用状況表 予備
-                PARA47.Value = DBNull.Value                                    '初期表示設定 運用状況表 予備
-
-                i = 0
-                For Each Item As ListItem In ChklFlags3.Items
-                    Select Case i
-                        Case 0
-                            If Item.Selected = True Then
-                                PARA48.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA48.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 1
-                            If Item.Selected = True Then
-                                PARA49.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA49.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 2
-                            If Item.Selected = True Then
-                                PARA50.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA50.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 3
-                            If Item.Selected = True Then
-                                PARA51.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA51.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 4
-                            If Item.Selected = True Then
-                                PARA52.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA52.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 5
-                            If Item.Selected = True Then
-                                PARA53.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA53.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 6
-                            If Item.Selected = True Then
-                                PARA54.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA54.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                        Case 7
-                            If Item.Selected = True Then
-                                PARA55.Value = "1"                             '初期表示設定 発着差
-                            Else
-                                PARA55.Value = DBNull.Value                    '初期表示設定 発着差
-                            End If
-                    End Select
-                    i += 1
-                Next
-
-                PARA56.Value = DBNull.Value                                    '初期表示設定 発着差 予備
-                PARA57.Value = DBNull.Value                                    '初期表示設定 発着差 予備
-
-
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
                 ' 更新ジャーナル出力
-                JPARA01.Value = LNS0002row("USERID")                          'ユーザーID
-                If Not String.IsNullOrEmpty(RTrim(LNS0002row("STYMD"))) Then  '開始年月日
-                    JPARA08.Value = RTrim(LNS0002row("STYMD"))
+                JPARA01.Value = LNS0001row("USERID")                          'ユーザーID
+                If Not String.IsNullOrEmpty(RTrim(LNS0001row("STYMD"))) Then  '開始年月日
+                    JPARA08.Value = RTrim(LNS0001row("STYMD"))
                 Else
                     JPARA08.Value = C_DEFAULT_YMD
                 End If
+                If Not String.IsNullOrEmpty(RTrim(LNS0001row("ENDYMD"))) Then  '終了年月日
+                    JPARA09.Value = RTrim(LNS0001row("ENDYMD"))
+                Else
+                    JPARA09.Value = C_DEFAULT_YMD
+                End If
 
                 Using SQLdr As MySqlDataReader = SQLcmdJnl.ExecuteReader()
-                    If IsNothing(LNS0002UPDtbl) Then
-                        LNS0002UPDtbl = New DataTable
+                    If IsNothing(LNS0001UPDtbl) Then
+                        LNS0001UPDtbl = New DataTable
 
                         For index As Integer = 0 To SQLdr.FieldCount - 1
-                            LNS0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            LNS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                         Next
                     End If
 
-                    LNS0002UPDtbl.Clear()
-                    LNS0002UPDtbl.Load(SQLdr)
+                    LNS0001UPDtbl.Clear()
+                    LNS0001UPDtbl.Load(SQLdr)
                 End Using
 
-                For Each LNS0002UPDrow As DataRow In LNS0002UPDtbl.Rows
-                    CS0020JOURNAL.TABLENM = "LNS0002D"
+                For Each LNS0001UPDrow As DataRow In LNS0001UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "LNS0001D"
                     CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-                    CS0020JOURNAL.ROW = LNS0002UPDrow
+                    CS0020JOURNAL.ROW = LNS0001UPDrow
                     CS0020JOURNAL.CS0020JOURNAL()
                     If Not isNormal(CS0020JOURNAL.ERR) Then
                         Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1386,10 +763,10 @@ Public Class LNS0002UserDetail
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D UPDATE_INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D UPDATE_INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D UPDATE_INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001D UPDATE_INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1402,7 +779,7 @@ Public Class LNS0002UserDetail
 
         '○ DB更新SQL(ユーザーパスワードマスタ)
         SQLStr =
-              "     INSERT INTO COM.LNS0003_USERPASS                                  " _
+              "     INSERT INTO COM.LNS0002_userpass                                  " _
             & "        (DELFLG                                                        " _
             & "       , USERID                                                        " _
             & "       , PASSWORD                                                      " _
@@ -1411,11 +788,9 @@ Public Class LNS0002UserDetail
             & "       , INITYMD                                                       " _
             & "       , INITUSER                                                      " _
             & "       , INITTERMID                                                    " _
-            & "       , INITPGID                                                      " _
             & "       , UPDYMD                                                        " _
             & "       , UPDUSER                                                       " _
             & "       , UPDTERMID                                                     " _
-            & "       , UPDPGID                                                       " _
             & "       , RECEIVEYMD)                                                   " _
             & "     VALUES                                                            " _
             & "        (@P00                                                          " _
@@ -1426,11 +801,9 @@ Public Class LNS0002UserDetail
             & "       , @P19                                                          " _
             & "       , @P20                                                          " _
             & "       , @P21                                                          " _
-            & "       , @P22                                                          " _
             & "       , @P23                                                          " _
             & "       , @P24                                                          " _
             & "       , @P25                                                          " _
-            & "       , @P26                                                          " _
             & "       , @P27)                                                         " _
             & "     ON DUPLICATE KEY UPDATE                                           " _
             & "         DELFLG     = @P00                                             " _
@@ -1440,7 +813,6 @@ Public Class LNS0002UserDetail
             & "       , UPDYMD     = @P23                                             " _
             & "       , UPDUSER    = @P24                                             " _
             & "       , UPDTERMID  = @P25                                             " _
-            & "       , UPDPGID    = @P26                                             " _
             & "       , RECEIVEYMD = @P27                                             " _
 
         '○ 更新ジャーナル出力SQL
@@ -1454,15 +826,13 @@ Public Class LNS0002UserDetail
             & "   , INITYMD                                " _
             & "   , INITUSER                               " _
             & "   , INITTERMID                             " _
-            & "   , INITPGID                               " _
             & "   , UPDYMD                                 " _
             & "   , UPDUSER                                " _
             & "   , UPDTERMID                              " _
-            & "   , UPDPGID                                " _
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.LNS0003_USERPASS                   " _
+            & "     COM.LNS0002_userpass                   " _
             & " WHERE                                      " _
             & "     USERID = @P01                          "
 
@@ -1477,68 +847,68 @@ Public Class LNS0002UserDetail
                 Dim PARA19 As MySqlParameter = SQLcmd.Parameters.Add("@P19", MySqlDbType.DateTime)            '登録年月日
                 Dim PARA20 As MySqlParameter = SQLcmd.Parameters.Add("@P20", MySqlDbType.VarChar, 20)        '登録ユーザーＩＤ
                 Dim PARA21 As MySqlParameter = SQLcmd.Parameters.Add("@P21", MySqlDbType.VarChar, 20)        '登録端末
-                Dim PARA22 As MySqlParameter = SQLcmd.Parameters.Add("@P22", MySqlDbType.VarChar, 40)        '登録プログラムＩＤ
+                'Dim PARA22 As MySqlParameter = SQLcmd.Parameters.Add("@P22", MySqlDbType.VarChar, 40)        '登録プログラムＩＤ
                 Dim PARA23 As MySqlParameter = SQLcmd.Parameters.Add("@P23", MySqlDbType.DateTime)            '更新年月日
                 Dim PARA24 As MySqlParameter = SQLcmd.Parameters.Add("@P24", MySqlDbType.VarChar, 20)        '更新ユーザーＩＤ
                 Dim PARA25 As MySqlParameter = SQLcmd.Parameters.Add("@P25", MySqlDbType.VarChar, 20)        '更新端末
-                Dim PARA26 As MySqlParameter = SQLcmd.Parameters.Add("@P26", MySqlDbType.VarChar, 40)        '更新プログラムＩＤ
+                'Dim PARA26 As MySqlParameter = SQLcmd.Parameters.Add("@P26", MySqlDbType.VarChar, 40)        '更新プログラムＩＤ
                 Dim PARA27 As MySqlParameter = SQLcmd.Parameters.Add("@P27", MySqlDbType.DateTime)            '集信日時
 
                 ' 更新ジャーナル出力用パラメータ
                 Dim JPARA01 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P01", MySqlDbType.VarChar, 20)    'ユーザーID
 
-                Dim LNS0002row As DataRow = LNS0002INPtbl.Rows(0)
+                Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
 
                 Dim WW_DateNow As DateTime = Date.Now
 
                 ' DB更新
-                PARA00.Value = LNS0002row("DELFLG")                                '削除フラグ
-                PARA01.Value = LNS0002row("USERID")                                'ユーザーID
-                PARA05.Value = LNS0002row("PASSWORD")                              'パスワード
-                If Not String.IsNullOrEmpty(LNS0002row("MISSCNT")) Then            '誤り回数
-                    PARA06.Value = LNS0002row("MISSCNT")
+                PARA00.Value = LNS0001row("DELFLG")                                '削除フラグ
+                PARA01.Value = LNS0001row("USERID")                                'ユーザーID
+                PARA05.Value = LNS0001row("PASSWORD")                              'パスワード
+                If Not String.IsNullOrEmpty(LNS0001row("MISSCNT")) Then            '誤り回数
+                    PARA06.Value = LNS0001row("MISSCNT")
                 Else
                     PARA06.Value = "0"
                 End If
-                If Not String.IsNullOrEmpty(RTrim(LNS0002row("PASSENDYMD"))) Then  'パスワード有効期限
-                    PARA07.Value = RTrim(LNS0002row("PASSENDYMD"))
+                If Not String.IsNullOrEmpty(RTrim(LNS0001row("PASSENDYMD"))) Then  'パスワード有効期限
+                    PARA07.Value = RTrim(LNS0001row("PASSENDYMD"))
                 Else
                     PARA07.Value = C_DEFAULT_YMD
                 End If
                 PARA19.Value = WW_DateNow                                          '登録年月日
                 PARA20.Value = Master.USERID                                       '登録ユーザーＩＤ
                 PARA21.Value = Master.USERTERMID                                   '登録端末
-                PARA22.Value = Me.GetType().BaseType.Name                          '登録プログラムＩＤ
+                'PARA22.Value = Me.GetType().BaseType.Name                          '登録プログラムＩＤ
                 PARA23.Value = WW_DateNow                                          '更新年月日
                 PARA24.Value = Master.USERID                                       '更新ユーザーＩＤ
                 PARA25.Value = Master.USERTERMID                                   '更新端末
-                PARA26.Value = Me.GetType().BaseType.Name                          '更新プログラムＩＤ
+                'PARA26.Value = Me.GetType().BaseType.Name                          '更新プログラムＩＤ
                 PARA27.Value = C_DEFAULT_YMD                                       '集信日時
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
-                LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
 
                 ' 更新ジャーナル出力
-                JPARA01.Value = LNS0002row("USERID")  'ユーザーID
+                JPARA01.Value = LNS0001row("USERID")  'ユーザーID
 
                 Using SQLdr As MySqlDataReader = SQLcmdJnl.ExecuteReader()
-                    If IsNothing(LNS0002UPDtbl) Then
-                        LNS0002UPDtbl = New DataTable
+                    If IsNothing(LNS0001UPDtbl) Then
+                        LNS0001UPDtbl = New DataTable
 
                         For index As Integer = 0 To SQLdr.FieldCount - 1
-                            LNS0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                            LNS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                         Next
                     End If
 
-                    LNS0002UPDtbl.Clear()
-                    LNS0002UPDtbl.Load(SQLdr)
+                    LNS0001UPDtbl.Clear()
+                    LNS0001UPDtbl.Load(SQLdr)
                 End Using
 
-                For Each LNS0002UPDrow As DataRow In LNS0002UPDtbl.Rows
-                    CS0020JOURNAL.TABLENM = "LNS0002D"
+                For Each LNS0001UPDrow As DataRow In LNS0001UPDtbl.Rows
+                    CS0020JOURNAL.TABLENM = "LNS0001D"
                     CS0020JOURNAL.ACTION = "UPDATE_INSERT"
-                    CS0020JOURNAL.ROW = LNS0002UPDrow
+                    CS0020JOURNAL.ROW = LNS0001UPDrow
                     CS0020JOURNAL.CS0020JOURNAL()
                     If Not isNormal(CS0020JOURNAL.ERR) Then
                         Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1557,10 +927,10 @@ Public Class LNS0002UserDetail
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D UPDATE_INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D UPDATE_INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0002D UPDATE_INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001D UPDATE_INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1584,7 +954,7 @@ Public Class LNS0002UserDetail
 
         '○ DB更新SQL(ユーザーマスタ)
         Dim SQLStr As String =
-              "UPDATE COM.LNS0002_USER " _
+              "UPDATE COM.lns0001_user " _
             & "SET                     " _
             & "    ENDYMD     = @P03   " _
             & "   ,UPDYMD     = @P04   " _
@@ -1614,7 +984,6 @@ Public Class LNS0002UserDetail
             & "   , VIEWPROFID                             " _
             & "   , RPRTPROFID                             " _
             & "   , VARIANT                                " _
-            & "   , APPROVALID                             " _
             & "   , INITYMD                                " _
             & "   , INITUSER                               " _
             & "   , INITTERMID                             " _
@@ -1625,38 +994,8 @@ Public Class LNS0002UserDetail
             & "   , UPDPGID                                " _
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
-            & "   , INITIALDISPLAYKBN01                    " _
-            & "   , INITIALDISPLAYKBN02                    " _
-            & "   , INITIALDISPLAYKBN03                    " _
-            & "   , INITIALDISPLAYKBN04                    " _
-            & "   , INITIALDISPLAYKBN05                    " _
-            & "   , INITIALDISPLAYKBN06                    " _
-            & "   , INITIALDISPLAYKBN07                    " _
-            & "   , INITIALDISPLAYKBN08                    " _
-            & "   , INITIALDISPLAYKBN09                    " _
-            & "   , INITIALDISPLAYKBN10                    " _
-            & "   , INITIALDISPLAYKBN11                    " _
-            & "   , INITIALDISPLAYKBN12                    " _
-            & "   , INITIALDISPLAYKBN13                    " _
-            & "   , INITIALDISPLAYKBN14                    " _
-            & "   , INITIALDISPLAYKBN15                    " _
-            & "   , INITIALDISPLAYKBN16                    " _
-            & "   , INITIALDISPLAYKBN17                    " _
-            & "   , INITIALDISPLAYKBN18                    " _
-            & "   , INITIALDISPLAYKBN19                    " _
-            & "   , INITIALDISPLAYKBN20                    " _
-            & "   , INITIALDISPLAYKBN21                    " _
-            & "   , INITIALDISPLAYKBN22                    " _
-            & "   , INITIALDISPLAYKBN23                    " _
-            & "   , INITIALDISPLAYKBN24                    " _
-            & "   , INITIALDISPLAYKBN25                    " _
-            & "   , INITIALDISPLAYKBN26                    " _
-            & "   , INITIALDISPLAYKBN27                    " _
-            & "   , INITIALDISPLAYKBN28                    " _
-            & "   , INITIALDISPLAYKBN29                    " _
-            & "   , INITIALDISPLAYKBN30                    " _
             & " FROM                                       " _
-            & "     COM.LNS0002_USER                       " _
+            & "     COM.lns0001_user                       " _
             & " WHERE                                      " _
             & "         USERID = @P01                      " _
             & "     AND STYMD  = @P02                      "
@@ -1678,13 +1017,13 @@ Public Class LNS0002UserDetail
                     Dim JPARA01 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P01", MySqlDbType.VarChar, 20)    'ユーザーID
                     Dim JPARA02 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P02", MySqlDbType.Date)            '開始年月日
 
-                    Dim LNS0002row As DataRow = LNS0002INPtbl.Rows(0)
+                    Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
 
                     Dim WW_DateNow As DateTime = Date.Now
 
                     ' DB更新
 
-                    PARA01.Value = LNS0002row("USERID")                           'ユーザーID
+                    PARA01.Value = LNS0001row("USERID")                           'ユーザーID
                     PARA02.Value = RTrim(pnlTxtLastStYMD.Text)                    '開始年月日
                     PARA03.Value = RTrim(pnlTxtLastEndYMD.Text)                   '終了年月日
                     PARA04.Value = WW_DateNow                                     '更新年月日
@@ -1696,26 +1035,26 @@ Public Class LNS0002UserDetail
                     SQLcmd.ExecuteNonQuery()
 
                     ' 更新ジャーナル出力
-                    JPARA01.Value = LNS0002row("USERID")                          'ユーザーID
+                    JPARA01.Value = LNS0001row("USERID")                          'ユーザーID
                     JPARA02.Value = RTrim(pnlTxtLastStYMD.Text)                   '開始年月日
 
                     Using SQLdr As MySqlDataReader = SQLcmdJnl.ExecuteReader()
-                        If IsNothing(LNS0002UPDtbl) Then
-                            LNS0002UPDtbl = New DataTable
+                        If IsNothing(LNS0001UPDtbl) Then
+                            LNS0001UPDtbl = New DataTable
 
                             For index As Integer = 0 To SQLdr.FieldCount - 1
-                                LNS0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                LNS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
                         End If
 
-                        LNS0002UPDtbl.Clear()
-                        LNS0002UPDtbl.Load(SQLdr)
+                        LNS0001UPDtbl.Clear()
+                        LNS0001UPDtbl.Load(SQLdr)
                     End Using
 
-                    For Each LNS0002UPDrow As DataRow In LNS0002UPDtbl.Rows
-                        CS0020JOURNAL.TABLENM = "LNS0002D"
+                    For Each LNS0001UPDrow As DataRow In LNS0001UPDtbl.Rows
+                        CS0020JOURNAL.TABLENM = "LNS0001D"
                         CS0020JOURNAL.ACTION = "LASTDATA_UPDATE"
-                        CS0020JOURNAL.ROW = LNS0002UPDrow
+                        CS0020JOURNAL.ROW = LNS0001UPDrow
                         CS0020JOURNAL.CS0020JOURNAL()
                         If Not isNormal(CS0020JOURNAL.ERR) Then
                             Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1734,10 +1073,10 @@ Public Class LNS0002UserDetail
                     Next
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D LASTDATA_UPDATE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D LASTDATA_UPDATE")
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                CS0011LOGWrite.INFPOSI = "DB:LNS0002D LASTDATA_UPDATE"
+                CS0011LOGWrite.INFPOSI = "DB:LNS0001D LASTDATA_UPDATE"
                 CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWrite.TEXT = ex.ToString()
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1753,7 +1092,7 @@ Public Class LNS0002UserDetail
 
             '○ DB更新SQL(ユーザーマスタ)
             SQLStr =
-              "UPDATE COM.LNS0002_USER " _
+              "UPDATE COM.lns0001_user " _
             & "SET                     " _
             & "    STYMD      = @P03   " _
             & "   ,UPDYMD     = @P04   " _
@@ -1781,12 +1120,12 @@ Public Class LNS0002UserDetail
                     Dim JPARA01 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P01", MySqlDbType.VarChar, 20)    'ユーザーID
                     Dim JPARA02 As MySqlParameter = SQLcmdJnl.Parameters.Add("@P02", MySqlDbType.Date)            '開始年月日
 
-                    Dim LNS0002row As DataRow = LNS0002INPtbl.Rows(0)
+                    Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
 
                     Dim WW_DateNow As DateTime = Date.Now
 
                     ' DB更新
-                    PARA01.Value = LNS0002row("USERID")                           'ユーザーID
+                    PARA01.Value = LNS0001row("USERID")                           'ユーザーID
                     PARA02.Value = RTrim(pnlTxtAdjustNextStYMD.Text)       '開始年月日(調整前)
                     PARA03.Value = RTrim(pnlTxtNextStYMD.Text)                    '開始年月日(調整後)
                     PARA04.Value = WW_DateNow                                     '更新年月日
@@ -1798,26 +1137,26 @@ Public Class LNS0002UserDetail
                     SQLcmd.ExecuteNonQuery()
 
                     ' 更新ジャーナル出力
-                    JPARA01.Value = LNS0002row("USERID")                          'ユーザーID
+                    JPARA01.Value = LNS0001row("USERID")                          'ユーザーID
                     JPARA02.Value = RTrim(pnlTxtAdjustNextStYMD.Text)      '開始年月日
 
                     Using SQLdr As MySqlDataReader = SQLcmdJnl.ExecuteReader()
-                        If IsNothing(LNS0002UPDtbl) Then
-                            LNS0002UPDtbl = New DataTable
+                        If IsNothing(LNS0001UPDtbl) Then
+                            LNS0001UPDtbl = New DataTable
 
                             For index As Integer = 0 To SQLdr.FieldCount - 1
-                                LNS0002UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                                LNS0001UPDtbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                             Next
                         End If
 
-                        LNS0002UPDtbl.Clear()
-                        LNS0002UPDtbl.Load(SQLdr)
+                        LNS0001UPDtbl.Clear()
+                        LNS0001UPDtbl.Load(SQLdr)
                     End Using
 
-                    For Each LNS0002UPDrow As DataRow In LNS0002UPDtbl.Rows
-                        CS0020JOURNAL.TABLENM = "LNS0002D"
+                    For Each LNS0001UPDrow As DataRow In LNS0001UPDtbl.Rows
+                        CS0020JOURNAL.TABLENM = "LNS0001D"
                         CS0020JOURNAL.ACTION = "NEXTDATA_UPDATE"
-                        CS0020JOURNAL.ROW = LNS0002UPDrow
+                        CS0020JOURNAL.ROW = LNS0001UPDrow
                         CS0020JOURNAL.CS0020JOURNAL()
                         If Not isNormal(CS0020JOURNAL.ERR) Then
                             Master.Output(CS0020JOURNAL.ERR, C_MESSAGE_TYPE.ABORT, "CS0020JOURNAL JOURNAL")
@@ -1836,10 +1175,10 @@ Public Class LNS0002UserDetail
                     Next
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002D NEXTDATA_UPDATE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001D NEXTDATA_UPDATE")
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                CS0011LOGWrite.INFPOSI = "DB:LNS0002D NEXTDATA_UPDATE"
+                CS0011LOGWrite.INFPOSI = "DB:LNS0001D NEXTDATA_UPDATE"
                 CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWrite.TEXT = ex.ToString()
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1852,6 +1191,208 @@ Public Class LNS0002UserDetail
         End If
     End Sub
 
+#Region "変更履歴テーブル登録"
+    ''' <summary>
+    ''' 変更チェック
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MASTEREXISTS(ByVal SQLcon As MySqlConnection, ByRef WW_MODIFYKBN As String)
+
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        'ユーザマスタに同一キーのデータが存在するか確認する。
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("    SELECT")
+        SQLStr.AppendLine("        USERID")
+        SQLStr.AppendLine("    FROM")
+        SQLStr.AppendLine("        COM.LNS0001_USER")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.Append("         USERID = @USERID                    ")
+        SQLStr.Append("     AND STYMD   = @STYMD                    ")
+        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
+                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+
+                Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
+
+                P_USERID.Value = LNS0001row("USERID")           'ユーザーID
+                P_STYMD.Value = LNS0001row("STYMD")           '開始年月日
+                P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
+
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    '更新の場合(データが存在した場合)は変更区分に変更前をセット
+                    If WW_Tbl.Rows.Count > 0 Then
+                        WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.BEFDATA '変更前
+                    Else
+                        WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.NEWDATA '新規
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001C SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNS0001C Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 履歴テーブル登録
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub InsertHist(ByVal SQLcon As MySqlConnection, ByVal WW_MODIFYKBN As String, ByVal WW_NOW As Date)
+
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ ＤＢ更新
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" INSERT INTO LNG.LNT0002_USERHIST ")
+        SQLStr.AppendLine("  (  ")
+        SQLStr.AppendLine("      USERID  ")
+        SQLStr.AppendLine("     ,STYMD  ")
+        SQLStr.AppendLine("     ,ENDYMD  ")
+        SQLStr.AppendLine("     ,CAMPCODE  ")
+        SQLStr.AppendLine("     ,ORG  ")
+        SQLStr.AppendLine("     ,STAFFNAMES  ")
+        SQLStr.AppendLine("     ,STAFFNAMEL  ")
+        SQLStr.AppendLine("     ,EMAIL  ")
+        SQLStr.AppendLine("     ,MENUROLE  ")
+        SQLStr.AppendLine("     ,MAPROLE  ")
+        SQLStr.AppendLine("     ,VIEWPROFID  ")
+        SQLStr.AppendLine("     ,RPRTPROFID  ")
+        SQLStr.AppendLine("     ,MAPID  ")
+        SQLStr.AppendLine("     ,VARIANT  ")
+        SQLStr.AppendLine("     ,OPERATEKBN  ")
+        SQLStr.AppendLine("     ,MODIFYKBN  ")
+        SQLStr.AppendLine("     ,MODIFYYMD  ")
+        SQLStr.AppendLine("     ,MODIFYUSER  ")
+        SQLStr.AppendLine("     ,DELFLG  ")
+        SQLStr.AppendLine("     ,INITYMD  ")
+        SQLStr.AppendLine("     ,INITUSER  ")
+        SQLStr.AppendLine("     ,INITTERMID  ")
+        SQLStr.AppendLine("     ,INITPGID  ")
+        SQLStr.AppendLine("  )  ")
+        SQLStr.AppendLine("  SELECT  ")
+        SQLStr.AppendLine("      USERID  ")
+        SQLStr.AppendLine("     ,STYMD  ")
+        SQLStr.AppendLine("     ,ENDYMD  ")
+        SQLStr.AppendLine("     ,CAMPCODE  ")
+        SQLStr.AppendLine("     ,ORG  ")
+        SQLStr.AppendLine("     ,STAFFNAMES  ")
+        SQLStr.AppendLine("     ,STAFFNAMEL  ")
+        SQLStr.AppendLine("     ,EMAIL  ")
+        SQLStr.AppendLine("     ,MENUROLE  ")
+        SQLStr.AppendLine("     ,MAPROLE  ")
+        SQLStr.AppendLine("     ,VIEWPROFID  ")
+        SQLStr.AppendLine("     ,RPRTPROFID  ")
+        SQLStr.AppendLine("     ,MAPID  ")
+        SQLStr.AppendLine("     ,VARIANT  ")
+        SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
+        SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
+        SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
+        SQLStr.AppendLine("     ,@MODIFYUSER AS MODIFYUSER ")
+        SQLStr.AppendLine("     ,DELFLG ")
+        SQLStr.AppendLine("     ,@INITYMD AS INITYMD ")
+        SQLStr.AppendLine("     ,@INITUSER AS INITUSER ")
+        SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
+        SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
+        SQLStr.AppendLine("  FROM   ")
+        SQLStr.AppendLine("        COM.LNS0001_USER")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.Append("         USERID = @USERID                    ")
+        SQLStr.Append("     AND STYMD   = @STYMD                    ")
+        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
+                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+
+                Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
+                Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
+                Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
+                Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
+
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
+
+                Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
+
+                ' DB更新
+                P_USERID.Value = LNS0001row("USERID")           'ユーザーID
+                P_STYMD.Value = LNS0001row("STYMD")           '開始年月日
+                P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
+
+                '操作区分
+                '変更区分が新規の場合
+                If WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.NEWDATA Then
+                    P_OPERATEKBN.Value = CInt(LNS0001WRKINC.OPERATEKBN.NEWDATA).ToString
+                Else
+                    '削除データの場合
+                    If LNS0001tbl.Rows(0)("DELFLG") = "0" And LNS0001row("DELFLG") = "1" Then
+                        P_OPERATEKBN.Value = CInt(LNS0001WRKINC.OPERATEKBN.DELDATA).ToString
+                    Else
+                        P_OPERATEKBN.Value = CInt(LNS0001WRKINC.OPERATEKBN.UPDDATA).ToString
+                    End If
+                End If
+
+                P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
+                P_MODIFYYMD.Value = WW_NOW               '変更日時
+                P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
+
+                P_INITYMD.Value = WW_NOW              '登録年月日
+                P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
+                P_INITTERMID.Value = Master.USERTERMID                '登録端末
+                P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
+
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0002_USERHIST  INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0002_USERHIST  INSERT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+
+            rightview.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+    End Sub
+
+#End Region
+
     ' ******************************************************************************
     ' ***  詳細表示関連操作                                                      ***
     ' ******************************************************************************
@@ -1862,11 +1403,29 @@ Public Class LNS0002UserDetail
     ''' <remarks></remarks>
     Protected Sub WF_UPDATE_Click()
 
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        '論理削除の場合は入力チェックを省略、削除フラグのみ更新
+        If Not DisabledKeyItem.Value = "" And
+            work.WF_SEL_DELFLG.Text = C_DELETE_FLG.ALIVE And
+            TxtDelFlg.Text = C_DELETE_FLG.DELETE Then
+
+            ' マスタ更新(削除フラグのみ)
+            UpdateMasterDelflgOnly()
+            If Not isNormal(WW_ErrSW) Then
+                Exit Sub
+            End If
+            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = "Update Success!!"
+            ' 前ページ遷移
+            Master.TransitionPrevPage()
+            Exit Sub
+        End If
+
         '○ エラーレポート準備
         rightview.SetErrorReport("")
 
         '○ DetailBoxをINPtblへ退避
-        DetailBoxToLNS0002INPtbl(WW_ErrSW)
+        DetailBoxToLNS0001INPtbl(WW_ErrSW)
         If Not isNormal(WW_ErrSW) Then
             Exit Sub
         End If
@@ -1878,7 +1437,7 @@ Public Class LNS0002UserDetail
         If isNormal(WW_ErrSW) Then
 
             ' 有効期間重複チェック
-            Dim LNS0002row As DataRow = LNS0002tbl.Rows(0)
+            Dim LNS0001row As DataRow = LNS0001tbl.Rows(0)
             Dim OverlapPeriodsFlg As Integer = 0
             ' 新規登録チェック
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
@@ -1896,7 +1455,7 @@ Public Class LNS0002UserDetail
                 Exit Sub
             End If
 
-            LNS0002tbl_UPD()
+            LNS0001tbl_UPD()
             ' 入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
             If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ErrCode) Then
                 Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
@@ -1905,7 +1464,7 @@ Public Class LNS0002UserDetail
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNS0002tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
 
         '○ メッセージ表示
         ' 右BOXクローズ
@@ -1951,7 +1510,7 @@ Public Class LNS0002UserDetail
         Dim OverlapPeriodsFlg As Integer = 0
 
         '○ DetailBoxをINPtblへ退避
-        DetailBoxToLNS0002INPtbl(WW_ErrSW)
+        DetailBoxToLNS0001INPtbl(WW_ErrSW)
         If Not isNormal(WW_ErrSW) Then
             Exit Sub
         End If
@@ -1962,9 +1521,9 @@ Public Class LNS0002UserDetail
         '○ 入力値のテーブル反映
         If isNormal(WW_ErrSW) Then
             '○ DetailBoxをINPtblへ退避
-            Dim LNS0002INProw As DataRow = LNS0002INPtbl.Rows(0)
-            LNS0002INProw("STYMD") = pnlTxtInputStYMD.Text             '開始年月日
-            LNS0002INProw("ENDYMD") = pnlTxtInputEndYMD.Text           '終了年月日
+            Dim LNS0001INProw As DataRow = LNS0001INPtbl.Rows(0)
+            LNS0001INProw("STYMD") = pnlTxtInputStYMD.Text             '開始年月日
+            LNS0001INProw("ENDYMD") = pnlTxtInputEndYMD.Text           '終了年月日
 
             ' 期間重複データ DB更新処理
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
@@ -1977,7 +1536,7 @@ Public Class LNS0002UserDetail
                 End If
             End Using
 
-            LNS0002tbl_UPD()
+            LNS0001tbl_UPD()
             ' 入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
             If C_MESSAGE_NO.NO_CHANGE_UPDATE.Equals(WW_ErrCode) Then
                 Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
@@ -1989,7 +1548,7 @@ Public Class LNS0002UserDetail
         End If
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNS0002tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
 
         '入力日付保存
         If Not String.IsNullOrEmpty(pnlTxtLastEndYMD.Text) Then
@@ -2046,7 +1605,7 @@ Public Class LNS0002UserDetail
     ''' </summary>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub DetailBoxToLNS0002INPtbl(ByRef O_RTN As String)
+    Protected Sub DetailBoxToLNS0001INPtbl(ByRef O_RTN As String)
 
         O_RTN = C_MESSAGE_NO.NORMAL
 
@@ -2069,7 +1628,7 @@ Public Class LNS0002UserDetail
         Master.EraseCharToIgnore(TxtViewProfId.Text)  '画面表示項目制御ロール
         Master.EraseCharToIgnore(TxtRprtProfId.Text)  'エクセル出力制御ロール
         Master.EraseCharToIgnore(TxtVariant.Text)     '画面初期値ロール
-        Master.EraseCharToIgnore(TxtApproValid.Text)  '承認権限ロール
+        'Master.EraseCharToIgnore(TxtApproValid.Text)  '承認権限ロール
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(LblSelLineCNT.Text) AndAlso
@@ -2087,214 +1646,47 @@ Public Class LNS0002UserDetail
             Exit Sub
         End If
 
-        Master.CreateEmptyTable(LNS0002INPtbl, work.WF_SEL_INPTBL.Text)
-        Dim LNS0002INProw As DataRow = LNS0002INPtbl.NewRow
+        Master.CreateEmptyTable(LNS0001INPtbl, work.WF_SEL_INPTBL.Text)
+        Dim LNS0001INProw As DataRow = LNS0001INPtbl.NewRow
 
         'LINECNT
         If String.IsNullOrEmpty(LblSelLineCNT.Text) Then
-            LNS0002INProw("LINECNT") = 0
+            LNS0001INProw("LINECNT") = 0
         Else
             Try
-                Integer.TryParse(LblSelLineCNT.Text, LNS0002INProw("LINECNT"))
+                Integer.TryParse(LblSelLineCNT.Text, LNS0001INProw("LINECNT"))
             Catch ex As Exception
-                LNS0002INProw("LINECNT") = 0
+                LNS0001INProw("LINECNT") = 0
             End Try
         End If
 
-        LNS0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
-        'LNS0002INProw("UPDTIMSTP") = 0
-        LNS0002INProw("SELECT") = 1
-        LNS0002INProw("HIDDEN") = 0
+        LNS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+        'LNS0001INProw("UPDTIMSTP") = 0
+        LNS0001INProw("SELECT") = 1
+        LNS0001INProw("HIDDEN") = 0
 
-        LNS0002INProw("DELFLG") = TxtDelFlg.Text           '削除フラグ
-        LNS0002INProw("USERID") = TxtUserId.Text           'ユーザーID
-        LNS0002INProw("STAFFNAMES") = TxtStaffNameS.Text   '社員名（短）
-        LNS0002INProw("STAFFNAMEL") = TxtStaffNameL.Text   '社員名（長）
-        LNS0002INProw("MAPID") = TxtMapId.Text             '画面ＩＤ
-        LNS0002INProw("PASSWORD") = TxtPassword.Text       'パスワード
-        LNS0002INProw("MISSCNT") = TxtMissCNT.Text         '誤り回数
-        LNS0002INProw("PASSENDYMD") = TxtPassEndYMD.Text   'パスワード有効期限
-        LNS0002INProw("STYMD") = TxtStYMD.Text             '開始年月日
-        LNS0002INProw("ENDYMD") = TxtEndYMD.Text           '終了年月日
-        LNS0002INProw("CAMPCODE") = TxtCampCode.Text       '会社コード
-        LNS0002INProw("ORG") = TxtOrg.Text                 '組織コード
-        LNS0002INProw("EMAIL") = TxtEMail.Text             'メールアドレス
-        LNS0002INProw("MENUROLE") = TxtMenuRole.Text       'メニュー表示制御ロール
-        LNS0002INProw("MAPROLE") = TxtMapRole.Text         '画面参照更新制御ロール
-        LNS0002INProw("VIEWPROFID") = TxtViewProfId.Text   '画面表示項目制御ロール
-        LNS0002INProw("RPRTPROFID") = TxtRprtProfId.Text   'エクセル出力制御ロール
-        LNS0002INProw("VARIANT") = TxtVariant.Text         '画面初期値ロール
-        LNS0002INProw("APPROVALID") = TxtApproValid.Text   '承認権限ロール
-
-        Dim i As Integer = 0
-
-        For Each Item As ListItem In ChklFlags.Items
-            Select Case i
-                Case 0
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN01") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN01") = ""                              '初期表示設定 現況表
-                    End If
-                Case 1
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN02") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN02") = ""                              '初期表示設定 現況表
-                    End If
-                Case 2
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN03") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN03") = ""                              '初期表示設定 現況表
-                    End If
-                Case 3
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN04") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN04") = ""                              '初期表示設定 現況表
-                    End If
-                Case 4
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN05") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN05") = ""                              '初期表示設定 現況表
-                    End If
-                Case 5
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN06") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN06") = ""                              '初期表示設定 現況表
-                    End If
-                Case 6
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN07") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN07") = ""                              '初期表示設定 現況表
-                    End If
-                Case 7
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN08") = "1"                             '初期表示設定 現況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN08") = ""                              '初期表示設定 現況表
-                    End If
-            End Select
-            i += 1
-        Next
-
-        i = 0
-        For Each Item As ListItem In ChklFlags2.Items
-            Select Case i
-                Case 0
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN11") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN11") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 1
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN12") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN12") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 2
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN13") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN13") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 3
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN14") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN14") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 4
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN15") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN15") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 5
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN16") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN16") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 6
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN17") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN17") = ""                              '初期表示設定 運用状況表
-                    End If
-                Case 7
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN18") = "1"                             '初期表示設定 運用状況表
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN18") = ""                              '初期表示設定 運用状況表
-                    End If
-            End Select
-            i += 1
-        Next
-
-        i = 0
-        For Each Item As ListItem In ChklFlags3.Items
-            Select Case i
-                Case 0
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN21") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN21") = ""                              '初期表示設定 発着差
-                    End If
-                Case 1
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN22") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN22") = ""                              '初期表示設定 発着差
-                    End If
-                Case 2
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN23") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN23") = ""                              '初期表示設定 発着差
-                    End If
-                Case 3
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN24") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN24") = ""                              '初期表示設定 発着差
-                    End If
-                Case 4
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN25") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN25") = ""                              '初期表示設定 発着差
-                    End If
-                Case 5
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN26") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN26") = ""                              '初期表示設定 発着差
-                    End If
-                Case 6
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN27") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN27") = ""                              '初期表示設定 発着差
-                    End If
-                Case 7
-                    If Item.Selected = True Then
-                        LNS0002INProw("INITIALDISPLAYKBN28") = "1"                             '初期表示設定 発着差
-                    Else
-                        LNS0002INProw("INITIALDISPLAYKBN28") = ""                              '初期表示設定 発着差
-                    End If
-            End Select
-            i += 1
-        Next
-
+        LNS0001INProw("DELFLG") = TxtDelFlg.Text           '削除フラグ
+        LNS0001INProw("USERID") = TxtUserId.Text           'ユーザーID
+        LNS0001INProw("STAFFNAMES") = TxtStaffNameS.Text   '社員名（短）
+        LNS0001INProw("STAFFNAMEL") = TxtStaffNameL.Text   '社員名（長）
+        LNS0001INProw("MAPID") = TxtMapId.Text             '画面ＩＤ
+        LNS0001INProw("PASSWORD") = TxtPassword.Text       'パスワード
+        LNS0001INProw("MISSCNT") = TxtMissCNT.Text         '誤り回数
+        LNS0001INProw("PASSENDYMD") = TxtPassEndYMD.Text   'パスワード有効期限
+        LNS0001INProw("STYMD") = TxtStYMD.Text             '開始年月日
+        LNS0001INProw("ENDYMD") = TxtEndYMD.Text           '終了年月日
+        LNS0001INProw("CAMPCODE") = TxtCampCode.Text       '会社コード
+        LNS0001INProw("ORG") = TxtOrg.Text                 '組織コード
+        LNS0001INProw("EMAIL") = TxtEMail.Text             'メールアドレス
+        LNS0001INProw("MENUROLE") = TxtMenuRole.Text       'メニュー表示制御ロール
+        LNS0001INProw("MAPROLE") = TxtMapRole.Text         '画面参照更新制御ロール
+        LNS0001INProw("VIEWPROFID") = TxtViewProfId.Text   '画面表示項目制御ロール
+        LNS0001INProw("RPRTPROFID") = TxtRprtProfId.Text   'エクセル出力制御ロール
+        LNS0001INProw("VARIANT") = TxtVariant.Text         '画面初期値ロール
+        'LNS0001INProw("APPROVALID") = TxtApproValid.Text   '承認権限ロール
 
         '○ チェック用テーブルに登録する
-        LNS0002INPtbl.Rows.Add(LNS0002INProw)
+        LNS0001INPtbl.Rows.Add(LNS0001INProw)
 
     End Sub
 
@@ -2303,61 +1695,36 @@ Public Class LNS0002UserDetail
     ''' </summary>
     Protected Sub WF_CLEAR_Click()
         '○ DetailBoxをINPtblへ退避
-        DetailBoxToLNS0002INPtbl(WW_ErrSW)
+        DetailBoxToLNS0001INPtbl(WW_ErrSW)
         If Not isNormal(WW_ErrSW) Then
             Exit Sub
         End If
 
         Dim WW_InputChangeFlg As Boolean = True
-        Dim LNS0002INProw As DataRow = LNS0002INPtbl.Rows(0)
+        Dim LNS0001INProw As DataRow = LNS0001INPtbl.Rows(0)
 
         ' 既存レコードとの比較
-        For Each LNS0002row As DataRow In LNS0002tbl.Rows
+        For Each LNS0001row As DataRow In LNS0001tbl.Rows
             ' KEY項目が等しい時
-            If LNS0002row("USERID") = LNS0002INProw("USERID") AndAlso
-                LNS0002row("STYMD") = LNS0002INProw("STYMD") Then
+            If LNS0001row("USERID") = LNS0001INProw("USERID") AndAlso
+                LNS0001row("STYMD") = LNS0001INProw("STYMD") Then
                 ' KEY項目以外の項目の差異をチェック
-                If LNS0002row("DELFLG") = LNS0002INProw("DELFLG") AndAlso
-                    LNS0002row("STAFFNAMES") = LNS0002INProw("STAFFNAMES") AndAlso
-                    LNS0002row("STAFFNAMEL") = LNS0002INProw("STAFFNAMEL") AndAlso
-                    LNS0002row("MAPID") = LNS0002INProw("MAPID") AndAlso
-                    LNS0002row("PASSWORD") = LNS0002INProw("PASSWORD") AndAlso
-                    LNS0002row("MISSCNT") = LNS0002INProw("MISSCNT") AndAlso
-                    LNS0002row("PASSENDYMD") = LNS0002INProw("PASSENDYMD") AndAlso
-                    LNS0002row("ENDYMD") = LNS0002INProw("ENDYMD") AndAlso
-                    LNS0002row("CAMPCODE") = LNS0002INProw("CAMPCODE") AndAlso
-                    LNS0002row("ORG") = LNS0002INProw("ORG") AndAlso
-                    LNS0002row("EMAIL") = LNS0002INProw("EMAIL") AndAlso
-                    LNS0002row("MENUROLE") = LNS0002INProw("MENUROLE") AndAlso
-                    LNS0002row("MAPROLE") = LNS0002INProw("MAPROLE") AndAlso
-                    LNS0002row("VIEWPROFID") = LNS0002INProw("VIEWPROFID") AndAlso
-                    LNS0002row("RPRTPROFID") = LNS0002INProw("RPRTPROFID") AndAlso
-                    LNS0002row("VARIANT") = LNS0002INProw("VARIANT") AndAlso
-                    LNS0002row("APPROVALID") = LNS0002INProw("APPROVALID") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN01") = LNS0002INProw("INITIALDISPLAYKBN01") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN02") = LNS0002INProw("INITIALDISPLAYKBN02") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN03") = LNS0002INProw("INITIALDISPLAYKBN03") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN04") = LNS0002INProw("INITIALDISPLAYKBN04") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN05") = LNS0002INProw("INITIALDISPLAYKBN05") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN06") = LNS0002INProw("INITIALDISPLAYKBN06") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN07") = LNS0002INProw("INITIALDISPLAYKBN07") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN08") = LNS0002INProw("INITIALDISPLAYKBN08") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN11") = LNS0002INProw("INITIALDISPLAYKBN11") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN12") = LNS0002INProw("INITIALDISPLAYKBN12") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN13") = LNS0002INProw("INITIALDISPLAYKBN13") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN14") = LNS0002INProw("INITIALDISPLAYKBN14") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN15") = LNS0002INProw("INITIALDISPLAYKBN15") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN16") = LNS0002INProw("INITIALDISPLAYKBN16") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN17") = LNS0002INProw("INITIALDISPLAYKBN17") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN18") = LNS0002INProw("INITIALDISPLAYKBN18") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN21") = LNS0002INProw("INITIALDISPLAYKBN21") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN22") = LNS0002INProw("INITIALDISPLAYKBN22") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN23") = LNS0002INProw("INITIALDISPLAYKBN23") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN24") = LNS0002INProw("INITIALDISPLAYKBN24") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN25") = LNS0002INProw("INITIALDISPLAYKBN25") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN26") = LNS0002INProw("INITIALDISPLAYKBN26") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN27") = LNS0002INProw("INITIALDISPLAYKBN27") AndAlso
-                    LNS0002row("INITIALDISPLAYKBN28") = LNS0002INProw("INITIALDISPLAYKBN28") Then
+                If LNS0001row("DELFLG") = LNS0001INProw("DELFLG") AndAlso
+                    LNS0001row("STAFFNAMES") = LNS0001INProw("STAFFNAMES") AndAlso
+                    LNS0001row("STAFFNAMEL") = LNS0001INProw("STAFFNAMEL") AndAlso
+                    LNS0001row("MAPID") = LNS0001INProw("MAPID") AndAlso
+                    LNS0001row("PASSWORD") = LNS0001INProw("PASSWORD") AndAlso
+                    LNS0001row("MISSCNT") = LNS0001INProw("MISSCNT") AndAlso
+                    LNS0001row("PASSENDYMD") = LNS0001INProw("PASSENDYMD") AndAlso
+                    LNS0001row("ENDYMD") = LNS0001INProw("ENDYMD") AndAlso
+                    LNS0001row("CAMPCODE") = LNS0001INProw("CAMPCODE") AndAlso
+                    LNS0001row("ORG") = LNS0001INProw("ORG") AndAlso
+                    LNS0001row("EMAIL") = LNS0001INProw("EMAIL") AndAlso
+                    LNS0001row("MENUROLE") = LNS0001INProw("MENUROLE") AndAlso
+                    LNS0001row("MAPROLE") = LNS0001INProw("MAPROLE") AndAlso
+                    LNS0001row("VIEWPROFID") = LNS0001INProw("VIEWPROFID") AndAlso
+                    LNS0001row("RPRTPROFID") = LNS0001INProw("RPRTPROFID") AndAlso
+                    LNS0001row("VARIANT") = LNS0001INProw("VARIANT") Then
                     ' 変更がない時は、入力変更フラグをOFFにする
                     WW_InputChangeFlg = False
                 End If
@@ -2406,33 +1773,33 @@ Public Class LNS0002UserDetail
     Protected Sub DetailBoxClear()
 
         '○ 状態をクリア
-        For Each LNS0002row As DataRow In LNS0002tbl.Rows
-            Select Case LNS0002row("OPERATION")
+        For Each LNS0001row As DataRow In LNS0001tbl.Rows
+            Select Case LNS0001row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
                     ' データなし
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     WW_ErrSW = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
                     ' 表示なし
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     WW_ErrSW = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED
                     ' 行選択
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.SELECTED
                     WW_ErrSW = C_MESSAGE_NO.NORMAL
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
                     ' 行選択 & 更新対象
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                     WW_ErrSW = C_MESSAGE_NO.NORMAL
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
                     ' 行選択 & エラー行対象
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                     WW_ErrSW = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End Select
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNS0002tbl, work.WF_SEL_INPTBL.Text)
+        Master.SaveTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
 
         LblSelLineCNT.Text = ""              'LINECNT
         TxtUserId.Text = ""                   'ユーザーID
@@ -2453,7 +1820,7 @@ Public Class LNS0002UserDetail
         TxtViewProfId.Text = ""               '画面表示項目制御ロール
         TxtRprtProfId.Text = ""               'エクセル出力制御ロール
         TxtVariant.Text = ""                  '画面初期値ロール
-        TxtApproValid.Text = ""               '承認権限ロール
+        'TxtApproValid.Text = ""               '承認権限ロール
         TxtDelFlg.Text = ""                   '削除フラグ
         LblDelFlgName.Text = ""              '削除フラグ名称
 
@@ -2506,8 +1873,8 @@ Public Class LNS0002UserDetail
                                 WW_PrmData = work.CreateRoleList(TxtCampCode.Text, "VIEW")
                             Case "TxtRprtProfId"  'エクセル出力制御ロール
                                 WW_PrmData = work.CreateRoleList(TxtCampCode.Text, "XML")
-                            Case "TxtApproValid"  '承認権限ロール
-                                WW_PrmData = work.CreateRoleList(TxtCampCode.Text, "APPROVAL")
+                            'Case "TxtApproValid"  '承認権限ロール
+                            '    WW_PrmData = work.CreateRoleList(TxtCampCode.Text, "APPROVAL")
                             Case "TxtDelFlg"
                                 WW_PrmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
                         End Select
@@ -2545,9 +1912,9 @@ Public Class LNS0002UserDetail
             Case "TxtRprtProfId"  'エクセル出力制御ロール
                 CODENAME_get("XML", TxtRprtProfId.Text, LblRprtProfIdName.Text, WW_Dummy)
                 TxtRprtProfId.Focus()
-            Case "TxtApproValid"  '承認権限ロール
-                CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
-                TxtApproValid.Focus()
+            'Case "TxtApproValid"  '承認権限ロール
+            '    CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
+            '    TxtApproValid.Focus()
             Case "TxtDelFlg"      '削除フラグ
                 CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
                 TxtDelFlg.Focus()
@@ -2558,6 +1925,134 @@ Public Class LNS0002UserDetail
         If Not isNormal(WW_RtnSW) Then
             Master.Output(WW_RtnSW, C_MESSAGE_TYPE.ERR)
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' ユーザマスタ更新(削除フラグのみ)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub UpdateMasterDelflgOnly()
+        Dim WW_MODIFYKBN As String = ""
+        Dim WW_DATE As Date = Date.Now
+
+        '初期化
+        LNS0001INPtbl = New DataTable
+        LNS0001INPtbl.Columns.Add("USERID")
+        LNS0001INPtbl.Columns.Add("STYMD")
+        LNS0001INPtbl.Columns.Add("ENDYMD")
+        LNS0001INPtbl.Columns.Add("DELFLG")
+
+        Dim row As DataRow
+        row = LNS0001INPtbl.NewRow
+        row("USERID") = TxtUserId.Text
+        row("STYMD") = TxtStYMD.Text
+        row("ENDYMD") = TxtEndYMD.Text
+        row("DELFLG") = C_DELETE_FLG.DELETE
+        LNS0001INPtbl.Rows.Add(row)
+
+        ' DB更新処理
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            ' DataBase接続
+            SQLcon.Open()
+
+            '履歴テーブルに変更前データを登録
+            InsertHist(SQLcon, LNS0001WRKINC.MODIFYKBN.BEFDATA, WW_DATE)
+            If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                Exit Sub
+            End If
+
+            '削除フラグ更新
+            SetDelflg(SQLcon, WW_DATE)
+            If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                Exit Sub
+            End If
+
+            '履歴テーブルに変更後データを登録
+            InsertHist(SQLcon, LNS0001WRKINC.MODIFYKBN.AFTDATA, WW_DATE)
+            If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                Exit Sub
+            End If
+
+        End Using
+
+        '○ 入力値反映
+        For Each LNS0001INProw As DataRow In LNS0001INPtbl.Rows
+            For Each CTM0002row As DataRow In LNS0001tbl.Rows
+                If LNS0001INProw("USERID") = CTM0002row("USERID") AndAlso
+                    LNS0001INProw("STYMD") = CTM0002row("STYMD") AndAlso
+                    LNS0001INProw("ENDYMD") = CTM0002row("ENDYMD") Then
+                    ' 画面入力テーブル項目設定              
+                    CTM0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    CTM0002row("DELFLG") = LNS0001INProw("DELFLG")
+                    CTM0002row("SELECT") = 0
+                    CTM0002row("HIDDEN") = 0
+                    Exit For
+                End If
+            Next
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 削除フラグ更新
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="WW_NOW"></param>
+    ''' <remarks></remarks>
+    Public Sub SetDelflg(ByVal SQLcon As MySqlConnection, ByVal WW_NOW As Date)
+
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ 対象データ取得
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" UPDATE                                      ")
+        SQLStr.Append("     COM.LNS0001_USER                        ")
+        SQLStr.Append(" SET                                         ")
+        SQLStr.Append("     DELFLG               = '1'              ")
+        SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
+        SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
+        SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
+        SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
+        SQLStr.Append(" WHERE                                       ")
+        SQLStr.Append("         USERID = @USERID                    ")
+        SQLStr.Append("     AND STYMD   = @STYMD                    ")
+        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
+                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+
+                Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
+                P_USERID.Value = LNS0001row("USERID")           'ユーザーID
+                P_STYMD.Value = LNS0001row("STYMD")           '開始年月日
+                P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
+                P_UPDYMD.Value = WW_NOW                '更新年月日
+                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+
+                '登録
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:CTM0002C UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -2642,10 +2137,10 @@ Public Class LNS0002UserDetail
                     TxtRprtProfId.Text = WW_SelectValue
                     LblRprtProfIdName.Text = WW_SelectText
                     TxtRprtProfId.Focus()
-                Case "TxtApproValid"  '承認権限ロール
-                    TxtApproValid.Text = WW_SelectValue
-                    LblApproValidName.Text = WW_SelectText
-                    TxtApproValid.Focus()
+                    'Case "TxtApproValid"  '承認権限ロール
+                    '    TxtApproValid.Text = WW_SelectValue
+                    '    LblApproValidName.Text = WW_SelectText
+                    '    TxtApproValid.Focus()
             End Select
         End If
 
@@ -2684,8 +2179,8 @@ Public Class LNS0002UserDetail
                     TxtViewProfId.Focus()
                 Case "TxtRprtProfId"        'エクセル出力制御ロール
                     TxtRprtProfId.Focus()
-                Case "TxtApproValid"        '承認権限ロール
-                    TxtApproValid.Focus()
+                    'Case "TxtApproValid"        '承認権限ロール
+                    '    TxtApproValid.Focus()
             End Select
         End If
 
@@ -2737,15 +2232,15 @@ Public Class LNS0002UserDetail
         End If
 
         '○ 単項目チェック
-        For Each LNS0002INProw As DataRow In LNS0002INPtbl.Rows
+        For Each LNS0001INProw As DataRow In LNS0001INPtbl.Rows
 
             WW_LineErr = ""
 
             ' 削除フラグ(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "DELFLG", LNS0002INProw("DELFLG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "DELFLG", LNS0001INProw("DELFLG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 ' 名称存在チェック
-                CODENAME_get("DELFLG", LNS0002INProw("DELFLG"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("DELFLG", LNS0001INProw("DELFLG"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・削除コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2761,7 +2256,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' ユーザーID(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "USERID", LNS0002INProw("USERID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "USERID", LNS0001INProw("USERID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・ユーザーID入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2770,7 +2265,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 社員名（短）(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "STAFFNAMES", LNS0002INProw("STAFFNAMES"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "STAFFNAMES", LNS0001INProw("STAFFNAMES"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・社員名（短）入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2779,7 +2274,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 社員名（長）(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "STAFFNAMEL", LNS0002INProw("STAFFNAMEL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "STAFFNAMEL", LNS0001INProw("STAFFNAMEL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・社員名（長）入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2788,7 +2283,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 誤り回数(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "MISSCNT", LNS0002INProw("MISSCNT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "MISSCNT", LNS0001INProw("MISSCNT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・誤り回数入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2799,7 +2294,7 @@ Public Class LNS0002UserDetail
 
             '### 20240129 START パスワードポリシー対応 
             '' パスワード(バリデーションチェック）
-            'Master.CheckField(Master.USERCAMP, "PASSWORD", LNS0002INProw("PASSWORD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            'Master.CheckField(Master.USERCAMP, "PASSWORD", LNS0001INProw("PASSWORD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             'If Not isNormal(WW_CS0024FCheckerr) Then
             '    WW_CheckMES1 = "・パスワード入力エラーです。"
             '    WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2809,11 +2304,11 @@ Public Class LNS0002UserDetail
             'End If
 
             ' パスワード(バリデーションチェック）
-            'If Not ChkUserPassword(LNS0002INProw("PASSWORD"), WW_CheckMES2) Then
+            'If Not ChkUserPassword(LNS0001INProw("PASSWORD"), WW_CheckMES2) Then
             'パスワード変更ありの場合のみチェックする
-            If LNS0002INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
-                If Not LNS0002INProw("DELFLG").ToString = C_DELETE_FLG.DELETE AndAlso
-                Not ChkUserPassword(LNS0002INProw("PASSWORD"), WW_CheckMES2) Then
+            If LNS0001INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
+                If Not LNS0001INProw("DELFLG").ToString = C_DELETE_FLG.DELETE AndAlso
+                Not LNS0001WRKINC.ChkUserPassword(LNS0001INProw("PASSWORD"), WW_CheckMES2) Then
                     WW_CheckMES1 = "・パスワード入力エラーです。"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
@@ -2822,15 +2317,15 @@ Public Class LNS0002UserDetail
             End If
 
 
-            If LNS0002INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
+            If LNS0001INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
                 ' パスワード有効期限
                 NowDate = NowDate.AddDays(ADDDATE)
-                LNS0002INProw("PASSENDYMD") = CDate(NowDate).ToShortDateString
+                LNS0001INProw("PASSENDYMD") = CDate(NowDate).ToShortDateString
             End If
             ' 開始年月日(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "STYMD", LNS0002INProw("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "STYMD", LNS0001INProw("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
-                LNS0002INProw("STYMD") = CDate(LNS0002INProw("STYMD")).ToString("yyyy/MM/dd")
+                LNS0001INProw("STYMD") = CDate(LNS0001INProw("STYMD")).ToString("yyyy/MM/dd")
             Else
                 WW_CheckMES1 = "・開始年月日エラー"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2839,16 +2334,16 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 終了年月日(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "ENDYMD", LNS0002INProw("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "ENDYMD", LNS0001INProw("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
-                If Date.Now > LNS0002INProw("ENDYMD") And LNS0002INProw("ENDYMD") <> work.WF_SEL_ENDYMD.Text Then
+                If Date.Now > LNS0001INProw("ENDYMD") And LNS0001INProw("ENDYMD") <> work.WF_SEL_ENDYMD.Text Then
                     WW_CheckMES1 = "・終了年月日エラーです。"
                     WW_CheckMES2 = "過去日入力エラー"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 Else
-                    LNS0002INProw("ENDYMD") = CDate(LNS0002INProw("ENDYMD")).ToString("yyyy/MM/dd")
+                    LNS0001INProw("ENDYMD") = CDate(LNS0001INProw("ENDYMD")).ToString("yyyy/MM/dd")
                 End If
             Else
                 WW_CheckMES1 = "・終了年月日エラー"
@@ -2858,10 +2353,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 会社コード(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "CAMPCODE", LNS0002INProw("CAMPCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "CAMPCODE", LNS0001INProw("CAMPCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 ' 名称存在チェック
-                CODENAME_get("CAMPCODE", LNS0002INProw("CAMPCODE"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("CAMPCODE", LNS0001INProw("CAMPCODE"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・会社コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2877,10 +2372,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 組織コード(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "ORG", LNS0002INProw("ORG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "ORG", LNS0001INProw("ORG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 ' 名称存在チェック
-                CODENAME_get("ORG", LNS0002INProw("ORG"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("ORG", LNS0001INProw("ORG"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・組織コード入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2896,7 +2391,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' メールアドレス(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "EMAIL", LNS0002INProw("EMAIL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "EMAIL", LNS0001INProw("EMAIL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・メールアドレス入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2905,10 +2400,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' メニュー表示制御ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "MENUROLE", LNS0002INProw("MENUROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "MENUROLE", LNS0001INProw("MENUROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 ' 名称存在チェック
-                CODENAME_get("MENU", LNS0002INProw("MENUROLE"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("MENU", LNS0001INProw("MENUROLE"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2924,10 +2419,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             ' 画面参照更新制御ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "MAPROLE", LNS0002INProw("MAPROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "MAPROLE", LNS0001INProw("MAPROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 ' 名称存在チェック
-                CODENAME_get("MAP", LNS0002INProw("MAPROLE"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("MAP", LNS0001INProw("MAPROLE"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2943,10 +2438,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             '画面表示項目制御ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "VIEWPROFID", LNS0002INProw("VIEWPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "VIEWPROFID", LNS0001INProw("VIEWPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 '名称存在チェック
-                CODENAME_get("VIEW", LNS0002INProw("VIEWPROFID"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("VIEW", LNS0001INProw("VIEWPROFID"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2962,10 +2457,10 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             'エクセル出力制御ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "RPRTPROFID", LNS0002INProw("RPRTPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "RPRTPROFID", LNS0001INProw("RPRTPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If isNormal(WW_CS0024FCheckerr) Then
                 '名称存在チェック
-                CODENAME_get("XML", LNS0002INProw("RPRTPROFID"), WW_Dummy, WW_RtnSW)
+                CODENAME_get("XML", LNS0001INProw("RPRTPROFID"), WW_Dummy, WW_RtnSW)
                 If Not isNormal(WW_RtnSW) Then
                     WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
                     WW_CheckMES2 = "マスタに存在しません。"
@@ -2981,7 +2476,7 @@ Public Class LNS0002UserDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
             '画面初期値ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "VARIANT", LNS0002INProw("VARIANT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            Master.CheckField(Master.USERCAMP, "VARIANT", LNS0001INProw("VARIANT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
                 WW_CheckMES1 = "・画面初期値ロール入力エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2989,31 +2484,31 @@ Public Class LNS0002UserDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            '承認権限ロール(バリデーションチェック）
-            Master.CheckField(Master.USERCAMP, "APPROVALID", LNS0002INProw("APPROVALID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            If isNormal(WW_CS0024FCheckerr) Then
-                If Not String.IsNullOrEmpty(LNS0002INProw("APPROVALID")) Then
-                    '名称存在チェック
-                    CODENAME_get("APPROVAL", LNS0002INProw("APPROVALID"), WW_Dummy, WW_RtnSW)
-                    If Not isNormal(WW_RtnSW) Then
-                        WW_CheckMES1 = "・承認権限ロール入力エラーです。"
-                        WW_CheckMES2 = "マスタに存在しません。"
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                        WW_LineErr = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-                End If
-            Else
-                WW_CheckMES1 = "・承認権限ロール入力エラーです。"
-                WW_CheckMES2 = WW_CS0024FCheckReport
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''承認権限ロール(バリデーションチェック）
+            'Master.CheckField(Master.USERCAMP, "APPROVALID", LNS0001INProw("APPROVALID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            'If isNormal(WW_CS0024FCheckerr) Then
+            '    If Not String.IsNullOrEmpty(LNS0001INProw("APPROVALID")) Then
+            '        '名称存在チェック
+            '        CODENAME_get("APPROVAL", LNS0001INProw("APPROVALID"), WW_Dummy, WW_RtnSW)
+            '        If Not isNormal(WW_RtnSW) Then
+            '            WW_CheckMES1 = "・承認権限ロール入力エラーです。"
+            '            WW_CheckMES2 = "マスタに存在しません。"
+            '            WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '            WW_LineErr = "ERR"
+            '            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '        End If
+            '    End If
+            'Else
+            '    WW_CheckMES1 = "・承認権限ロール入力エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCheckReport
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    WW_LineErr = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
             ' 日付大小チェック
-            If Not String.IsNullOrEmpty(LNS0002INProw("STYMD")) AndAlso
-                Not String.IsNullOrEmpty(LNS0002INProw("ENDYMD")) Then
-                If CDate(LNS0002INProw("STYMD")) > CDate(LNS0002INProw("ENDYMD")) Then
+            If Not String.IsNullOrEmpty(LNS0001INProw("STYMD")) AndAlso
+                Not String.IsNullOrEmpty(LNS0001INProw("ENDYMD")) Then
+                If CDate(LNS0001INProw("STYMD")) > CDate(LNS0001INProw("ENDYMD")) Then
                     WW_CheckMES1 = "・開始年月日＆終了年月日エラーです。"
                     WW_CheckMES2 = "日付大小入力エラー"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
@@ -3036,15 +2531,15 @@ Public Class LNS0002UserDetail
                 If Not isNormal(WW_DBDataCheck) Then
                     WW_CheckMES1 = "・排他エラー（ユーザーID & 開始年月日）"
                     WW_CheckMES2 = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR &
-                                           "([" & LNS0002INProw("USERID") & "]" &
-                                           " [" & LNS0002INProw("STYMD") & "])"
+                                           "([" & LNS0001INProw("USERID") & "]" &
+                                           " [" & LNS0001INProw("STYMD") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
                 End If
             End If
             ' 一意制約チェック
-            If Not LNS0002INProw("USERID") = work.WF_SEL_USERID.Text OrElse Not LNS0002INProw("STYMD") = work.WF_SEL_STYMD2.Text Then
+            If Not LNS0001INProw("USERID") = work.WF_SEL_USERID.Text OrElse Not LNS0001INProw("STYMD") = work.WF_SEL_STYMD2.Text Then
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     ' DataBase接続
                     SQLcon.Open()
@@ -3053,10 +2548,11 @@ Public Class LNS0002UserDetail
                 End Using
 
                 If Not isNormal(WW_DBDataCheck) Then
-                    WW_CheckMES1 = "・一意制約違反（ユーザーID & 開始年月日）"
+                    WW_CheckMES1 = "・一意制約違反（ユーザーID & 開始年月日 & 終了年月日）"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
-                                       "([" & LNS0002INProw("USERID") & "]" &
-                                       " [" & LNS0002INProw("STYMD") & "])"
+                                       "([" & LNS0001INProw("USERID") & "]" &
+                                       "([" & LNS0001INProw("STYMD") & "]" &
+                                       " [" & LNS0001INProw("ENDYMD") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_PRIMARYKEY_REPEAT_ERROR
@@ -3064,16 +2560,16 @@ Public Class LNS0002UserDetail
             End If
 
             If String.IsNullOrEmpty(WW_LineErr) Then
-                If LNS0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-                    LNS0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                If LNS0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                    LNS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 End If
             Else
                 If WW_LineErr = CONST_PATTERNERR Then
                     ' 関連チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = CONST_PATTERNERR
+                    LNS0001INProw.Item("OPERATION") = CONST_PATTERNERR
                 Else
                     ' 単項目チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                 End If
             End If
         Next
@@ -3116,14 +2612,14 @@ Public Class LNS0002UserDetail
         End If
 
         '○ 単項目チェック
-        For Each LNS0002INProw As DataRow In LNS0002INPtbl.Rows
+        For Each LNS0001INProw As DataRow In LNS0001INPtbl.Rows
 
             WW_LineErr = ""
 
-            If LNS0002INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
+            If LNS0001INProw("PASSWORD") <> work.WF_SEL_PASSWORD.Text Then
                 ' パスワード有効期限
                 NowDate = NowDate.AddDays(ADDDATE)
-                LNS0002INProw("PASSENDYMD") = CDate(NowDate).ToShortDateString
+                LNS0001INProw("PASSENDYMD") = CDate(NowDate).ToShortDateString
             End If
 
             ' 登録済前回期間-終了年月日(バリデーションチェック）
@@ -3136,7 +2632,7 @@ Public Class LNS0002UserDetail
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_OVERLAPPERIODS_NOTDATE_ERR
                     ' 単項目チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                     Exit Sub
                 End If
             End If
@@ -3149,7 +2645,7 @@ Public Class LNS0002UserDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.CTN_OVERLAPPERIODS_NOTDATE_ERR
                 ' 単項目チェックエラーをセット
-                LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                 Exit Sub
             End If
             ' 今回入力期間-終了年月日(バリデーションチェック）
@@ -3162,7 +2658,7 @@ Public Class LNS0002UserDetail
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_OVERLAPPERIODS_PASTDATE_ERR
                     ' 単項目チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                     Exit Sub
                 End If
             Else
@@ -3172,7 +2668,7 @@ Public Class LNS0002UserDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.CTN_OVERLAPPERIODS_NOTDATE_ERR
                 ' 単項目チェックエラーをセット
-                LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                 Exit Sub
             End If
             ' 登録済次回期間-開始年月日(バリデーションチェック）
@@ -3185,7 +2681,7 @@ Public Class LNS0002UserDetail
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_OVERLAPPERIODS_NOTDATE_ERR
                     ' 単項目チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                     Exit Sub
                 End If
             End If
@@ -3279,82 +2775,21 @@ Public Class LNS0002UserDetail
             End If
 
             If String.IsNullOrEmpty(WW_LineErr) Then
-                If LNS0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
-                    LNS0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                If LNS0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.ERRORED Then
+                    LNS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 End If
             Else
                 If WW_LineErr = CONST_PATTERNERR Then
                     ' 関連チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = CONST_PATTERNERR
+                    LNS0001INProw.Item("OPERATION") = CONST_PATTERNERR
                 Else
                     ' 単項目チェックエラーをセット
-                    LNS0002INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001INProw.Item("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
                 End If
             End If
         Next
 
     End Sub
-
-    '### 20240222 START パスワードポリシー対応 
-    ''' <summary>
-    ''' ユーザーパスワードポリシーチェック
-    ''' </summary>
-    ''' <param name="I_userPassWd">ユーザーパスワード</param>
-    ''' <remarks></remarks>
-    Public Function ChkUserPassword(ByVal I_userPassWd As String, ByRef errMsg As String) As Boolean
-
-        errMsg = "パスワードは「英字大文字・小文字・数字・記号を含む12文字以上30文字以下」で設定してください。"
-
-        '○文字数チェック(12文字以上)
-        If I_userPassWd.Count < 12 Then
-            'errMsg = "文字数が12文字以上ではありません。"
-            Return False
-        End If
-
-        'Dim aaa As String = "^[a-zA-Z0-9!-/:-@?[-`{-~]+$"
-        '○数字チェック(含まれているか)
-        Dim chkNum As String = "[0-9]"
-        If Regex.IsMatch(I_userPassWd, chkNum) = False Then
-            'errMsg = "数字が含まれておりません。"
-            Return False
-        End If
-
-        '○大文字(英字)チェック(含まれているか)
-        Dim chkUpper As String = "[A-Z]"
-        If Regex.IsMatch(I_userPassWd, chkUpper) = False Then
-            'errMsg = "大文字(英字)が含まれておりません。"
-            Return False
-        End If
-
-        '○小文字(英字)チェック(含まれているか)
-        Dim chkLower As String = "[a-z]"
-        If Regex.IsMatch(I_userPassWd, chkLower) = False Then
-            'errMsg = "小文字(英字)が含まれておりません。"
-            Return False
-        End If
-
-        '○記号チェック(含まれているか)
-        Dim chkSymbol As String = "[!-/:-@?[-`{-~]"
-        '★数値を取り除いてから記号チェックを実施
-        Dim symbolPassWd As String = I_userPassWd
-        For i As Integer = 0 To 9
-            symbolPassWd = symbolPassWd.Replace(i.ToString(), "")
-        Next
-        If Regex.IsMatch(symbolPassWd, chkSymbol) = False Then
-            'errMsg = "記号が含まれておりません。"
-            Return False
-        End If
-
-        '○文字数チェック(30文字以内)
-        If I_userPassWd.Count > 30 Then
-            'errMsg = "文字数は30文字以内でおねがいします。"
-            Return False
-        End If
-
-        errMsg = ""
-        Return True
-    End Function
-    '### 20240222 END   パスワードポリシー対応 
 
     ''' <summary>
     ''' エラーレポート編集
@@ -3375,97 +2810,72 @@ Public Class LNS0002UserDetail
     End Sub
 
     ''' <summary>
-    ''' LNS0002tbl更新
+    ''' LNS0001tbl更新
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub LNS0002tbl_UPD()
+    Protected Sub LNS0001tbl_UPD()
         ' 発見フラグ
         Dim WW_IsFound As Boolean = False
 
         '○ 画面状態設定
-        For Each LNS0002row As DataRow In LNS0002tbl.Rows
-            Select Case LNS0002row("OPERATION")
+        For Each LNS0001row As DataRow In LNS0001tbl.Rows
+            Select Case LNS0001row("OPERATION")
                 Case C_LIST_OPERATION_CODE.NODATA
                     ' データなし
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.NODISP
                     ' 表示なし
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED
                     ' 行選択
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.UPDATING
                     ' 行選択 & 更新対象
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                 Case C_LIST_OPERATION_CODE.SELECTED & C_LIST_OPERATION_CODE.ERRORED
                     ' 行選択 & エラー行対象
-                    LNS0002row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
+                    LNS0001row("OPERATION") = C_LIST_OPERATION_CODE.ERRORED
             End Select
         Next
 
         '○ 追加変更判定
-        For Each LNS0002INProw As DataRow In LNS0002INPtbl.Rows
+        For Each LNS0001INProw As DataRow In LNS0001INPtbl.Rows
             'エラーレコード読み飛ばし
-            If LNS0002INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
+            If LNS0001INProw("OPERATION") <> C_LIST_OPERATION_CODE.UPDATING Then
                 Continue For
             End If
 
-            LNS0002INProw.Item("OPERATION") = CONST_INSERT
+            LNS0001INProw.Item("OPERATION") = CONST_INSERT
 
             ' 既存レコードとの比較
-            For Each LNS0002row As DataRow In LNS0002tbl.Rows
+            For Each LNS0001row As DataRow In LNS0001tbl.Rows
                 ' KEY項目が等しい時
-                If LNS0002row("USERID") = LNS0002INProw("USERID") AndAlso
-                    LNS0002row("STYMD") = LNS0002INProw("STYMD") Then
+                If LNS0001row("USERID") = LNS0001INProw("USERID") AndAlso
+                    LNS0001row("STYMD") = LNS0001INProw("STYMD") Then
                     ' KEY項目以外の項目の差異をチェック
-                    If LNS0002row("DELFLG") = LNS0002INProw("DELFLG") AndAlso
-                        LNS0002row("STAFFNAMES") = LNS0002INProw("STAFFNAMES") AndAlso
-                        LNS0002row("STAFFNAMEL") = LNS0002INProw("STAFFNAMEL") AndAlso
-                        LNS0002row("MAPID") = LNS0002INProw("MAPID") AndAlso
-                        LNS0002row("PASSWORD") = LNS0002INProw("PASSWORD") AndAlso
-                        LNS0002row("MISSCNT") = LNS0002INProw("MISSCNT") AndAlso
-                        LNS0002row("PASSENDYMD") = LNS0002INProw("PASSENDYMD") AndAlso
-                        LNS0002row("ENDYMD") = LNS0002INProw("ENDYMD") AndAlso
-                        LNS0002row("CAMPCODE") = LNS0002INProw("CAMPCODE") AndAlso
-                        LNS0002row("ORG") = LNS0002INProw("ORG") AndAlso
-                        LNS0002row("EMAIL") = LNS0002INProw("EMAIL") AndAlso
-                        LNS0002row("MENUROLE") = LNS0002INProw("MENUROLE") AndAlso
-                        LNS0002row("MAPROLE") = LNS0002INProw("MAPROLE") AndAlso
-                        LNS0002row("VIEWPROFID") = LNS0002INProw("VIEWPROFID") AndAlso
-                        LNS0002row("RPRTPROFID") = LNS0002INProw("RPRTPROFID") AndAlso
-                        LNS0002row("VARIANT") = LNS0002INProw("VARIANT") AndAlso
-                        LNS0002row("APPROVALID") = LNS0002INProw("APPROVALID") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN01") = LNS0002INProw("INITIALDISPLAYKBN01") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN02") = LNS0002INProw("INITIALDISPLAYKBN02") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN03") = LNS0002INProw("INITIALDISPLAYKBN03") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN04") = LNS0002INProw("INITIALDISPLAYKBN04") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN05") = LNS0002INProw("INITIALDISPLAYKBN05") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN06") = LNS0002INProw("INITIALDISPLAYKBN06") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN07") = LNS0002INProw("INITIALDISPLAYKBN07") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN08") = LNS0002INProw("INITIALDISPLAYKBN08") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN11") = LNS0002INProw("INITIALDISPLAYKBN11") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN12") = LNS0002INProw("INITIALDISPLAYKBN12") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN13") = LNS0002INProw("INITIALDISPLAYKBN13") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN14") = LNS0002INProw("INITIALDISPLAYKBN14") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN15") = LNS0002INProw("INITIALDISPLAYKBN15") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN16") = LNS0002INProw("INITIALDISPLAYKBN16") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN17") = LNS0002INProw("INITIALDISPLAYKBN17") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN18") = LNS0002INProw("INITIALDISPLAYKBN18") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN21") = LNS0002INProw("INITIALDISPLAYKBN21") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN22") = LNS0002INProw("INITIALDISPLAYKBN22") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN23") = LNS0002INProw("INITIALDISPLAYKBN23") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN24") = LNS0002INProw("INITIALDISPLAYKBN24") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN25") = LNS0002INProw("INITIALDISPLAYKBN25") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN26") = LNS0002INProw("INITIALDISPLAYKBN26") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN27") = LNS0002INProw("INITIALDISPLAYKBN27") AndAlso
-                        LNS0002row("INITIALDISPLAYKBN28") = LNS0002INProw("INITIALDISPLAYKBN28") AndAlso
-                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(LNS0002row("OPERATION")) Then
+                    If LNS0001row("DELFLG") = LNS0001INProw("DELFLG") AndAlso
+                        LNS0001row("STAFFNAMES") = LNS0001INProw("STAFFNAMES") AndAlso
+                        LNS0001row("STAFFNAMEL") = LNS0001INProw("STAFFNAMEL") AndAlso
+                        LNS0001row("MAPID") = LNS0001INProw("MAPID") AndAlso
+                        LNS0001row("PASSWORD") = LNS0001INProw("PASSWORD") AndAlso
+                        LNS0001row("MISSCNT") = LNS0001INProw("MISSCNT") AndAlso
+                        LNS0001row("PASSENDYMD") = LNS0001INProw("PASSENDYMD") AndAlso
+                        LNS0001row("ENDYMD") = LNS0001INProw("ENDYMD") AndAlso
+                        LNS0001row("CAMPCODE") = LNS0001INProw("CAMPCODE") AndAlso
+                        LNS0001row("ORG") = LNS0001INProw("ORG") AndAlso
+                        LNS0001row("EMAIL") = LNS0001INProw("EMAIL") AndAlso
+                        LNS0001row("MENUROLE") = LNS0001INProw("MENUROLE") AndAlso
+                        LNS0001row("MAPROLE") = LNS0001INProw("MAPROLE") AndAlso
+                        LNS0001row("VIEWPROFID") = LNS0001INProw("VIEWPROFID") AndAlso
+                        LNS0001row("RPRTPROFID") = LNS0001INProw("RPRTPROFID") AndAlso
+                        LNS0001row("VARIANT") = LNS0001INProw("VARIANT") AndAlso
+                        Not C_LIST_OPERATION_CODE.UPDATING.Equals(LNS0001row("OPERATION")) Then
 
                         ' 変更がない時は「操作」の項目は空白にする
-                        LNS0002INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                        LNS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
                     Else
                         ' 変更がある時は「操作」の項目を「更新」に設定する
-                        LNS0002INProw("OPERATION") = CONST_UPDATE
+                        LNS0001INProw("OPERATION") = CONST_UPDATE
                     End If
 
                     Exit For
@@ -3474,19 +2884,46 @@ Public Class LNS0002UserDetail
         Next
 
         '更新チェック
-        If C_LIST_OPERATION_CODE.NODATA.Equals(LNS0002INPtbl.Rows(0)("OPERATION")) Then
+        If C_LIST_OPERATION_CODE.NODATA.Equals(LNS0001INPtbl.Rows(0)("OPERATION")) Then
             ' 更新なしの場合、エラーコードに変更なしエラーをセットして処理打ち切り
             WW_ErrCode = C_MESSAGE_NO.NO_CHANGE_UPDATE
             Exit Sub
 
-        ElseIf CONST_UPDATE.Equals(LNS0002INPtbl.Rows(0)("OPERATION")) OrElse
-            CONST_INSERT.Equals(LNS0002INPtbl.Rows(0)("OPERATION")) Then
+        ElseIf CONST_UPDATE.Equals(LNS0001INPtbl.Rows(0)("OPERATION")) OrElse
+            CONST_INSERT.Equals(LNS0001INPtbl.Rows(0)("OPERATION")) Then
             ' 追加/更新の場合、DB更新処理
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                 ' DataBase接続
                 SQLcon.Open()
+
+                Dim WW_MODIFYKBN As String = ""
+                Dim WW_DATE As Date = Date.Now
+
+                '変更チェック
+                MASTEREXISTS(SQLcon, WW_MODIFYKBN)
+                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                    Exit Sub
+                End If
+
+                '変更がある場合履歴テーブルに変更前データを登録
+                If WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.BEFDATA Then
+                    '履歴登録(変更前)
+                    InsertHist(SQLcon, WW_MODIFYKBN, WW_DATE)
+                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                        Exit Sub
+                    End If
+                    '登録後変更区分を変更後にする
+                    WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.AFTDATA
+                End If
+
                 ' マスタ更新
                 UpdateMaster(SQLcon)
+                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                    Exit Sub
+                End If
+
+                '履歴登録(新規・変更後)
+                InsertHist(SQLcon, WW_MODIFYKBN, WW_DATE)
                 If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
                     Exit Sub
                 End If
@@ -3495,22 +2932,22 @@ Public Class LNS0002UserDetail
         End If
 
         '○ 変更有無判定 & 入力値反映
-        For Each LNS0002INProw As DataRow In LNS0002INPtbl.Rows
+        For Each LNS0001INProw As DataRow In LNS0001INPtbl.Rows
             ' 発見フラグ
             WW_IsFound = False
 
-            For Each LNS0002row As DataRow In LNS0002tbl.Rows
+            For Each LNS0001row As DataRow In LNS0001tbl.Rows
                 ' 同一レコードか判定
-                If LNS0002INProw("USERID") = LNS0002row("USERID") AndAlso
-                    LNS0002INProw("STYMD") = LNS0002row("STYMD") Then
+                If LNS0001INProw("USERID") = LNS0001row("USERID") AndAlso
+                    LNS0001INProw("STYMD") = LNS0001row("STYMD") Then
                     ' 画面入力テーブル項目設定
-                    LNS0002INProw("LINECNT") = LNS0002row("LINECNT")
-                    LNS0002INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-                    LNS0002INProw("UPDTIMSTP") = LNS0002row("UPDTIMSTP")
-                    LNS0002INProw("SELECT") = 0
-                    LNS0002INProw("HIDDEN") = 0
+                    LNS0001INProw("LINECNT") = LNS0001row("LINECNT")
+                    LNS0001INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
+                    LNS0001INProw("UPDTIMSTP") = LNS0001row("UPDTIMSTP")
+                    LNS0001INProw("SELECT") = 0
+                    LNS0001INProw("HIDDEN") = 0
                     ' 項目テーブル項目設定
-                    LNS0002row.ItemArray = LNS0002INProw.ItemArray
+                    LNS0001row.ItemArray = LNS0001INProw.ItemArray
                     ' 発見フラグON
                     WW_IsFound = True
                     Exit For
@@ -3519,15 +2956,15 @@ Public Class LNS0002UserDetail
 
             ' 同一レコードが発見できない場合は、追加する
             If Not WW_IsFound Then
-                Dim WW_NRow = LNS0002tbl.NewRow
-                WW_NRow.ItemArray = LNS0002INProw.ItemArray
+                Dim WW_NRow = LNS0001tbl.NewRow
+                WW_NRow.ItemArray = LNS0001INProw.ItemArray
                 ' 画面入力テーブル項目設定
-                WW_NRow("LINECNT") = LNS0002tbl.Rows.Count + 1
+                WW_NRow("LINECNT") = LNS0001tbl.Rows.Count + 1
                 WW_NRow("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
                 'WW_NRow("UPDTIMSTP") = "0"
                 WW_NRow("SELECT") = 0
                 WW_NRow("HIDDEN") = 0
-                LNS0002tbl.Rows.Add(WW_NRow)
+                LNS0001tbl.Rows.Add(WW_NRow)
             End If
         Next
 
@@ -3576,8 +3013,8 @@ Public Class LNS0002UserDetail
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, work.CreateRoleList(TxtCampCode.Text, I_FIELD))
                 Case "XML"              'エクセル出力制御ロール
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, work.CreateRoleList(TxtCampCode.Text, I_FIELD))
-                Case "APPROVAL"         '承認権限ロール
-                    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, work.CreateRoleList(TxtCampCode.Text, I_FIELD))
+                'Case "APPROVAL"         '承認権限ロール
+                '    leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ROLE, I_VALUE, O_TEXT, O_RTN, work.CreateRoleList(TxtCampCode.Text, I_FIELD))
 
                 Case "OUTPUTID"         '情報出力ID
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "PANEID"))

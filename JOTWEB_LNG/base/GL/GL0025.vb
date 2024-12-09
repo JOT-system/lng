@@ -75,7 +75,7 @@ Public Class GL0025FinanceItemList
                    & "     ,''                                      AS SEQ   " _
                    & " FROM                                                  " _
                    & "     LNG.LNT0065_FL_LEVIES LEVIES                      " _
-                   & " INNER JOIN COM.LNS0019_ORG ORG                        " _
+                   & " INNER JOIN COM.LNS0014_ORG ORG                        " _
                    & "     ON  ORG.CAMPCODE = '01'                           " _
                    & "     AND LEVIES.KEIJOORGCD = ORG.ORGCODE               " _
                    & "     AND CURDATE() BETWEEN ORG.STYMD AND ORG.ENDYMD    " _
@@ -105,7 +105,7 @@ Public Class GL0025FinanceItemList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0025"                       'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0019_ORG Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNS0014_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

@@ -1,18 +1,18 @@
-﻿<%@ Page Title="LNS0002D" Language="vb" AutoEventWireup="false" CodeBehind="LNS0002UserDetail.aspx.vb" Inherits="JOTWEB_LNG.LNS0002UserDetail" %>
+﻿<%@ Page Title="LNS0001D" Language="vb" AutoEventWireup="false" CodeBehind="LNS0001UserDetail.aspx.vb" Inherits="JOTWEB_LNG.LNS0001UserDetail" %>
 <%@ MasterType VirtualPath="~/LNG/LNGMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB_LNG.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/LNG/inc/LNS0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/LNS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content ID="LNS0002DH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/LNG/css/LNS0002D.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0002D.js")%>'></script>
+<asp:Content ID="LNS0001DH" ContentPlaceHolderID="head" runat="server">
+    <link href='<%=ResolveUrl("~/LNG/css/LNS0001D.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0001D.js")%>'></script>
 </asp:Content>
  
-<asp:Content ID="LNS0002D" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="LNS0001D" ContentPlaceHolderID="contents1" runat="server">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　detailbox -->
         <div class="detailboxOnly" id="detailbox" >
@@ -190,51 +190,16 @@
                         <asp:Label ID="WF_VARIANT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                     </span>
 
-                    <!-- 承認権限ロール -->
+<%--                    <!-- 承認権限ロール -->
                     <span class="ef">
                         <asp:Label ID="WF_APPROVALID_L" runat="server" Text="承認権限ロール" CssClass="WF_TEXT_LEFT"></asp:Label>
                         <span ondblclick="Field_DBclick('TxtApproValid', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('TxtApproValid');">
                             <asp:TextBox ID="TxtApproValid" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                         </span>
                         <asp:Label ID="LblApproValidName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                    </span>
+                    </span>--%>
                 </p>
 
-            </div>
-            <div id="SetItemBox">
-            <!-- セレクトボックス -->
-                <div class="selectBox">
-                    <asp:Label ID="WF_INIT_DISP" runat="server" Text="初期表示設定" CssClass="WF_TEXT_LEFT"></asp:Label>
-                </div>
-                <div id="KEY_LINE_12">
-                    <!-- 現況表 -->
-                    <div class="divSelectItem">
-                        <asp:Label ID="WF_CSTCTN" runat="server" Text="現況表" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <div class="divListItem">
-                            <asp:CheckBoxList ID="ChklFlags" runat="server" ClientIDMode="Predictable" RepeatLayout="UnorderedList"  onclick="selectCheckBox();" ></asp:CheckBoxList>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="KEY_LINE_13">
-                    <!-- 運用状況表 -->
-                    <div class="divSelectItem">
-                        <asp:Label ID="WF_OSTCTN" runat="server" Text="運用状況表" CssClass="WF_TEXT_LEFT"></asp:Label>
-                        <div class="divListItem">
-                            <asp:CheckBoxList ID="ChklFlags2" runat="server" ClientIDMode="Predictable" RepeatLayout="UnorderedList"  onclick="selectCheckBox();" ></asp:CheckBoxList>
-                        </div>                 
-                    </div>
-                </div>
-
-                <div id="KEY_LINE_14">
-                    <!-- 発着差 -->
-                    <div class="divSelectItem">
-                        <asp:Label ID="WF_DAADCTN" runat="server" Text="発着差" CssClass="WF_TEXT_LEFT"></asp:Label> 
-                        <div class="divListItem">
-                            <asp:CheckBoxList ID="ChklFlags3" runat="server" ClientIDMode="Predictable" RepeatLayout="UnorderedList"  onclick="selectCheckBox();" ></asp:CheckBoxList>
-                        </div>          
-                    </div>
-                </div>
             </div>
         </div>
 

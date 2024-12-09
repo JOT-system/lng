@@ -78,10 +78,10 @@ Public Class CS0051UserInfo : Implements IDisposable
     ''' エクセル出力権限
     ''' </summary>
     Public Property RPRTPROFROLE As String
-    ''' <summary>
-    ''' 承認権限
-    ''' </summary>
-    Public Property APPROVALIDROLE As String
+    '''' <summary>
+    '''' 承認権限
+    '''' </summary>
+    'Public Property APPROVALIDROLE As String
     ''' <summary>
     ''' 部署権限
     ''' </summary>
@@ -187,17 +187,17 @@ Public Class CS0051UserInfo : Implements IDisposable
             SQLStr.AppendLine(" , rtrim(UR.MAPROLE) as MAPROLE")
             SQLStr.AppendLine(" , rtrim(UR.VIEWPROFID) as VIEWPROFID")
             SQLStr.AppendLine(" , rtrim(UR.RPRTPROFID) as RPRTPROFID")
-            SQLStr.AppendLine(" , rtrim(UR.APPROVALID) as APPROVALID")
+            'SQLStr.AppendLine(" , rtrim(UR.APPROVALID) as APPROVALID")
             SQLStr.AppendLine(" , rtrim(ORG.CONTROLCODE) as CONTROLCODE")
             SQLStr.AppendLine(" , rtrim(CNTRL.NAME) as CONTROLNAME")
-            SQLStr.AppendLine("FROM  COM.LNS0002_USER UR")
-            SQLStr.AppendLine("INNER JOIN COM.LNS0019_ORG ORG")
+            SQLStr.AppendLine("FROM  COM.lns0001_user UR")
+            SQLStr.AppendLine("INNER JOIN COM.LNS0014_ORG ORG")
             SQLStr.AppendLine(" ON ORG.CAMPCODE = UR.CAMPCODE")
             SQLStr.AppendLine("   and ORG.ORGCODE = UR.ORG")
             SQLStr.AppendLine("   and ORG.STYMD <= @P3 ")
             SQLStr.AppendLine("   and ORG.ENDYMD >= @P2 ")
             SQLStr.AppendLine("   and ORG.DELFLG = @P4 ")
-            SQLStr.AppendLine("LEFT JOIN COM.LNS0019_ORG CNTRL")
+            SQLStr.AppendLine("LEFT JOIN COM.LNS0014_ORG CNTRL")
             SQLStr.AppendLine(" ON CNTRL.CAMPCODE = UR.CAMPCODE")
             SQLStr.AppendLine("   and CNTRL.ORGCODE = ORG.CONTROLCODE")
             SQLStr.AppendLine("   and CNTRL.STYMD <= @P3 ")
@@ -235,7 +235,7 @@ Public Class CS0051UserInfo : Implements IDisposable
                         MENUROLE = Convert.ToString(SQLdr("MENUROLE"))
                         VIEWPROFROLE = Convert.ToString(SQLdr("VIEWPROFID"))
                         RPRTPROFROLE = Convert.ToString(SQLdr("RPRTPROFID"))
-                        APPROVALIDROLE = Convert.ToString(SQLdr("APPROVALID"))
+                        'APPROVALIDROLE = Convert.ToString(SQLdr("APPROVALID"))
                         MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
                         VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
                         RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
@@ -253,7 +253,7 @@ Public Class CS0051UserInfo : Implements IDisposable
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = METHOD_NAME                    'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0002_USER Select"             '
+            CS0011LOGWRITE.INFPOSI = "DB:lns0001_user Select"             '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

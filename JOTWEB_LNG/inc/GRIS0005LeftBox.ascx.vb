@@ -1504,20 +1504,20 @@ Public Class GRIS0005LeftBox
             If Params.Item(C_PARAMETERS.LP_STYMD) IsNot Nothing Then
                 StYmd = Convert.ToDateTime(Params.Item(C_PARAMETERS.LP_STYMD))
             End If
-            ' 承認権限ロール(第一承認者)
-            Dim ApprovalId_1 As String = ""
-            If Params.Item(C_PARAMETERS.LP_APPROVALFLG1) IsNot Nothing Then
-                If Convert.ToString(Params.Item(C_PARAMETERS.LP_APPROVALFLG1)) = "1" Then
-                    ApprovalId_1 = GL0026UserList.C_APPROVALID.ROLE_1
-                End If
-            End If
-            ' 承認権限ロール(最終承認者)
-            Dim ApprovalId_2 As String = ""
-            If Params.Item(C_PARAMETERS.LP_APPROVALFLG2) IsNot Nothing Then
-                If Convert.ToString(Params.Item(C_PARAMETERS.LP_APPROVALFLG2)) = "1" Then
-                    ApprovalId_2 = GL0026UserList.C_APPROVALID.ROLE_2
-                End If
-            End If
+            '' 承認権限ロール(第一承認者)
+            'Dim ApprovalId_1 As String = ""
+            'If Params.Item(C_PARAMETERS.LP_APPROVALFLG1) IsNot Nothing Then
+            '    If Convert.ToString(Params.Item(C_PARAMETERS.LP_APPROVALFLG1)) = "1" Then
+            '        ApprovalId_1 = GL0026UserList.C_APPROVALID.ROLE_1
+            '    End If
+            'End If
+            '' 承認権限ロール(最終承認者)
+            'Dim ApprovalId_2 As String = ""
+            'If Params.Item(C_PARAMETERS.LP_APPROVALFLG2) IsNot Nothing Then
+            '    If Convert.ToString(Params.Item(C_PARAMETERS.LP_APPROVALFLG2)) = "1" Then
+            '        ApprovalId_2 = GL0026UserList.C_APPROVALID.ROLE_2
+            '    End If
+            'End If
             ' ユーザーID
             Dim userId As String = ""
             If Params.Item(C_PARAMETERS.LP_USERID) IsNot Nothing Then
@@ -1531,8 +1531,6 @@ Public Class GRIS0005LeftBox
 
             Using GL0026UserList As New GL0026UserList With {
                   .STYMD = StYmd _
-                , .APPROVALID1 = ApprovalId_1 _
-                , .APPROVALID2 = ApprovalId_2 _
                 , .USERID = userId _
                 , .ORGCODE = orgCode
              }

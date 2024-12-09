@@ -1,0 +1,22 @@
+﻿/*アップロードボタン*/
+#WF_UPLOAD_LABEL {
+    display: block;
+}
+
+input#WF_UPLOAD_BTN {
+    display: none;
+}
+
+#WF_UPLOAD_LABEL:hover {
+    cursor: pointer;
+}
+
+#WF_UPLOAD_LABEL:has(input:disabled) {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+    #WF_UPLOAD_LABEL:has(input:disabled):hover {
+        border-color: #cfcfcf;
+        cursor: default;
+    }

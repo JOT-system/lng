@@ -653,7 +653,7 @@ Public Class LNT0018_PaymentLedgerReport_DIODOC
             SQLBldr.AppendLine("        LEFT JOIN lng.LNM0022_CLASS D04")
             SQLBldr.AppendLine("            ON D04.BIGCTNCD = TRIM(D01.BIGCTNCD)")
             SQLBldr.AppendLine("            AND D04.DELFLG = @P01")
-            SQLBldr.AppendLine("        LEFT JOIN com.LNS0019_ORG D05")
+            SQLBldr.AppendLine("        LEFT JOIN com.LNS0014_ORG D05")
             SQLBldr.AppendLine("            ON D05.ORGCODE = D01.KEIJOBRANCH")
             SQLBldr.AppendLine("    WHERE")
             SQLBldr.AppendLine("        D01.TORICODE = '" & TORICODE & "'")

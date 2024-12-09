@@ -1,11 +1,11 @@
 ﻿''************************************************************
 ' ユーザーマスタメンテ検索画面
-' 作成日 2021/12/24
+' 作成日 2024/12/02
 ' 更新日 
-' 作成者 名取
+' 作成者 大浜
 ' 更新者 
 '
-' 修正履歴 : 2021/12/24 新規作成
+' 修正履歴 : 2024/12/02 新規作成
 '          : 
 ''************************************************************
 Imports JOTWEB_LNG.GRIS0005LeftBox
@@ -14,7 +14,7 @@ Imports JOTWEB_LNG.GRIS0005LeftBox
 ''' ユーザマスタ登録（検索）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class LNS0002UserSearch
+Public Class LNS0001UserSearch
     Inherits Page
 
     ''' <summary>
@@ -71,7 +71,7 @@ Public Class LNS0002UserSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = LNS0002WRKINC.MAPIDS
+        Master.MAPID = LNS0001WRKINC.MAPIDS
 
         TxtStYMDCode.Focus()
         WF_FIELD.Value = ""
@@ -102,7 +102,7 @@ Public Class LNS0002UserSearch
             TxtStYMDCode.Text = TxtStYMDCode.Text.ToString
             TxtEndYMDCode.Text = ""                                            '有効年月日(To)
             TxtOrgCode.Text = ""                                               '組織コード
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0002L Then
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Then
             ' 実行画面からの遷移
             TxtStYMDCode.Text = work.WF_SEL_STYMD.Text    '有効年月日(From)
             TxtEndYMDCode.Text = work.WF_SEL_ENDYMD.Text  '有効年月日(To)
@@ -126,8 +126,8 @@ Public Class LNS0002UserSearch
         Me.TxtEndYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
 
         '○ RightBox情報設定
-        rightview.MAPIDS = LNS0002WRKINC.MAPIDS
-        rightview.MAPID = LNS0002WRKINC.MAPIDL
+        rightview.MAPIDS = LNS0001WRKINC.MAPIDS
+        rightview.MAPID = LNS0001WRKINC.MAPIDL
         rightview.COMPCODE = TxtCampCode.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
@@ -285,7 +285,7 @@ Public Class LNS0002UserSearch
     Protected Sub WF_ButtonEND_Click()
 
         '○ メニュー画面遷移
-        Master.TransitionPrevPage(, LNS0002WRKINC.TITLEKBNS)
+        Master.TransitionPrevPage(, LNS0001WRKINC.TITLEKBNS)
 
     End Sub
 

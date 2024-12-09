@@ -539,10 +539,10 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
     color: #d38bd4;
 }
 #WF_TITLETEXT::before {
-    width: 150px;
+    width: 170px;
     height: 24px;
     margin-right: 8px;
-    /*background-image: url(../img/syrius_logo.png);*/
+    background-image: url(../img/kronos_logo.svg);
     background-repeat: no-repeat;
     background-position: 0 0;
     content: "";

@@ -1,17 +1,17 @@
-﻿<%@ Page Title="LNS0002S" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master"  CodeBehind="LNS0002UserSearch.aspx.vb" Inherits="JOTWEB_LNG.LNS0002UserSearch" %>
+﻿<%@ Page Title="LNS0001S" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master"  CodeBehind="LNS0001UserSearch.aspx.vb" Inherits="JOTWEB_LNG.LNS0001UserSearch" %>
 <%@ MasterType VirtualPath="~/LNG/LNGMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB_LNG.GRIS0005LeftBox" %>
 
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
-<%@ Register Src="~/LNG/inc/LNS0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/LNS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:content id="LNS0002SH" contentplaceholderid="head" runat="server">
-    <link href='<%=ResolveUrl("~/LNG/css/LNS0002S.css")%>' rel="stylesheet" type="text/css" />
+<asp:content id="LNS0001SH" contentplaceholderid="head" runat="server">
+    <link href='<%=ResolveUrl("~/LNG/css/LNS0001S.css")%>' rel="stylesheet" type="text/css" />
 </asp:content>
 
-<asp:Content ID="LNS0002S" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="LNS0001S" ContentPlaceHolderID="contents1" runat="server">
      <!-- 全体レイアウト　searchbox -->
     <div class="searchbox" id="searchbox">
         <!-- ○ 固定項目 ○ -->

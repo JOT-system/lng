@@ -501,7 +501,7 @@ Public Class LNT0018PaymentLedgerReportOutput
             SQLBldr.AppendLine("     ORGCODE AS [key] ")
             SQLBldr.AppendLine("     , RTRIM(NAME) AS [value]  ")
             SQLBldr.AppendLine(" FROM")
-            SQLBldr.AppendLine("     com.LNS0019_ORG")
+            SQLBldr.AppendLine("     com.LNS0014_ORG")
             SQLBldr.AppendLine(" WHERE")
             SQLBldr.AppendLine("     CTNFLG = '1'")
             SQLBldr.AppendLine(" AND CLASS01 IN (1,2,4)")

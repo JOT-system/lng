@@ -2304,7 +2304,10 @@ div.showGuidance a[id^="Menu_"] {
     border: 1px solid #aaa;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-    padding: 16px;
+    /*padding: 16px;*/
+    padding-left: 16px;
+    padding-right:16px;
+    padding-bottom: 16px;
 }
 .menuFrame:first-of-type {
     margin: 0 auto;
@@ -2462,20 +2465,26 @@ input[type=checkbox]#contents1_repLeftNav15_chkTopItem15_2 + label:hover::before
     background-image: url(../img/google_font_icon_registration_blue.svg);
 }
 
-/* ナビゲーションボタン（黒）*/
+/* ナビゲーションボタン（青）*/
 div.parentMenu4.Performance > input[type=checkbox] + label,
 input[type=checkbox]#contents1_repLeftNav6_chkTopItem6_0 + label,
 input[type=checkbox]#contents1_repLeftNav6_chkTopItem6_1 + label,
 div.parentMenu4.Budget > input[type=checkbox] + label {
-    background-color: #333;
+    /*background-color: #333;
+    color: #fff;*/
+    background-color: #0a58ca;
+    border: 1px solid #0a58ca;
     color: #fff;
 }
 div.parentMenu4.Performance > input[type=checkbox] + label:hover,
 input[type=checkbox]#contents1_repLeftNav6_chkTopItem6_0 + label:hover,
 input[type=checkbox]#contents1_repLeftNav6_chkTopItem6_1 + label:hover,
 div.parentMenu4.Budget > input[type=checkbox] + label:hover {
-    background-color: #666;
-    border-color: #cfcfcf;
+    /*background-color: #666;
+border-color: #cfcfcf;*/
+    background-color: #cfe2ff;
+    border-color: #0a58ca;
+    color: #0a58ca;
 }
 
 /* ナビゲーションボタン（黒）：リスト*/
@@ -2498,4 +2507,28 @@ input[type=checkbox]#contents1_repLeftNav6_chkTopItem6_1 + label::before {
 /* ナビゲーションボタン（黒）：出力 */
 div.parentMenu4.PrtOther > input[type=checkbox] + label::before {
     background-image: url(../img/google_font_icon_output_white.svg);
+}
+
+.icon1::before {
+    content: "";
+    background-image: url(../img/bar_chart_4_bars.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-right: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
+}
+
+.icon2::before {
+    content: "";
+    background-image: url(../img/edit_note.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-right: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
 }

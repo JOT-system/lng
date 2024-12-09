@@ -180,7 +180,7 @@ Public Class GL0002OrgList
     ''' </summary>
     Protected Sub getOrgList(ByVal SQLcon As MySqlConnection)
         '●Leftボックス用部署取得
-        '○ User権限によりDB(LNS0019_ORG)検索
+        '○ User権限によりDB(LNS0014_ORG)検索
         Try
             '検索SQL文
             Dim SQLStr As String =
@@ -189,7 +189,7 @@ Public Class GL0002OrgList
                 & "   rtrim(A.NAME)        as NAMES     ,  " _
                 & "   rtrim(A.ORGCODE)     as CATEGORY  ,  " _
                 & "   ''                   as SEQ          " _
-                & " FROM       COM.LNS0019_ORG A           " _
+                & " FROM       COM.LNS0014_ORG A           " _
                 & " Where                                  " _
                 & "         A.CONTROLCODE  = @P2           " _
                 & "   and   A.STYMD       <= @P3           " _
@@ -227,7 +227,7 @@ Public Class GL0002OrgList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0019_ORG Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNS0014_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -245,7 +245,7 @@ Public Class GL0002OrgList
     ''' </summary>
     Protected Sub getOrgAllList(ByVal SQLcon As MySqlConnection, ByVal COMPANYCODE_FLG As String)
         '●Leftボックス用部署取得
-        '○ User権限によりDB(LNS0019_ORG)検索
+        '○ User権限によりDB(LNS0014_ORG)検索
         Try
             '検索SQL文
             Dim SQLStr As String =
@@ -254,7 +254,7 @@ Public Class GL0002OrgList
                 & "   rtrim(A.NAME)        as NAMES     ,  " _
                 & "   rtrim(A.ORGCODE)     as CATEGORY  ,  " _
                 & "   ''                   as SEQ          " _
-                & " FROM       COM.LNS0019_ORG A           " _
+                & " FROM       COM.LNS0014_ORG A           " _
                 & " Where                                  " _
                 & "         A.STYMD   <= @P1               " _
                 & "   and   A.ENDYMD  >= @P2               " _
@@ -293,7 +293,7 @@ Public Class GL0002OrgList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0019_ORG Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNS0014_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -311,7 +311,7 @@ Public Class GL0002OrgList
     ''' </summary>
     Protected Sub getOrgBranchList(ByVal SQLcon As MySqlConnection)
         '●Leftボックス用部署取得
-        '○ User権限によりDB(LNS0019_ORG)検索
+        '○ User権限によりDB(LNS0014_ORG)検索
         Try
             '検索SQL文
             Dim SQLStr As String =
@@ -320,7 +320,7 @@ Public Class GL0002OrgList
                 & "   RTRIM(NAME)        AS NAMES     ,      " _
                 & "   RTRIM(ORGCODE)     AS CATEGORY  ,      " _
                 & "   ''                 AS SEQ              " _
-                & " FROM       COM.LNS0019_ORG with(nolock)  " _
+                & " FROM       COM.LNS0014_ORG with(nolock)  " _
                 & " WHERE                                    " _
                 & "         DELFLG   <> @P0                  " _
                 & "   AND   CAMPCODE  = @P1                  " _
@@ -349,7 +349,7 @@ Public Class GL0002OrgList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0002"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0019_ORG Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNS0014_ORG Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

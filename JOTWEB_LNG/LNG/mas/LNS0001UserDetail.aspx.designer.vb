@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNS0002UserDetail
+Partial Public Class LNS0001UserDetail
     
     '''<summary>
     '''WF_SEL_LINECNT_L コントロール。
@@ -509,96 +509,6 @@ Partial Public Class LNS0002UserDetail
     Protected WithEvents WF_VARIANT_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_APPROVALID_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_APPROVALID_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtApproValid コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtApproValid As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblApproValidName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblApproValidName As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_INIT_DISP コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_INIT_DISP As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_CSTCTN コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_CSTCTN As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ChklFlags コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ChklFlags As Global.System.Web.UI.WebControls.CheckBoxList
-    
-    '''<summary>
-    '''WF_OSTCTN コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_OSTCTN As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ChklFlags2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ChklFlags2 As Global.System.Web.UI.WebControls.CheckBoxList
-    
-    '''<summary>
-    '''WF_DAADCTN コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_DAADCTN As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ChklFlags3 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ChklFlags3 As Global.System.Web.UI.WebControls.CheckBoxList
-    
-    '''<summary>
     '''pnlOverlapPeriodsContents コントロール。
     '''</summary>
     '''<remarks>
@@ -866,7 +776,7 @@ Partial Public Class LNS0002UserDetail
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNS0002WRKINC
+    Protected WithEvents work As Global.JOTWEB_LNG.LNS0001WRKINC
     
     '''<summary>
     '''DisabledKeyItem コントロール。

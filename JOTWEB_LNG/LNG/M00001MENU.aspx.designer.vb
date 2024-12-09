@@ -68,15 +68,6 @@ Partial Public Class M00001MENU
     Protected WithEvents repLeftNav4 As Global.System.Web.UI.WebControls.Repeater
     
     '''<summary>
-    '''repLeftNav5 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents repLeftNav5 As Global.System.Web.UI.WebControls.Repeater
-    
-    '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
     '''<remarks>
@@ -318,15 +309,6 @@ Partial Public Class M00001MENU
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB_LNG.GRIS0005LeftBox
-    
-    '''<summary>
-    '''WF_ApprovalId コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ApprovalId As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

@@ -17,7 +17,7 @@
             <!-- ガイダンスエリア -->
             <div id="guidanceArea" class="guidance" runat="server">
                 <div id="guidanceList">
-                    <p class="ttl">ガイダンス１</p>
+                    <p class="ttl">ガイダンス</p>
                     <asp:Repeater ID="repGuidance" runat="server" ClientIDMode="Predictable">
                         <HeaderTemplate>
                             <table class="guidanceTable">
@@ -80,13 +80,13 @@
         <div class="menuMain2">
             <!-- メインメニュー１ -->
             <div class="menuFrame">
-                <label>分析</label>
+                <%--<label>分析</label>--%>
                 <!--分類１ -->
                 <div id="divLeftNav3" class= "sideMenu">
                     <asp:Repeater ID="repLeftNav3" runat="server" ClientIDMode="Predictable">
                         <HeaderTemplate>
                             <div class="lblMenu4Title" >
-                                <label>実績</label>
+                                <label class ="icon1">分析</label>
                             </div>
                         </HeaderTemplate>
                         <ItemTemplate>
@@ -132,7 +132,7 @@
                     <asp:Repeater ID="repLeftNav4" runat="server" ClientIDMode="Predictable">
                         <HeaderTemplate>
                             <div class="lblMenu4Title" >
-                                <label>予算</label>
+                                <label class ="icon2">マスタ</label>
                             </div>
                         </HeaderTemplate>
                         <ItemTemplate>
@@ -175,7 +175,7 @@
                 </div>
             </div>
             <!-- メインメニュー２ -->
-            <div class="menuFrame">
+ <%--           <div class="menuFrame">
                 <label>システム管理</label>
                 <div id="divLeftNav5" class= "sideMenu">
                     <asp:Repeater ID="repLeftNav5" runat="server" ClientIDMode="Predictable">
@@ -221,7 +221,7 @@
 
                         </FooterTemplate>
                     </asp:Repeater>
-                </div>
+                </div>--%>
             </div>
         </div>
         <!-- ***** ボタン押下 ***** -->
@@ -264,7 +264,7 @@
     <!-- 非表示項目 -->
     <div hidden="hidden">
         <!-- ロールID -->
-        <input id="WF_ApprovalId" runat="server" value="" type="text" />
+        <%--<input id="WF_ApprovalId" runat="server" value="" type="text" />--%>
     </div>
 </asp:Content>
 

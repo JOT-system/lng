@@ -1,4 +1,4 @@
-﻿<%@ Control Language="vb" AutoEventWireup="false" CodeBehind="LNS0002WRKINC.ascx.vb" Inherits="JOTWEB_LNG.LNS0002WRKINC" %>
+﻿<%@ Control Language="vb" AutoEventWireup="false" CodeBehind="LNS0001WRKINC.ascx.vb" Inherits="JOTWEB_LNG.LNS0001WRKINC" %>
 
 <!-- Work レイアウト -->
 <div hidden="hidden">
@@ -23,7 +23,7 @@
     <asp:TextBox ID="WF_SEL_RPRTPROFID" runat="server"></asp:TextBox>               <!-- エクセル出力制御ロール -->
     <asp:TextBox ID="WF_SEL_MAPID" runat="server"></asp:TextBox>                    <!-- 画面ＩＤ -->
     <asp:TextBox ID="WF_SEL_VARIANT" runat="server"></asp:TextBox>                  <!-- 画面初期値ロール -->
-    <asp:TextBox ID="WF_SEL_APPROVALID" runat="server"></asp:TextBox>               <!-- 承認権限ロール -->
+<%--    <asp:TextBox ID="WF_SEL_APPROVALID" runat="server"></asp:TextBox>               <!-- 承認権限ロール -->--%>
     <asp:TextBox ID="WF_SEL_PASSWORD" runat="server"></asp:TextBox>                 <!-- パスワード -->
     <asp:TextBox ID="WF_SEL_MISSCNT" runat="server"></asp:TextBox>                  <!-- 誤り回数 -->
     <asp:TextBox ID="WF_SEL_PASSENDYMD" runat="server"></asp:TextBox>               <!-- パスワード有効期限 -->

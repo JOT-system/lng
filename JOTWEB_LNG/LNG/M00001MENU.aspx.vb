@@ -44,7 +44,7 @@ Public Class M00001MENU
             'Me.LeftNavColleLNToSaveCookie(Me.repLeftNav2, "chkTopItem2")
             Me.LeftNavColleLNToSaveCookie(Me.repLeftNav3, "chkTopItem3")
             Me.LeftNavColleLNToSaveCookie(Me.repLeftNav4, "chkTopItem4")
-            Me.LeftNavColleLNToSaveCookie(Me.repLeftNav5, "chkTopItem5")
+            'Me.LeftNavColleLNToSaveCookie(Me.repLeftNav5, "chkTopItem5")
             'Me.LeftNavColleLNToSaveCookie(Me.repLeftNav6, "chkTopItem6")
             'Me.LeftNavColleLNToSaveCookie(Me.repLeftNav7, "chkTopItem7")
             'Me.LeftNavColleLNToSaveCookie(Me.repLeftNav8, "chkTopItem8")
@@ -100,7 +100,7 @@ Public Class M00001MENU
             '★★★ 初期画面表示 ★★★
             Initialize()
             WF_ButtonClick.Value = ""
-            WF_ApprovalId.Value = Master.ROLE_APPROVALID
+            'WF_ApprovalId.Value = Master.ROLE_APPROVALID
         End If
 
     End Sub
@@ -180,8 +180,8 @@ Public Class M00001MENU
             Me.repLeftNav4.DataSource = menuButtonList4
             Me.repLeftNav4.DataBind()
             ViewState(C_VSNAME_LEFTNAVIDATA_5) = menuButtonList5
-            Me.repLeftNav5.DataSource = menuButtonList5
-            Me.repLeftNav5.DataBind()
+            'Me.repLeftNav5.DataSource = menuButtonList5
+            'Me.repLeftNav5.DataBind()
             'ViewState(C_VSNAME_LEFTNAVIDATA_6) = menuButtonList6
             'Me.repLeftNav6.DataSource = menuButtonList6
             'Me.repLeftNav6.DataBind()
@@ -229,9 +229,9 @@ Public Class M00001MENU
                     Dim guidDt As DataTable = CmnGuidanceData.GetGuidanceData(sqlCon, splTran, Master.USERID)
                     Me.repGuidance1.DataSource = guidDt
                     Me.repGuidance1.DataBind()
-                    If guidDt.Rows.Count = 0 Then
-                        guidanceBoxWrapper.Visible = False
-                    End If
+                    'If guidDt.Rows.Count = 0 Then
+                    '    guidanceBoxWrapper.Visible = False
+                    'End If
                 End Using
             Catch ex As Exception
             End Try
@@ -673,8 +673,8 @@ Public Class M00001MENU
                 .AppendLine("        ELSE A02.NAME")
                 .AppendLine("    END AS NAME")
                 .AppendLine("FROM")
-                .AppendLine("    com.LNS0019_ORG A01")
-                .AppendLine("    LEFT JOIN com.LNS0019_ORG A02")
+                .AppendLine("    com.LNS0014_ORG A01")
+                .AppendLine("    LEFT JOIN com.LNS0014_ORG A02")
                 .AppendLine("        ON A02.ORGCODE = A01.CONTROLCODE")
                 .AppendLine("WHERE")
                 .AppendLine("    A01.ORGCODE = '" & Master.USER_ORG & "'")

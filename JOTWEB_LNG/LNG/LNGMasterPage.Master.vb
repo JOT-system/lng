@@ -299,7 +299,7 @@ Public Class LNGMasterPage
                     MF_MAP_ROLE.Value = DirectCast(.FindControl("MF_MAP_ROLE"), HiddenField).Value                   '画面参照更新権限
                     MF_VIEWPROF_ROLE.Value = DirectCast(.FindControl("MF_VIEWPROF_ROLE"), HiddenField).Value         '画面表示項目権限
                     MF_RPRTPROF_ROLE.Value = DirectCast(.FindControl("MF_RPRTPROF_ROLE"), HiddenField).Value         'エクセル出力権限
-                    MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
+                    'MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
                     '20191101-追加-END
                     MF_POSICOL.Value = DirectCast(.FindControl("MF_POSICOL"), HiddenField).Value                     '選択メニューのPOSICOL
                 End With
@@ -312,7 +312,7 @@ Public Class LNGMasterPage
                 MF_MAP_ROLE.Value = CS0050SESSION.VIEW_MAP_MODE
                 MF_VIEWPROF_ROLE.Value = CS0050SESSION.VIEW_VIEWPROF_MODE
                 MF_RPRTPROF_ROLE.Value = CS0050SESSION.VIEW_RPRTPROF_MODE
-                MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
+                'MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
                 '20191101-追加-END
 
             End If
@@ -334,7 +334,7 @@ Public Class LNGMasterPage
                 ROLE_MAP = CS0051UserInfo.MAPROLE
                 ROLE_VIEWPROF = CS0051UserInfo.VIEWPROFROLE
                 ROLE_RPRTPROF = CS0051UserInfo.RPRTPROFROLE
-                ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
+                'ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
                 MAPvariant = CS0051UserInfo.MAPVARI
                 '20191101-追加-END
                 USRCOMPCODE = CS0051UserInfo.CAMPCODE
@@ -391,7 +391,7 @@ Public Class LNGMasterPage
                 MF_MAP_ROLE.Value = DirectCast(.FindControl("MF_MAP_ROLE"), HiddenField).Value                   '画面参照更新権限
                 MF_VIEWPROF_ROLE.Value = DirectCast(.FindControl("MF_VIEWPROF_ROLE"), HiddenField).Value         '画面表示項目権限
                 MF_RPRTPROF_ROLE.Value = DirectCast(.FindControl("MF_RPRTPROF_ROLE"), HiddenField).Value         'エクセル出力権限
-                MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
+                'MF_APPROVALID_ROLE.Value = DirectCast(.FindControl("MF_APPROVALID_ROLE"), HiddenField).Value     '承認権限
                 '20191101-追加-END
                 MF_USER_ORG.Value = DirectCast(.FindControl("MF_USER_ORG"), HiddenField).Value
                 MF_USER_ORGNAME.Value = DirectCast(.FindControl("MF_USER_ORGNAME"), HiddenField).Value
@@ -423,7 +423,7 @@ Public Class LNGMasterPage
             MF_MAP_ROLE.Value = CS0050SESSION.VIEW_MAP_MODE
             MF_VIEWPROF_ROLE.Value = CS0050SESSION.VIEW_VIEWPROF_MODE
             MF_RPRTPROF_ROLE.Value = CS0050SESSION.VIEW_RPRTPROF_MODE
-            MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
+            'MF_APPROVALID_ROLE.Value = CS0050SESSION.VIEW_APPROVALID
             '20191101-追加-END
 
             '〇ユーザ権限情報取得
@@ -442,7 +442,7 @@ Public Class LNGMasterPage
                 ROLE_MAP = CS0051UserInfo.MAPROLE
                 ROLE_VIEWPROF = CS0051UserInfo.VIEWPROFROLE
                 ROLE_RPRTPROF = CS0051UserInfo.RPRTPROFROLE
-                ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
+                'ROLE_APPROVALID = CS0051UserInfo.APPROVALIDROLE
                 MAPvariant = CS0051UserInfo.MAPVARI
                 '20191101-追加-END
                 USRCOMPCODE = CS0051UserInfo.CAMPCODE
@@ -1229,17 +1229,17 @@ Public Class LNGMasterPage
             MF_RPRTPROF_ROLE.Value = value
         End Set
     End Property
-    ''' <summary>
-    ''' ROLE_APPROVALID
-    ''' </summary>
-    Property ROLE_APPROVALID As String
-        Get
-            Return MF_APPROVALID_ROLE.Value
-        End Get
-        Set(value As String)
-            MF_APPROVALID_ROLE.Value = value
-        End Set
-    End Property
+    '''' <summary>
+    '''' ROLE_APPROVALID
+    '''' </summary>
+    'Property ROLE_APPROVALID As String
+    '    Get
+    '        Return MF_APPROVALID_ROLE.Value
+    '    End Get
+    '    Set(value As String)
+    '        MF_APPROVALID_ROLE.Value = value
+    '    End Set
+    'End Property
     ''' <summary>
     ''' ROLE_ORG
     ''' </summary>

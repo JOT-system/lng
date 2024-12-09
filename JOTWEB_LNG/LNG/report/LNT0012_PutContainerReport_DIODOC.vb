@@ -671,7 +671,7 @@ Public Class LNT0012_PutContainerReport_DIODOC
         sqlStat.AppendLine(" SELECT                                                       ")
         sqlStat.AppendLine("     ORGCODE                                          as CODE ")
         sqlStat.AppendLine(" FROM                                                         ")
-        sqlStat.AppendLine("     com.LNS0019_ORG WITH(nolock)                             ")
+        sqlStat.AppendLine("     com.LNS0014_ORG WITH(nolock)                             ")
         sqlStat.AppendLine(" WHERE                                                        ")
         sqlStat.AppendLine("     ORGSELECTFLAG = 1                                        ")
         sqlStat.AppendLine(" AND CLASS01 = 1                                              ")

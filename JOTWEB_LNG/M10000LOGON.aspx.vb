@@ -159,7 +159,7 @@ Public Class M10000LOGON
         'Master.EraseCharToIgnore(PassWord.Text)
         '### 20240222 END   パスワードポリシー対応 ※パスワードに記号を用いるため廃止
 
-        '○ 画面UserIDのDB(LNS0002_USER)存在チェック
+        '○ 画面UserIDのDB(lns0001_user)存在チェック
         Dim WW_USERID As String = String.Empty
         Dim WW_PASSWORD As String = String.Empty
         Dim WW_USERCAMP As String = String.Empty
@@ -174,7 +174,7 @@ Public Class M10000LOGON
         Dim WW_MAPROLE As String = String.Empty
         Dim WW_VIEWPROFID As String = String.Empty
         Dim WW_RPRTPROFID As String = String.Empty
-        Dim WW_APPROVALID As String = String.Empty
+        'Dim WW_APPROVALID As String = String.Empty
         '20191101-追加-END
         Dim WW_MAPID As String = String.Empty
         Dim WW_VARIANT As String = String.Empty
@@ -209,9 +209,9 @@ Public Class M10000LOGON
             '    End Using
 
             'Catch ex As Exception
-            '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002_USERPASS OPEN")
+            '    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "lns0002_userpass OPEN")
             '    CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-            '    CS0011LOGWRITE.INFPOSI = "LNS0002_USERPASS OPEN"                           '
+            '    CS0011LOGWRITE.INFPOSI = "lns0002_userpass OPEN"                           '
             '    CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             '    CS0011LOGWRITE.TEXT = ex.ToString()
             '    CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -220,7 +220,7 @@ Public Class M10000LOGON
             'End Try
 
             Try
-                'LNS0002_USER検索SQL文
+                'lns0001_user検索SQL文
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendLine("SELECT rtrim(A.USERID)   as USERID")
                 sqlStat.AppendLine("      ,rtrim(A.CAMPCODE) as CAMPCODE")
@@ -238,10 +238,10 @@ Public Class M10000LOGON
                 sqlStat.AppendLine("      ,rtrim(A.RPRTPROFID) as RPRTPROFID")
                 sqlStat.AppendLine("      ,rtrim(A.MAPID)      as MAPID")
                 sqlStat.AppendLine("      ,rtrim(A.VARIANT)    as VARIANT")
-                sqlStat.AppendLine("      ,rtrim(A.APPROVALID) as APPROVALID")
+                'sqlStat.AppendLine("      ,rtrim(A.APPROVALID) as APPROVALID")
                 sqlStat.AppendLine("      ,B.PASSENDYMD        as PASSENDYMD")
-                sqlStat.AppendLine("  FROM        COM.LNS0002_USER       A")
-                sqlStat.AppendLine("  INNER JOIN  COM.LNS0003_USERPASS   B")
+                sqlStat.AppendLine("  FROM        COM.lns0001_user       A")
+                sqlStat.AppendLine("  INNER JOIN  COM.lns0002_userpass   B")
                 sqlStat.AppendLine("    ON B.USERID      = A.USERID")
                 sqlStat.AppendLine("   and B.DELFLG     <> @P4 ")
                 sqlStat.AppendLine(" Where A.USERID      = @P1 ")
@@ -279,7 +279,7 @@ Public Class M10000LOGON
                             WW_MAPROLE = Convert.ToString(SQLdr("MAPROLE"))
                             WW_VIEWPROFID = Convert.ToString(SQLdr("VIEWPROFID"))
                             WW_RPRTPROFID = Convert.ToString(SQLdr("RPRTPROFID"))
-                            WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
+                            'WW_APPROVALID = Convert.ToString(SQLdr("APPROVALID"))
                             '20191101-追加-END
                             WW_MAPID = Convert.ToString(SQLdr("MAPID"))
                             WW_VARIANT = Convert.ToString(SQLdr("VARIANT"))
@@ -297,10 +297,10 @@ Public Class M10000LOGON
                 SQLcon.Dispose()
 
 
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0002_USER SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "lns0001_user SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "LNS0002_USER SELECT"                           '
+                CS0011LOGWRITE.INFPOSI = "lns0001_user SELECT"                           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -340,7 +340,7 @@ Public Class M10000LOGON
                 Try
                     'S0014_USER更新SQL文
                     Dim SQL_Str As String =
-                         "Update COM.LNS0003_USERPASS " _
+                         "Update COM.lns0002_userpass " _
                        & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                        & "Where  USERID  = @P3 "
                     Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
@@ -364,9 +364,9 @@ Public Class M10000LOGON
                     SQLcon.Dispose()
 
 
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0003_USERPASS UPDATE")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "lns0002_userpass UPDATE")
                     CS0011LOGWRITE.INFSUBCLASS = "Main"
-                    CS0011LOGWRITE.INFPOSI = "LNS0003_USERPASS Update"
+                    CS0011LOGWRITE.INFPOSI = "lns0002_userpass Update"
                     CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                     CS0011LOGWRITE.TEXT = ex.ToString()
                     CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -384,7 +384,7 @@ Public Class M10000LOGON
             Try
                 'S0014_USER更新SQL文
                 Dim SQL_Str As String =
-                     "Update COM.LNS0003_USERPASS " _
+                     "Update COM.lns0002_userpass " _
                    & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                    & "Where  USERID  = @P3 "
                 Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
@@ -403,10 +403,10 @@ Public Class M10000LOGON
                 SQLcon.Close()
                 SQLcon.Dispose()
 
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0003_USERPASS UPDATE")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "lns0002_userpass UPDATE")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"
-                CS0011LOGWRITE.INFPOSI = "LNS0003_USERPASS Update"
+                CS0011LOGWRITE.INFPOSI = "lns0002_userpass Update"
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -432,7 +432,7 @@ Public Class M10000LOGON
         CS0050Session.VIEW_MAP_MODE = WW_MAPID
         CS0050Session.VIEW_VIEWPROF_MODE = WW_VIEWPROFID
         CS0050Session.VIEW_RPRTPROF_MODE = WW_RPRTPROFID
-        CS0050Session.VIEW_APPROVALID = WW_APPROVALID
+        'CS0050Session.VIEW_APPROVALID = WW_APPROVALID
         '20191101-追加-END
         CS0050Session.VIEW_MAP_VARIANT = WW_VARIANT
         CS0050Session.MAP_ETC = ""
@@ -449,7 +449,7 @@ Public Class M10000LOGON
         Master.ROLE_MAP = WW_MAPID
         Master.ROLE_VIEWPROF = WW_VIEWPROFID
         Master.ROLE_RPRTPROF = WW_RPRTPROFID
-        Master.ROLE_APPROVALID = WW_APPROVALID
+        'Master.ROLE_APPROVALID = WW_APPROVALID
         '20191101-追加-END
         Master.MAPvariant = WW_VARIANT
         Master.MAPpermitcode = ""
@@ -462,7 +462,7 @@ Public Class M10000LOGON
 
             SQLcon.Open() 'DataBase接続(Open)
             Try
-                'LNS0002_USER検索SQL文
+                'lns0001_user検索SQL文
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendLine("SELECT rtrim(A.LICENSEKEY)   as LICENSEKEY")
                 sqlStat.AppendLine(" FROM        COM.LNS0025_LICENSE       A")
@@ -514,7 +514,7 @@ Public Class M10000LOGON
 
             SQLcon.Open() 'DataBase接続(Open)
             Try
-                'LNS0002_USER検索SQL文
+                'lns0001_user検索SQL文
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendLine("SELECT rtrim(A.LICENSEKEY)   as LICENSEKEY")
                 sqlStat.AppendLine(" FROM        COM.LNS0025_LICENSE       A")

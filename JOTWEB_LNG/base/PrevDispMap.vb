@@ -118,15 +118,15 @@ Public Module PrevDispMap
         ''' <summary>
         ''' ユーザIDマスタメンテナンス（検索）
         ''' </summary>
-        Public Const LNS0002S As String = "ASP.LNG_MAS_LNS0002USERSEARCH_ASPX"
+        Public Const LNS0001S As String = "ASP.LNG_MAS_LNS0001USERSEARCH_ASPX"
         ''' <summary>
         ''' ユーザIDマスタメンテナンス（一覧）
         ''' </summary>
-        Public Const LNS0002L As String = "ASP.LNG_MAS_LNS0002USERLIST_ASPX"
+        Public Const LNS0001L As String = "ASP.LNG_MAS_LNS0001USERLIST_ASPX"
         ''' <summary>
         ''' ユーザIDマスタメンテナンス（詳細）
         ''' </summary>
-        Public Const LNS0002D As String = "ASP.LNG_MAS_LNS0002USERDETAIL_ASPX"
+        Public Const LNS0001D As String = "ASP.LNG_MAS_LNS0001USERDETAIL_ASPX"
 
         ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
