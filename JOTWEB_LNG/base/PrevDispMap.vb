@@ -27,13 +27,13 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const LNT0001S As String = "ASP.LNG_ORD_LNT0001ORDERSEARCH_ASPX"
         ''' <summary>
-        ''' 受注一覧
+        ''' 実績管理
         ''' </summary>
-        Public Const LNT0001L As String = "ASP.LNG_ORD_LNT0001ORDERLIST_ASPX"
+        Public Const LNT0001L As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIMANAGE_ASPX"
         ''' <summary>
-        ''' 受注明細
+        ''' 実績取込
         ''' </summary>
-        Public Const LNT0001D As String = "ASP.LNG_ORD_LNT0001ORDERDETAIL_ASPX"
+        Public Const LNT0001D As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIINTAKE_ASPX"
 
         ''' <summary>
         ''' リース一覧

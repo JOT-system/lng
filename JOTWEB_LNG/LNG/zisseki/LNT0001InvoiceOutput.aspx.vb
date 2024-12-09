@@ -1,23 +1,23 @@
-﻿'************************************************************
-' 実績管理
-' 作成日 2024/12/01
+﻿''************************************************************
+' 請求出力管理
+' 作成日 2024/12/05
 ' 更新日 
 ' 作成者 
 ' 更新者 
 '
 ' 修正履歴 
-'************************************************************
+''************************************************************
 
 Imports GrapeCity.Documents.Excel
 Imports Newtonsoft.Json
 Imports MySQL.Data.MySqlClient
 Imports JOTWEB_LNG.GRIS0005LeftBox
 
-Public Class LNT0001ZissekiManage
+Public Class LNT0001InvoiceOutput
     Inherits System.Web.UI.Page
 
     '○ 検索結果格納Table
-    Private LNT0001tbl As DataTable                                  '一覧格納用テーブル
+    Private LNT0001tbl As DataTable                                  '実績（アボカド）データ格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -31,9 +31,16 @@ Public Class LNT0001ZissekiManage
     Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private CS0051UserInfo As New CS0051UserInfo                    'ユーザー情報取得
     Private GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
 
-    Private WW_Dummy As String
+    '○ 共通処理結果
+    Private WW_ErrSW As String = ""
+    Private WW_RtnSW As String = ""
+    Private WW_Dummy As String = ""
+    Private WW_ErrCode As String                                    'サブ用リターンコード
+
+    Private toriList As New ListBox
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -47,34 +54,24 @@ Public Class LNT0001ZissekiManage
             If IsPostBack Then
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
-                    '○ 画面表示データ復元
-                    Master.RecoverTable(LNT0001tbl)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonExtract"         '絞り込みボタンクリック
                             WF_ButtonExtract_Click()
-                        Case "WF_ButtonZisseki"         '実績取込ボタンクリック
-                            WF_ButtonZisseki_Click()
+                        Case "WF_ButtonDOWNLOAD"        'ダウンロードボタン押下
+                            WF_ButtonDOWNLOAD_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FiledDBClick()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ButtonInvoice"         '請求書出力ボタン押下
-                            WF_ButtonInvoice_Click()
-                        Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
-                            WF_ButtonPRINT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
                     End Select
 
                     '○ 一覧再表示処理
-                    DisplayGrid()
+                    'DisplayGrid()
                 End If
             Else
                 '○ 初期化処理
@@ -106,41 +103,28 @@ Public Class LNT0001ZissekiManage
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = LNT0001WRKINC.MAPIDL
+        Master.MAPID = LNT0001WRKINC.MAPIDI
         '○ HELP表示有無設定
         Master.dispHelp = False
         '○ D&D有無設定
         Master.eventDrop = True
         '○ Grid情報保存先のファイル名
-        Master.CreateXMLSaveFile()
+        'Master.CreateXMLSaveFile()
 
         '○ 初期値設定
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
-        rightviewR.ResetIndex()
+        rightview.ResetIndex()
         leftview.ActiveListBox()
 
         '○ 右Boxへの値設定
-        rightviewR.MAPID = Master.MAPID
-        rightviewR.MAPVARI = Master.MAPvariant
-        rightviewR.COMPCODE = Master.USERCAMP
-        rightviewR.PROFID = Master.PROF_REPORT
-        rightviewR.Initialize("")
-
-        '○ RightBox情報設定
-        rightviewD.MAPIDS = Master.MAPID
-        rightviewD.MAPID = Master.MAPID
-        rightviewD.COMPCODE = Master.USERCAMP
-        rightviewD.MAPVARI = Master.MAPvariant
-        rightviewD.PROFID = Master.PROF_VIEW
-        rightviewD.MENUROLE = Master.ROLE_MENU
-        rightviewD.MAPROLE = Master.ROLE_MAP
-        rightviewD.VIEWROLE = Master.ROLE_VIEWPROF
-        rightviewD.RPRTROLE = Master.ROLE_RPRTPROF
-
-        rightviewD.Initialize("画面レイアウト設定", WW_dummy)
+        rightview.MAPID = Master.MAPID
+        rightview.MAPVARI = Master.MAPvariant
+        rightview.COMPCODE = Master.USERCAMP
+        rightview.PROFID = Master.PROF_REPORT
+        rightview.Initialize("")
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -150,7 +134,7 @@ Public Class LNT0001ZissekiManage
         WW_MAPValueSet()
 
         '○ GridView初期設定
-        GridViewInitialize()
+        'GridViewInitialize()
 
         '〇 更新画面からの遷移の場合、更新完了メッセージを出力
         If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
@@ -165,22 +149,18 @@ Public Class LNT0001ZissekiManage
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001L Then
             ' メニューからの画面遷移
             ' 画面間の情報クリア
             work.Initialize()
 
             ' 初期変数設定処理
-            TxtCreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D Then
-            ' 実行画面からの遷移
-            TxtCreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
+            TxtTaishoYm.Text = Date.Now.ToString("yyyy/MM")
         End If
 
         ' ドロップダウンリスト（荷主）作成
-        Dim toriList As New ListBox
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
-        GS0007FIXVALUElst.CLAS = "TORICODEDROP"
+        GS0007FIXVALUElst.CLAS = "INVOICE"
         GS0007FIXVALUElst.LISTBOX1 = toriList
         GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
         GS0007FIXVALUElst.GS0007FIXVALUElst()
@@ -215,16 +195,13 @@ Public Class LNT0001ZissekiManage
         Master.SaveTable(LNT0001tbl)
 
         '〇 一覧の件数を取得
-        'Me.ListCount.Text = "件数：" + LNT0001tbl.Rows.Count.ToString()
+        'Me.ListCount.Text = "件数：" + LNT0002tbl.Rows.Count.ToString()
 
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(LNT0001tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
-        If String.IsNullOrEmpty(Master.VIEWID) Then
-            Master.VIEWID = rightviewD.GetViewId(Master.USERCAMP)
-        End If
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
@@ -482,18 +459,25 @@ Public Class LNT0001ZissekiManage
             & " FROM                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                         " _
             & " WHERE                                                               " _
-            & "     date_format(LT1.CREATEYMD, '%Y/%m/%d') = @P1                    " _
+            & "     LT1.ORDERORGCODE = @P1                                          " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
             & " ORDER BY                                                            " _
-            & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
+            & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE  "
 
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)  '作成日
-                If Not String.IsNullOrEmpty(TxtCreateYmd.Text) AndAlso IsDate(TxtCreateYmd.Text) Then
-                    PARA1.Value = TxtCreateYmd.Text
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar)  '部署
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
+                Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
+                PARA1.Value = WF_TORI.SelectedValue
+                If Not String.IsNullOrEmpty(TxtTaishoYm.Text) AndAlso IsDate(TxtTaishoYm.Text & "/01") Then
+                    PARA2.Value = TxtTaishoYm.Text & "/01"
+                    PARA3.Value = TxtTaishoYm.Text & DateTime.DaysInMonth(CDate(TxtTaishoYm.Text).Year, CDate(TxtTaishoYm.Text).Month).ToString("/00")
                 Else
-                    PARA1.Value = Date.Now.ToString("yyyy/MM/dd")
+                    PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -513,10 +497,10 @@ Public Class LNT0001ZissekiManage
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0001L SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0001I SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0001L Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0001I Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -536,11 +520,11 @@ Public Class LNT0001ZissekiManage
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
-        For Each LNM0023row As DataRow In LNT0001tbl.Rows
-            If LNM0023row("HIDDEN") = 0 Then
+        For Each LNT0001row As DataRow In LNT0001tbl.Rows
+            If LNT0001row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
-                LNM0023row("SELECT") = WW_DataCNT
+                LNT0001row("SELECT") = WW_DataCNT
             End If
         Next
 
@@ -572,7 +556,7 @@ Public Class LNT0001ZissekiManage
         End If
 
         '〇 一覧の件数を取得
-        'Me.ListCount.Text = "件数：" + LNT0001tbl.Rows.Count.ToString()
+        'Me.ListCount.Text = "件数：" + LNT0002tbl.Rows.Count.ToString()
 
         '○ 画面(GridView)表示
         Dim TBLview As DataView = New DataView(LNT0001tbl)
@@ -582,9 +566,6 @@ Public Class LNT0001ZissekiManage
         TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
 
         '○ 一覧作成
-        If String.IsNullOrEmpty(Master.VIEWID) Then
-            Master.VIEWID = rightviewD.GetViewId(Master.USERCAMP)
-        End If
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
         CS0013ProfView.MAPID = Master.MAPID
@@ -605,8 +586,6 @@ Public Class LNT0001ZissekiManage
         Else
             WF_GridPosition.Text = TBLview.Item(0)("SELECT")
         End If
-
-        WF_SvCreateYmd.Value = TxtCreateYmd.Text
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -629,21 +608,45 @@ Public Class LNT0001ZissekiManage
     End Sub
 
     ''' <summary>
-    ''' 実績取込画面遷移
+    ''' ﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
-    Private Sub WF_ButtonZisseki_Click()
-        '○ 画面レイアウト設定
-        If String.IsNullOrEmpty(Master.VIEWID) Then
-            Master.VIEWID = rightviewD.GetViewId(Master.USERCAMP)
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonDOWNLOAD_Click()
+
+        '○ 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            MAPDataGet(SQLcon)
+        End Using
+
+        If LNT0001tbl.Rows.Count = 0 Then
+            Master.Output(C_MESSAGE_NO.CTN_SELECT_EXIST, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            Exit Sub
         End If
 
-        Master.CheckParmissionCode(Master.USERCAMP)
-        If Not Master.MAPpermitcode = C_PERMISSION.INVALID Then
-            ' 画面遷移
-            Master.TransitionPage()
+        '○ 帳票出力
+        CS0030REPORT.CAMPCODE = Master.USERCAMP                 '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        CS0030REPORT.REPORTID = rightview.GetReportId()        '帳票ID
+        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        CS0030REPORT.TBLDATA = LNT0001tbl                       'データ参照  Table
+        CS0030REPORT.CS0030REPORT()
+        If Not isNormal(CS0030REPORT.ERR) Then
+            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Else
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT", needsPopUp:=True)
+            End If
+            Exit Sub
         End If
+
+        '○ 別画面でExcelを表示
+        WF_PrintURL.Value = CS0030REPORT.URL
+        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
     End Sub
-
     ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
@@ -664,8 +667,8 @@ Public Class LNT0001ZissekiManage
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "TxtCreateYmd"         '作成日時
-                                .WF_Calendar.Text = TxtCreateYmd.Text
+                            Case "TxtTaishoYm"         '作成日時
+                                .WF_Calendar.Text = TxtTaishoYm.Text
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -697,17 +700,17 @@ Public Class LNT0001ZissekiManage
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtCreateYmd"             '作成日時
+            Case "TxtTaishoYm"             '対象年月
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtCreateYmd.Text = ""
+                        TxtTaishoYm.Text = ""
                     Else
-                        TxtCreateYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        TxtTaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
-                TxtCreateYmd.Focus()
+                TxtTaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -725,55 +728,14 @@ Public Class LNT0001ZissekiManage
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "TxtCreateYmd"             '作成日時
-                TxtCreateYmd.Focus()
+            Case "TxtTaishoYm"             '対象年月
+                TxtTaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_LeftMViewChange.Value = ""
-
-    End Sub
-    ''' <summary>
-    ''' 請求書l出力ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonInvoice_Click()
-
-        Dim WW_URL As String = ""
-        GetURL(LNT0001WRKINC.MAPIDI, WW_URL)
-
-        Server.Transfer(WW_URL)
-
-    End Sub
-
-    ''' <summary>
-    ''' ﾀﾞｳﾝﾛｰﾄﾞ(PDF出力)・一覧印刷ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonPRINT_Click()
-
-        '○ 帳票出力
-        CS0030REPORT.CAMPCODE = Master.USERCAMP                 '会社コード
-        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
-        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
-        CS0030REPORT.REPORTID = rightviewR.GetReportId()        '帳票ID
-        CS0030REPORT.FILEtyp = "pdf"                            '出力ファイル形式
-        CS0030REPORT.TBLDATA = LNT0001tbl                       'データ参照Table
-        CS0030REPORT.CS0030REPORT()
-        If Not isNormal(CS0030REPORT.ERR) Then
-            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-            Else
-                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT")
-            End If
-            Exit Sub
-        End If
-
-        '○ 別画面でPDFを表示
-        WF_PrintURL.Value = CS0030REPORT.URL
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_PDFPrint();", True)
 
     End Sub
 
@@ -784,118 +746,6 @@ Public Class LNT0001ZissekiManage
     Protected Sub WF_ButtonEND_Click()
 
         Master.TransitionPrevPage()
-
-    End Sub
-
-    ''' <summary>
-    ''' 先頭頁ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonFIRST_Click()
-
-        '○ 先頭頁に移動
-        WF_GridPosition.Text = "1"
-
-    End Sub
-
-    ''' <summary>
-    ''' 最終頁ボタン押下時処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WF_ButtonLAST_Click()
-
-        '○ ソート
-        Dim TBLview As New DataView(LNT0001tbl)
-        TBLview.RowFilter = "HIDDEN = 0"
-
-        '○ 最終頁に移動
-        If TBLview.Count Mod 10 = 0 Then
-            WF_GridPosition.Text = TBLview.Count - (TBLview.Count Mod 10)
-        Else
-            WF_GridPosition.Text = TBLview.Count - (TBLview.Count Mod 10) + 1
-        End If
-
-        TBLview.Dispose()
-        TBLview = Nothing
-
-    End Sub
-
-    ' ******************************************************************************
-    ' ***  共通処理                                                              ***
-    ' ******************************************************************************
-
-    ''' <summary>
-    ''' 遷移先(登録画面)退避データ保存先の作成
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Sub WW_CreateXMLSaveFile()
-        work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
-            Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
-
-    End Sub
-    ''' <summary>
-    ''' 遷移先URLの取得
-    ''' </summary>
-    ''' <param name="I_MAPID"></param>
-    ''' <param name="O_URL"></param>
-    ''' <remarks></remarks>
-    Protected Sub GetURL(ByVal I_MAPID As String, ByRef O_URL As String)
-
-        '○共通宣言
-        '*共通関数宣言(APPLDLL)
-        Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
-
-        Dim WW_URL As String = ""
-        Try
-            'DataBase接続文字
-            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                SQLcon.Open() 'DataBase接続(Open)
-
-                'LNS0007_URL検索SQL文
-                Dim SQL_Str As String =
-                     "SELECT rtrim(URL) as URL " _
-                   & " FROM  COM.LNS0007_URL " _
-                   & " Where MAPID    = @P1 " _
-                   & "   and STYMD   <= @P2 " _
-                   & "   and ENDYMD  >= @P3 " _
-                   & "   and DELFLG  <> @P4 "
-                Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
-                    Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 50)
-                    Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)
-                    Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)
-                    Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar, 1)
-                    PARA1.Value = I_MAPID
-
-                    PARA2.Value = Date.Now
-                    PARA3.Value = Date.Now
-                    PARA4.Value = C_DELETE_FLG.DELETE
-                    Dim SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-
-                    If SQLdr.Read Then
-                        O_URL = Convert.ToString(SQLdr("URL"))
-                    End If
-
-                    'Close
-                    SQLdr.Close() 'Reader(Close)
-                    SQLdr = Nothing
-
-                End Using
-                'SQL コネクションクローズ
-                SQLcon.Close()
-                SQLcon.Dispose()
-
-            End Using
-
-        Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0007_URL SELECT")
-            CS0011LOGWRITE.INFSUBCLASS = "GetURL"                         'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "LNS0007_URL SELECT"
-            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWRITE.TEXT = ex.ToString()
-            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
-            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
-        End Try
 
     End Sub
 

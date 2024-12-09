@@ -12,7 +12,16 @@ Option Explicit On
 
 
 Partial Public Class LNS0008GuidanceSearch
-
+    
+    '''<summary>
+    '''leftmenu コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
+    
     '''<summary>
     '''TxtFromYmd コントロール。
     '''</summary>
@@ -21,7 +30,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtFromYmd As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''TxtEndYmd コントロール。
     '''</summary>
@@ -30,7 +39,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtEndYmd As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''ChklFlags コントロール。
     '''</summary>
@@ -39,7 +48,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents ChklFlags As Global.System.Web.UI.WebControls.CheckBoxList
-
+    
     '''<summary>
     '''ChkDelDataFlg コントロール。
     '''</summary>
@@ -48,7 +57,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents ChkDelDataFlg As Global.System.Web.UI.WebControls.CheckBox
-
+    
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -57,7 +66,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rightview As Global.JOTWEB_LNG.GRIS0003SRightBox
-
+    
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -66,7 +75,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB_LNG.GRIS0005LeftBox
-
+    
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -75,7 +84,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB_LNG.LNS0008WRKINC
-
+    
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -84,7 +93,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_SelectedIndex コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -111,7 +120,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -120,7 +129,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -129,7 +138,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-
+    
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -138,7 +147,7 @@ Partial Public Class LNS0008GuidanceSearch
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB_LNG.LNGMasterPage
         Get
-            Return CType(MyBase.Master, JOTWEB_LNG.LNGMasterPage)
+            Return CType(MyBase.Master,JOTWEB_LNG.LNGMasterPage)
         End Get
     End Property
 End Class

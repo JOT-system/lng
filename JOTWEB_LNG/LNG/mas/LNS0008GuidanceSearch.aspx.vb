@@ -124,6 +124,24 @@ Public Class LNS0008GuidanceSearch
             Else
                 ChkDelDataFlg.Checked = False
             End If
+        Else
+            ' サイドメニューメニューからの画面遷移
+            ' 画面間の情報クリア
+            work.Initialize()
+
+            ' 初期変数設定処理
+            Master.GetFirstValue(Master.USERCAMP, "FROMYMD", TxtFromYmd.Text)  '掲載開始日
+            Master.GetFirstValue(Master.USERCAMP, "ENDYMD", TxtEndYmd.Text)    '掲載終了日
+            ' チェックリスト(対象フラグ)の初期値を設定
+            Dim chklList = LNS0008WRKINC.GetNewDisplayFlags()                  '対象フラグList
+            If chklList IsNot Nothing AndAlso chklList.Count <> 0 Then
+                chklList = (From itm In chklList Order By itm.DispOrder).ToList
+            End If
+            work.WF_SEL_DISPFLAGS_LIST.Text = work.EncodeDisplayFlags(chklList)
+            ChklFlags.DataSource = chklList
+            ChklFlags.DataTextField = "DispName"
+            ChklFlags.DataValueField = "FieldName"
+            ChklFlags.DataBind()
         End If
 
         ' 有効年月日(開始)・有効年月日(終了)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
@@ -143,6 +161,9 @@ Public Class LNS0008GuidanceSearch
 
         rightview.Initialize("画面レイアウト設定", WW_Dummy)
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
     End Sub
 
 

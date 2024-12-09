@@ -235,13 +235,16 @@
     <Content Include="css\images\ui-icons_ffffff_256x240.png" />
     <Content Include="css\jquery-ui-1.10.4.custom.min.css" />
     <Content Include="css\jquery.multiselect.css" />
+    <Content Include="inc\GRIS0006LeftMenu.ascx" />
     <Content Include="LNG\css\LNS0002D.css" />
     <Content Include="LNG\css\LNS0002L.css" />
     <Content Include="LNG\css\LNS0002S.css" />
     <Content Include="LNG\css\LNS0008D.css" />
     <Content Include="LNG\css\LNS0008L.css" />
     <Content Include="LNG\css\LNS0008S.css" />
-    <Content Include="LNG\css\LNT0001C.css" />
+    <Content Include="LNG\css\LNT0001D.css" />
+    <Content Include="LNG\css\LNT0001I.css" />
+    <Content Include="LNG\css\LNT0001L.css" />
     <Content Include="LNG\css\LNM0023D.css" />
     <Content Include="LNG\css\LNM0023L.css" />
     <Content Include="LNG\css\LNM0023S.css" />
@@ -291,6 +294,10 @@
     <Content Include="LNG\inc\LNS0002WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
+    <Content Include="LNG\script\LNT0001D.js" />
+    <Content Include="LNG\script\LNT0001I.js" />
+    <Content Include="LNG\zisseki\LNT0001InvoiceOutput.aspx" />
+    <Content Include="LNG\zisseki\LNT0001ZissekiIntake.aspx" />
     <Content Include="LNG\zisseki\LNT0001ZissekiManage.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperDetail.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperList.aspx" />
@@ -302,7 +309,7 @@
     <Content Include="LNG\mas\LNS0002UserList.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceSearch.aspx" />
     <Content Include="LNG\mas\LNS0002UserSearch.aspx" />
-    <Content Include="LNG\script\LNT0001C.js" />
+    <Content Include="LNG\script\LNT0001L.js" />
     <Content Include="LNG\script\LNM0023D.js" />
     <Content Include="LNG\script\LNM0023L.js" />
     <Content Include="LNG\script\LNS0008D.js" />
@@ -442,6 +449,13 @@
     <Compile Include="base\SessionKey.vb" />
     <Compile Include="base\StoredPGName.vb" />
     <Compile Include="base\YDF.vb" />
+    <Compile Include="inc\GRIS0006LeftMenu.ascx.designer.vb">
+      <DependentUpon>GRIS0006LeftMenu.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="inc\GRIS0006LeftMenu.ascx.vb">
+      <DependentUpon>GRIS0006LeftMenu.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\com\CmnLng.vb">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -508,6 +522,20 @@
     </Compile>
     <Compile Include="LNG\inc\LNT0001WRKINC.ascx.vb">
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001InvoiceOutput.aspx.designer.vb">
+      <DependentUpon>LNT0001InvoiceOutput.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001InvoiceOutput.aspx.vb">
+      <DependentUpon>LNT0001InvoiceOutput.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiIntake.aspx.designer.vb">
+      <DependentUpon>LNT0001ZissekiIntake.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiIntake.aspx.vb">
+      <DependentUpon>LNT0001ZissekiIntake.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\zisseki\LNT0001ZissekiManage.aspx.designer.vb">

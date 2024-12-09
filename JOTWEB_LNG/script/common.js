@@ -114,7 +114,65 @@ window.addEventListener('load', function () {
             popUpObj.focus();
         }
     }
+
+    //再度メニューのイベント
+    bindLeftNaviClick('divLeftNav1', '1');
+    bindLeftNaviClick('divLeftNav2', '2');
+    bindLeftNaviClick('divLeftNav3', '3');
+    bindLeftNaviClick('divLeftNav4', '4');
+    bindLeftNaviClick('divLeftNav5', '5');
+    bindLeftNaviClick('divLeftNav6', '6');
+    bindLeftNaviClick('divLeftNav7', '7');
+    bindLeftNaviClick('divLeftNav8', '8');
+    bindLeftNaviClick('divLeftNav9', '9');
+    bindLeftNaviClick('divLeftNav10', '10');
+    bindLeftNaviClick('divLeftNav11', '11');
+    bindLeftNaviClick('divLeftNav12', '12');
+    bindLeftNaviClick('divLeftNav13', '13');
+    bindLeftNaviClick('divLeftNav14', '14');
+    bindLeftNaviClick('divLeftNav15', '15');
+
 });
+/**
+ * 左ナビゲーションクリックイベントバインド
+ * @return {undefined} なし
+ */
+function bindLeftNaviClick(strElementID, strID) {
+    /* 左ナビ全体のDivを取得 */
+    let leftNavObj = document.getElementById(strElementID);
+    /* 左ナビ未描画なら終了 */
+    if (leftNavObj === null) {
+        return;
+    }
+    /* ラベルタグ（左ナビボタン風デザイン）のオブジェクトを取得 */
+    let labelObjList = leftNavObj.querySelectorAll("div[data-hasnext='1'] > label");
+    /* 左ナビボタンが描画されてなければそのまま終了 */
+    if (labelObjList === null) {
+        return;
+    }
+    if (labelObjList.length === 0) {
+        return;
+    }
+    /* 左ナビボタンのループ */
+    for (let i = 0; i < labelObjList.length; i++) {
+        let targetLabel = labelObjList[i];
+        let parentDiv = targetLabel.parentNode;
+        let posicol = parentDiv.dataset.posicol;
+        let rowline = parentDiv.dataset.rowline;
+        // ダイアログを閉じるタイミングでフォーカスを合わせる
+        targetLabel.addEventListener('click', (function (posicol, rowline) {
+            return function () {
+                let hdnPosiColObj = document.getElementById('hdnPosiCol');
+                hdnPosiColObj.value = posicol;
+                let hdnRowLineObj = document.getElementById('hdnRowLine');
+                hdnRowLineObj.value = rowline;
+                commonDispWait();
+                ButtonClick('WF_ButtonLeftNavi' + strID); /* 共通サブミット処理、VB側ロード時のSelectケースで割り振らせる */
+            };
+        })(posicol, rowline), false);
+
+    }
+}
 /**
  * DOM読み込み完了時時処理(ロードより先に実行される)
  * @param {object} なし
