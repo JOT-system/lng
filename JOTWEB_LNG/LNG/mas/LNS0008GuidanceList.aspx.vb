@@ -117,6 +117,10 @@ Public Class LNS0008GuidanceList
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize("")
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
+
         '○ 画面の値設定
         WW_MAPValueSet()
 

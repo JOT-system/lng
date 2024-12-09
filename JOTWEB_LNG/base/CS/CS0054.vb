@@ -31,6 +31,16 @@ Public Class CS0054KintoneApi
     ''' </summary>
     ''' <returns></returns>
     Public Property ApiApplId As String = ""
+    ''' <summary>
+    ''' アプリID
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property YmdFrom As String = ""
+    ''' <summary>
+    ''' アプリID
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property YmdTo As String = ""
 
     ''' <summary>
     ''' テスト用　引数無しのこのコンストラクタは仕様しないこと！引数なしのNewはしない！
@@ -57,16 +67,6 @@ Public Class CS0054KintoneApi
         Net.ServicePointManager.SecurityProtocol = Net.ServicePointManager.SecurityProtocol Or System.Net.SecurityProtocolType.Tls12
     End Sub
 
-    ''' <summary>
-    ''' アップロードしたファイルのIDを保持（基本外で設定しない想定）
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property FileId As String
-    ''' <summary>
-    ''' 送信ファイルのバックアップ保存パス（未指定時は保存しない）
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property BackUpPath As String = ""
     ''' <summary>
     ''' 複数レコード取得(アプリID)
     ''' </summary>
@@ -98,14 +98,25 @@ Public Class CS0054KintoneApi
         Dim GetApplId As String = "app=" & ApiApplId
         Dim GetLimit As Integer = 500
         Dim GetOffset As Integer = 0
-        'Dim GetFields As String = "fields[0]=加算先部署名_受注受付部署&fields[1]=kViewer用受注数量"
         Dim GetFields As String = ""
         Dim GetTotalCnt As String = "totalCount=true"
         Dim GetUrl As String = ""
 
+        If String.IsNullOrEmpty(YmdFrom) Then
+            YmdFrom = Date.Now.ToString("yyyy-MM-dd")
+        Else
+            YmdFrom = YmdFrom.Replace("/", "-")
+        End If
+        If String.IsNullOrEmpty(YmdTo) Then
+            YmdTo = Date.Now.ToString("yyyy-MM-dd")
+        Else
+            YmdTo = YmdTo.Replace("/", "-")
+        End If
+
         While GetOffset < 10000
-            'Dim GetQuery As String = "query= 出荷日 = ""2024-11-15"" limit " & GetLimit & " offset " & GetOffset
-            Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
+            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届日 >= ""{0}"" and 届日 <= ""{1}"" limit " & GetLimit & " offset " & GetOffset
+            Dim GetQuery As String = String.Format(EditQuery, YmdFrom, YmdTo)
+            'Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
 
             GetUrl = Me.ApiBaseUrl + "?"
             GetUrl += GetApplId
@@ -128,27 +139,48 @@ Public Class CS0054KintoneApi
                         Dim responseText As String = reader.ReadToEnd()
                         ' Kintone（アボカド）から取得したデータ（JSON形式）をリストにデシリアライズ（項目毎に取り出す）
                         Dim avovadList As ApiResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(Of ApiResponse)(responseText)
+                        '取得が0件の場合、処理終了
                         If avovadList.Records.Count = 0 Then Exit While
-                        ' recordsを取得
-                        For Each record As AvocadoData In avovadList.Records
+
+                        ' １レコード毎に編集する
+                        For Each record As AvocadoRec In avovadList.Records
                             Dim dr As DataRow = outTbl.NewRow()
 
                             ' リフレクションを使用して階層型プロパティの値を動的に取得
                             Dim properties As Reflection.PropertyInfo() = record.GetType().GetProperties()
+                            '項目毎にプロパティより値を取り出す（属性に合わせて取り出す
+                            '★　2024/11/22現在は次の４パターンのみ）
                             For Each prop As Reflection.PropertyInfo In properties
-                                Dim propValue As Object = prop.GetValue(record)
-                                If propValue IsNot Nothing Then
-                                    Dim valueProp As Reflection.PropertyInfo = propValue.GetType().GetProperty("value")
-                                    If valueProp IsNot Nothing Then
-                                        'DATE、TIME、DROP_DOWNなど「"value": null」が存在し、nothingが返るための対応
-                                        If valueProp.GetValue(propValue) IsNot Nothing Then
-                                            Dim value As String = valueProp.GetValue(propValue).ToString()
-                                            dr(prop.Name) = value
-                                        Else
-                                            dr(prop.Name) = ""
+                                dr(prop.Name) = ""
+                                Select Case prop.PropertyType.Name
+                                    Case "NormalStruct"
+                                        Dim propRec As Object = prop.GetValue(record)
+                                        If propRec IsNot Nothing Then
+                                            dr(prop.Name) = propRec.value
                                         End If
-                                    End If
+                                    Case "ValListStruct"
+                                        Dim valueProp = GetNestedPropertyValue(record, prop.Name + ".value[0]")
+                                        If valueProp IsNot Nothing Then
+                                            dr(prop.Name) = valueProp
+                                        End If
+                                    Case "ValNestStruct"
+                                        Dim valueProp = GetNestedPropertyValue(record, prop.Name + ".value.code")
+                                        If valueProp IsNot Nothing Then
+                                            dr(prop.Name) = valueProp
+                                        End If
+                                    Case "ValSelectListStruct"
+                                        Dim codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].code")
+                                        If codeProp IsNot Nothing Then
+                                            dr(prop.Name) = codeProp
+                                        End If
+                                End Select
+
+                                '日付形式ならば、形式変換
+                                Dim propInfo As Object = prop.GetValue(record)
+                                If propInfo Is Nothing Then
+                                    Throw New Exception("KintoneAPIエラー（項目不一致）: " & prop.Name)
                                 End If
+                                dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
                             Next
                             outTbl.Rows.Add(dr)
                         Next
@@ -182,14 +214,98 @@ Public Class CS0054KintoneApi
 
         End While
 
-        Return outTbl
+        Dim outView As New DataView(outTbl)
+        outView.Sort = "届日,レコード番号"
 
+        Return outView.ToTable
+
+    End Function
+    ''' <summary>
+    ''' 階層のクラスプロパティから特定のプロパティ名を指定して値を取り出す
+    ''' </summary>
+    Function GetNestedPropertyValue(ByVal obj As Object, ByVal basePropertyName As String) As Object
+        Dim parts As String() = basePropertyName.Split("."c)
+        Dim currentObject As Object = obj
+
+        For Each part As String In parts
+            If currentObject Is Nothing Then Return Nothing
+
+            ' インデックスを含むプロパティ名を処理
+            '(\w+): 1つ以上の単語文字（アルファベット、数字、アンダースコア）に一致します。
+            '\[(\d+)\]: 角括弧内の1つ以上の数字に一致します。
+            '例えば、Parents[0]を発見します。
+            Dim match = System.Text.RegularExpressions.Regex.Match(part, "(\w+)\[(\d+)\]")
+            If match.Success Then
+                Dim propName As String = match.Groups(1).Value
+                Dim index As Integer = Integer.Parse(match.Groups(2).Value)
+                Dim propInfo As PropertyInfo = currentObject.GetType().GetProperty(propName)
+                If propInfo Is Nothing Then Return Nothing
+                Dim list As IList = CType(propInfo.GetValue(currentObject, Nothing), IList)
+                If list.Count = 0 Then
+                    currentObject = Nothing
+                Else
+                    currentObject = list(index)
+                End If
+            Else
+                Dim propInfo As PropertyInfo = currentObject.GetType().GetProperty(part)
+                If propInfo Is Nothing Then Return Nothing
+                currentObject = propInfo.GetValue(currentObject, Nothing)
+            End If
+        Next
+
+        Return currentObject
+    End Function
+
+    ''' <summary>
+    ''' 日付だけの場合と日付と時間を区別して動的に変換する
+    ''' </summary>
+    Function ConvertToDate(ByVal value As Object, ByVal type As String) As String
+        Dim dateValue As DateTime
+        Dim timePattern As String = "^\d{1,2}:\d{2}$" ' h:mm または hh:mm 形式の正規表現パターン
+
+        Select Case type
+            Case "CREATED_TIME", "UPDATED_TIME", "DATETIME"
+                If DateTime.TryParse(value.ToString(), dateValue) Then
+                    Return dateValue.ToString("yyyy/MM/dd HH:mm:ss")
+                Else
+                    Return value.ToString()
+                End If
+            Case "DATE"
+                If DateTime.TryParse(value.ToString(), dateValue) Then
+                    Return dateValue.ToString("yyyy/MM/dd")
+                Else
+                    Return value.ToString()
+                End If
+            Case "TIME"
+                Return value.ToString()
+            Case "NUMBER"
+                Return value.ToString()
+            Case Else
+                Return value.ToString()
+        End Select
+
+        '不具合のため上記に変更（例えば、NUMBERの"7.5"が「7月5日」と判断されるため）
+        '' hh:mm形式の場合は変換しない
+        'If Regex.IsMatch(value.ToString(), timePattern) Then
+        '    Return value.ToString()
+        'End If
+
+        'If DateTime.TryParse(value.ToString(), dateValue) Then
+        '    ' 時間部分が0:00:00の場合は日付のみ、それ以外は日付と時間をフォーマット
+        '    If dateValue.TimeOfDay = TimeSpan.Zero Then
+        '        Return dateValue.ToString("yyyy/MM/dd")
+        '    Else
+        '        Return dateValue.ToString("yyyy/MM/dd HH:mm:ss")
+        '    End If
+        'Else
+        '    Return value.ToString()
+        'End If
     End Function
 
     ''' <summary>
     ''' DataTable作成（KintoneAPIの返却データ格納用）
     ''' </summary>
-    Public Sub CreateDataTable(ioTbl As DataTable)
+    Public Sub CreateDataTable(ByRef ioTbl As DataTable)
 
         If IsNothing(ioTbl) Then ioTbl = New DataTable
 
@@ -198,7 +314,8 @@ Public Class CS0054KintoneApi
         ioTbl.Clear()
 
         '返却用テーブル（カラム）作成
-        Dim properties = GetType(AvocadoData).GetProperties()
+        ioTbl.Columns.Add("LINECNT", GetType(String)) 'ダウンロードするのに必要なためとりあえず...
+        Dim properties = GetType(AvocadoRec).GetProperties()
         For Each prop In properties
             ioTbl.Columns.Add(prop.Name, GetType(String))
         Next
@@ -209,9 +326,10 @@ Public Class CS0054KintoneApi
     ''' KintoneAPIの返却データ（JSON）情報：全体構造
     ''' </summary>
     Public Class ApiResponse
-        Public Property Records As List(Of AvocadoData)
+        Public Property Records As List(Of AvocadoRec)
         Public Property Totalcount As String
     End Class
+
     ''' <summary>
     ''' KintoneAPIのデータ構造（一般）
     ''' (例）{"出荷場所名称": {"type" "SINGLE_LINE_TEXT","value": "ＸＸ名称"}}
@@ -220,6 +338,7 @@ Public Class CS0054KintoneApi
         Public Property type As String
         Public Property value As String
     End Class
+
     ''' <summary>
     ''' KintoneAPIのデータ構造（Valueが配列）
     ''' (例）{"配車配乗不可": {"type" "CHECK_BOX","value": []}}
@@ -228,6 +347,7 @@ Public Class CS0054KintoneApi
         Public Property type As String
         Public Property value As List(Of String)
     End Class
+
     ''' <summary>
     ''' KintoneAPIのデータ構造（Valueがネスト）
     ''' (例） "作成者": {"type": "CREATOR","value": {"code": "xxxx@jot.co.jp","name": "ＸＸ ＸＸ"}]}
@@ -240,6 +360,7 @@ Public Class CS0054KintoneApi
             Public Property name As String
         End Class
     End Class
+
     ''' <summary>
     ''' KintoneAPIのデータ構造（リスト選択）
     ''' (例） "加算先受注受付部署": {"type": "ORGANIZATION_SELECT","value": [{"code": "020401","name": "EX 東北支店"}]}
@@ -253,219 +374,204 @@ Public Class CS0054KintoneApi
             Public Property name As String
         End Class
     End Class
-    ''' <summary>
-    ''' KintoneAPIのデータ構造（添付ファイル）
-    ''' (例） "添付ファイル": {"type": "FILE","value": [{"contentType": "text/plain","fileKey": "????????","name": "AAAA.txt","size": "231"}]}
-    ''' </summary>
-    Public Class FileStruct
-        Public Property type As String
-        Public Property value As List(Of FileValue)
-        Public Class FileValue
-            Public Property contentType As String
-            Public Property fileKey As String
-            Public Property name As String
-            Public Property size As String
-        End Class
-    End Class
+
     ''' <summary>
     ''' KintoneAPIの返却データ（JSON）：業務データ部分
     ''' </summary>
-    Public Class AvocadoData
-        Public Property 出荷場所名称 As NormalStruct
-        Public Property 加算先部署名_受注受付部署 As NormalStruct
-        Public Property kViewer用受注数量 As NormalStruct
-        Public Property 指定時間_画面表示用 As NormalStruct
-        Public Property 加算先出荷部署コード As NormalStruct
-        Public Property 車型 As NormalStruct
-        Public Property 乗務員コード_副乗務員 As NormalStruct
-        Public Property 陸運局_カレンダー画面メモ As NormalStruct
-        Public Property 届先カラーコード_境界色 As NormalStruct
-        Public Property 出荷場所備考3 As NormalStruct
-        Public Property 車両備考3 As NormalStruct
-        Public Property 車両備考1 As NormalStruct
-        Public Property 車両備考2 As NormalStruct
-        Public Property 車両メモ_本トラクタ As NormalStruct
-        Public Property 陸運局_本トラクタ As NormalStruct
-        Public Property 荷主名_本トラクタ As NormalStruct
-        Public Property 陸運局_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property 品名1名_車両_本トラクタ As NormalStruct
-        Public Property 背景色_カレンダー画面メモ As NormalStruct
-        Public Property 指定時間 As NormalStruct
-        Public Property 文字色_カレンダー画面メモ As NormalStruct
-        Public Property 業務指示3 As NormalStruct
-        Public Property 車両備考2_本トラクタ As NormalStruct
-        Public Property 業務指示2 As NormalStruct
-        Public Property 業務指示1 As NormalStruct
-        Public Property id As NormalStruct
-        Public Property 出荷場所略名 As NormalStruct
-        Public Property 品名選択 As NormalStruct
-        Public Property 加算先出荷部署名_本トラクタ As NormalStruct
-        Public Property 出荷部署コード_本トラクタ As NormalStruct
-        Public Property 出荷場所電話番号 As NormalStruct
-        Public Property ドロップ As NormalStruct
-        Public Property 出荷場所カラーコード_文字色 As NormalStruct
+    Public Class AvocadoRec
+        Public Property レコード番号 As NormalStruct
+        Public Property 積込荷卸区分 As NormalStruct
+        Public Property 積置区分 As NormalStruct
         Public Property 配送セットID As NormalStruct
+        Public Property 受注受付部署選択 As NormalStruct
+        Public Property 受注受付部署名 As NormalStruct
+        Public Property 受注受付部署コード As NormalStruct
+        Public Property 受注受付部署略名 As NormalStruct
+        Public Property 加算先部署名_受注受付部署 As NormalStruct
+        Public Property 加算先部署コード_受注受付部署 As NormalStruct
+        Public Property 加算先部署略名_受注受付部署 As NormalStruct
+        Public Property 受注受付部署 As ValSelectListStruct
         Public Property 加算先受注受付部署 As ValSelectListStruct
-        Public Property 車腹_カレンダー画面メモ As NormalStruct
+        Public Property 品名選択 As NormalStruct
         Public Property 品名詳細 As NormalStruct
-        Public Property 退勤時間_副乗務員 As NormalStruct
+        Public Property 品名2名 As NormalStruct
+        Public Property 品名2コード As NormalStruct
+        Public Property 品名1名 As NormalStruct
+        Public Property 品名1コード As NormalStruct
+        Public Property 油種名 As NormalStruct
+        Public Property 油種コード As NormalStruct
+        Public Property 届先選択 As NormalStruct
+        Public Property 届先コード As NormalStruct
+        Public Property 届先名称 As NormalStruct
+        Public Property 届先略名 As NormalStruct
+        Public Property 届先取引先コード As NormalStruct
+        Public Property 届先取引先名称 As NormalStruct
+        Public Property 届先住所 As NormalStruct
         Public Property 届先電話番号 As NormalStruct
+        Public Property 届先Googleマップ As NormalStruct
         Public Property 届先緯度 As NormalStruct
+        Public Property 届先経度 As NormalStruct
+        Public Property 届先備考1 As NormalStruct
+        Public Property 届先備考2 As NormalStruct
+        Public Property 届先備考3 As NormalStruct
+        Public Property 届先カラーコード_背景色 As NormalStruct
+        Public Property 届先カラーコード_境界色 As NormalStruct
+        Public Property 届先カラーコード_文字色 As NormalStruct
+        Public Property 出荷場所選択 As NormalStruct
+        Public Property 出荷場所コード As NormalStruct
+        Public Property 出荷場所名称 As NormalStruct
+        Public Property 出荷場所略名 As NormalStruct
+        Public Property 出荷場所取引先コード As NormalStruct
+        Public Property 出荷場所取引先名称 As NormalStruct
+        Public Property 出荷場所住所 As NormalStruct
+        Public Property 出荷場所電話番号 As NormalStruct
+        Public Property 出荷場所Googleマップ As NormalStruct
+        Public Property 出荷場所緯度 As NormalStruct
+        Public Property 出荷場所経度 As NormalStruct
         Public Property 出荷場所備考1 As NormalStruct
         Public Property 出荷場所備考2 As NormalStruct
-        Public Property 契約区分_本トラクタ As NormalStruct
-        Public Property 届先コード As NormalStruct
-        Public Property 開始日_カレンダー画面メモ As NormalStruct
-        Public Property 届先取引先コード As NormalStruct
+        Public Property 出荷場所備考3 As NormalStruct
+        Public Property 出荷場所カラーコード_背景色 As NormalStruct
         Public Property 出荷場所カラーコード_境界色 As NormalStruct
-        Public Property ひらがな_本トラクタ As NormalStruct
-        Public Property kViewer用タイトル As NormalStruct
-        Public Property 社員番号_カレンダー画面メモ As NormalStruct
-        Public Property 品名1名_車両 As NormalStruct
-        Public Property 車腹単位_カレンダー画面メモ As NormalStruct
-        Public Property 実績数量 As NormalStruct
-        Public Property 本トラクタ選択 As NormalStruct
-        Public Property 品名2コード As NormalStruct
-        Public Property 出荷部署名_本トラクタ As NormalStruct
-        Public Property 届先住所 As NormalStruct
-        Public Property 車型_本トラクタ As NormalStruct
-        Public Property 業務車番選択_カレンダー画面メモ As NormalStruct
-        Public Property 届先経度 As NormalStruct
-        Public Property 出荷場所カラーコード_背景色_0 As NormalStruct
-        Public Property kViewer用実績数量 As NormalStruct
-        Public Property 一連指定番号 As NormalStruct
-        Public Property 出荷場所取引先名称 As NormalStruct
-        Public Property 加算先出荷部署名 As NormalStruct
-        Public Property 加算先出荷部署略名 As NormalStruct
-        Public Property 加算先出荷部署コード_本トラクタ As NormalStruct
-        Public Property 表示順_配車 As NormalStruct
-        Public Property 分類番号_カレンダー画面メモ As NormalStruct
-        Public Property 出荷部署名 As NormalStruct
+        Public Property 出荷場所カラーコード_文字色 As NormalStruct
+        Public Property 出荷日 As NormalStruct
+        Public Property 積込時間 As NormalStruct
+        Public Property 積込時間手入力 As NormalStruct
+        Public Property 積込時間_画面表示用 As NormalStruct
         Public Property 届日 As NormalStruct
-        Public Property 届先選択 As NormalStruct
-        Public Property 内容詳細_カレンダー画面メモ As NormalStruct
-        Public Property 統一車番_本トラクタ As NormalStruct
-        Public Property 業務車番 As NormalStruct
-        Public Property 表示内容_カレンダー画面メモ As NormalStruct
-        Public Property 統一車番_トラクタ As NormalStruct
-        Public Property 油種コード As NormalStruct
-        Public Property 車両メモ As NormalStruct
+        Public Property 指定時間 As NormalStruct
+        Public Property 指定時間手入力 As NormalStruct
+        Public Property 指定時間_画面表示用 As NormalStruct
+        Public Property 受注数量 As NormalStruct
+        Public Property 実績数量 As NormalStruct
+        Public Property 数量単位 As NormalStruct
+        Public Property 業務指示1 As NormalStruct
+        Public Property 業務指示2 As NormalStruct
+        Public Property 業務指示3 As NormalStruct
+        Public Property 荷主備考 As NormalStruct
+        Public Property 業務車番選択 As NormalStruct
+        Public Property 出荷部署名 As NormalStruct
         Public Property 出荷部署コード As NormalStruct
-        Public Property 統一車番 As NormalStruct
-        Public Property ひらがな As NormalStruct
-        Public Property 用車先_本トラクタ As NormalStruct
-        Public Property レコード番号 As NormalStruct
-        Public Property 車型_カレンダー画面メモ As NormalStruct
         Public Property 出荷部署略名 As NormalStruct
+        Public Property 加算先出荷部署名 As NormalStruct
+        Public Property 加算先出荷部署コード As NormalStruct
+        Public Property 加算先出荷部署略名 As NormalStruct
+        Public Property 統一車番 As NormalStruct
+        Public Property 陸事番号 As NormalStruct
+        Public Property 車型 As NormalStruct
+        Public Property 車腹 As NormalStruct
+        Public Property 荷主名 As NormalStruct
+        Public Property 契約区分 As NormalStruct
+        Public Property 品名1名_車両 As NormalStruct
+        Public Property 車両メモ As NormalStruct
+        Public Property 車両備考1 As NormalStruct
+        Public Property 車両備考2 As NormalStruct
+        Public Property 車両備考3 As NormalStruct
+        Public Property 統一車番_トラクタ As NormalStruct
+        Public Property 陸事番号_トラクタ As NormalStruct
+        Public Property トリップ As NormalStruct
+        Public Property ドロップ As NormalStruct
+        Public Property 当日前後運行メモ As NormalStruct
+        Public Property 出勤時間 As NormalStruct
+        Public Property 乗務員選択 As NormalStruct
+        Public Property 氏名_乗務員 As NormalStruct
+        Public Property 社員番号_乗務員 As NormalStruct
+        Public Property 副乗務員選択 As NormalStruct
+        Public Property 氏名_副乗務員 As NormalStruct
+        Public Property 社員番号_副乗務員 As NormalStruct
+        Public Property カレンダー画面メモ表示 As ValListStruct
+        Public Property 業務車番選択_カレンダー画面メモ As NormalStruct
+        Public Property 開始日_カレンダー画面メモ As NormalStruct
+        Public Property 終了日_カレンダー画面メモ As NormalStruct
+        Public Property 背景色_カレンダー画面メモ As NormalStruct
+        Public Property 境界色_カレンダー画面メモ As NormalStruct
+        Public Property 文字色_カレンダー画面メモ As NormalStruct
+        Public Property 表示内容_カレンダー画面メモ As NormalStruct
+        Public Property 業務車番_カレンダー画面メモ As NormalStruct
+        Public Property 表示用終了日_カレンダー画面メモ As NormalStruct
+        Public Property 業務車番 As NormalStruct
+        Public Property 用車先 As NormalStruct
+        Public Property レコードタイトル用 As NormalStruct
+        Public Property 出庫日 As NormalStruct
+        Public Property 帰庫日 As NormalStruct
+        Public Property 帰庫時間 As NormalStruct
         Public Property 乗務員備考1 As NormalStruct
         Public Property 乗務員備考2 As NormalStruct
-        Public Property 積置区分 As NormalStruct
-        Public Property 帰庫時間 As NormalStruct
-        Public Property kViewer用乗務員情報 As NormalStruct
-        Public Property 氏名_副乗務員 As NormalStruct
-        Public Property 業務車番選択 As NormalStruct
-        Public Property 氏名_乗務員 As NormalStruct
-        Public Property 積込荷卸区分 As NormalStruct
-        Public Property 荷主名 As NormalStruct
-        Public Property 積込時間 As NormalStruct
-        Public Property 届先カラーコード_文字色 As NormalStruct
-        Public Property 出荷場所Googleマップ As NormalStruct
-        Public Property 分類番号_トラクタ As NormalStruct
-        Public Property 出庫日 As NormalStruct
-        Public Property 用車先 As NormalStruct
-        Public Property 出荷場所緯度 As NormalStruct
-        Public Property 配車配乗不可 As ValListStruct
-        Public Property 届先略名 As NormalStruct
-        Public Property 一連指定番号_カレンダー画面メモ As NormalStruct
-        Public Property 出荷場所コード As NormalStruct
-        Public Property 出荷場所取引先コード As NormalStruct
-        Public Property 積込時間手入力 As NormalStruct
-        Public Property 品名2名 As NormalStruct
-        Public Property 用車先_カレンダー画面メモ As NormalStruct
-        Public Property 積込時間_画面表示用 As NormalStruct
-        Public Property 乗務員選択_カレンダー画面メモ As NormalStruct
-        Public Property 届先備考1 As NormalStruct
-        Public Property 届先備考3 As NormalStruct
-        Public Property 届先備考2 As NormalStruct
-        Public Property 分類番号_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property 契約区分 As NormalStruct
         Public Property 副乗務員備考1 As NormalStruct
-        Public Property 一連指定番号_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property 作成者 As ValNestStruct
         Public Property 副乗務員備考2 As NormalStruct
-        Public Property 受注受付部署コード As NormalStruct
-        Public Property 更新日時 As NormalStruct
-        Public Property 届先名称 As NormalStruct
-        Public Property 境界色_カレンダー画面メモ As NormalStruct
-        Public Property 一連指定番号_本トラクタ As NormalStruct
-        Public Property 分類番号 As NormalStruct
-        Public Property 品名1コード As NormalStruct
-        Public Property 届先カラーコード_背景色 As NormalStruct
-        Public Property 添付ファイル As FileStruct
-        Public Property 車腹単位_本トラクタ As NormalStruct
-        Public Property 受注受付部署選択 As NormalStruct
-        Public Property 届先Googleマップ As NormalStruct
-        Public Property 加算先出荷部署略名_本トラクタ As NormalStruct
-        Public Property 車両備考3_本トラクタ As NormalStruct
-        Public Property 陸運局 As NormalStruct
-        Public Property 車腹_本トラクタ As NormalStruct
-        Public Property 出荷日 As NormalStruct
-        Public Property 業務車番_カレンダー画面メモ As NormalStruct
-        Public Property 乗務員コード_乗務員 As NormalStruct
-        Public Property 車両備考3_トラクタ As NormalStruct
-        Public Property 社員番号_乗務員 As NormalStruct
-        Public Property ひらなが_トラクタ As NormalStruct
-        Public Property カレンダー画面メモ表示 As ValListStruct
-        Public Property 受注受付部署略名 As NormalStruct
-        Public Property 受注受付部署名 As NormalStruct
-        Public Property 表示用終了日_カレンダー画面メモ As NormalStruct
-        Public Property 加算先部署略名_受注受付部署 As NormalStruct
-        Public Property 帰庫日 As NormalStruct
-        Public Property 品名1名 As NormalStruct
-        Public Property 副乗務員選択 As NormalStruct
-        Public Property 陸事番号_本トラクタ As NormalStruct
-        Public Property 出荷場所選択 As NormalStruct
-        Public Property 陸事番号 As NormalStruct
-        Public Property 出勤時間 As NormalStruct
-        Public Property 作成日時 As NormalStruct
-        Public Property 受注受付部署 As ValSelectListStruct
-        Public Property 油種名 As NormalStruct
-        Public Property 陸事番号_カレンダー画面メモ As NormalStruct
-        Public Property 車両備考1_本トラクタ As NormalStruct
-        Public Property 陸事番号_トラクタ As NormalStruct
-        Public Property 更新者 As ValNestStruct
-        Public Property 車両備考1_トラクタ As NormalStruct
-        Public Property 乗務員選択 As NormalStruct
-        Public Property 退勤時間 As NormalStruct
-        Public Property レコードタイトル用 As NormalStruct
-        Public Property オーダー変更削除 As NormalStruct
-        Public Property 受注数量 As NormalStruct
-        Public Property 終了日_カレンダー画面メモ As NormalStruct
         Public Property 出勤時間_副乗務員 As NormalStruct
-        Public Property 出荷場所住所 As NormalStruct
-        Public Property ひらがな_カレンダー画面メモ As NormalStruct
-        Public Property 陸運局_トラクタ As NormalStruct
-        Public Property 荷主備考 As NormalStruct
-        Public Property 当日前後運行メモ As NormalStruct
-        Public Property 数量単位 As NormalStruct
-        Public Property 分類番号_本トラクタ As NormalStruct
-        Public Property 陸事番号_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property 加算先部署コード_受注受付部署 As NormalStruct
-        Public Property 指定時間手入力 As NormalStruct
-        Public Property 車両備考2_トラクタ As NormalStruct
-        Public Property kViewer用乗務員情報_0 As NormalStruct
-        Public Property 表示順_届先 As NormalStruct
-        Public Property revision As NormalStruct
-        Public Property 社員番号_副乗務員 As NormalStruct
-        Public Property 出荷場所経度 As NormalStruct
-        Public Property 一連指定番号_トラクタ As NormalStruct
-        Public Property 届先取引先名称 As NormalStruct
-        Public Property 業務車番_本トラクタ As NormalStruct
-        Public Property ひらなが_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property トリップ As NormalStruct
+        Public Property 乗務員選択_カレンダー画面メモ As NormalStruct
+        Public Property 社員番号_カレンダー画面メモ As NormalStruct
+        Public Property 内容詳細_カレンダー画面メモ As NormalStruct
         Public Property 車腹単位 As NormalStruct
-        Public Property 車腹 As NormalStruct
+        Public Property 退勤時間 As NormalStruct
+        Public Property 退勤時間_副乗務員 As NormalStruct
+        Public Property kViewer用タイトル As NormalStruct
+        Public Property kViewer用受注数量 As NormalStruct
+        Public Property kViewer用実績数量 As NormalStruct
+        Public Property kViewer用乗務員情報 As NormalStruct
+        Public Property 乗務員コード_乗務員 As NormalStruct
+        Public Property 乗務員コード_副乗務員 As NormalStruct
+        Public Property kViewer用副乗務員情報 As NormalStruct
+        Public Property オーダー変更削除 As NormalStruct
+        Public Property 陸運局 As NormalStruct
+        Public Property 分類番号 As NormalStruct
+        Public Property ひらがな As NormalStruct
+        Public Property 一連指定番号 As NormalStruct
+        Public Property 陸運局_トラクタ As NormalStruct
+        Public Property 分類番号_トラクタ As NormalStruct
+        Public Property ひらなが_トラクタ As NormalStruct
+        Public Property 一連指定番号_トラクタ As NormalStruct
+        Public Property 車両備考1_トラクタ As NormalStruct
+        Public Property 車両備考2_トラクタ As NormalStruct
+        Public Property 車両備考3_トラクタ As NormalStruct
+        Public Property 配車配乗不可 As ValListStruct
+        Public Property 表示順_届先 As NormalStruct
+        Public Property 表示順_配車 As NormalStruct
+        Public Property 本トラクタ選択 As NormalStruct
+        Public Property 出荷部署名_本トラクタ As NormalStruct
+        Public Property 業務車番_本トラクタ As NormalStruct
+        Public Property 出荷部署コード_本トラクタ As NormalStruct
         Public Property 出荷部署略名_本トラクタ As NormalStruct
+        Public Property 加算先出荷部署略名_本トラクタ As NormalStruct
+        Public Property 加算先出荷部署コード_本トラクタ As NormalStruct
+        Public Property 加算先出荷部署名_本トラクタ As NormalStruct
+        Public Property 用車先_本トラクタ As NormalStruct
+        Public Property 統一車番_本トラクタ As NormalStruct
+        Public Property 陸事番号_本トラクタ As NormalStruct
+        Public Property 車型_本トラクタ As NormalStruct
+        Public Property 車腹_本トラクタ As NormalStruct
+        Public Property 車腹単位_本トラクタ As NormalStruct
+        Public Property 陸運局_本トラクタ As NormalStruct
+        Public Property 分類番号_本トラクタ As NormalStruct
+        Public Property ひらがな_本トラクタ As NormalStruct
+        Public Property 一連指定番号_本トラクタ As NormalStruct
+        Public Property 荷主名_本トラクタ As NormalStruct
+        Public Property 契約区分_本トラクタ As NormalStruct
+        Public Property 品名1名_車両_本トラクタ As NormalStruct
+        Public Property 車両メモ_本トラクタ As NormalStruct
+        Public Property 車両備考1_本トラクタ As NormalStruct
+        Public Property 車両備考2_本トラクタ As NormalStruct
+        Public Property 車両備考3_本トラクタ As NormalStruct
+        Public Property 用車先_カレンダー画面メモ As NormalStruct
+        Public Property 車型_カレンダー画面メモ As NormalStruct
+        Public Property 陸事番号_カレンダー画面メモ As NormalStruct
+        Public Property 車腹_カレンダー画面メモ As NormalStruct
+        Public Property 車腹単位_カレンダー画面メモ As NormalStruct
+        Public Property 陸運局_カレンダー画面メモ As NormalStruct
+        Public Property 分類番号_カレンダー画面メモ As NormalStruct
+        Public Property ひらがな_カレンダー画面メモ As NormalStruct
+        Public Property 一連指定番号_カレンダー画面メモ As NormalStruct
+        Public Property 陸事番号_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property 陸運局_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property 分類番号_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property ひらなが_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property 一連指定番号_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property 更新者 As ValNestStruct
+        Public Property 作成者 As ValNestStruct
+        Public Property 更新日時 As NormalStruct
+        Public Property 作成日時 As NormalStruct
+
     End Class
 
     ''' <summary>
