@@ -138,6 +138,11 @@ Public Class LNS0001UserSearch
 
         rightview.Initialize("画面レイアウト設定", WW_Dummy)
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
+
+
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_Dummy)  '会社コード
 

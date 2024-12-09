@@ -185,6 +185,10 @@ Public Class LNS0001UserList
             Master.RecoverTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
         End If
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
+
     End Sub
 
     ''' <summary>

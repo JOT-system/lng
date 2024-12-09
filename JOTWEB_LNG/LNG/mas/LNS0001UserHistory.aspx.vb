@@ -177,6 +177,9 @@ Public Class LNS0001UserHistory
             MODIFYUSERGet(SQLcon)
         End Using
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
     End Sub
 
     ''' <summary>

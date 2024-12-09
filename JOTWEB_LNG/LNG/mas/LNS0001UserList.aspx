@@ -5,10 +5,16 @@
 
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
+<%@ Register Src="~/inc/GRIS0006LeftMenu.ascx" TagName="leftmenu" TagPrefix="MSINC" %>
 <%@ Register Src="~/LNG/inc/LNS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="LNS0001LH" ContentPlaceHolderID="head" runat="server">
     <link href='<%=ResolveUrl("~/LNG/css/LNS0001L.css")%>' rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0001L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -17,6 +23,10 @@
 </asp:Content>
  
 <asp:Content ID="LNS0001L" ContentPlaceHolderID="contents1" runat="server">
+    <div class="d-inline-flex align-items-center flex-column w-100">
+        <div class="d-flex w-100 wrap">
+            <!-- サイドメニュー -->
+            <MSINC:leftmenu ID="leftmenu" runat="server" />
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
         <div class="headerboxOnly" id="headerbox">
@@ -44,7 +54,8 @@
             <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
 
         </div>
-
+            </div>
+        </div>
         <!-- rightbox レイアウト -->
         <MSINC:rightview ID="rightview" runat="server" />
 

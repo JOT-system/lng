@@ -14,6 +14,15 @@ Option Explicit On
 Partial Public Class LNS0001UserDetail
     
     '''<summary>
+    '''leftmenu コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
+    
+    '''<summary>
     '''WF_SEL_LINECNT_L コントロール。
     '''</summary>
     '''<remarks>

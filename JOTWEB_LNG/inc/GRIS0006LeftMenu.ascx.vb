@@ -52,9 +52,13 @@ Public Class GRIS0006LeftMenu
             sqlCon.Open()
             'メニューボタン情報の取得
             Try
-                menuButtonList3 = GetMenuItemList(sqlCon, "3")
-                menuButtonList4 = GetMenuItemList(sqlCon, "4")
-                menuButtonList5 = GetMenuItemList(sqlCon, "5")
+                'menuButtonList3 = GetMenuItemList(sqlCon, "3")　'予算
+                'menuButtonList4 = GetMenuItemList(sqlCon, "4")
+                'menuButtonList5 = GetMenuItemList(sqlCon, "5")　'マスタ
+                menuButtonList3 = GetMenuItemList(sqlCon, "3")　'予算
+                menuButtonList4 = GetMenuItemList(sqlCon, "5")
+                menuButtonList5 = GetMenuItemList(sqlCon, "4")　'マスタ
+
 
                 ViewState(C_VSNAME_LEFTNAVIDATA_3) = menuButtonList3
                 Me.repLeftNav3.DataSource = menuButtonList3

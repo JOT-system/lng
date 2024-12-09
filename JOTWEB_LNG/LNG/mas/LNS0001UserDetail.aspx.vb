@@ -258,6 +258,9 @@ Public Class LNS0001UserDetail
             End If
         End If
 
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
     End Sub
 
     ''' <summary>
