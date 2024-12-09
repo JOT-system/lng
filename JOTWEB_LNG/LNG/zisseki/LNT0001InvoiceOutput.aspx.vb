@@ -462,6 +462,7 @@ Public Class LNT0001InvoiceOutput
             & "     LT1.ORDERORGCODE = @P1                                          " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
+            & " AND LT1.ZISSEKI <> 0                                                " _
             & " ORDER BY                                                            " _
             & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE  "
 

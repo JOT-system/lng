@@ -241,9 +241,6 @@
     <Content Include="LNG\css\LNS0001L.css" />
     <Content Include="LNG\css\LNS0001S.css" />
     <Content Include="inc\GRIS0006LeftMenu.ascx" />
-    <Content Include="LNG\css\LNS0002D.css" />
-    <Content Include="LNG\css\LNS0002L.css" />
-    <Content Include="LNG\css\LNS0002S.css" />
     <Content Include="LNG\css\LNS0008D.css" />
     <Content Include="LNG\css\LNS0008L.css" />
     <Content Include="LNG\css\LNS0008S.css" />
@@ -318,8 +315,6 @@
     <Content Include="LNG\mas\LNS0008GuidanceDownload.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceList.aspx" />
     <Content Include="LNG\mas\LNS0008GuidanceSearch.aspx" />
-    <Content Include="LNG\script\LNT0001C.js" />
-    <Content Include="LNG\mas\LNS0002UserSearch.aspx" />
     <Content Include="LNG\script\LNT0001L.js" />
     <Content Include="LNG\script\LNM0023D.js" />
     <Content Include="LNG\script\LNM0023L.js" />

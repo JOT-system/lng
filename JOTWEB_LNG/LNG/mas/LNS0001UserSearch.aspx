@@ -18,73 +18,85 @@
 </asp:content>
 
 <asp:Content ID="LNS0001S" ContentPlaceHolderID="contents1" runat="server">
+    <!-- 全体レイアウト　searchbox -->
     <div class="d-inline-flex align-items-center flex-column w-100">
         <div class="d-flex w-100 wrap">
             <!-- サイドメニュー -->
             <MSINC:leftmenu ID="leftmenu" runat="server" />
 
-     <!-- 全体レイアウト　searchbox -->
-    <div class="searchbox" id="searchbox">
-        <!-- ○ 固定項目 ○ -->
-        <div class="actionButtonBox">
-            <div class="rightSide">
-                <input type="button" id="WF_ButtonSEARCH" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonSEARCH');" />
-                <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
-            </div>
-        </div> <!-- End actionButtonBox -->
+            <div class="w-100 contents">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
+                        <li class="breadcrumb-item active">ユーザーマスタ</li>
+                        <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ検索</li>
+                    </ol>
+                </nav>
+                <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
+                    <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ検索</h2>
+                    <div class="searchbox" id="searchbox">
+                        <!-- ○ 固定項目 ○ -->
+                        <div class="actionButtonBox">
+                            <div class="rightSide">
+                                <input type="button" id="WF_ButtonSEARCH" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonSEARCH');" />
+                                <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
+                            </div>
+                        </div> <!-- End actionButtonBox -->
 
-        <!-- ○ 変動項目 ○ -->
-        <div class="inputBox">
-            <!-- 会社コード -->
-            <div class="inputItem">
-                <a id="WF_CAMPCODE_LABEL">
-                    <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード"></asp:Label>
-                </a>
-                <a id="WF_CAMPCODE">
-                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6" Enabled="false"></asp:TextBox>
-                </a>
-                <a class="ef" id="WF_CAMPCODE_TEXT">
-                    <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </div>
-            <!-- 有効年月日(開始） -->
-            <div class="inputItem">
-                <a id="WF_STYMD_LABEL">有効年月日（開始）</a>
-                <a ondblclick="Field_DBclick('TxtStYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox  ID="TxtStYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                </a>
-                    <%--<asp:TextBox ID="TxtStYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
-            </div>
-            <!-- 有効年月日(終了） -->
-            <div class="inputItem">
-                <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>
-                <a ondblclick="Field_DBclick('TxtEndYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                    <asp:TextBox  ID="TxtEndYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                </a>
-                    <%--<asp:TextBox ID="TxtEndYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
-            </div>
+                        <!-- ○ 変動項目 ○ -->
+                        <div class="inputBox">
+                            <!-- 会社コード -->
+                            <div class="inputItem">
+                                <a id="WF_CAMPCODE_LABEL">
+                                    <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード"></asp:Label>
+                                </a>
+                                <a id="WF_CAMPCODE">
+                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6" Enabled="false"></asp:TextBox>
+                                </a>
+                                <a class="ef" id="WF_CAMPCODE_TEXT">
+                                    <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                                </a>
+                            </div>
+                            <!-- 有効年月日(開始） -->
+                            <div class="inputItem">
+                                <a id="WF_STYMD_LABEL">有効年月日（開始）</a>
+                                <a ondblclick="Field_DBclick('TxtStYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                    <asp:TextBox  ID="TxtStYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
+                                </a>
+                                    <%--<asp:TextBox ID="TxtStYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
+                            </div>
+                            <!-- 有効年月日(終了） -->
+                            <div class="inputItem">
+                                <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>
+                                <a ondblclick="Field_DBclick('TxtEndYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                    <asp:TextBox  ID="TxtEndYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
+                                </a>
+                                    <%--<asp:TextBox ID="TxtEndYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
+                            </div>
 
-            <!-- 組織コード -->
-            <div class="inputItem">
-                <a id="WF_ORG_LABEL" >組織コード</a>
-                <a class="ef" id="WF_ORG" ondblclick="Field_DBclick('TxtOrgCode', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('TxtOrgCode');">
-                    <asp:TextBox ID="TxtOrgCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
-                </a>
-                <a id="WF_ORG_TEXT">
-                    <asp:Label ID="LblOrgName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                </a>
-            </div>
+                            <!-- 組織コード -->
+                            <div class="inputItem">
+                                <a id="WF_ORG_LABEL" >組織コード</a>
+                                <a class="ef" id="WF_ORG" ondblclick="Field_DBclick('TxtOrgCode', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('TxtOrgCode');">
+                                    <asp:TextBox ID="TxtOrgCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
+                                </a>
+                                <a id="WF_ORG_TEXT">
+                                    <asp:Label ID="LblOrgName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                                </a>
+                            </div>
 
-            <!-- 論理削除フラグ -->
-            <div class="inputItem">
-                <a id="WF_DELDATAFLG">
-                    <asp:CheckBox ID="ChkDelDataFlg" runat="server" Text="削除行を含む" />
-                </a>
-            </div>
-        </div> <!-- End inputBox -->
-    </div> <!-- End searchbox -->
+                            <!-- 論理削除フラグ -->
+                            <div class="inputItem">
+                                <a id="WF_DELDATAFLG">
+                                    <asp:CheckBox ID="ChkDelDataFlg" runat="server" Text="削除行を含む" />
+                                </a>
+                            </div>
+                        </div> <!-- End inputBox -->
+                    </div> <!-- End searchbox -->
+                </div>
             </div>
         </div>
+    </div>
     <!-- rightbox レイアウト -->
     <MSINC:rightview id="rightview" runat="server" />
 

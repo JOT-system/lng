@@ -30,8 +30,8 @@ Public Class LNS0001UserList
     ''' <summary>
     ''' 定数
     ''' </summary>
-    Private Const CONST_DISPROWCOUNT As Integer = 20                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 20                 'マウススクロール時稼働行数
+    Private Const CONST_DISPROWCOUNT As Integer = 16                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
     Private Const CONST_PATTERNERR As String = "PATTEN ERR"         '関連チェックエラー
     Private Const ADDDATE As Integer = 90                           '有効期限追加日数
 
