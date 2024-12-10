@@ -8,12 +8,9 @@
 #divContensbox {
     overflow: hidden;
 }
-
 #pnlListArea {
     margin: 0 0px;
-    height: 65vh;
 }
-
 :root, [data-bs-theme=light] {
     --bs-body-font-size: 1.5rem;
 }
@@ -21,7 +18,9 @@
 .fs-5 {
     font-size: 1.5rem !important;
 }
-
+th {
+    text-align: center;
+}
 /*--------------------------------------------------------------
 # サイズ基準
 # 1rem = 16px
@@ -37,4 +36,7 @@
 p {
     margin-top: 0;
     margin-bottom: 0rem;
+}
+*, ::after, ::before {
+    box-sizing: unset;
 }

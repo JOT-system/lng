@@ -152,12 +152,6 @@ Public Class LNT0001ZissekiManage
         '○ GridView初期設定
         GridViewInitialize()
 
-        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
-        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
-            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
-        End If
-
     End Sub
 
     ''' <summary>
@@ -171,10 +165,14 @@ Public Class LNT0001ZissekiManage
             work.Initialize()
 
             ' 初期変数設定処理
-            TxtCreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D Then
+            WF_CreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
+               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
             ' 実行画面からの遷移
-            TxtCreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
+            WF_CreateYmd.Text = work.WF_SEL_YMD.Text
+        Else
+            ' 再度メニューからの遷移
+            WF_CreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -194,7 +192,19 @@ Public Class LNT0001ZissekiManage
         For i As Integer = 0 To toriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
         Next
-        WF_TORI.SelectedValue = 0
+
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
+           Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
+            ' 実行画面からの遷移
+            For i As Integer = 0 To WF_TORI.Items.Count - 1
+                If WF_TORI.Items(i).Value = work.WF_SEL_TORICODE.Text Then
+                    WF_TORI.SelectedIndex = i
+                    Exit For
+                End If
+            Next
+        Else
+            WF_TORI.SelectedIndex = 0
+        End If
 
     End Sub
 
@@ -244,6 +254,9 @@ Public Class LNT0001ZissekiManage
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
+
+        work.WF_SEL_YMD.Text = WF_CreateYmd.Text
+        work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -483,17 +496,24 @@ Public Class LNT0001ZissekiManage
             & "     LNG.LNT0001_ZISSEKI LT1                                         " _
             & " WHERE                                                               " _
             & "     date_format(LT1.CREATEYMD, '%Y/%m/%d') = @P1                    " _
+            & " AND LT1.TORICODE like @P2                                           " _
             & " ORDER BY                                                            " _
             & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
 
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)  '作成日
-                If Not String.IsNullOrEmpty(TxtCreateYmd.Text) AndAlso IsDate(TxtCreateYmd.Text) Then
-                    PARA1.Value = TxtCreateYmd.Text
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)        '作成日
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar)     '取引先
+                If Not String.IsNullOrEmpty(WF_CreateYmd.Text) AndAlso IsDate(WF_CreateYmd.Text) Then
+                    PARA1.Value = WF_CreateYmd.Text
                 Else
                     PARA1.Value = Date.Now.ToString("yyyy/MM/dd")
+                End If
+                If WF_TORI.SelectedIndex = 0 Then
+                    PARA2.Value = "%"
+                Else
+                    PARA2.Value = WF_TORI.SelectedValue
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -606,7 +626,8 @@ Public Class LNT0001ZissekiManage
             WF_GridPosition.Text = TBLview.Item(0)("SELECT")
         End If
 
-        WF_SvCreateYmd.Value = TxtCreateYmd.Text
+        work.WF_SEL_YMD.Text = WF_CreateYmd.Text
+        work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -664,8 +685,8 @@ Public Class LNT0001ZissekiManage
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "TxtCreateYmd"         '作成日時
-                                .WF_Calendar.Text = TxtCreateYmd.Text
+                            Case "WF_CreateYmd"         '作成日時
+                                .WF_Calendar.Text = WF_CreateYmd.Text
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -697,17 +718,17 @@ Public Class LNT0001ZissekiManage
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtCreateYmd"             '作成日時
+            Case "WF_CreateYmd"             '作成日時
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtCreateYmd.Text = ""
+                        WF_CreateYmd.Text = ""
                     Else
-                        TxtCreateYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_CreateYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
-                TxtCreateYmd.Focus()
+                WF_CreateYmd.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -725,8 +746,8 @@ Public Class LNT0001ZissekiManage
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "TxtCreateYmd"             '作成日時
-                TxtCreateYmd.Focus()
+            Case "WF_CreateYmd"             '作成日時
+                WF_CreateYmd.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

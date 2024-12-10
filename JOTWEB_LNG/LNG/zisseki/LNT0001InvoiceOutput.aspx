@@ -35,7 +35,7 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
                         <li class="breadcrumb-item active">実績管理</li>
                         <li class="breadcrumb-item active" aria-current="page">請求書出力</li>
                     </ol>
@@ -50,8 +50,8 @@
                                     <div class="d-flex align-items-center gap-2 me-3">
                                         <strong class="flex-shrink-0">対象年月</strong>
                                         <div id="datetimepicker1" class="position-relative input-group calendar" data-target-input="nearest">
-                                            <a ondblclick="Field_DBclick('TxtTaishoYm', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                                <asp:TextBox  ID="TxtTaishoYm" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
+                                            <a ondblclick="Field_DBclick('WF_TaishoYm', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                                <asp:TextBox  ID="WF_TaishoYm" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
                                             </a>
                                         </div>
                                     </div>

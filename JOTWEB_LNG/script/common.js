@@ -1511,7 +1511,7 @@ function commonListAdjustHeight(listId) {
     var listHeight = parentRect.top + listObjParent.clientHeight - listRect.top;
 
     //alert(parentBottom);
-    listObj.style.height = (listHeight + browserAjust).toString() + 'px';
+    listObj.style.height = (listHeight + browserAjust - 15).toString() + 'px';
 }
 /**
  * リストの横スクロール位置をwebStrage(セッションストレージ)に保持した値より取得する

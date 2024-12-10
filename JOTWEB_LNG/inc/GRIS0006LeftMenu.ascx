@@ -2,7 +2,9 @@
 
     <div class="bg-white shadow overflow-x-hidden overflow-y-auto flex-shrink-0 side-menu">
         <div class="side-menu-inner">
-            <button type="button" class="d-flex align-items-center gap-2 w-100 border-0 border-bottom fw-bold px-2 side-menu-top"><span class="material-symbols-outlined">home</span>TOP<span class="material-symbols-outlined ms-auto">chevron_right</span></button>
+            <button type="button" class="d-flex align-items-center gap-2 w-100 border-0 border-bottom fw-bold px-2 side-menu-top" onclick="ButtonClick('WF_ButtonBackToMenu');">
+                <span class="material-symbols-outlined">home</span>TOP<span class="material-symbols-outlined ms-auto">chevron_right</span>
+            </button>
             <div id="divLeftNav3">
                 <asp:Repeater ID="repLeftNav3" runat="server" ClientIDMode="Predictable">
                     <HeaderTemplate>

@@ -25,7 +25,7 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 受注検索
         ''' </summary>
-        Public Const LNT0001S As String = "ASP.LNG_ORD_LNT0001ORDERSEARCH_ASPX"
+        Public Const LNT0001I As String = "ASP.LNG_ZISSEKI_LNT0001INVOICEOUTPUT_ASPX"
         ''' <summary>
         ''' 実績管理
         ''' </summary>

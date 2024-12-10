@@ -18,7 +18,7 @@ Public Class LNT0001ZissekiIntake
 
     '○ 検索結果格納Table
     Private LNT0001tbl As DataTable                                  '実績（アボカド）データ格納用テーブル
-    Private LNT0002tbl As DataTable                                  '一覧（実績取込履歴）格納用テーブル
+    Private LNT0003tbl As DataTable                                  '一覧（実績取込履歴）格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -55,7 +55,7 @@ Public Class LNT0001ZissekiIntake
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(LNT0002tbl)
+                    Master.RecoverTable(LNT0003tbl)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonExtract"         '絞り込みボタンクリック
@@ -93,10 +93,10 @@ Public Class LNT0001ZissekiIntake
 
         Finally
             '○ 格納Table Close
-            If Not IsNothing(LNT0002tbl) Then
-                LNT0002tbl.Clear()
-                LNT0002tbl.Dispose()
-                LNT0002tbl = Nothing
+            If Not IsNothing(LNT0003tbl) Then
+                LNT0003tbl.Clear()
+                LNT0003tbl.Dispose()
+                LNT0003tbl = Nothing
             End If
         End Try
 
@@ -157,12 +157,6 @@ Public Class LNT0001ZissekiIntake
         '○ GridView初期設定
         GridViewInitialize()
 
-        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
-        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
-            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
-        End If
-
     End Sub
 
     ''' <summary>
@@ -176,7 +170,7 @@ Public Class LNT0001ZissekiIntake
             work.Initialize()
 
             ' 初期変数設定処理
-            TxtTaishoYm.Text = Date.Now.ToString("yyyy/MM")
+            WF_TaishoYm.Text = Date.Now.ToString("yyyy/MM")
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -196,7 +190,7 @@ Public Class LNT0001ZissekiIntake
         For i As Integer = 0 To toriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
         Next
-        WF_TORI.SelectedValue = 0
+        WF_TORI.SelectedIndex = 0
 
     End Sub
 
@@ -214,13 +208,13 @@ Public Class LNT0001ZissekiIntake
         End Using
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNT0002tbl)
+        Master.SaveTable(LNT0003tbl)
 
         '〇 一覧の件数を取得
-        'Me.ListCount.Text = "件数：" + LNT0002tbl.Rows.Count.ToString()
+        'Me.ListCount.Text = "件数：" + LNT0003tbl.Rows.Count.ToString()
 
         '○ 一覧表示データ編集(性能対策)
-        Dim TBLview As DataView = New DataView(LNT0002tbl)
+        Dim TBLview As DataView = New DataView(LNT0003tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
@@ -259,43 +253,43 @@ Public Class LNT0001ZissekiIntake
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As MySqlConnection)
 
-        If IsNothing(LNT0002tbl) Then
-            LNT0002tbl = New DataTable
+        If IsNothing(LNT0003tbl) Then
+            LNT0003tbl = New DataTable
         End If
 
-        If LNT0002tbl.Columns.Count <> 0 Then
-            LNT0002tbl.Columns.Clear()
+        If LNT0003tbl.Columns.Count <> 0 Then
+            LNT0003tbl.Columns.Clear()
         End If
 
-        LNT0002tbl.Clear()
+        LNT0003tbl.Clear()
 
         '○ 検索SQL
         '　検索説明
         '     条件指定に従い該当データを実績取込履歴から取得する
         Dim SQLStr As String =
-              " Select                                                      " _
-            & "     1                                        AS 'SELECT'    " _
-            & "   , 0                                        AS HIDDEN      " _
-            & "   , 0                                        AS LINECNT     " _
-            & "   , ''                                       AS OPERATION   " _
-            & "   , coalesce(RTRIM(LT2.TAISHOYM), '')        AS TAISHOYM    " _
-            & "   , coalesce(RTRIM(LT2.SHIPORG), '')         AS SHIPORG     " _
-            & "   , coalesce(RTRIM(LT2.SHIPORGNAME), '')     AS SHIPORGNAME " _
-            & "   , coalesce(RTRIM(LT2.USERID), '')          AS USERID      " _
-            & "   , coalesce(RTRIM(LT2.USERNAME), '')        AS USERNAME    " _
-            & "   , coalesce(RTRIM(LT2.INTAKEDATE), '')      AS INTAKEDATE  " _
-            & " FROM                                                        " _
-            & "     LNG.LNT0002_ZISSEKIHISTORY LT2                          " _
-            & " WHERE                                                       " _
-            & "     LT2.TAISHOYM = @P1                                      " _
-            & " ORDER BY                                                    " _
-            & "     LT2.INTAKEDATE DESC                                     "
+              " Select                                                                 " _
+            & "     1                                                   AS 'SELECT'    " _
+            & "   , 0                                                   AS HIDDEN      " _
+            & "   , 0                                                   AS LINECNT     " _
+            & "   , ''                                                  AS OPERATION   " _
+            & "   , coalesce(RTRIM(LT3.TAISHOYM), '')                   AS TAISHOYM    " _
+            & "   , coalesce(RTRIM(LT3.SHIPORG), '')                    AS SHIPORG     " _
+            & "   , coalesce(RTRIM(LT3.SHIPORGNAME), '')                AS SHIPORGNAME " _
+            & "   , coalesce(RTRIM(LT3.USERID), '')                     AS USERID      " _
+            & "   , coalesce(RTRIM(LT3.USERNAME), '')                   AS USERNAME    " _
+            & "   , date_format(LT3.INTAKEDATE, '%Y/%m/%d %H:%m:%s')    AS INTAKEDATE  " _
+            & " FROM                                                                   " _
+            & "     LNG.LNT0003_ZISSEKIHIST LT3                                        " _
+            & " WHERE                                                                  " _
+            & "     LT3.TAISHOYM = @P1                                                 " _
+            & " ORDER BY                                                               " _
+            & "     LT3.INTAKEDATE DESC                                                "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Decimal, 6)  '対象年月
-                If Not String.IsNullOrEmpty(TxtTaishoYm.Text) AndAlso IsDate(TxtTaishoYm.Text & "/01") Then
-                    PARA1.Value = CDate(TxtTaishoYm.Text & "/01").ToString("yyyyMM")
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
+                    PARA1.Value = CDate(WF_TaishoYm.Text & "/01").ToString("yyyyMM")
                 Else
                     PARA1.Value = Date.Now.ToString("yyyyMM")
                 End If
@@ -303,19 +297,17 @@ Public Class LNT0001ZissekiIntake
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        LNT0002tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        LNT0003tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    LNT0002tbl.Load(SQLdr)
+                    LNT0003tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each LNT0002row As DataRow In LNT0002tbl.Rows
+                For Each LNT0003row As DataRow In LNT0003tbl.Rows
                     i += 1
-                    LNT0002row("LINECNT") = i        'LINECNT
-                    Dim wDATE As String = CDate(LNT0002row("INTAKEDATE")).ToString("yyyy/MM/dd hh:mm:ss")
-                    LNT0002row("INTAKEDATE") = wDATE    'LINECNT
+                    LNT0003row("LINECNT") = i        'LINECNT
                 Next
             End Using
         Catch ex As Exception
@@ -342,7 +334,7 @@ Public Class LNT0001ZissekiIntake
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
-        For Each LNM0023row As DataRow In LNT0002tbl.Rows
+        For Each LNM0023row As DataRow In LNT0003tbl.Rows
             If LNM0023row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
@@ -378,10 +370,10 @@ Public Class LNT0001ZissekiIntake
         End If
 
         '〇 一覧の件数を取得
-        'Me.ListCount.Text = "件数：" + LNT0002tbl.Rows.Count.ToString()
+        'Me.ListCount.Text = "件数：" + LNT0003tbl.Rows.Count.ToString()
 
         '○ 画面(GridView)表示
-        Dim TBLview As DataView = New DataView(LNT0002tbl)
+        Dim TBLview As DataView = New DataView(LNT0003tbl)
 
         '○ ソート
         TBLview.Sort = "LINECNT"
@@ -429,7 +421,7 @@ Public Class LNT0001ZissekiIntake
         End Using
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNT0002tbl)
+        Master.SaveTable(LNT0003tbl)
     End Sub
 
     ''' <summary>
@@ -452,8 +444,8 @@ Public Class LNT0001ZissekiIntake
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "TxtTaishoYm"         '作成日時
-                                .WF_Calendar.Text = TxtTaishoYm.Text
+                            Case "WF_TaishoYm"         '作成日時
+                                .WF_Calendar.Text = WF_TaishoYm.Text
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -485,17 +477,17 @@ Public Class LNT0001ZissekiIntake
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtTaishoYm"             '対象年月
+            Case "WF_TaishoYm"             '対象年月
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtTaishoYm.Text = ""
+                        WF_TaishoYm.Text = ""
                     Else
-                        TxtTaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        WF_TaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
-                TxtTaishoYm.Focus()
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -513,8 +505,8 @@ Public Class LNT0001ZissekiIntake
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "TxtTaishoYm"             '対象年月
-                TxtTaishoYm.Focus()
+            Case "WF_TaishoYm"             '対象年月
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -552,7 +544,7 @@ Public Class LNT0001ZissekiIntake
     Protected Sub WF_ButtonLAST_Click()
 
         '○ ソート
-        Dim TBLview As New DataView(LNT0002tbl)
+        Dim TBLview As New DataView(LNT0003tbl)
         TBLview.RowFilter = "HIDDEN = 0"
 
         '○ 最終頁に移動
@@ -598,8 +590,8 @@ Public Class LNT0001ZissekiIntake
             Dim ApiApplID As String = "1007"
             Dim kintoneApi As New CS0054KintoneApi(ApiBaseUrl, ApiBasicPass, ApiToken, ApiApplID)
 
-            kintoneApi.YmdFrom = TxtTaishoYm.Text & "/01"
-            kintoneApi.YmdTo = TxtTaishoYm.Text & DateTime.DaysInMonth(CDate(TxtTaishoYm.Text).Year, CDate(TxtTaishoYm.Text).Month).ToString("/00")
+            kintoneApi.YmdFrom = WF_TaishoYm.Text & "/01"
+            kintoneApi.YmdTo = WF_TaishoYm.Text & DateTime.DaysInMonth(CDate(WF_TaishoYm.Text).Year, CDate(WF_TaishoYm.Text).Month).ToString("/00")
             Dim LNT0001tbl = kintoneApi.GetRecords()
 
             'アボカドデータ保存（念のため調査用にダウンロードできるようにする）
@@ -611,7 +603,7 @@ Public Class LNT0001ZissekiIntake
             End If
 
             '○ 画面表示データ保存
-            Master.SaveTable(LNT0002tbl)
+            Master.SaveTable(LNT0003tbl)
 
         Catch ex As Exception
             'エラーメッセージ出力
@@ -1759,7 +1751,7 @@ Public Class LNT0001ZissekiIntake
 
             '○ DB更新SQL(実績取込履歴)
             SQLStr =
-              "     INSERT INTO LNG.LNT0002_ZISSEKIHISTORY                            " _
+              "     INSERT INTO LNG.LNT0003_ZISSEKIHIST                               " _
             & "        (TAISHOYM                                                      " _
             & "       , SHIPORG                                                       " _
             & "       , SHIPORGNAME                                                   " _
@@ -1827,7 +1819,7 @@ Public Class LNT0001ZissekiIntake
                     Dim WW_DateNow As DateTime = Date.Now
 
                     ' DB更新
-                    TAISHOYM.Value = TxtTaishoYm.Text.Replace("/", "")                      '対象年月
+                    TAISHOYM.Value = WF_TaishoYm.Text.Replace("/", "")                      '対象年月
                     SHIPORG.Value = SaveOrg                                                 '営業所コード
                     SHIPORGNAME.Value = SaveOrgName                                         '営業所名
                     USERID.Value = Master.USERID                                            'ユーザーID
@@ -1858,7 +1850,7 @@ Public Class LNT0001ZissekiIntake
                 Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                CS0011LOGWrite.INFPOSI = "DB:LNT0002 INSERT"
+                CS0011LOGWrite.INFPOSI = "DB:LNT0003 INSERT"
                 CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWrite.TEXT = ex.ToString()
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

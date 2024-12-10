@@ -36,7 +36,7 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
                         <li class="breadcrumb-item active" aria-current="page">実績管理</li>
                     </ol>
                 </nav>
@@ -49,8 +49,8 @@
                                 <div class="d-flex align-items-center gap-2 me-3">
                                     <strong class="flex-shrink-0">作成日時</strong>
                                     <div id="datetimepicker1" class="position-relative input-group calendar" data-target-input="nearest">
-                                        <a ondblclick="Field_DBclick('TxtCreateYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                            <asp:TextBox  ID="TxtCreateYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
+                                        <a ondblclick="Field_DBclick('WF_CreateYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                            <asp:TextBox  ID="WF_CreateYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
                                         </a>
                                     </div>
                                 </div>
@@ -127,7 +127,6 @@
             <asp:TextBox ID="WF_GridPosition" Text="" runat="server"></asp:TextBox>
             <!-- GridView表示位置フィールド -->
 
-            <input id="WF_SvCreateYmd" runat="server" value="" type="text" />
             <input id="WF_FIELD" runat="server" value="" type="text" />
             <!-- Textbox DBクリックフィールド -->
             <input id="WF_FIELD_REP" runat="server" value="" type="text" />

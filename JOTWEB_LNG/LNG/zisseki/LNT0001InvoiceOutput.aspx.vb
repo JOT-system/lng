@@ -136,12 +136,6 @@ Public Class LNT0001InvoiceOutput
         '○ GridView初期設定
         'GridViewInitialize()
 
-        '〇 更新画面からの遷移の場合、更新完了メッセージを出力
-        If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
-            Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
-            work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
-        End If
-
     End Sub
 
     ''' <summary>
@@ -155,7 +149,7 @@ Public Class LNT0001InvoiceOutput
             work.Initialize()
 
             ' 初期変数設定処理
-            TxtTaishoYm.Text = Date.Now.ToString("yyyy/MM")
+            WF_TaishoYm.Text = Date.Now.ToString("yyyy/MM")
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -174,7 +168,7 @@ Public Class LNT0001InvoiceOutput
         For i As Integer = 0 To toriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
         Next
-        WF_TORI.SelectedValue = 0
+        WF_TORI.SelectedIndex = 0
 
     End Sub
 
@@ -473,9 +467,9 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
                 PARA1.Value = WF_TORI.SelectedValue
-                If Not String.IsNullOrEmpty(TxtTaishoYm.Text) AndAlso IsDate(TxtTaishoYm.Text & "/01") Then
-                    PARA2.Value = TxtTaishoYm.Text & "/01"
-                    PARA3.Value = TxtTaishoYm.Text & DateTime.DaysInMonth(CDate(TxtTaishoYm.Text).Year, CDate(TxtTaishoYm.Text).Month).ToString("/00")
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
+                    PARA2.Value = WF_TaishoYm.Text & "/01"
+                    PARA3.Value = WF_TaishoYm.Text & DateTime.DaysInMonth(CDate(WF_TaishoYm.Text).Year, CDate(WF_TaishoYm.Text).Month).ToString("/00")
                 Else
                     PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
                     PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
@@ -668,8 +662,8 @@ Public Class LNT0001InvoiceOutput
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "TxtTaishoYm"         '作成日時
-                                .WF_Calendar.Text = TxtTaishoYm.Text
+                            Case "WF_TaishoYm"         '作成日時
+                                .WF_Calendar.Text = WF_TaishoYm.Text
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -701,17 +695,17 @@ Public Class LNT0001InvoiceOutput
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtTaishoYm"             '対象年月
+            Case "WF_TaishoYm"             '対象年月
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtTaishoYm.Text = ""
+                        WF_TaishoYm.Text = ""
                     Else
-                        TxtTaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        WF_TaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
-                TxtTaishoYm.Focus()
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -729,8 +723,8 @@ Public Class LNT0001InvoiceOutput
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "TxtTaishoYm"             '対象年月
-                TxtTaishoYm.Focus()
+            Case "WF_TaishoYm"             '対象年月
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
