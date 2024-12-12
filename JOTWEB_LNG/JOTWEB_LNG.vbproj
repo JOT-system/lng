@@ -475,7 +475,6 @@
     <Compile Include="LNG\com\EntryPaymentData.vb" />
     <Compile Include="LNG\com\EntrySeikyuData.vb" />
     <Compile Include="LNG\com\EntryOrderData.vb" />
-    <Compile Include="LNG\com\EntrySeisanFData.vb" />
     <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
       <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
     </Compile>

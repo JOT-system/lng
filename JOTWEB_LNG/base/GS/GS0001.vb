@@ -175,12 +175,12 @@ Public Class GS0001CAMPget
         'セッション制御宣言
         Dim sm As New CS0050SESSION
         '●会社情報取得
-        '○ DB(LNS0018_CAMP)検索
+        '○ DB(LNG.LNM0001_CAMP)検索
         Try
-            'LNS0018_CAMP検索SQL文
+            'LNG.LNM0001_CAMP検索SQL文
             Dim SQL_Str As String =
                     "SELECT rtrim(NAMES) as NAMES , rtrim(NAMEL) as NAMEL , rtrim(NAMESK) as NAMESK , rtrim(NAMELK) as NAMELK , rtrim(POSTNUM1) as POSTNUM1 , rtrim(POSTNUM2) as POSTNUM2 , rtrim(ADDR1) as ADDR1 , rtrim(ADDR2) as ADDR2 , rtrim(ADDR3) as ADDR3 , rtrim(ADDR4) as ADDR4 , rtrim(TEL) as TEL , rtrim(FAX) as FAX , rtrim(MAIL) as MAIL " _
-                & " FROM  COM.LNS0018_CAMP " _
+                & " FROM  LNG.LNM0001_CAMP " _
                 & " Where CAMPCODE = @P1 " _
                 & "   and STYMD   <= @P2 " _
                 & "   and ENDYMD  >= @P3 " _
@@ -238,7 +238,7 @@ Public Class GS0001CAMPget
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
 
             CS0011LOGWRITE.INFSUBCLASS = "GS0001CAMPget"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0018_CAMP Select"             '
+            CS0011LOGWRITE.INFPOSI = "DB:LNM0001_CAMP Select"             '
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

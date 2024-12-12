@@ -465,7 +465,7 @@ Public Class M10000LOGON
                 'lns0001_user検索SQL文
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendLine("SELECT rtrim(A.LICENSEKEY)   as LICENSEKEY")
-                sqlStat.AppendLine(" FROM        COM.LNS0025_LICENSE       A")
+                sqlStat.AppendLine(" FROM        COM.LNS0004_LICENSE       A")
                 sqlStat.AppendLine(" WHERE A.LICENSETYPE     = @P1")
                 sqlStat.AppendLine("   AND A.LICENSEGET      = @P2")
                 sqlStat.AppendLine("   AND A.DELFLG         <> @P3")
@@ -492,10 +492,10 @@ Public Class M10000LOGON
                 SQLcon.Dispose()
 
 
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0025_LICENSE SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0004_LICENSE SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "LNS0025_LICENSE SELECT"                           '
+                CS0011LOGWRITE.INFPOSI = "LNS0004_LICENSE SELECT"                           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -517,7 +517,7 @@ Public Class M10000LOGON
                 'lns0001_user検索SQL文
                 Dim sqlStat As New StringBuilder
                 sqlStat.AppendLine("SELECT rtrim(A.LICENSEKEY)   as LICENSEKEY")
-                sqlStat.AppendLine(" FROM        COM.LNS0025_LICENSE       A")
+                sqlStat.AppendLine(" FROM        COM.LNS0004_LICENSE       A")
                 sqlStat.AppendLine(" WHERE A.LICENSETYPE     = @P1")
                 sqlStat.AppendLine("   AND A.LICENSEGET      = @P2")
                 sqlStat.AppendLine("   AND A.DELFLG         <> @P3")
@@ -544,10 +544,10 @@ Public Class M10000LOGON
                 SQLcon.Dispose()
 
 
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0025_LICENSE SELECT")
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0004_LICENSE SELECT")
 
                 CS0011LOGWRITE.INFSUBCLASS = "Main"                         'SUBクラス名
-                CS0011LOGWRITE.INFPOSI = "LNS0025_LICENSE SELECT"                           '
+                CS0011LOGWRITE.INFPOSI = "LNS0004_LICENSE SELECT"                           '
                 CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
                 CS0011LOGWRITE.TEXT = ex.ToString()
                 CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
@@ -748,7 +748,7 @@ Public Class M10000LOGON
     Public Sub InsertLogonYMDMaster(ByVal I_KBN As String)
         '◯ログオン日付マスタTBL
         Dim sqlLogonYMDStat As New StringBuilder
-        sqlLogonYMDStat.AppendLine("INSERT INTO COM.LNS0028_LOGONYMD")
+        sqlLogonYMDStat.AppendLine("INSERT INTO COM.LNS0003_LOGONYMD")
         sqlLogonYMDStat.AppendLine("   (TERMID,USERID,IPADDRESS,LOGYMD,KBN,")
         sqlLogonYMDStat.AppendLine("    DELFLG,INITYMD,INITUSER,INITTERMID,INITPGID,")
         sqlLogonYMDStat.AppendLine("    UPDYMD,UPDUSER,UPDTERMID,UPDPGID,RECEIVEYMD )")

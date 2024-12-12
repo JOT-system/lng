@@ -16,7 +16,6 @@
     <link href="<%= ResolveUrl("~/css/jquery-ui-1.10.4.custom.min.css")%>" rel="stylesheet" type="text/css"/>
     <link href="<%= ResolveUrl("~/css/jquery.multiselect.css")%>" rel="stylesheet" type="text/css"/>
     <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon2.ico" />
-
     <%--個別のスタイルは以下に記載 OR 外部ファイルに逃す --%>
     <%--共通利用するJavaScript --%>
     <script src='<%= ResolveUrl("~/script/common.js")%>' type="text/javascript" charset="utf-8"></script>
@@ -29,6 +28,12 @@
     <script src='<%= ResolveUrl("~/script/prettify.js")%>'></script>
     <%-- 左ボックスカレンダー使用の場合のスクリプト --%>
     <script src='<%= ResolveUrl("~/script/calendar.js")%>' type="text/javascript" charset="utf-8"></script>
+
+    <%-- サイドメニュー用のスクリプト --%>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
     <%-- コンテンツ領域 --%>
     <asp:ContentPlaceHolder ID="head" runat="server" />
 

@@ -275,6 +275,15 @@ Public Class GRIS0006LeftMenu
             Return
         End If
 
+        Select Case intID
+            Case 3
+                Dim obj3 = Request.Form("divLeftMenu3" & posiCol)
+            Case 4
+                Dim obj4 = Request.Form("divLeftMenu4" & posiCol)
+            Case 5
+                Dim obj5 = Request.Form("divLeftMenu5" & posiCol)
+        End Select
+
         'ボタン押下時、画面遷移
         Server.Transfer(menuItm.Url)
     End Sub
