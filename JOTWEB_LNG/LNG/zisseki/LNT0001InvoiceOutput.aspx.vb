@@ -33,6 +33,7 @@ Public Class LNT0001InvoiceOutput
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
     Private CS0051UserInfo As New CS0051UserInfo                    'ユーザー情報取得
     Private GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ErrSW As String = ""
@@ -40,7 +41,8 @@ Public Class LNT0001InvoiceOutput
     Private WW_Dummy As String = ""
     Private WW_ErrCode As String                                    'サブ用リターンコード
 
-    Private toriList As New ListBox
+    Private ListShippersInvoice As New ListBox
+    Private ListShippersInvoiceExcel As New ListBox
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -68,6 +70,8 @@ Public Class LNT0001InvoiceOutput
                             WF_ButtonCan_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
+                        Case "WF_TORI"                  'リスト変更
+                            WF_ListChange(WF_ButtonClick.Value)
                     End Select
 
                     '○ 一覧再表示処理
@@ -155,7 +159,8 @@ Public Class LNT0001InvoiceOutput
         ' ドロップダウンリスト（荷主）作成
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
         GS0007FIXVALUElst.CLAS = "INVOICE"
-        GS0007FIXVALUElst.LISTBOX1 = toriList
+        GS0007FIXVALUElst.LISTBOX1 = ListShippersInvoice
+        GS0007FIXVALUElst.LISTBOX2 = ListShippersInvoiceExcel
         GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
         GS0007FIXVALUElst.GS0007FIXVALUElst()
         If Not isNormal(GS0007FIXVALUElst.ERR) Then
@@ -165,10 +170,17 @@ Public Class LNT0001InvoiceOutput
 
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To toriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
+        For i As Integer = 0 To ListShippersInvoice.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(ListShippersInvoice.Items(i).Text, ListShippersInvoice.Items(i).Value))
         Next
         WF_TORI.SelectedIndex = 0
+
+        WF_TORIEXL.Items.Clear()
+        WF_TORIEXL.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To ListShippersInvoiceExcel.Items.Count - 1
+            WF_TORIEXL.Items.Add(New ListItem(ListShippersInvoiceExcel.Items(i).Text, ListShippersInvoiceExcel.Items(i).Value))
+        Next
+        WF_TORIEXL.SelectedValue = 0
 
     End Sub
 
@@ -620,6 +632,24 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
+        If Me.WF_TORI.SelectedItem.Text = "ENEOS_八戸　輸送費請求書" Then
+            '〇(帳票)項目チェック処理
+            WW_ReportCheck(Me.WF_TORI.SelectedItem.Text)
+
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, taishoYm:=Me.WF_TaishoYm.Text)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
+        End If
+
         '○ 帳票出力
         CS0030REPORT.CAMPCODE = Master.USERCAMP                 '会社コード
         CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
@@ -741,6 +771,73 @@ Public Class LNT0001InvoiceOutput
     Protected Sub WF_ButtonEND_Click()
 
         Master.TransitionPrevPage()
+
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListChange(ByVal chkFieldName As String)
+
+        Select Case chkFieldName
+            '〇荷主リスト変更
+            Case "WF_TORI"
+                Me.WF_TORIEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' (帳票)項目チェック処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ReportCheck(ByVal reportName As String)
+
+        Select Case reportName
+            Case "ENEOS_八戸　輸送費請求書"
+                Dim dtHachinoheTank As New DataTable
+                Dim dtAvocadoTodoke As New DataTable
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    CMNPTS.SelectCONVERTMaster(SQLcon, "ENEOS_HACHINOHE_TANK", dtHachinoheTank)
+                    CMNPTS.SelectCONVERTMaster(SQLcon, "AVOCADO_TODOKE_MAS", dtAvocadoTodoke)
+                End Using
+
+                LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
+                LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))
+                LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))
+                LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))
+                LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))
+                LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))
+
+                '〇陸事番号マスタ設定
+                For Each dtHachinoheTankrow As DataRow In dtHachinoheTank.Rows
+                    Dim condition As String = String.Format("TANKNUMBER='{0}'", dtHachinoheTankrow("KEYCODE01"))
+                    For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                        '★届日より日を取得(セル(行数)の設定のため)
+                        Dim iLine As Integer = Integer.Parse(Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")) - 1
+                        iLine = (iLine * Integer.Parse(dtHachinoheTankrow("VALUE06"))) + Integer.Parse(dtHachinoheTankrow("VALUE05"))
+                        '★トリップより位置を取得
+                        Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP").ToString()) - 1
+                        'iTrip += Integer.Parse(dtHachinoheTankrow("VALUE05"))
+                        iTrip += iLine
+                        LNT0001tblrow("ROWSORTNO") = dtHachinoheTankrow("VALUE01")
+                        LNT0001tblrow("SETCELL01") = dtHachinoheTankrow("VALUE02") + iTrip.ToString()
+                        LNT0001tblrow("SETCELL02") = dtHachinoheTankrow("VALUE03") + iTrip.ToString()
+                        LNT0001tblrow("SETCELL03") = dtHachinoheTankrow("VALUE04") + iTrip.ToString()
+                        LNT0001tblrow("SETLINE") = iTrip.ToString()
+                    Next
+                Next
+
+                '〇(AVOCADO)届先出荷場所車庫マスタ設定
+                For Each dtAvocadoTodokerow As DataRow In dtAvocadoTodoke.Rows
+                    Dim condition As String = String.Format("TODOKECODE='{0}'", dtAvocadoTodokerow("KEYCODE01"))
+                    For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                        LNT0001tblrow("TODOKENAME_REP") = dtAvocadoTodokerow("VALUE01")
+                    Next
+                Next
+        End Select
 
     End Sub
 

@@ -41,6 +41,15 @@ Partial Public Class LNT0001InvoiceOutput
     Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''WF_TORIEXL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORIEXL As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>

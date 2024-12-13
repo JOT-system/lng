@@ -58,6 +58,9 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">荷主</strong>
                                         <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
+                                        <div style="display:none;">
+                                        <asp:DropDownList ID="WF_TORIEXL" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="rightSide d-flex flex-wrap gap-3 mt-3">

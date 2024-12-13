@@ -464,6 +464,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\com\CmnCustomReport.vb" />
+    <Compile Include="LNG\com\CmnParts.vb" />
     <Compile Include="LNG\com\CmnSearchSQL.vb">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -476,6 +477,7 @@
     <Compile Include="LNG\com\EntrySeikyuData.vb" />
     <Compile Include="LNG\com\EntryOrderData.vb" />
     <Compile Include="LNG\com\EntrySeisanFData.vb" />
+    <Compile Include="LNG\com\LNT0001InvoiceOutputReport.vb" />
     <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
       <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
     </Compile>
