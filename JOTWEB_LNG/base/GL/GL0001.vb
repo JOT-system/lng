@@ -92,7 +92,7 @@ Public Class GL0001CompList
     ''' </summary>
     Protected Sub getCompAllList(ByVal SQLcon As MySqlConnection)
         '●Leftボックス用会社取得
-        '○　DB(LNS0018_CAMP)検索
+        '○　DB(LNG.LNM0001_CAMP)検索
         Try
 
             '検索SQL文
@@ -100,7 +100,7 @@ Public Class GL0001CompList
                   " SELECT                        " _
                 & " rtrim(A.CAMPCODE) as CODE  ,  " _
                 & " rtrim(A.NAME)    as NAMES    " _
-                & " FROM  COM.LNS0018_CAMP A        " _
+                & " FROM  LNG.LNM0001_CAMP A        " _
                 & " WHERE                         " _
                 & "       A.STYMD   <= @P4        " _
                 & "   and A.ENDYMD  >= @P3        " _
@@ -136,7 +136,7 @@ Public Class GL0001CompList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0001"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0018_CAMP Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNM0001_CAMP Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -154,7 +154,7 @@ Public Class GL0001CompList
     ''' </summary>
     Protected Sub getCompList(ByVal SQLcon As MySqlConnection)
         '●Leftボックス用会社取得
-        '○ User権限によりDB(LNS0018_CAMP)検索
+        '○ User権限によりDB(LNG.LNM0001_CAMP)検索
         Try
 
             '検索SQL文
@@ -162,7 +162,7 @@ Public Class GL0001CompList
                     "SELECT " _
                 & " rtrim(A.CAMPCODE) as CODE ," _
                 & " rtrim(A.NAME) as NAMES " _
-                & " FROM  COM.LNS0018_CAMP A " _
+                & " FROM  LNG.LNM0001_CAMP A " _
                 & " INNER JOIN COM.LNS0005_ROLE B ON " _
                 & "       B.CAMPCODE     = A.CAMPCODE " _
                 & "   and B.ROLE     = @P1 " _
@@ -177,7 +177,7 @@ Public Class GL0001CompList
             '    "SELECT " _
             '& " rtrim(A.CAMPCODE) as CODE ," _
             '& " rtrim(A.NAMES) as NAMES " _
-            '& " FROM  COM.LNS0018_CAMP A " _
+            '& " FROM  LNG.LNM0001_CAMP A " _
             '& " INNER JOIN COM.LNS0005_ROLE B ON " _
             '& "       B.CODE     = A.CAMPCODE " _
             '& "   and B.ROLE     = @P1 " _
@@ -222,7 +222,7 @@ Public Class GL0001CompList
         Catch ex As Exception
             Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
             CS0011LOGWRITE.INFSUBCLASS = "GL0001"                'SUBクラス名
-            CS0011LOGWRITE.INFPOSI = "DB:LNS0018_CAMP Select"
+            CS0011LOGWRITE.INFPOSI = "DB:LNM0001_CAMP Select"
             CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWRITE.TEXT = ex.ToString()
             CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR

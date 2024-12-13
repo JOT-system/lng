@@ -118,7 +118,7 @@ Public Class GL0026UserList
                    & "      RTRIM(B.USERID) AS CODE         " _
                    & "     ,RTRIM(B.STAFFNAMEL) AS NAMES    " _
                    & "  FROM                                " _
-                   & "      COM.LNS0014_ORG A               " _
+                   & "      LNG.LNM0002_ORG A               " _
                    & "  INNER JOIN                          " _
                    & "      COM.lns0001_user B              " _
                    & "  ON                                  " _

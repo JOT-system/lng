@@ -90,7 +90,7 @@ Public Class CS0015TITLEcamp
                      "SELECT rtrim(A.CAMPCODE) as CAMPCODE " _
                    & "     , rtrim(A.NAME) as NAME  " _
                    & "     , rtrim(MAX( B.PERMITCODE )) as PERMITCODE " _
-                   & " FROM  COM.LNS0018_CAMP A " _
+                   & " FROM  LNG.LNM0001_CAMP A " _
                    & " INNER JOIN COM.LNS0005_ROLE B ON " _
                    & "       B.PERMITCODE >= 1 " _
                    & "   and B.DELFLG  <> @P5 " _
