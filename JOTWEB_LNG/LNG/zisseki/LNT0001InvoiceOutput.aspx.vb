@@ -350,6 +350,7 @@ Public Class LNT0001InvoiceOutput
             & "     ,coalesce(LT1.TRACTORNUM, '')                         AS TRACTORNUM			" _
             & "     ,coalesce(LT1.TRACTORNUMBER, '')                      AS TRACTORNUMBER		" _
             & "     ,coalesce(LT1.TRIP, '')                               AS TRIP					" _
+            & "     ,ROW_NUMBER() OVER(PARTITION BY coalesce(LT1.TANKNUMBER, ''),coalesce(LT1.SHUKADATE_MG, '') ORDER BY coalesce(LT1.TANKNUMBER, ''),coalesce(LT1.SHUKADATE, ''),coalesce(LT1.TODOKEDATE, ''),coalesce(LT1.TRIP, '') ) TRIP_REP " _
             & "     ,coalesce(LT1.DRP, '')                                AS DRP					" _
             & "     ,coalesce(LT1.UNKOUMEMO, '')                          AS UNKOUMEMO			" _
             & "     ,coalesce(LT1.SHUKKINTIME, '')                        AS SHUKKINTIME			" _
@@ -462,6 +463,13 @@ Public Class LNT0001InvoiceOutput
             & "     ,coalesce(LT1.UPDPGID, '')                            AS UPDPGID				" _
             & "     ,coalesce(LT1.RECEIVEYMD, '')                         AS RECEIVEYMD			" _
             & "     ,coalesce(LT1.UPDTIMSTP, '')                          AS UPDTIMSTP			" _
+            & " FROM (                                                                " _
+            & " SELECT                                                                " _
+            & "      LT1.*                                                            " _
+            & "     ,CASE @P4 " _
+            & "      WHEN DATE_FORMAT(LT1.SHUKADATE, '%Y/%m') THEN LT1.TODOKEDATE " _
+            & "      ELSE LT1.SHUKADATE " _
+            & "      END AS SHUKADATE_MG " _
             & " FROM                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                         " _
             & " WHERE                                                               " _
@@ -469,6 +477,7 @@ Public Class LNT0001InvoiceOutput
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
             & " AND LT1.ZISSEKI <> 0                                                " _
+            & " ) LT1                                                                " _
             & " ORDER BY                                                            " _
             & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE  "
 
@@ -478,6 +487,7 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar)  '部署
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
+                Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
                 PARA1.Value = WF_TORI.SelectedValue
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
                     PARA2.Value = WF_TaishoYm.Text & "/01"
@@ -486,6 +496,8 @@ Public Class LNT0001InvoiceOutput
                     PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
                     PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
+                Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Text + "/01").AddMonths(-1).ToString("yyyy/MM")
+                PARA4.Value = lastMonth
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -810,23 +822,37 @@ Public Class LNT0001InvoiceOutput
                 LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))
                 LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))
                 LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))
+                LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))
 
                 '〇陸事番号マスタ設定
                 For Each dtHachinoheTankrow As DataRow In dtHachinoheTank.Rows
                     Dim condition As String = String.Format("TANKNUMBER='{0}'", dtHachinoheTankrow("KEYCODE01"))
                     For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                         '★届日より日を取得(セル(行数)の設定のため)
-                        Dim iLine As Integer = Integer.Parse(Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")) - 1
+                        Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
+                        Dim lastMonth As Boolean = False
+                        If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Text + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                            setDay = "1"
+                            lastMonth = True
+                        End If
+                        Dim iLine As Integer = Integer.Parse(setDay) - 1
                         iLine = (iLine * Integer.Parse(dtHachinoheTankrow("VALUE06"))) + Integer.Parse(dtHachinoheTankrow("VALUE05"))
                         '★トリップより位置を取得
-                        Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP").ToString()) - 1
-                        'iTrip += Integer.Parse(dtHachinoheTankrow("VALUE05"))
+                        Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
                         iTrip += iLine
                         LNT0001tblrow("ROWSORTNO") = dtHachinoheTankrow("VALUE01")
                         LNT0001tblrow("SETCELL01") = dtHachinoheTankrow("VALUE02") + iTrip.ToString()
                         LNT0001tblrow("SETCELL02") = dtHachinoheTankrow("VALUE03") + iTrip.ToString()
                         LNT0001tblrow("SETCELL03") = dtHachinoheTankrow("VALUE04") + iTrip.ToString()
                         LNT0001tblrow("SETLINE") = iTrip.ToString()
+                        '★備考設定用(出荷日と届日が不一致の場合)
+                        If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                            If lastMonth = True Then
+                                LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                            Else
+                                LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                            End If
+                        End If
                     Next
                 Next
 
