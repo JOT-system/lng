@@ -23,7 +23,7 @@ Public Module PrevDispMap
         Public Const SUBMENU As String = "ASP.LNG_M00001MENU_ASPX"
         'Public Const SUBMENU As String = "ASP.LNG_M00002MENU_ASPX"
         ''' <summary>
-        ''' 受注検索
+        ''' 請求書出力
         ''' </summary>
         Public Const LNT0001I As String = "ASP.LNG_ZISSEKI_LNT0001INVOICEOUTPUT_ASPX"
         ''' <summary>
@@ -34,6 +34,10 @@ Public Module PrevDispMap
         ''' 実績取込
         ''' </summary>
         Public Const LNT0001D As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIINTAKE_ASPX"
+        ''' <summary>
+        ''' 実績数量ゼロ
+        ''' </summary>
+        Public Const LNT0001Z As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIZERO_ASPX"
 
         ''' <summary>
         ''' リース一覧

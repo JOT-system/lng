@@ -10,60 +10,49 @@ Imports Newtonsoft.Json.Linq
 ''' </summary>
 ''' <remarks>基本的に例外はThrowするので呼出し元で制御</remarks>
 Public Class CS0054KintoneApi
-    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     ''' <summary>
     ''' APIトークン
     ''' </summary>
     ''' <returns></returns>
     Public Property ApiToken As String = ""
     ''' <summary>
-    ''' APIを実行する元となるURLを設定
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property ApiBaseUrl As String = ""
-    ''' <summary>
-    ''' ベーシック認証のパスワード
-    ''' </summary>
-    ''' <returns></returns>
-    Public Property ApiBasicPass As String = ""
-    ''' <summary>
     ''' アプリID
     ''' </summary>
     ''' <returns></returns>
     Public Property ApiApplId As String = ""
     ''' <summary>
-    ''' アプリID
+    ''' 取引先（荷主）コード
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property ToriCode As String = ""
+    ''' <summary>
+    ''' 開始日付
     ''' </summary>
     ''' <returns></returns>
     Public Property YmdFrom As String = ""
     ''' <summary>
-    ''' アプリID
+    ''' 終了日付
     ''' </summary>
     ''' <returns></returns>
     Public Property YmdTo As String = ""
-
     ''' <summary>
-    ''' テスト用　引数無しのこのコンストラクタは仕様しないこと！引数なしのNewはしない！
+    ''' APIを実行する元となるURLを設定
+    ''' </summary>
+    ''' <returns></returns>
+    Private Property ApiBaseUrl As String = ""
+    ''' <summary>
+    ''' ベーシック認証のパスワード
+    ''' </summary>
+    ''' <returns></returns>
+    Private Property ApiBasicPass As String = ""
+
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    ''' <summary>
+    ''' コンストラクタ
     ''' </summary>
     Public Sub New()
         Me.ApiBaseUrl = ”https://jot.cybozu.com/k/v1/records.json"
         Me.ApiBasicPass = "Basic am90dXNlcjppc3VzZXI="
-        '以下は、八戸営業所用
-        Me.ApiToken = "1g1vJZ8agOyof2WEuKKqDTQmVF3h9EXeLT9YJkrN"
-        Me.ApiApplId = "1007"
-    End Sub
-    ''' <summary>
-    ''' コンストラクタ
-    ''' </summary>
-    ''' <param name="iBaseUrl">KintoneAPIのURLを指定</param>
-    ''' <param name="iBasicPass">APIアカウント</param>
-    ''' <param name="iToken">APIトークン</param>
-    ''' <param name="iApplID">アプリID</param>
-    Public Sub New(ByVal iBaseUrl As String, ByVal iBasicPass As String, ByVal iToken As String, ByVal iApplID As String)
-        Me.ApiBaseUrl = iBaseUrl
-        Me.ApiBasicPass = iBasicPass
-        Me.ApiToken = iToken
-        Me.ApiApplId = iApplID
         Net.ServicePointManager.SecurityProtocol = Net.ServicePointManager.SecurityProtocol Or System.Net.SecurityProtocolType.Tls12
     End Sub
 
@@ -114,8 +103,8 @@ Public Class CS0054KintoneApi
         End If
 
         While GetOffset < 10000
-            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届日 >= ""{0}"" and 届日 <= ""{1}"" limit " & GetLimit & " offset " & GetOffset
-            Dim GetQuery As String = String.Format(EditQuery, YmdFrom, YmdTo)
+            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届先取引先コード = ""{0}"" and 届日 >= ""{1}"" and 届日 <= ""{2}"" limit " & GetLimit & " offset " & GetOffset
+            Dim GetQuery As String = String.Format(EditQuery, ToriCode, YmdFrom, YmdTo)
             'Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
 
             GetUrl = Me.ApiBaseUrl + "?"

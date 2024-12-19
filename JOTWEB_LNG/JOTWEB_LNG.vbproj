@@ -251,6 +251,7 @@
     <Content Include="LNG\css\LNM0023L.css" />
     <Content Include="LNG\css\LNM0023S.css" />
     <Content Include="LNG\css\ex\error.css" />
+    <Content Include="LNG\css\LNT0001Z.css" />
     <Content Include="LNG\ex\page_400.html" />
     <Content Include="LNG\ex\page_401.html" />
     <Content Include="LNG\ex\page_403.html" />
@@ -376,6 +377,7 @@
     <Content Include="inc\GRIS0003SRightBox.ascx" />
     <Content Include="inc\GRIS0004RightBox.ascx" />
     <Content Include="inc\GRIS0005LeftBox.ascx" />
+    <Content Include="LNG\zisseki\LNT0001ZissekiZero.aspx" />
     <Content Include="M10000LOGON.aspx" />
     <Content Include="LNG\ex\page_404.html" />
     <Content Include="LNG\M00001MENU.aspx" />
@@ -682,6 +684,13 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\menupane\MP0000Base.vb">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiZero.aspx.designer.vb">
+      <DependentUpon>LNT0001ZissekiZero.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiZero.aspx.vb">
+      <DependentUpon>LNT0001ZissekiZero.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="M10000LOGON.aspx.designer.vb">

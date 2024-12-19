@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNT0001ZissekiManage
+Partial Public Class LNT0001ZissekiZero
     
     '''<summary>
     '''leftmenu コントロール。
@@ -32,13 +32,13 @@ Partial Public Class LNT0001ZissekiManage
     Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_CreateYmd コントロール。
+    '''WF_TaishoYm コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CreateYmd As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_TaishoYm As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_TORI コントロール。
@@ -101,7 +101,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents leftview As Global.JOTWEB_LNG.GRIS0005LeftBox
+    Protected WithEvents leftview As Global.JOTWEB_LNG.GRIS0005LeftBox
     
     '''<summary>
     '''work コントロール。
@@ -110,7 +110,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents work As Global.JOTWEB_LNG.LNT0001WRKINC
+    Protected WithEvents work As Global.JOTWEB_LNG.LNT0001WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。
@@ -119,7 +119,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_GridPosition コントロール。
@@ -128,7 +128,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_FIELD コントロール。
@@ -137,7 +137,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_FIELD_REP コントロール。
@@ -146,7 +146,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_SelectedIndex コントロール。
@@ -155,7 +155,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_SelectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_LeftMViewChange コントロール。
@@ -164,7 +164,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_LeftboxOpen コントロール。
@@ -173,7 +173,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_RightViewChange コントロール。
@@ -182,7 +182,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_RightboxOpen コントロール。
@@ -191,7 +191,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_PrintURL コントロール。
@@ -209,7 +209,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_ButtonClick コントロール。
@@ -218,7 +218,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_MAPpermitcode コントロール。
@@ -227,7 +227,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

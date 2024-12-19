@@ -1,4 +1,4 @@
-﻿<%@ Page Title="LNT0001L" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master" CodeBehind="LNT0001ZissekiManage.aspx.vb" Inherits="JOTWEB_LNG.LNT0001ZissekiManage" %>
+﻿<%@ Page Title="LNT0001L" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master" CodeBehind="LNT0001ZissekiZero.aspx.vb" Inherits="JOTWEB_LNG.LNT0001ZissekiZero" %>
 <%@ MasterType VirtualPath="~/LNG/LNGMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB_LNG.GRIS0005LeftBox" %>
@@ -16,9 +16,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link href='<%=ResolveUrl("~/LNG/css/LNT0001L.css")%>' rel="stylesheet" type="text/css" />
+    <link href='<%=ResolveUrl("~/LNG/css/LNT0001Z.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/script/fixed_midashi.js")%>'></script>
-    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNT0001L.js")%>'></script>
+    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNT0001Z.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
@@ -37,11 +37,13 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">実績管理</li>
+                        <li class="breadcrumb-item active">実績管理</li>
+                        <li class="breadcrumb-item active">実績取込</li>
+                        <li class="breadcrumb-item active" aria-current="page">実績数量ゼロ</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">実績管理</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title">実績数量ゼロ</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
                             <!-- 作成日時 -->
@@ -51,10 +53,10 @@
                                     <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 me-3">
-                                    <strong class="flex-shrink-0">作成日時</strong>
+                                    <strong class="flex-shrink-0">対象年月</strong>
                                     <div id="datetimepicker1" class="position-relative input-group calendar" data-target-input="nearest">
-                                        <a ondblclick="Field_DBclick('WF_CreateYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                            <asp:TextBox  ID="WF_CreateYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
+                                        <a ondblclick="Field_DBclick('WF_TaishoYm', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
+                                            <asp:TextBox  ID="WF_TaishoYm" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
                                         </a>
                                     </div>
                                 </div>
@@ -65,11 +67,9 @@
                             </div>
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
-                                <input type="button" id="WF_ButtonZisseki" class="btn-sticky" value="実績取込" onclick="ButtonClick('WF_ButtonZisseki');" />
-                                <input type="button" id="WF_ButtonInvoice" class="btn-sticky" value="請求書出力" onclick="ButtonClick('WF_ButtonInvoice');" />
-                                <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
+                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
                                 <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
-                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" hidden="hidden"/> 
+                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 
                                 <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
                                 <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
                             </div>

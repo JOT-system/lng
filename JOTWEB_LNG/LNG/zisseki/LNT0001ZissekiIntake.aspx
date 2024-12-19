@@ -60,9 +60,10 @@
                                     <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
                                 </div>
                             </div>
-                            <div class="rightSide d-flex flex-wrap gap-3 mt-3">
+                            <div class="rightSide">
                                 <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
                                 <input type="button" id="WF_ButtonKintone" class="btn-sticky" value="実績取込" onclick="ButtonClick('WF_ButtonKintone');" />
+                                <input type="button" id="WF_ButtonZero" class="btn-sticky" value="実績数量ゼロ" onclick="ButtonClick('WF_ButtonZero');" />
                                 <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
                                 <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 
                             </div>
