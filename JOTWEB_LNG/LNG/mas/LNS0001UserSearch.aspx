@@ -15,6 +15,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link href='<%=ResolveUrl("~/LNG/css/LNS0001S.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0001S.js")%>'></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 </asp:content>
 
 <asp:Content ID="LNS0001S" ContentPlaceHolderID="contents1" runat="server">
@@ -23,7 +27,6 @@
         <div class="d-flex w-100 wrap">
             <!-- サイドメニュー -->
             <MSINC:leftmenu ID="leftmenu" runat="server" />
-
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
@@ -36,12 +39,12 @@
                     <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ検索</h2>
                     <div class="searchbox" id="searchbox">
                         <!-- ○ 固定項目 ○ -->
-                        <div class="actionButtonBox">
+<%--                        <div class="actionButtonBox">
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonSEARCH" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonSEARCH');" />
                                 <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
                             </div>
-                        </div> <!-- End actionButtonBox -->
+                        </div> <!-- End actionButtonBox -->--%>
 
                         <!-- ○ 変動項目 ○ -->
                         <div class="inputBox">
@@ -51,27 +54,32 @@
                                     <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード"></asp:Label>
                                 </a>
                                 <a id="WF_CAMPCODE">
-                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6" Enabled="false"></asp:TextBox>
+                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2" Enabled="false"></asp:TextBox>
                                 </a>
-                                <a class="ef" id="WF_CAMPCODE_TEXT">
+                                <a id="WF_CAMPCODE_TEXT">
                                     <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                                 </a>
                             </div>
                             <!-- 有効年月日(開始） -->
                             <div class="inputItem">
-                                <a id="WF_STYMD_LABEL">有効年月日（開始）</a>
-                                <a ondblclick="Field_DBclick('TxtStYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                    <asp:TextBox  ID="TxtStYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                                </a>
-                                    <%--<asp:TextBox ID="TxtStYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
+                                <a id="WF_STYMD_LABEL">有効年月日（開始）</a>                
+                                <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                    <input type="text" id="WF_StYMDCode" runat="server" class="WF_TEXTBOX_CSS" data-input>
+                                    <span class="input-group-text" data-toggle>
+                                        <span class="material-symbols-outlined">calendar_month</span>
+                                    </span>
+                                </div>
                             </div>
+
                             <!-- 有効年月日(終了） -->
                             <div class="inputItem">
-                                <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>
-                                <a ondblclick="Field_DBclick('TxtEndYMDCode', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                    <asp:TextBox  ID="TxtEndYMDCode" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                                </a>
-                                    <%--<asp:TextBox ID="TxtEndYMDCode" runat="server" TextMode="Date" CssClass="TxtDate" onblur="MsgClear();" MaxLength="10"></asp:TextBox>--%>
+                                <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>            
+                                <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                    <input type="text" id="WF_EndYMDCode" runat="server" class="WF_TEXTBOX_CSS" data-input>
+                                    <span class="input-group-text" data-toggle>
+                                        <span class="material-symbols-outlined">calendar_month</span>
+                                    </span>
+                                </div>
                             </div>
 
                             <!-- 組織コード -->
@@ -92,6 +100,15 @@
                                 </a>
                             </div>
                         </div> <!-- End inputBox -->
+
+                        <div class="actionButtonBox">
+                            <div class="centerSide">
+                                <%--<input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />--%>
+                                <input type="button" id="WF_ButtonEND2" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" />
+                                <input type="button" id="WF_ButtonSEARCH" class="btn-sticky btn-action" value="検索" onclick="ButtonClick('WF_ButtonSEARCH');" />
+                            </div>
+                        </div> <!-- End actionButtonBox -->
+
                     </div> <!-- End searchbox -->
                 </div>
             </div>

@@ -32,13 +32,13 @@ Partial Public Class LNS0001UserDetail
     Protected WithEvents WF_SEL_LINECNT_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''LblSelLineCNT コントロール。
+    '''TxtSelLineCNT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents LblSelLineCNT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents TxtSelLineCNT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_DELFLG_L コントロール。
@@ -266,13 +266,13 @@ Partial Public Class LNS0001UserDetail
     Protected WithEvents WF_STYMD_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtStYMD コントロール。
+    '''WF_StYMD コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtStYMD As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_StYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_STYMD_TEXT コントロール。
@@ -293,13 +293,13 @@ Partial Public Class LNS0001UserDetail
     Protected WithEvents WF_ENDYMD_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtEndYMD コントロール。
+    '''WF_EndYMD コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtEndYMD As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_EndYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_ENDYMD_TEXT コントロール。

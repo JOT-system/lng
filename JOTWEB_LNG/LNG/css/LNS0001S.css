@@ -69,3 +69,28 @@ p {
     margin-top: 0;
     margin-bottom: 0rem;
 }
+
+/* 中央寄せの箱 */
+.actionButtonBox .centerSide {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top:20px;
+    margin-left: auto; /* 中央に寄せる為マージンで埋める */
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+#TxtCampCode {
+    text-align: right !important;
+}
+
+/*--------------------------------------------------------------
+# common微調整
+--------------------------------------------------------------*/
+/* 虫眼鏡アイコン位置調整 */
+.boxIconArea div {
+    margin-top: calc(100% - 0px) !important;
+}
+
+

@@ -50,22 +50,22 @@ Partial Public Class LNS0001UserSearch
     Protected WithEvents LblCampCodeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtStYMDCode コントロール。
+    '''WF_StYMDCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtStYMDCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_StYMDCode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''TxtEndYMDCode コントロール。
+    '''WF_EndYMDCode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtEndYMDCode As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_EndYMDCode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''TxtOrgCode コントロール。

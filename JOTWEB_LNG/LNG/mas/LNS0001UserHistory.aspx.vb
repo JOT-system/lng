@@ -727,7 +727,7 @@ Public Class LNS0001UserHistory
         wb.ActiveSheet.Range("A1").Value = "ID:" + Master.MAPID
         wb.ActiveSheet.Range("A2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)
         wb.ActiveSheet.Range("B2").Value = "は変更項目"
-        wb.ActiveSheet.Range("C1").Value = "ユーザ変更履歴一覧"
+        wb.ActiveSheet.Range("C1").Value = "ユーザマスタ変更履歴一覧"
 
         '列幅自動調整
         wb.ActiveSheet.Range("A3:" + WW_MAXRANGE).EntireColumn.AutoFit()
@@ -751,7 +751,7 @@ Public Class LNS0001UserHistory
         Dim FilePath As String
         Select Case WW_FILETYPE
             Case LNS0001WRKINC.FILETYPE.EXCEL
-                FileName = "ユーザ変更履歴.xlsx"
+                FileName = "ユーザマスタ変更履歴.xlsx"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -761,7 +761,7 @@ Public Class LNS0001UserHistory
                 WF_PrintURL.Value = UrlRoot & FileName
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
             Case LNS0001WRKINC.FILETYPE.PDF
-                FileName = "ユーザ変更履歴.pdf"
+                FileName = "ユーザマスタ変更履歴.pdf"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存

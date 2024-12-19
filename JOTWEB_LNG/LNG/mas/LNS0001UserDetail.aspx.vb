@@ -170,7 +170,7 @@ Public Class LNS0001UserDetail
 
         '○ 名称設定処理
         '選択行
-        LblSelLineCNT.Text = work.WF_SEL_LINECNT.Text
+        TxtSelLineCNT.Text = work.WF_SEL_LINECNT.Text
         'ユーザーID
         TxtUserId.Text = work.WF_SEL_USERID.Text
         '社員名（短）
@@ -187,9 +187,9 @@ Public Class LNS0001UserDetail
         'パスワード有効期限
         TxtPassEndYMD.Text = work.WF_SEL_PASSENDYMD.Text
         '開始年月日
-        TxtStYMD.Text = work.WF_SEL_STYMD2.Text.ToString.Replace("/", "-")
+        WF_StYMD.Value = work.WF_SEL_STYMD2.Text.ToString.Replace("/", "-")
         '終了年月日
-        TxtEndYMD.Text = work.WF_SEL_ENDYMD2.Text.ToString.Replace("/", "-")
+        WF_EndYMD.Value = work.WF_SEL_ENDYMD2.Text.ToString.Replace("/", "-")
         '会社コード
         TxtCampCode.Text = work.WF_SEL_CAMPCODE.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
@@ -228,8 +228,8 @@ Public Class LNS0001UserDetail
 
         ' パスワード有効期限・開始年月日・終了年月日を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
         Me.TxtPassEndYMD.Attributes("onkeyPress") = "CheckCalendar()"
-        Me.TxtStYMD.Attributes("onkeyPress") = "CheckCalendar()"
-        Me.TxtEndYMD.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_StYMD.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_EndYMD.Attributes("onkeyPress") = "CheckCalendar()"
 
         '情報システム部以外は変更不可
         If Master.USER_ORG <> CONST_OFFICECODE_SYSTEM Then
@@ -241,7 +241,7 @@ Public Class LNS0001UserDetail
                 TxtStaffNameL.Enabled = False
                 TxtMissCNT.Enabled = False
                 TxtPassEndYMD.Enabled = False
-                TxtEndYMD.Enabled = False
+                'WF_EndYMD.Enabled = False
                 TxtCampCode.Enabled = False
                 TxtOrg.Enabled = False
                 TxtEMail.Enabled = False
@@ -293,12 +293,12 @@ Public Class LNS0001UserDetail
 
                 P_USERID.Value = TxtUserId.Text       'ユーザーID
                 If StYMD = "" Then
-                    P_STYMD.Value = TxtStYMD.Text    '開始年月日
+                    P_STYMD.Value = WF_StYMD.Value    '開始年月日
                 Else
                     P_STYMD.Value = StYMD            '開始年月日
                 End If
                 If EnYMD = "" Then
-                    P_ENDYMD.Value = TxtEndYMD.Text    '終了年月日
+                    P_ENDYMD.Value = WF_EndYMD.Value    '終了年月日
                 Else
                     P_ENDYMD.Value = EnYMD            '終了年月日
                 End If
@@ -393,7 +393,7 @@ Public Class LNS0001UserDetail
 
                 PARA1.Value = TxtUserId.Text       'ユーザーID
                 PARA2.Value = C_DELETE_FLG.ALIVE   '削除フラグ
-                PARA3.Value = TxtStYMD.Text        '利用開始日
+                PARA3.Value = WF_StYMD.Value        '利用開始日
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
@@ -410,13 +410,13 @@ Public Class LNS0001UserDetail
                     If LNS0001Chk.Rows.Count <> 0 Then
                         Dim LastLNS0001row As DataRow = LNS0001Chk.Rows(0)
                         ' 期間重複が同じデータで無い場合のみ次回情報を表示
-                        If TxtStYMD.Text <> CDate(LastLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
+                        If WF_StYMD.Value <> CDate(LastLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
                             flg = 1
                             DisabledKey_OverlapPeriodsInput_Start.Value = ""
                             pnlTxtAdjustLastStYMD.Text = CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd")
                             pnlTxtAdjustLastEndYMD.Text = CDate(LastLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
-                            pnlTxtInputStYMD.Text = TxtStYMD.Text
-                            pnlTxtInputEndYMD.Text = TxtEndYMD.Text
+                            pnlTxtInputStYMD.Text = WF_StYMD.Value
+                            pnlTxtInputEndYMD.Text = WF_EndYMD.Value
                             pnlTxtLastStYMD.Text = CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd")
                             If pnlTxtInputStYMD.Text = pnlTxtLastStYMD.Text Then
                                 pnlTxtLastEndYMD.Text = pnlTxtLastStYMD.Text
@@ -467,7 +467,7 @@ Public Class LNS0001UserDetail
 
                 PARA1.Value = TxtUserId.Text       'ユーザーID
                 PARA2.Value = C_DELETE_FLG.ALIVE   '削除フラグ
-                PARA3.Value = TxtStYMD.Text        '利用開始日
+                PARA3.Value = WF_StYMD.Value        '利用開始日
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
@@ -483,15 +483,15 @@ Public Class LNS0001UserDetail
 
                     If LNS0001Chk.Rows.Count <> 0 Then
                         Dim NextLNS0001row As DataRow = LNS0001Chk.Rows(0)
-                        If TxtEndYMD.Text >= CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd") Or flg = 1 Then
+                        If WF_EndYMD.Value >= CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd") Or flg = 1 Then
                             flg = 1
                             ' 期間重複が同じデータで無い場合のみ次回情報を表示
                             If pnlTxtLastStYMD.Text <> CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
                                 DisabledKey_OverlapPeriodsInput_End.Value = ""
                                 pnlTxtAdjustNextStYMD.Text = CDate(NextLNS0001row("STYMD")).ToString("yyyy/MM/dd")
                                 pnlTxtAdjustNextEndYMD.Text = CDate(NextLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
-                                pnlTxtInputStYMD.Text = TxtStYMD.Text
-                                pnlTxtInputEndYMD.Text = TxtEndYMD.Text
+                                pnlTxtInputStYMD.Text = WF_StYMD.Value
+                                pnlTxtInputEndYMD.Text = WF_EndYMD.Value
                                 pnlTxtNextStYMD.Text = CDate(NextLNS0001row("STYMD")).ToString("yyyy-MM-dd")
                                 pnlTxtNextEndYMD.Text = CDate(NextLNS0001row("ENDYMD")).ToString("yyyy/MM/dd")
                                 If pnlTxtInputEndYMD.Text = pnlTxtNextEndYMD.Text Then
@@ -1621,8 +1621,8 @@ Public Class LNS0001UserDetail
         Master.EraseCharToIgnore(TxtPassword.Text)    'パスワード
         Master.EraseCharToIgnore(TxtMissCNT.Text)     '誤り回数
         Master.EraseCharToIgnore(TxtPassEndYMD.Text)  'パスワード有効期限
-        Master.EraseCharToIgnore(TxtStYMD.Text)       '開始年月日
-        Master.EraseCharToIgnore(TxtEndYMD.Text)      '終了年月日
+        Master.EraseCharToIgnore(WF_StYMD.Value)       '開始年月日
+        Master.EraseCharToIgnore(WF_EndYMD.Value)      '終了年月日
         Master.EraseCharToIgnore(TxtCampCode.Text)    '会社コード
         Master.EraseCharToIgnore(TxtOrg.Text)         '組織コード
         Master.EraseCharToIgnore(TxtEMail.Text)       'メールアドレス
@@ -1634,7 +1634,7 @@ Public Class LNS0001UserDetail
         'Master.EraseCharToIgnore(TxtApproValid.Text)  '承認権限ロール
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
-        If String.IsNullOrEmpty(LblSelLineCNT.Text) AndAlso
+        If String.IsNullOrEmpty(TxtSelLineCNT.Text) AndAlso
             String.IsNullOrEmpty(TxtDelFlg.Text) Then
             Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
@@ -1653,11 +1653,11 @@ Public Class LNS0001UserDetail
         Dim LNS0001INProw As DataRow = LNS0001INPtbl.NewRow
 
         'LINECNT
-        If String.IsNullOrEmpty(LblSelLineCNT.Text) Then
+        If String.IsNullOrEmpty(TxtSelLineCNT.Text) Then
             LNS0001INProw("LINECNT") = 0
         Else
             Try
-                Integer.TryParse(LblSelLineCNT.Text, LNS0001INProw("LINECNT"))
+                Integer.TryParse(TxtSelLineCNT.Text, LNS0001INProw("LINECNT"))
             Catch ex As Exception
                 LNS0001INProw("LINECNT") = 0
             End Try
@@ -1676,8 +1676,8 @@ Public Class LNS0001UserDetail
         LNS0001INProw("PASSWORD") = TxtPassword.Text       'パスワード
         LNS0001INProw("MISSCNT") = TxtMissCNT.Text         '誤り回数
         LNS0001INProw("PASSENDYMD") = TxtPassEndYMD.Text   'パスワード有効期限
-        LNS0001INProw("STYMD") = TxtStYMD.Text             '開始年月日
-        LNS0001INProw("ENDYMD") = TxtEndYMD.Text           '終了年月日
+        LNS0001INProw("STYMD") = WF_StYMD.Value             '開始年月日
+        LNS0001INProw("ENDYMD") = WF_EndYMD.Value           '終了年月日
         LNS0001INProw("CAMPCODE") = TxtCampCode.Text       '会社コード
         LNS0001INProw("ORG") = TxtOrg.Text                 '組織コード
         LNS0001INProw("EMAIL") = TxtEMail.Text             'メールアドレス
@@ -1804,7 +1804,7 @@ Public Class LNS0001UserDetail
         '○ 画面表示データ保存
         Master.SaveTable(LNS0001tbl, work.WF_SEL_INPTBL.Text)
 
-        LblSelLineCNT.Text = ""              'LINECNT
+        TxtSelLineCNT.Text = ""              'LINECNT
         TxtUserId.Text = ""                   'ユーザーID
         TxtStaffNameS.Text = ""               '社員名（短）
         TxtStaffNameL.Text = ""               '社員名（長）
@@ -1813,8 +1813,8 @@ Public Class LNS0001UserDetail
         TxtPassword.Attributes("Value") = ""
         TxtMissCNT.Text = ""                  '誤り回数
         TxtPassEndYMD.Text = ""               'パスワード有効期限
-        TxtStYMD.Text = ""                    '開始年月日
-        TxtEndYMD.Text = ""                   '終了年月日
+        WF_StYMD.Value = ""                    '開始年月日
+        WF_EndYMD.Value = ""                   '終了年月日
         TxtCampCode.Text = ""                 '会社コード
         TxtOrg.Text = ""                      '組織コード
         TxtEMail.Text = ""                    'メールアドレス
@@ -1851,10 +1851,10 @@ Public Class LNS0001UserDetail
                         Select Case WF_FIELD.Value
                             Case "TxtPassEndYMD"  'パスワード有効期限
                                 .WF_Calendar.Text = TxtPassEndYMD.Text
-                            Case "TxtStYMD"       '有効年月日(From)
-                                .WF_Calendar.Text = TxtStYMD.Text
-                            Case "TxtEndYMD"      '有効年月日(To)
-                                .WF_Calendar.Text = TxtEndYMD.Text
+                            Case "WF_StYMD"       '有効年月日(From)
+                                .WF_Calendar.Text = WF_StYMD.Value
+                            Case "WF_EndYMD"      '有効年月日(To)
+                                .WF_Calendar.Text = WF_EndYMD.Value
                         End Select
                         .ActiveCalendar()
                     Case Else
@@ -1949,8 +1949,8 @@ Public Class LNS0001UserDetail
         Dim row As DataRow
         row = LNS0001INPtbl.NewRow
         row("USERID") = TxtUserId.Text
-        row("STYMD") = TxtStYMD.Text
-        row("ENDYMD") = TxtEndYMD.Text
+        row("STYMD") = WF_StYMD.Value
+        row("ENDYMD") = WF_EndYMD.Value
         row("DELFLG") = C_DELETE_FLG.DELETE
         LNS0001INPtbl.Rows.Add(row)
 
@@ -2098,28 +2098,28 @@ Public Class LNS0001UserDetail
                     Catch ex As Exception
                     End Try
                     TxtPassEndYMD.Focus()
-                Case "TxtStYMD"       '有効年月日(From)
+                Case "WF_StYMD"       '有効年月日(From)
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_Date)
                         If WW_Date < C_DEFAULT_YMD Then
-                            TxtStYMD.Text = ""
+                            WF_StYMD.Value = ""
                         Else
-                            TxtStYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy-MM-dd")
+                            WF_StYMD.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy-MM-dd")
                         End If
                     Catch ex As Exception
                     End Try
-                    TxtStYMD.Focus()
-                Case "TxtEndYMD"      '有効年月日(To)
+                    WF_StYMD.Focus()
+                Case "WF_EndYMD"      '有効年月日(To)
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_Date)
                         If WW_Date < C_DEFAULT_YMD Then
-                            TxtEndYMD.Text = ""
+                            WF_EndYMD.Value = ""
                         Else
-                            TxtEndYMD.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy-MM-dd")
+                            WF_EndYMD.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy-MM-dd")
                         End If
                     Catch ex As Exception
                     End Try
-                    TxtEndYMD.Focus()
+                    WF_EndYMD.Focus()
                 Case "TxtOrg"         '組織コード
                     TxtOrg.Text = WW_SelectValue
                     LblOrgName.Text = WW_SelectText
@@ -2168,10 +2168,10 @@ Public Class LNS0001UserDetail
                     TxtDelFlg.Focus()
                 Case "TxtPassEndYMD"        'パスワード有効期限
                     TxtPassEndYMD.Focus()
-                Case "TxtStYMD"             '有効年月日(From)
-                    TxtStYMD.Focus()
-                Case "TxtEndYMD"            '有効年月日(To)
-                    TxtEndYMD.Focus()
+                Case "WF_StYMD"             '有効年月日(From)
+                    WF_StYMD.Focus()
+                Case "WF_EndYMD"            '有効年月日(To)
+                    WF_EndYMD.Focus()
                 Case "TxtOrg"               '組織コード
                     TxtOrg.Focus()
                 Case "TxtMenuRole"          'メニュー表示制御ロール

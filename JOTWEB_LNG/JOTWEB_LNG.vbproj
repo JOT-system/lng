@@ -304,6 +304,7 @@
     <Content Include="LNG\script\LNS0001D.js" />
     <Content Include="LNG\script\LNS0001H.js" />
     <Content Include="LNG\script\LNS0001L.js" />
+    <Content Include="LNG\script\LNS0001S.js" />
     <Content Include="LNG\script\LNT0001D.js" />
     <Content Include="LNG\script\LNT0001I.js" />
     <Content Include="LNG\zisseki\LNT0001InvoiceOutput.aspx" />

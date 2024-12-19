@@ -73,7 +73,7 @@ Public Class LNS0001UserSearch
         '○ 画面ID設定
         Master.MAPID = LNS0001WRKINC.MAPIDS
 
-        TxtStYMDCode.Focus()
+        WF_StYMDCode.Focus()
         WF_FIELD.Value = ""
         WF_ButtonClick.Value = ""
         WF_LeftboxOpen.Value = ""
@@ -98,14 +98,15 @@ Public Class LNS0001UserSearch
             work.Initialize()
 
             ' 初期変数設定処理
-            Master.GetFirstValue(Master.USERCAMP, "STYMD", TxtStYMDCode.Text)  '有効年月日(From)
-            TxtStYMDCode.Text = TxtStYMDCode.Text.ToString
-            TxtEndYMDCode.Text = ""                                            '有効年月日(To)
+            Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
+            WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
+
+            WF_EndYMDCode.Value = ""                                            '有効年月日(To)
             TxtOrgCode.Text = ""                                               '組織コード
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Then
             ' 実行画面からの遷移
-            TxtStYMDCode.Text = work.WF_SEL_STYMD.Text    '有効年月日(From)
-            TxtEndYMDCode.Text = work.WF_SEL_ENDYMD.Text  '有効年月日(To)
+            WF_StYMDCode.Value = work.WF_SEL_STYMD.Text    '有効年月日(From)
+            WF_EndYMDCode.Value = work.WF_SEL_ENDYMD.Text  '有効年月日(To)
             TxtOrgCode.Text = work.WF_SEL_ORG.Text        '組織コード
             ' 論理削除フラグ
             If work.WF_SEL_DELDATAFLG.Text = "1" Then
@@ -122,8 +123,8 @@ Public Class LNS0001UserSearch
         Me.TxtOrgCode.Attributes("onkeyPress") = "CheckNum()"
 
         ' 有効年月日(開始)・有効年月日(終了)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
-        Me.TxtStYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
-        Me.TxtEndYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_StYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
+        Me.WF_EndYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
 
         '○ RightBox情報設定
         rightview.MAPIDS = LNS0001WRKINC.MAPIDS
@@ -156,8 +157,8 @@ Public Class LNS0001UserSearch
     Protected Sub WF_ButtonSEARCH_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(TxtStYMDCode.Text)             '有効年月日(From)
-        Master.EraseCharToIgnore(TxtEndYMDCode.Text)            '有効年月日(To)
+        Master.EraseCharToIgnore(WF_StYMDCode.Value)             '有効年月日(From)
+        Master.EraseCharToIgnore(WF_EndYMDCode.Value)            '有効年月日(To)
         Master.EraseCharToIgnore(TxtOrgCode.Text)               '組織コード
 
         '○ チェック処理
@@ -167,8 +168,8 @@ Public Class LNS0001UserSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_STYMD.Text = TxtStYMDCode.Text.ToString     '有効年月日(From)
-        work.WF_SEL_ENDYMD.Text = TxtEndYMDCode.Text.ToString   '有効年月日(To)
+        work.WF_SEL_STYMD.Text = WF_StYMDCode.Value.ToString     '有効年月日(From)
+        work.WF_SEL_ENDYMD.Text = WF_EndYMDCode.Value.ToString   '有効年月日(To)
         work.WF_SEL_ORG.Text = TxtOrgCode.Text                  '組織コード
         ' 論理削除フラグ
         If ChkDelDataFlg.Checked = True Then
@@ -204,56 +205,56 @@ Public Class LNS0001UserSearch
         Dim WW_EndDate As Date
 
         ' 有効年月日(From)
-        If TxtStYMDCode.Text = "" Then
+        If WF_StYMDCode.Value = "" Then
             Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(From)", needsPopUp:=True)
-            TxtStYMDCode.Focus()
+            WF_StYMDCode.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
-        Master.CheckField(Master.USERCAMP, "STYMD", TxtStYMDCode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "STYMD", WF_StYMDCode.Value, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
-            If Not String.IsNullOrEmpty(TxtStYMDCode.Text) Then
-                TxtStYMDCode.Text = CDate(TxtStYMDCode.Text)
+            If Not String.IsNullOrEmpty(WF_StYMDCode.Value) Then
+                WF_StYMDCode.Value = CDate(WF_StYMDCode.Value)
             End If
         Else
             Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(From)", needsPopUp:=True)
-            TxtStYMDCode.Focus()
+            WF_StYMDCode.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
         ' 有効年月日(To)
-        'If TxtEndYMDCode.Text = "" Then
+        'If WF_EndYMDCode.Value = "" Then
         '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(To)", needsPopUp:=True)
-        '    TxtStYMDCode.Focus()
+        '    WF_StYMDCode.Focus()
         '    O_RTN = "ERR"
         '    Exit Sub
         'End If
-        Master.CheckField(Master.USERCAMP, "ENDYMD", TxtEndYMDCode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "ENDYMD", WF_EndYMDCode.Value, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
-            If Not String.IsNullOrEmpty(TxtEndYMDCode.Text) Then
-                TxtEndYMDCode.Text = CDate(TxtEndYMDCode.Text)
+            If Not String.IsNullOrEmpty(WF_EndYMDCode.Value) Then
+                WF_EndYMDCode.Value = CDate(WF_EndYMDCode.Value)
             End If
         Else
             Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(To)", needsPopUp:=True)
-            TxtEndYMDCode.Focus()
+            WF_EndYMDCode.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
         ' 日付大小チェック
-        If Not String.IsNullOrEmpty(TxtStYMDCode.Text) AndAlso Not String.IsNullOrEmpty(TxtEndYMDCode.Text) Then
+        If Not String.IsNullOrEmpty(WF_StYMDCode.Value) AndAlso Not String.IsNullOrEmpty(WF_EndYMDCode.Value) Then
             Try
-                Date.TryParse(TxtStYMDCode.Text, WW_StrDate)
-                Date.TryParse(TxtEndYMDCode.Text, WW_EndDate)
+                Date.TryParse(WF_StYMDCode.Value, WW_StrDate)
+                Date.TryParse(WF_EndYMDCode.Value, WW_EndDate)
 
                 If WW_StrDate > WW_EndDate Then
                     Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                    TxtStYMDCode.Focus()
+                    WF_StYMDCode.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, TxtStYMDCode.Text & ":" & TxtEndYMDCode.Text)
-                TxtStYMDCode.Focus()
+                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_StYMDCode.Value & ":" & WF_EndYMDCode.Value)
+                WF_StYMDCode.Focus()
                 O_RTN = "ERR"
                 Exit Sub
             End Try
@@ -314,10 +315,10 @@ Public Class LNS0001UserSearch
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "TxtStYMDCode"         '有効年月日(From)
-                                .WF_Calendar.Text = TxtStYMDCode.Text
-                            Case "TxtEndYMDCode"        '有効年月日(To)
-                                .WF_Calendar.Text = TxtEndYMDCode.Text
+                            Case "WF_StYMDCode"         '有効年月日(From)
+                                .WF_Calendar.Text = WF_StYMDCode.Value
+                            Case "WF_EndYMDCode"        '有効年月日(To)
+                                .WF_Calendar.Text = WF_EndYMDCode.Value
                         End Select
                         .ActiveCalendar()
                     Case Else
@@ -377,29 +378,29 @@ Public Class LNS0001UserSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "TxtStYMDCode"             '有効年月日(From)
+            Case "WF_StYMDCode"             '有効年月日(From)
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtStYMDCode.Text = ""
+                        WF_StYMDCode.Value = ""
                     Else
-                        TxtStYMDCode.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_StYMDCode.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try
-                TxtStYMDCode.Focus()
-            Case "TxtEndYMDCode"            '有効年月日(To)
+                WF_StYMDCode.Focus()
+            Case "WF_EndYMDCode"            '有効年月日(To)
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        TxtEndYMDCode.Text = ""
+                        WF_EndYMDCode.Value = ""
                     Else
-                        TxtEndYMDCode.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_EndYMDCode.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
 
                 End Try
-                TxtEndYMDCode.Focus()
+                WF_EndYMDCode.Focus()
             Case "TxtOrgCode"               '組織コード
                 TxtOrgCode.Text = WW_SelectValue
                 LblOrgName.Text = WW_SelectText
@@ -421,10 +422,10 @@ Public Class LNS0001UserSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "TxtStYMDCode"             '有効年月日(From)
-                TxtStYMDCode.Focus()
-            Case "TxtEndYMDCode"            '有効年月日(To)
-                TxtEndYMDCode.Focus()
+            Case "WF_StYMDCode"             '有効年月日(From)
+                WF_StYMDCode.Focus()
+            Case "WF_EndYMDCode"            '有効年月日(To)
+                WF_EndYMDCode.Focus()
             Case "TxtOrgCode"               '組織コード
                 TxtOrgCode.Focus()
         End Select

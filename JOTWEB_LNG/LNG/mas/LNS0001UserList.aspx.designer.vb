@@ -50,24 +50,6 @@ Partial Public Class LNS0001UserList
     Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
     
     '''<summary>
-    '''WF_ButtonFIRST コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
-    '''<summary>
-    '''WF_ButtonLAST コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
-    '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>

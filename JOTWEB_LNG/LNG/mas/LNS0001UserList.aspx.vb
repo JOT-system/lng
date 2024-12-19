@@ -44,6 +44,7 @@ Public Class LNS0001UserList
     Private Const CONST_COLOR_GRAY As String = "#808080" '灰色
     Private Const CONST_HEIGHT_PER_ROW As Integer = 14 'セルのコメントの一行あたりの高さ
     Private Const CONST_DATA_START_ROW As Integer = 3 'データ開始行
+    Private Const CONST_PULLDOWNSHEETNAME = "PULLLIST"
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -1225,7 +1226,15 @@ Public Class LNS0001UserList
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
+        Dim WW_STROW As Integer = 0
+        Dim WW_ENDROW As Integer = 0
+
+        WW_STROW = WW_ACTIVEROW
         SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        WW_ENDROW = WW_ACTIVEROW - 1
+
+        'プルダウンリスト作成
+        SetPULLDOWNLIST(wb, WW_STROW, WW_ENDROW)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -1434,8 +1443,170 @@ Public Class LNS0001UserList
                 End With
             End If
 
+            'パスワード
+            WW_TEXT = "パスワードは「英字大文字・小文字・数字・記号を含む12文字以上30文字以下」で設定してください。"
+            sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.PASSWORD).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.PASSWORD).Comment.Shape
+                .Width = 300
+                .Height = 50
+            End With
+
+            '組織コード
+            COMMENT_get(SQLcon, "ORG", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.ORG).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.ORG).Comment.Shape
+                    .Width = 150
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            'メニュー表示制御ロール
+            COMMENT_get(SQLcon, "MENU", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Comment.Shape
+                    .Width = 150
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            '画面参照更新制御ロール
+            COMMENT_get(SQLcon, "MAP", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Comment.Shape
+                    .Width = 150
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            '画面表示項目制御ロール
+            COMMENT_get(SQLcon, "VIEW", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Comment.Shape
+                    .Width = 150
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            'エクセル出力制御ロール
+            COMMENT_get(SQLcon, "XML", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Comment.Shape
+                    .Width = 150
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
         End Using
 
+    End Sub
+
+    ''' <summary>
+    ''' プルダウンリスト作成
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub SetPULLDOWNLIST(ByVal wb As Workbook, ByVal WW_STROW As Integer, ByVal WW_ENDROW As Integer)
+        'メインシートを取得
+        Dim mainsheet As IWorksheet = wb.ActiveSheet
+        'サブシートを作成
+        Dim subsheet As IWorksheet = wb.Worksheets.Add()
+        subsheet.Name = CONST_PULLDOWNSHEETNAME
+
+        Dim WW_COL As String = ""
+        Dim WW_MAIN_STRANGE As IRange
+        Dim WW_MAIN_ENDRANGE As IRange
+        Dim WW_SUB_STRANGE As IRange
+        Dim WW_SUB_ENDRANGE As IRange
+        Dim WW_FIXENDROW As Integer = 0
+        Dim WW_FORMULA1 As String = ""
+
+        '○入力リスト取得
+        '削除フラグ
+        SETFIXVALUELIST(subsheet, "DELFLG", LNS0001WRKINC.INOUTEXCELCOL.DELFLG, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        '組織コード
+        SETFIXVALUELIST(subsheet, "ORG", LNS0001WRKINC.INOUTEXCELCOL.ORG, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.ORG)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.ORG)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.ORG)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.ORG)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        'メニュー表示制御ロール
+        SETFIXVALUELIST(subsheet, "MENU", LNS0001WRKINC.INOUTEXCELCOL.MENUROLE, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        '画面参照更新制御ロール
+        SETFIXVALUELIST(subsheet, "MAP", LNS0001WRKINC.INOUTEXCELCOL.MAPROLE, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        '画面表示項目制御ロール
+        SETFIXVALUELIST(subsheet, "VIEW", LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        'エクセル出力制御ロール
+        SETFIXVALUELIST(subsheet, "XML", LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        'メインシートをアクティブにする
+        mainsheet.Activate()
+        'サブシートを非表示にする
+        subsheet.Visible = Visibility.Hidden
     End Sub
 
     ''' <summary>
@@ -1500,9 +1671,30 @@ Public Class LNS0001UserList
 
         With leftview
             Select Case I_FIELD
+                Case "ORG"              '組織コード
+                    If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+                        ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
+                        WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, Master.USERCAMP)
+                    Else
+                        ' その他の場合、操作ユーザーの組織のみ取得
+                        WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, Master.USERCAMP)
+                    End If
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ORG
+                Case "MENU"             'メニュー表示制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "MAP"             '画面参照更新制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "VIEW"             '画面表示項目制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "XML"             'エクセル出力制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
                 Case "DELFLG"   '削除フラグ
                     WW_PrmData = work.CreateFIXParam(Master.USERCAMP, I_FIELD)
-                    WW_VALUE = GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_FIX_VALUE
             End Select
             .SetListBox(WW_VALUE, WW_DUMMY, WW_PrmData)
 
@@ -1517,6 +1709,63 @@ Public Class LNS0001UserList
 
         End With
     End Sub
+
+    ''' <summary>
+    ''' プルダウンシートにリストを作成
+    ''' </summary>
+    ''' <param name="sheet"></param>
+    ''' <param name="I_FIELD"></param>
+    ''' <param name="I_COL"></param>
+    ''' <remarks></remarks>
+    Protected Sub SETFIXVALUELIST(ByVal sheet As IWorksheet, ByVal I_FIELD As String, ByVal I_COL As Integer, ByRef WW_FIXENDROW As Integer)
+
+        Dim WW_PrmData As New Hashtable
+        Dim WW_DUMMY As String = ""
+        Dim WW_VALUE As String = ""
+        Dim WW_ROW As Integer = 0
+
+        With leftview
+            Select Case I_FIELD
+                Case "ORG"              '組織コード
+                    If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+                        ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
+                        WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, Master.USERCAMP)
+                    Else
+                        ' その他の場合、操作ユーザーの組織のみ取得
+                        WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, Master.USERCAMP)
+                    End If
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ORG
+                Case "MENU"             'メニュー表示制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "MAP"             '画面参照更新制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "VIEW"             '画面表示項目制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "XML"             'エクセル出力制御ロール
+                    WW_PrmData = work.CreateRoleList(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = LIST_BOX_CLASSIFICATION.LC_ROLE
+                Case "DELFLG"   '削除フラグ
+                    WW_PrmData = work.CreateFIXParam(Master.USERCAMP, I_FIELD)
+                    WW_VALUE = GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE
+            End Select
+            .SetListBox(WW_VALUE, WW_DUMMY, WW_PrmData)
+
+            For i As Integer = 0 To .WF_LeftListBox.Items.Count - 1
+                If Not Trim(.WF_LeftListBox.Items(i).Text) = "" Then
+                    sheet.Cells(WW_ROW, I_COL).Value = .WF_LeftListBox.Items(i).Value
+                    WW_ROW += 1
+                End If
+            Next
+
+            WW_FIXENDROW = WW_ROW - 1
+
+        End With
+    End Sub
+
+
 #End Region
 
 #Region "ｱｯﾌﾟﾛｰﾄﾞ"
@@ -1543,9 +1792,12 @@ Public Class LNS0001UserList
             DATENOW = Date.Now
             rightview.InitMemoErrList(WW_Dummy)
             rightview.AddErrorReport("以下のデータが登録されませんでした。")
+
+            Dim WW_USERM_HASDIFFERENCE As Boolean = False              'ユーザマスタ同一データチェック用(true:差異あり)
             For Each Row As DataRow In LNS0001Exceltbl.Rows
-                'テーブルに同一データが存在しない場合
-                If Not SameDataChk(SQLcon, Row) = False Then
+                'テーブルに同一データが存在しない場合、またはパスワード変更がある場合
+                WW_USERM_HASDIFFERENCE = SameDataChk(SQLcon, Row)
+                If Not WW_USERM_HASDIFFERENCE = False Or Row("PASSUPD") = "1" Then
                     '項目チェックスキップ(削除フラグが無効から有効になった場合)
                     If ValidationSkipChk(SQLcon, Row) = True Then
                         '履歴登録(変更前)
@@ -1586,10 +1838,12 @@ Public Class LNS0001UserList
 
                     '変更がある場合履歴テーブルに変更前データを登録
                     If WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.BEFDATA Then
-                        '履歴登録(変更前)
-                        InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                        If Not isNormal(WW_ErrSW) Then
-                            Exit Sub
+                        If WW_USERM_HASDIFFERENCE = True Then
+                            '履歴登録(変更前)
+                            InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                            If Not isNormal(WW_ErrSW) Then
+                                Exit Sub
+                            End If
                         End If
                         '登録後変更区分を変更後にする
                         WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.AFTDATA
@@ -1601,11 +1855,14 @@ Public Class LNS0001UserList
                         Exit Sub
                     End If
 
-                    '履歴登録(新規・変更後)
-                    InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
+                    If WW_USERM_HASDIFFERENCE = True Then
+                        '履歴登録(新規・変更後)
+                        InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
                     End If
+
                 End If
             Next
 
@@ -1674,7 +1931,10 @@ Public Class LNS0001UserList
         Dim dir = New System.IO.DirectoryInfo(fileUploadPath)
         Dim files As IEnumerable(Of System.IO.FileInfo) = dir.EnumerateFiles("*", System.IO.SearchOption.AllDirectories)
         For Each file As System.IO.FileInfo In files
-            IO.File.Delete(fileUploadPath & "\" & file.Name)
+            Try
+                IO.File.Delete(fileUploadPath & "\" & file.Name)
+            Catch ex As Exception
+            End Try
         Next
 
         'ファイル名先頭
@@ -1711,10 +1971,12 @@ Public Class LNS0001UserList
             Dim WW_UplDelCnt As Integer = 0                             'アップロード件数(削除)
             Dim WW_UplErrCnt As Integer = 0                             'アップロード件数(エラー)
             Dim WW_UplUnnecessaryCnt As Integer = 0                     'アップロード件数(更新不要)
+            Dim WW_USERM_HASDIFFERENCE As Boolean = False              'ユーザマスタ同一データチェック用(true:差異あり)
 
             For Each Row As DataRow In LNS0001Exceltbl.Rows
-                'テーブルに同一データが存在しない場合
-                If Not SameDataChk(SQLcon, Row) = False Then
+                'テーブルに同一データが存在しない場合、またはパスワード変更がある場合
+                WW_USERM_HASDIFFERENCE = SameDataChk(SQLcon, Row)
+                If Not WW_USERM_HASDIFFERENCE = False Or Row("PASSUPD") = "1" Then
                     '項目チェックスキップ(削除フラグが無効から有効になった場合)
                     If ValidationSkipChk(SQLcon, Row) = True Then
                         '履歴登録(変更前)
@@ -1755,16 +2017,20 @@ Public Class LNS0001UserList
                         Exit Sub
                     End If
 
+
                     '変更がある場合履歴テーブルに変更前データを登録
                     If WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.BEFDATA Then
-                        '履歴登録(変更前)
-                        InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                        If Not isNormal(WW_ErrSW) Then
-                            Exit Sub
+                        If WW_USERM_HASDIFFERENCE = True Then
+                            '履歴登録(変更前)
+                            InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                            If Not isNormal(WW_ErrSW) Then
+                                Exit Sub
+                            End If
                         End If
                         '登録後変更区分を変更後にする
                         WW_MODIFYKBN = LNS0001WRKINC.MODIFYKBN.AFTDATA
                     End If
+
 
                     '件数カウント
                     Select Case True
@@ -1782,10 +2048,12 @@ Public Class LNS0001UserList
                         Exit Sub
                     End If
 
-                    '履歴登録(新規・変更後)
-                    InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
+                    If WW_USERM_HASDIFFERENCE = True Then
+                        '履歴登録(新規・変更後)
+                        InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
                     End If
 
                 Else '同一データの場合
@@ -1835,8 +2103,9 @@ Public Class LNS0001UserList
         SQLStr.AppendLine(" SELECT ")
         SQLStr.AppendLine("   0   AS LINECNT ")
         SQLStr.AppendLine("  ,''  AS PASSUPD ") 'パスワード変更確認用
+        SQLStr.AppendLine("  ,''  AS BEFOREENDYMD ") '更新前
         SQLStr.AppendLine("        ,A.USERID  ")
-        SQLStr.AppendLine("        ,B.PASSWORD  ")
+        SQLStr.AppendLine("  ,''  AS  PASSWORD  ")
         SQLStr.AppendLine("        ,B.MISSCNT  ")
         SQLStr.AppendLine("        ,B.PASSENDYMD  ")
         SQLStr.AppendLine("        ,A.STYMD  ")
@@ -1853,6 +2122,7 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("        ,A.VARIANT  ")
         SQLStr.AppendLine("        ,A.DELFLG  ")
         SQLStr.AppendLine(" FROM COM.LNS0001_USER A ,COM.LNS0002_USERPASS B ")
+        SQLStr.AppendLine(" LIMIT 0 ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -2067,10 +2337,11 @@ Public Class LNS0001UserList
     Protected Function SameDataChk(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow) As Boolean
         SameDataChk = False
 
-        'パスワード変更がある場合
-        If WW_ROW("PASSUPD") = "1" Then
-            Exit Function
-        End If
+        ''パスワード変更がある場合
+        'If WW_ROW("PASSUPD") = "1" Then
+        '    SameDataChk = True
+        '    Exit Function
+        'End If
 
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine("    SELECT")
@@ -2079,9 +2350,6 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("        COM.LNS0001_USER")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(USERID, '')             = @USERID ")
-        'SQLStr.AppendLine("    AND  COALESCE(PASSWORD, '')             = @PASSWORD ")
-        SQLStr.AppendLine("    AND  COALESCE(MISSCNT, '0')             = @MISSCNT ")
-        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(PASSENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@PASSENDYMD, '%Y/%m/%d'), '') ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
         SQLStr.AppendLine("    AND  COALESCE(ORG, '')             = @ORG ")
@@ -2376,7 +2644,7 @@ Public Class LNS0001UserList
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
                 Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
-                Dim P_CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORG", MySqlDbType.VarChar, 2)     '会社コード
+                Dim P_CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar, 2)     '会社コード
                 Dim P_ORG As MySqlParameter = SQLcmd.Parameters.Add("@ORG", MySqlDbType.VarChar, 6)     '組織コード
                 Dim P_STAFFNAMES As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAMES", MySqlDbType.VarChar, 20)     '社員名（短）
                 Dim P_STAFFNAMEL As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAMEL", MySqlDbType.VarChar, 50)     '社員名（長）
@@ -2448,20 +2716,24 @@ Public Class LNS0001UserList
         SQLStrUPA.AppendLine("  INSERT INTO COM.LNS0002_USERPASS")
         SQLStrUPA.AppendLine("   (  ")
         SQLStrUPA.AppendLine("      USERID  ")
-        SQLStrUPA.AppendLine("     ,PASSWORD  ")
+
+        'パスワード変更あり※(UPDATE文と項目あわせないとエラーでコケる)
+        If WW_ROW("PASSUPD") = "1" Then
+            SQLStrUPA.AppendLine("     ,PASSWORD  ")
+        End If
+
         SQLStrUPA.AppendLine("     ,MISSCNT  ")
         SQLStrUPA.AppendLine("     ,PASSENDYMD  ")
         SQLStrUPA.AppendLine("     ,DELFLG  ")
         SQLStrUPA.AppendLine("     ,INITYMD  ")
         SQLStrUPA.AppendLine("     ,INITUSER  ")
         SQLStrUPA.AppendLine("     ,INITTERMID  ")
-        SQLStrUPA.AppendLine("     ,INITPGID  ")
         SQLStrUPA.AppendLine("   )  ")
         SQLStrUPA.AppendLine("   VALUES  ")
         SQLStrUPA.AppendLine("   (  ")
         SQLStrUPA.AppendLine("      @USERID  ")
 
-        'パスワード変更あり
+        'パスワード変更あり※(UPDATE文と項目あわせないとエラーでコケる)
         If WW_ROW("PASSUPD") = "1" Then
             SQLStrUPA.AppendLine("     ,AES_ENCRYPT(@PASSWORD, 'loginpasskey')  ")
         End If
@@ -2472,7 +2744,6 @@ Public Class LNS0001UserList
         SQLStrUPA.AppendLine("     ,@INITYMD  ")
         SQLStrUPA.AppendLine("     ,@INITUSER  ")
         SQLStrUPA.AppendLine("     ,@INITTERMID  ")
-        SQLStrUPA.AppendLine("     ,@INITPGID  ")
         SQLStrUPA.AppendLine("   )   ")
         SQLStrUPA.AppendLine("  ON DUPLICATE KEY UPDATE  ")
         SQLStrUPA.AppendLine("      USERID =  @USERID ")
@@ -2488,7 +2759,6 @@ Public Class LNS0001UserList
         SQLStrUPA.AppendLine("     ,UPDYMD =  @UPDYMD ")
         SQLStrUPA.AppendLine("     ,UPDUSER =  @UPDUSER ")
         SQLStrUPA.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
-        SQLStrUPA.AppendLine("     ,UPDPGID =  @UPDPGID ")
         SQLStrUPA.AppendLine("    ;  ")
 
         Try
@@ -2501,11 +2771,9 @@ Public Class LNS0001UserList
                 Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
                 Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
                 Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
-                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
 
                 'DB更新
                 P_USERID.Value = WW_ROW("USERID")           'ユーザーID
@@ -2516,11 +2784,9 @@ Public Class LNS0001UserList
                 P_INITYMD.Value = WW_DATENOW                '登録年月日
                 P_INITUSER.Value = Master.USERID               '登録ユーザーＩＤ
                 P_INITTERMID.Value = Master.USERTERMID               '登録端末
-                P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
                 P_UPDYMD.Value = WW_DATENOW                '更新年月日
                 P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
 
                 'パスワード変更あり
                 If WW_ROW("PASSUPD") = "1" Then
@@ -2654,7 +2920,7 @@ Public Class LNS0001UserList
         ' 終了年月日(バリデーションチェック）
         Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
-            If Date.Now > WW_ROW("ENDYMD") And WW_ROW("ENDYMD") <> work.WF_SEL_ENDYMD.Text Then
+            If Date.Now > WW_ROW("ENDYMD") Then
                 WW_CheckMES1 = "・終了年月日エラーです。"
                 WW_CheckMES2 = "過去日入力エラー"
                 WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -2670,25 +2936,25 @@ Public Class LNS0001UserList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 会社コード(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "CAMPCODE", WW_ROW("CAMPCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            ' 名称存在チェック
-            CODENAME_get("CAMPCODE", WW_ROW("CAMPCODE"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・会社コード入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        Else
-            WW_CheckMES1 = "・会社コード入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        '' 会社コード(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "CAMPCODE", WW_ROW("CAMPCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    ' 名称存在チェック
+        '    CODENAME_get("CAMPCODE", WW_ROW("CAMPCODE"), WW_Dummy, WW_RtnSW)
+        '    If Not isNormal(WW_RtnSW) Then
+        '        WW_CheckMES1 = "・会社コード入力エラーです。"
+        '        WW_CheckMES2 = "マスタに存在しません。"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'Else
+        '    WW_CheckMES1 = "・会社コード入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         ' 組織コード(バリデーションチェック）
         Master.CheckField(Master.USERCAMP, "ORG", WW_ROW("ORG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
