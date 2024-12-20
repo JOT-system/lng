@@ -291,10 +291,10 @@ Public Class LNS0001UserList
             & " INNER JOIN COM.LNS0002_userpass LNS0002                                                             " _
             & "     ON  LNS0002.USERID = LNS0001.USERID                                                             " _
             & "     AND LNS0002.DELFLG = LNS0001.DELFLG                                                             " _
-            & " INNER JOIN COM.LNS0014_ORG LNS0019                                                                  " _
-            & "     ON  LNS0019.ORGCODE = LNS0001.ORG                                                               " _
-            & "     AND CURDATE() BETWEEN LNS0019.STYMD AND LNS0019.ENDYMD                                          " _
-            & "     AND LNS0019.DELFLG = LNS0001.DELFLG                                                             "
+            & " INNER JOIN LNG.LNM0002_ORG LNM0002                                                                  " _
+            & "     ON  LNM0002.ORGCODE = LNS0001.ORG                                                               " _
+            & "     AND CURDATE() BETWEEN LNM0002.STYMD AND LNM0002.ENDYMD                                          " _
+            & "     AND LNM0002.DELFLG = LNS0001.DELFLG                                                             "
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim SQLWhereStr As String = ""
@@ -342,9 +342,9 @@ Public Class LNS0001UserList
         ElseIf Master.USER_ORG <> CONST_OFFICECODE_SYSTEM AndAlso Master.USER_ORG <> CONST_OFFICECODE_011310 Then
             If String.IsNullOrEmpty(SQLWhereStr) Then
                 SQLWhereStr = " WHERE                     " _
-                            & "     LNS0019.CONTROLCODE = @P4     "
+                            & "     LNM0002.CONTROLCODE = @P4     "
             Else
-                SQLWhereStr &= "    AND LNS0019.CONTROLCODE = @P4 "
+                SQLWhereStr &= "    AND LNM0002.CONTROLCODE = @P4 "
             End If
         End If
         ' 論理削除フラグ
