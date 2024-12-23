@@ -173,9 +173,9 @@ Public Class LNT0001ZissekiIntake
             work.Initialize()
 
             ' 初期変数設定処理
-            WF_TaishoYm.Text = Date.Now.ToString("yyyy/MM")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
-            WF_TaishoYm.Text = work.WF_SEL_YM.Text
+            WF_TaishoYm.Value = work.WF_SEL_YM.Text
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -301,8 +301,8 @@ Public Class LNT0001ZissekiIntake
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Decimal, 6)  '対象年月
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20)  '取引先コード
-                If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
-                    PARA1.Value = CDate(WF_TaishoYm.Text & "/01").ToString("yyyyMM")
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    PARA1.Value = CDate(WF_TaishoYm.Value & "/01").ToString("yyyyMM")
                 Else
                     PARA1.Value = Date.Now.ToString("yyyyMM")
                 End If
@@ -448,7 +448,7 @@ Public Class LNT0001ZissekiIntake
     ''' <remarks></remarks>
     Protected Sub WF_ButtonZero_Click()
 
-        work.WF_SEL_YM.Text = WF_TaishoYm.Text
+        work.WF_SEL_YM.Text = WF_TaishoYm.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         Dim WW_URL As String = ""
@@ -479,7 +479,7 @@ Public Class LNT0001ZissekiIntake
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_TaishoYm"         '作成日時
-                                .WF_Calendar.Text = WF_TaishoYm.Text
+                                .WF_Calendar.Text = WF_TaishoYm.Value
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -515,9 +515,9 @@ Public Class LNT0001ZissekiIntake
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        WF_TaishoYm.Text = ""
+                        WF_TaishoYm.Value = ""
                     Else
-                        WF_TaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        WF_TaishoYm.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
@@ -614,7 +614,7 @@ Public Class LNT0001ZissekiIntake
     ''' </summary>
     Private Sub WF_KintoneGetconfirm_Click()
         Dim result As DateTime
-        If Not DateTime.TryParseExact(Me.WF_TaishoYm.Text & "/01", "yyyy/MM/dd", Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, result) Then
+        If Not DateTime.TryParseExact(Me.WF_TaishoYm.Value & "/01", "yyyy/MM/dd", Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, result) Then
             Master.Output(C_MESSAGE_NO.CTN_INPUT_DATE_ERR, C_MESSAGE_TYPE.ERR, "対象年月", "", True)
             Exit Sub
         End If
@@ -624,7 +624,7 @@ Public Class LNT0001ZissekiIntake
             Exit Sub
         End If
 
-        Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Text
+        Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
         Msg += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
         Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.INF, "実績取込を行います", Msg, True, "", True)
 
@@ -692,8 +692,8 @@ Public Class LNT0001ZissekiIntake
                 CS0054KintoneApi.ApiApplId = ApiInfo(i).AppId
                 CS0054KintoneApi.ApiToken = ApiInfo(i).Token
                 CS0054KintoneApi.ToriCode = WF_TORI.SelectedValue
-                CS0054KintoneApi.YmdFrom = WF_TaishoYm.Text & "/01"
-                CS0054KintoneApi.YmdTo = WF_TaishoYm.Text & DateTime.DaysInMonth(CDate(WF_TaishoYm.Text).Year, CDate(WF_TaishoYm.Text).Month).ToString("/00")
+                CS0054KintoneApi.YmdFrom = WF_TaishoYm.Value & "/01"
+                CS0054KintoneApi.YmdTo = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                 LNT0001tbl = CS0054KintoneApi.GetRecords()
 
                 If LNT0001tbl.Rows.Count > 0 Then
@@ -725,7 +725,7 @@ Public Class LNT0001ZissekiIntake
             dv.RowFilter = "積置区分 <> '積置' and (実績数量 = '0' or 実績数量 = '')"
             If dv.Count > 0 Then
                 '実績数量ゼロありメッセージ出力
-                Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Text
+                Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
                 Msg += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
                 Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, "実績数量=0のデータが存在します。画面表示しますか", Msg, True, "", True, "btnCommonConfirmYes")
                 Exit Sub
@@ -841,9 +841,9 @@ Public Class LNT0001ZissekiIntake
                     ' DB更新
                     ORDERORGCODE.Value = iOrg                                               '営業所コード
                     DELFLG.Value = C_DELETE_FLG.DELETE                                      '削除フラグ（削除）
-                    If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
-                        YMDFROM.Value = WF_TaishoYm.Text & "/01"
-                        YMDTO.Value = WF_TaishoYm.Text & DateTime.DaysInMonth(CDate(WF_TaishoYm.Text).Year, CDate(WF_TaishoYm.Text).Month).ToString("/00")
+                    If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                        YMDFROM.Value = WF_TaishoYm.Value & "/01"
+                        YMDTO.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                     End If
                     UPDYMD.Value = WW_DateNow                                               '更新年月日
                     UPDUSER.Value = Master.USERID                                           '更新ユーザーＩＤ
@@ -2056,7 +2056,7 @@ Public Class LNT0001ZissekiIntake
                     Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)           '集信日時
 
                     ' DB更新
-                    TAISHOYM.Value = WF_TaishoYm.Text.Replace("/", "")                      '対象年月
+                    TAISHOYM.Value = WF_TaishoYm.Value.Replace("/", "")                      '対象年月
                     TORICODE.Value = SaveTori                                               '取引先コード
                     TORINAME.Value = SaveToriName                                           '取引先名
                     SHIPORG.Value = SaveOrg                                                 '営業所コード

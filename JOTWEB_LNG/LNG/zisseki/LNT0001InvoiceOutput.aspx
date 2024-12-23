@@ -46,13 +46,14 @@
                         <div class="Operation">
                             <div class="actionButtonBox">
                                 <!-- 対象年月 -->
-                                <div id="actionTrigger" class="d-flex flex-wrap gap-3 mt-3">
+                                <div id="actionTrigger" class="d-flex flex-wrap gap-3">
                                     <div class="d-flex align-items-center gap-2 me-3">
                                         <strong class="flex-shrink-0">対象年月</strong>
-                                        <div id="datetimepicker1" class="position-relative input-group calendar" data-target-input="nearest">
-                                            <a ondblclick="Field_DBclick('WF_TaishoYm', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                                <asp:TextBox  ID="WF_TaishoYm" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                                            </a>
+                                        <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                            <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" data-input >
+                                            <span class="input-group-text" data-toggle >
+                                                <span class="material-symbols-outlined">calendar_month</span>
+                                            </span>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -63,8 +64,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="rightSide d-flex flex-wrap gap-3 mt-3">
-                                    <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
+                                <div class="rightSide">
+                                    <%--<input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />--%>
                                     <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="請求書出力" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
                                     <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
                                     <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 

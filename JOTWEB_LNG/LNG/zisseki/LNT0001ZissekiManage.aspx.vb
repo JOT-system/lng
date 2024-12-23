@@ -165,14 +165,14 @@ Public Class LNT0001ZissekiManage
             work.Initialize()
 
             ' 初期変数設定処理
-            WF_CreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
+            WF_CreateYmd.Value = Date.Now.ToString("yyyy/MM/dd")
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
             ' 実行画面からの遷移
-            WF_CreateYmd.Text = work.WF_SEL_YMD.Text
+            WF_CreateYmd.Value = work.WF_SEL_YMD.Text
         Else
             ' 再度メニューからの遷移
-            WF_CreateYmd.Text = Date.Now.ToString("yyyy/MM/dd")
+            WF_CreateYmd.Value = Date.Now.ToString("yyyy/MM/dd")
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -255,7 +255,7 @@ Public Class LNT0001ZissekiManage
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
 
-        work.WF_SEL_YMD.Text = WF_CreateYmd.Text
+        work.WF_SEL_YMD.Text = WF_CreateYmd.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
@@ -506,8 +506,8 @@ Public Class LNT0001ZissekiManage
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)        '作成日
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar)     '取引先
-                If Not String.IsNullOrEmpty(WF_CreateYmd.Text) AndAlso IsDate(WF_CreateYmd.Text) Then
-                    PARA1.Value = WF_CreateYmd.Text
+                If Not String.IsNullOrEmpty(WF_CreateYmd.Value) AndAlso IsDate(WF_CreateYmd.Value) Then
+                    PARA1.Value = WF_CreateYmd.Value
                 Else
                     PARA1.Value = Date.Now.ToString("yyyy/MM/dd")
                 End If
@@ -627,7 +627,7 @@ Public Class LNT0001ZissekiManage
             WF_GridPosition.Text = TBLview.Item(0)("SELECT")
         End If
 
-        work.WF_SEL_YMD.Text = WF_CreateYmd.Text
+        work.WF_SEL_YMD.Text = WF_CreateYmd.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
@@ -687,7 +687,7 @@ Public Class LNT0001ZissekiManage
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_CreateYmd"         '作成日時
-                                .WF_Calendar.Text = WF_CreateYmd.Text
+                                .WF_Calendar.Text = WF_CreateYmd.Value
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -723,9 +723,9 @@ Public Class LNT0001ZissekiManage
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        WF_CreateYmd.Text = ""
+                        WF_CreateYmd.Value = ""
                     Else
-                        WF_CreateYmd.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_CreateYmd.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
                     End If
                 Catch ex As Exception
                 End Try

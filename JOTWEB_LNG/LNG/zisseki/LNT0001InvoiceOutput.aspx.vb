@@ -153,7 +153,7 @@ Public Class LNT0001InvoiceOutput
             work.Initialize()
 
             ' 初期変数設定処理
-            WF_TaishoYm.Text = Date.Now.ToString("yyyy/MM")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         End If
 
         ' ドロップダウンリスト（荷主）作成
@@ -489,14 +489,14 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
                 Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
                 PARA1.Value = WF_TORI.SelectedValue
-                If Not String.IsNullOrEmpty(WF_TaishoYm.Text) AndAlso IsDate(WF_TaishoYm.Text & "/01") Then
-                    PARA2.Value = WF_TaishoYm.Text & "/01"
-                    PARA3.Value = WF_TaishoYm.Text & DateTime.DaysInMonth(CDate(WF_TaishoYm.Text).Year, CDate(WF_TaishoYm.Text).Month).ToString("/00")
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    PARA2.Value = WF_TaishoYm.Value & "/01"
+                    PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                 Else
                     PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
                     PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
-                Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Text + "/01").AddMonths(-1).ToString("yyyy/MM")
+                Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
                 PARA4.Value = lastMonth
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -648,10 +648,29 @@ Public Class LNT0001InvoiceOutput
             '〇(帳票)項目チェック処理
             WW_ReportCheck(Me.WF_TORI.SelectedItem.Text)
 
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, taishoYm:=Me.WF_TaishoYm.Text)
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
+        End If
+
+        If Me.WF_TORI.SelectedItem.Text = "西部ガス　LNG請求書明細" Then
+            Dim prtTbl As New DataTable
+            '〇(帳票)項目チェック処理
+            WW_ReportCheckSAIBU(Me.WF_TORI.SelectedItem.Text, prtTbl)
+
+            Dim LNT0001InvoiceOutputSAIBU As New LNT0001InvoiceOutputSAIBU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, prtTbl, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputSAIBU.CreateExcelPrintData()
             Catch ex As Exception
                 Return
             End Try
@@ -705,7 +724,7 @@ Public Class LNT0001InvoiceOutput
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
                             Case "WF_TaishoYm"         '作成日時
-                                .WF_Calendar.Text = WF_TaishoYm.Text
+                                .WF_Calendar.Text = WF_TaishoYm.Value
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -741,9 +760,9 @@ Public Class LNT0001InvoiceOutput
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        WF_TaishoYm.Text = ""
+                        WF_TaishoYm.Value = ""
                     Else
-                        WF_TaishoYm.Text = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
+                        WF_TaishoYm.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
@@ -831,7 +850,7 @@ Public Class LNT0001InvoiceOutput
                         '★届日より日を取得(セル(行数)の設定のため)
                         Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
                         Dim lastMonth As Boolean = False
-                        If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Text + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                        If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
                             setDay = "1"
                             lastMonth = True
                         End If
@@ -863,7 +882,77 @@ Public Class LNT0001InvoiceOutput
                         LNT0001tblrow("TODOKENAME_REP") = dtAvocadoTodokerow("VALUE01")
                     Next
                 Next
+
         End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' (帳票)項目チェック処理（西部ガス）
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ReportCheckSAIBU(ByVal reportName As String, ByRef oTbl As DataTable)
+
+        Dim dtKyushuTodoke As New DataTable
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            CMNPTS.SelectCONVERTMaster(SQLcon, "SAIBU_KYUSHU_TODOKE", dtKyushuTodoke, I_ORDERBY_KEY:="VALUE01")
+        End Using
+
+        '届先毎グルーピングして数量をサマリー（LINQを使う）
+        Dim query = From row In LNT0001tbl.AsEnumerable()
+                    Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+                    Select New With {
+                            .TODOKECODE = TODOKECODE,
+                            .DAISU = Group.Count(),
+                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
+                        }
+
+        ' 保存データ領域
+        Dim prtTbl As New DataTable
+
+        prtTbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
+        prtTbl.Columns.Add("TODOKECODE", Type.GetType("System.String"))
+        prtTbl.Columns.Add("TODOKECLASS", Type.GetType("System.String"))
+        prtTbl.Columns.Add("TODOKENAME", Type.GetType("System.String"))
+        prtTbl.Columns.Add("TANKA", Type.GetType("System.Int32"))
+        prtTbl.Columns.Add("DAISU", Type.GetType("System.Int32"))
+        prtTbl.Columns.Add("ZISSEKI", Type.GetType("System.Decimal"))
+        prtTbl.Columns.Add("SETCELL01", Type.GetType("System.String"))
+        prtTbl.Columns.Add("SETCELL02", Type.GetType("System.String"))
+        prtTbl.Columns.Add("SETCELL03", Type.GetType("System.String"))
+        prtTbl.Columns.Add("SETCELL04", Type.GetType("System.String"))
+
+        '〇請求書出力情報を保存
+        For Each dtKyushuTodokerow As DataRow In dtKyushuTodoke.Rows
+            Dim prtRow As DataRow = prtTbl.NewRow
+            prtRow("ROWSORTNO") = dtKyushuTodokerow("VALUE01")
+            prtRow("SETCELL01") = dtKyushuTodokerow("VALUE02") & dtKyushuTodokerow("VALUE06")
+            prtRow("SETCELL02") = dtKyushuTodokerow("VALUE03") & dtKyushuTodokerow("VALUE06")
+            prtRow("SETCELL03") = dtKyushuTodokerow("VALUE04") & dtKyushuTodokerow("VALUE06")
+            prtRow("SETCELL04") = dtKyushuTodokerow("VALUE05") & dtKyushuTodokerow("VALUE06")
+            prtRow("TODOKECODE") = dtKyushuTodokerow("KEYCODE01")
+            prtRow("TODOKECLASS") = dtKyushuTodokerow("KEYCODE02")
+            prtRow("TODOKENAME") = dtKyushuTodokerow("KEYCODE03")
+            prtRow("TANKA") = 0
+            prtRow("DAISU") = 0
+            prtRow("ZISSEKI") = 0
+            prtTbl.Rows.Add(prtRow)
+        Next
+
+        ' 表示情報を付加
+        For Each result In query
+            For Each prtRow In prtTbl.Rows
+                If prtRow("TODOKECODE") = result.TODOKECODE Then
+                    prtRow("TODOKECODE") = result.TODOKECODE
+                    prtRow("TANKA") = 0
+                    prtRow("DAISU") = result.DAISU
+                    prtRow("ZISSEKI") = result.ZISSEKI
+                    Exit For
+                End If
+            Next
+        Next
+        oTbl = prtTbl.Copy
 
     End Sub
 

@@ -38,7 +38,7 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CreateYmd As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_CreateYmd As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_TORI コントロール。

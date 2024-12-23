@@ -4,6 +4,19 @@ function InitDisplay() {
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
+    // カレンダー表示
+    document.querySelectorAll('.datetimepicker').forEach(picker => {
+        flatpickr(picker, {
+            wrap: true,
+            dateFormat: 'Y/m/d',
+            locale: 'ja',
+            clickOpens: false,
+            allowInput: true,
+            monthSelectorType: 'static',
+            //defaultDate: new Date() // 必要に応じてカスタマイズ
+        });
+    });
+
 }
 
 /**

@@ -155,12 +155,12 @@ function OverlapPeriodsSrcCloseClick() {
 
 document.addEventListener("DOMContentLoaded", function () {
     // #contentsInnerの高さ取得
-    let windowHeight = window.innerHeight;
-    const headerHeight = 47;
-    const breadcrumbHeight = 18;
-    const spaceHeight = 8 + 8 + 16;
-    let contentsInnerHeight = windowHeight - headerHeight - breadcrumbHeight - spaceHeight;
-    document.getElementById("contentsInner").style.height = contentsInnerHeight + "px";
+    //let windowHeight = window.innerHeight;
+    //const headerHeight = 47;
+    //const breadcrumbHeight = 18;
+    //const spaceHeight = 8 + 8 + 16;
+    //let contentsInnerHeight = windowHeight - headerHeight - breadcrumbHeight - spaceHeight;
+    //document.getElementById("contentsInner").style.height = contentsInnerHeight + "px";
 
     // カレンダー表示
     document.querySelectorAll('.datetimepicker').forEach(picker => {

@@ -29,7 +29,7 @@ Partial Public Class LNT0001InvoiceOutput
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TaishoYm As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_TaishoYm As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_TORI コントロール。

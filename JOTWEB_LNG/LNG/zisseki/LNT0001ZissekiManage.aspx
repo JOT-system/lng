@@ -45,17 +45,19 @@
                     <div class="Operation">
                         <div class="actionButtonBox">
                             <!-- 作成日時 -->
-                            <div id="actionTrigger" class="d-flex flex-wrap gap-3 mt-3">
+                            <div id="actionTrigger" class="d-flex flex-wrap gap-3">
                                 <div class="d-flex align-items-center gap-2 me-3">
                                     <!-- 一覧件数 -->
                                     <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </div>
+                                <!-- 有効年月日(開始） -->
                                 <div class="d-flex align-items-center gap-2 me-3">
                                     <strong class="flex-shrink-0">作成日時</strong>
-                                    <div id="datetimepicker1" class="position-relative input-group calendar" data-target-input="nearest">
-                                        <a ondblclick="Field_DBclick('WF_CreateYmd', <%=LIST_BOX_CLASSIFICATION.LC_CALENDAR%>);">
-                                            <asp:TextBox  ID="WF_CreateYmd" runat="server" CssClass="calendarIcon" onblur="MsgClear();" MaxLength="10" ></asp:TextBox>
-                                        </a>
+                                    <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                        <input type="text" id="WF_CreateYmd" runat="server" class="WF_TEXTBOX_CSS" data-input >
+                                        <span class="input-group-text" data-toggle >
+                                            <span class="material-symbols-outlined">calendar_month</span>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">

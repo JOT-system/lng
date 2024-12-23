@@ -25,15 +25,13 @@ th {
 --------------------------------------------------------------*/
 .form-select {
     font-size: 1.3rem;
-    width: 200px;
+    width: 250px;
 }
 input[type=text] {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 p {
     margin-top: 0;
     margin-bottom: 0rem;
 }
-*, ::after, ::before {
-     box-sizing: unset; 
-}
+
