@@ -246,7 +246,8 @@ Public Class LNGMasterPage
                 Dim startHtml = editedPageSource.Substring(0, idPos + incVal + 1)
                 Dim endHtml = editedPageSource.Substring(idPos + incVal + 1)
                 '対象の戻るボタンの後ろにメニューへボタン追加
-                Dim backToMenuElm As String = " " & ControlChars.CrLf & "<input type=""button"" id=""WF_ButtonBackToMenu"" class=""btn-sticky"" value=""メニューへ"" onclick=""ButtonClick('WF_ButtonBackToMenu');"" />" & ControlChars.CrLf & " "
+                'Dim backToMenuElm As String = " " & ControlChars.CrLf & "<input type=""button"" id=""WF_ButtonBackToMenu"" class=""btn-sticky"" value=""メニューへ"" onclick=""ButtonClick('WF_ButtonBackToMenu');"" />" & ControlChars.CrLf & " "
+                Dim backToMenuElm As String = ""
                 'さらにその後ろに「ログアウト」ボタンを追加
                 Dim logoutElm As String = " " & ControlChars.CrLf & "<input type=""button"" id=""WF_ButtonLogOut"" class=""btn-sticky"" value=""ログアウト"" onclick=""location.href='" & String.Format("{0}://{1}/", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority) & "M10000LOGON.aspx'"" />" & ControlChars.CrLf & " "
                 editedPageSource = startHtml & backToMenuElm & logoutElm & endHtml

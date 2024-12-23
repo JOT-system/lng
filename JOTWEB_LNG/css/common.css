@@ -211,8 +211,8 @@ input[type=number] {
     font-weight: bold;
     content: "\00a0★";
     vertical-align: middle;
-    height: 1em;
-    margin-top: -0.8em; /* ネガティブマージンを設定し中央に寄ってるように */
+    height: 2em;
+    /*margin-top: -0.8em;*/ /* ネガティブマージンを設定し中央に寄ってるように */
     overflow-y: hidden;
 }
 
@@ -488,7 +488,7 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
     height: 46px;
     min-width: 600px;
     width: 100%;
-    top: 0;
+    top: 5px;
     overflow: hidden;
 }
 /* 画面ID、タイトル等各文言を格納する表定義 */
@@ -497,7 +497,8 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
     justify-content: space-between;
     align-items: center;
     height: calc(100% - 10px);
-    padding: 5px 24px;
+    padding: 3px 24px;
+    box-sizing:content-box
 }
 /* 表内文言の共通定義個別は次のスタイル定義 */
 #tblTitlebox td {
@@ -2019,7 +2020,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 }
 
 #pnlCommonMessageTitle {
-    width: calc(100% - 20px);
+    width: calc(100%);
     font-weight: bold;
     padding: 10px;
     height: 20px;
@@ -2038,6 +2039,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 #pnlCommonMessageText {
     padding: 10px 10px 15px 15px;
     min-height: 50px;
+    margin-top: 20px;
 }
 
 #pnlCommonMessageText #lblCommonMessageText[data-naeiw="I"]:before,
@@ -2824,7 +2826,7 @@ input[type=number]:focus {
 
 .calendar input {
     width: 120px !important;
-    height: 38px;
+    height: 35px;
     border: 1px solid #ced4da;
     padding: 0.375rem 0.5rem;
     border-radius:0;
