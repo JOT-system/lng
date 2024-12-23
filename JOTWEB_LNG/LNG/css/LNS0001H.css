@@ -40,7 +40,9 @@ div[data-generated='1'] div[id$='_DR'] {
 .fs-5 {
     font-size: 1.5rem !important;
 }
-
+th {
+    text-align: center;
+}
 /*--------------------------------------------------------------
 # サイズ基準
 # 1rem = 16px

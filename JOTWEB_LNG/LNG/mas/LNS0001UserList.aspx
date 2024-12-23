@@ -9,12 +9,12 @@
 <%@ Register Src="~/LNG/inc/LNS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
 <asp:Content ID="LNS0001LH" ContentPlaceHolderID="head" runat="server">
-    <link href='<%=ResolveUrl("~/LNG/css/LNS0001L.css")%>' rel="stylesheet" type="text/css" />
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link href='<%=ResolveUrl("~/LNG/css/LNS0001L.css")%>' rel="stylesheet" type="text/css" />
     <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0001L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
@@ -39,32 +39,30 @@
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
                     <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ一覧</h2>
-                    <div class="headerboxOnly" id="headerbox">
-                        <div class="Operation">
-                            <div class="actionButtonBox">
-                                <div class="leftSide">
-                                    <!-- 一覧件数 -->
-                                    <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                </div>
-                                <div class="rightSide">
-                                    <input type="button" id="WF_ButtonINSERT"   class="btn-sticky btn-action" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
-                                    <%--<input type="button" id="WF_ButtonDebug" class="btn-sticky" value="デバッグ" onclick="ButtonClick('WF_ButtonDebug');" />--%>
-                                    <asp:Label ID="WF_UPLOAD_LABEL" AssociatedControlID="WF_UPLOAD_BTN" runat="server" CssClass="btn-sticky btn-action" Text="ｱｯﾌﾟﾛｰﾄﾞ"> <asp:FileUpload ID="WF_UPLOAD_BTN" runat="server"  onchange="ButtonClick('WF_ButtonUPLOAD')"/>
-                                    </asp:Label>
-                                    <input type="button" id="WF_ButtonHISTORY"  class="btn-sticky" value="変更履歴" onclick="ButtonClick('WF_ButtonHISTORY');" />
-                                    <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
-                                    <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
-                                    <%--<input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />--%>
-                                    <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
-                                    <%--<div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>--%>
-                                    <%--<div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
-                                </div>
-                            </div> <!-- End class=actionButtonBox -->
-                        </div> <!-- End class="Operation" -->
+                    <div class="Operation">
+                        <div class="actionButtonBox">
+                            <div class="leftSide">
+                                <!-- 一覧件数 -->
+                                <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                            </div>
+                            <div class="rightSide">
+                                <input type="button" id="WF_ButtonINSERT"   class="btn-sticky btn-action" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
+                                <%--<input type="button" id="WF_ButtonDebug" class="btn-sticky" value="デバッグ" onclick="ButtonClick('WF_ButtonDebug');" />--%>
+                                <asp:Label ID="WF_UPLOAD_LABEL" AssociatedControlID="WF_UPLOAD_BTN" runat="server" CssClass="btn-sticky btn-action" Text="ｱｯﾌﾟﾛｰﾄﾞ"> <asp:FileUpload ID="WF_UPLOAD_BTN" runat="server"  onchange="ButtonClick('WF_ButtonUPLOAD')"/>
+                                </asp:Label>
+                                <input type="button" id="WF_ButtonHISTORY"  class="btn-sticky" value="変更履歴" onclick="ButtonClick('WF_ButtonHISTORY');" />
+                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
+                                <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
+                                <%--<input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />--%>
+                                <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
+                                <%--<div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>--%>
+                                <%--<div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
+                            </div>
+                        </div> <!-- End class=actionButtonBox -->
+                    </div> <!-- End class="Operation" -->
 
-                        <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
 
-                    </div>
+                    <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
                 </div>
             </div>
         </div>

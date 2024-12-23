@@ -325,10 +325,11 @@ p {
     width: 90% !important;
 }
 #detailkeybox {
-    height: 90% !important;
-    overflow-x:hidden;
+    height: 73% !important;
+    overflow-x: hidden;
     overflow-y: auto !important;
-    padding-bottom:50px;
+    padding-bottom: 180px;
+    position: fixed;
 }
 
 #detailkeybox p[id^=USER_LINE_] {
