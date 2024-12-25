@@ -4,7 +4,11 @@ Imports GrapeCity.Documents.Excel
 Public Class LNT0001InvoiceOutputReport
     Private WW_Workbook As New Workbook  '共通
     Private WW_SheetNo As Integer = 0
-    Private WW_SheetNoTmp As Integer = 0
+    Private WW_SheetNoTmp01 As Integer = 0
+    Private WW_SheetNoTmp02 As Integer = 0
+    Private WW_SheetNoTmp03 As Integer = 0
+    Private WW_SheetNoTmp04 As Integer = 0
+    Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -66,11 +70,21 @@ Public Class LNT0001InvoiceOutputReport
             WW_Workbook.Open(Me.ExcelTemplatePath)
 
             If excelFileName = "④ENEOS_八戸　輸送費請求書.xlsx" Then
+                Dim j As Integer = 0
                 For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
                     If WW_Workbook.Worksheets(i).Name = "入力表" Then
                         WW_SheetNo = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" Then
-                        WW_SheetNoTmp = i
+                        WW_SheetNoTmp01 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
+                        WW_SheetNoTmp02 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "届先毎" Then
+                        WW_SheetNoTmp03 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
+                        WW_SheetNoTmp04 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "TMP" + (j + 1).ToString("00") Then
+                        WW_ArrSheetNo(j) = i
+                        j += 1
                     End If
                 Next
             End If
@@ -130,10 +144,34 @@ Public Class LNT0001InvoiceOutputReport
             WW_Workbook.Worksheets(WW_SheetNo).Range("B1").Value = Integer.Parse(Me.TaishoYYYY)
             WW_Workbook.Worksheets(WW_SheetNo).Range("B2").Value = Integer.Parse(Me.TaishoMM)
 
+            '〇 日付(セルチェック)
+            Dim dayCells As String() = {"91", "94", "97"}
+            Dim lastDay As String = Date.Parse(Me.TaishoYYYY + "/" + Me.TaishoMM + "/01").AddMonths(1).AddDays(-1).ToString("dd")
+            Dim i As Integer = 0
+            For Each dayCell As String In dayCells
+                '★月末日チェック
+                Dim blnFlg As Boolean = True
+                If Integer.Parse(lastDay) = 28 Then
+                ElseIf Integer.Parse(lastDay) = 29 Then
+                    If i < 1 Then blnFlg = False
+                ElseIf Integer.Parse(lastDay) = 30 Then
+                    If i < 2 Then blnFlg = False
+                ElseIf Integer.Parse(lastDay) = 31 Then
+                    blnFlg = False
+                End If
+
+                '★チェックがTRUE
+                If blnFlg = True Then
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("A" + dayCell).Value = ""
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("B" + dayCell).Value = ""
+                End If
+                i += 1
+            Next
+
             '〇 年月（鏡用）
             Dim lastDate As String = Me.TaishoYYYY + "/" + Me.TaishoMM + "/01"
             lastDate = Date.Parse(lastDate).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
-            WW_Workbook.Worksheets(WW_SheetNoTmp).Range("I1").Value = Date.Parse(lastDate)
+            WW_Workbook.Worksheets(WW_SheetNoTmp01).Range("I1").Value = Date.Parse(lastDate)
 
         Catch ex As Exception
             Throw
@@ -145,6 +183,8 @@ Public Class LNT0001InvoiceOutputReport
     ''' </summary>
     Private Sub EditDetailArea()
         Try
+            Dim cellStay As String = ""
+
             'For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO, TODOKEDATE")
             For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO, SHUKADATE")
                 '◯ 届先名
@@ -154,6 +194,68 @@ Public Class LNT0001InvoiceOutputReport
                 '◯ 備考
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = PrintDatarow("REMARK_REP").ToString()
             Next
+
+            '★計算エンジンの無効化
+            WW_Workbook.EnableCalculation = False
+
+            '〇陸事番号(追加)用設定
+            For Each PrintDatarow As DataRow In PrintData.Select("DISPLAYCELL_START<>''")
+                If cellStay <> "" AndAlso cellStay = PrintDatarow("DISPLAYCELL_START").ToString() Then
+                    Continue For
+                End If
+                '〇シート「入力表」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNo).Range(String.Format("{0}:{1}", PrintDatarow("DISPLAYCELL_START").ToString(), PrintDatarow("DISPLAYCELL_END").ToString())).Hidden = False
+                '★ 陸事番号
+                WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("DISPLAYCELL_START").ToString() + "4").Value = PrintDatarow("TANKNUMBER").ToString()
+                '★ 受注数量
+                Dim dblZyutyu As Double = Math.Round(Double.Parse(PrintDatarow("ZYUTYU").ToString()), 1, MidpointRounding.AwayFromZero)
+                WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("DISPLAYCELL_END").ToString() + "4").Value = dblZyutyu.ToString() + "t"
+
+                '〇シート「固定費」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())).Hidden = False
+                '★ トラクタ
+                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("E" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TRACTORNUMBER").ToString()
+                '★ トレーラ
+                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("F" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TANKNUMBER").ToString()
+
+                '表示用セル保管
+                cellStay = PrintDatarow("DISPLAYCELL_START").ToString()
+            Next
+
+            '〇届名称(追加)用設定
+            cellStay = ""
+            For Each PrintDatarow As DataRow In PrintData.Select("TODOKECELL_REP<>''")
+                If cellStay <> "" AndAlso cellStay = PrintDatarow("TODOKECELL_REP").ToString() Then
+                    Continue For
+                End If
+                '〇シート「届先毎」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoTmp03).Range(String.Format("{0}:{0}", PrintDatarow("TODOKECELL_REP").ToString())).Hidden = False
+
+                '〇シート「マスタ」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("{0}:{0}", PrintDatarow("MASTERCELL_REP").ToString())).Hidden = False
+                '★ 設定
+                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("TODOKENAME_REP").ToString()
+
+                Try
+                    '★ シート表示
+                    Dim iDisp As Integer = Integer.Parse(PrintDatarow("SHEETDISPLAY_REP").ToString())
+                    WW_Workbook.Worksheets(WW_ArrSheetNo(iDisp)).Visible = Visibility.Visible
+                    '★ シート名変更
+                    WW_Workbook.Worksheets(WW_ArrSheetNo(iDisp)).Name = PrintDatarow("TODOKENAME_REP").ToString()
+                Catch ex As Exception
+                End Try
+
+                '表示用セル保管
+                cellStay = PrintDatarow("TODOKECELL_REP").ToString()
+            Next
+
+            '★計算エンジンの有効化
+            WW_Workbook.EnableCalculation = True
+
         Catch ex As Exception
             Throw
         Finally

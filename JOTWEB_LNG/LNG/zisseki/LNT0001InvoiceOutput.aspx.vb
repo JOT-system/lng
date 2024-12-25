@@ -18,6 +18,7 @@ Public Class LNT0001InvoiceOutput
 
     '○ 検索結果格納Table
     Private LNT0001tbl As DataTable                                  '実績（アボカド）データ格納用テーブル
+    Private LNT0001Sumtbl As DataTable                               '実績（アボカド）サマリーデータ格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -477,6 +478,7 @@ Public Class LNT0001InvoiceOutput
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
             & " AND LT1.ZISSEKI <> 0                                                " _
+            & String.Format(" AND LT1.DELFLG = '{0}' ", BaseDllConst.C_DELETE_FLG.ALIVE) _
             & " ) LT1                                                                " _
             & " ORDER BY                                                            " _
             & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE  "
@@ -835,13 +837,21 @@ Public Class LNT0001InvoiceOutput
                     CMNPTS.SelectCONVERTMaster(SQLcon, "AVOCADO_TODOKE_MAS", dtAvocadoTodoke)
                 End Using
 
-                LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
-                LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))
-                LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))
-                LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))
-                LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))
-                LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))
-                LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))
+                LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
+                LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
+                LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
+                LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
+                LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
+                LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
+                LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
+                LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
+                LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
+                LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
+                LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
+                LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
+                LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
+                LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
+                LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
 
                 '〇陸事番号マスタ設定
                 For Each dtHachinoheTankrow As DataRow In dtHachinoheTank.Rows
@@ -864,6 +874,16 @@ Public Class LNT0001InvoiceOutput
                         LNT0001tblrow("SETCELL02") = dtHachinoheTankrow("VALUE03") + iTrip.ToString()
                         LNT0001tblrow("SETCELL03") = dtHachinoheTankrow("VALUE04") + iTrip.ToString()
                         LNT0001tblrow("SETLINE") = iTrip.ToString()
+                        If dtHachinoheTankrow("VALUE07").ToString() = "1" Then
+                            LNT0001tblrow("DISPLAYCELL_START") = dtHachinoheTankrow("VALUE02").ToString()
+                            LNT0001tblrow("DISPLAYCELL_END") = dtHachinoheTankrow("VALUE04").ToString()
+                            LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtHachinoheTankrow("VALUE08").ToString()
+                        Else
+                            LNT0001tblrow("DISPLAYCELL_START") = ""
+                            LNT0001tblrow("DISPLAYCELL_END") = ""
+                            LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+                        End If
+
                         '★備考設定用(出荷日と届日が不一致の場合)
                         If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
                             If lastMonth = True Then
@@ -879,11 +899,219 @@ Public Class LNT0001InvoiceOutput
                 For Each dtAvocadoTodokerow As DataRow In dtAvocadoTodoke.Rows
                     Dim condition As String = String.Format("TODOKECODE='{0}'", dtAvocadoTodokerow("KEYCODE01"))
                     For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                        LNT0001tblrow("SHEETSORTNO_REP") = dtAvocadoTodokerow("KEYCODE03")
                         LNT0001tblrow("TODOKENAME_REP") = dtAvocadoTodokerow("VALUE01")
+                        LNT0001tblrow("SHEETNAME_REP") = dtAvocadoTodokerow("VALUE06")
+
+                        If dtAvocadoTodokerow("VALUE02").ToString() = "1" Then
+                            LNT0001tblrow("TODOKECELL_REP") = dtAvocadoTodokerow("VALUE03")
+                            LNT0001tblrow("MASTERCELL_REP") = dtAvocadoTodokerow("VALUE04")
+                            LNT0001tblrow("SHEETDISPLAY_REP") = dtAvocadoTodokerow("VALUE05")
+                        Else
+                            LNT0001tblrow("TODOKECELL_REP") = ""
+                            LNT0001tblrow("MASTERCELL_REP") = ""
+                            LNT0001tblrow("SHEETDISPLAY_REP") = ""
+                        End If
                     Next
                 Next
 
+                ''○各シート(届先名)抽出処理
+                'Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                '    SQLcon.Open()  ' DataBase接続
+                '    '〇実績WORK作成
+                '    WW_InsertHachinoheMoment(SQLcon, reportName)
+                'End Using
+
         End Select
+
+    End Sub
+
+    Protected Sub WW_InsertHachinoheMoment(ByVal SQLcon As MySqlConnection, ByVal reportName As String)
+
+        '○ DB更新SQL(実績WORK取込)
+        Dim SQLDel As String = ""
+        SQLDel &= " DELETE FROM LNG.TMP0001_ZISSEKI; "
+
+        Dim SQLStr As String = ""
+        SQLStr &= " INSERT INTO LNG.TMP0001_ZISSEKI "
+        SQLStr &= " ( RECONO,ORDERORG,KASANORDERORG "
+        SQLStr &= "  ,TODOKECODE,TODOKENAME,TORICODE,TORINAME "
+        SQLStr &= "  ,SHUKABASHO,SHUKANAME,SHUKADATE,SHUKADATE_S,TODOKEDATE "
+        SQLStr &= "  ,ZYUTYU,ZISSEKI,TANNI "
+        SQLStr &= "  ,TANKNUMBER,SYAGATA,TRACTORNUMBER "
+        SQLStr &= "  ,TRIP,DRP,SHUKODATE,KIKODATE "
+        SQLStr &= "  ,ROWSORTNO,SETCELL01,SETCELL02,SETCELL03 "
+        SQLStr &= "  ,SETLINE,TODOKENAME_REP,REMARK_REP "
+        SQLStr &= "  ,DISPLAYCELL_START,DISPLAYCELL_END,DISPLAYCELL_KOTEICHI "
+        SQLStr &= "  ,TODOKECELL_REP,MASTERCELL_REP,SHEETDISPLAY_REP,SHEETSORTNO_REP,SHEETNAME_REP "
+        SQLStr &= "  ,DELFLG,INITYMD,INITUSER,INITTERMID,INITPGID "
+        SQLStr &= "  ,UPDYMD,UPDUSER,UPDTERMID,UPDPGID,RECEIVEYMD ) "
+        SQLStr &= " VALUES "
+        SQLStr &= " ( @RECONO,@ORDERORG,@KASANORDERORG "
+        SQLStr &= "  ,@TODOKECODE,@TODOKENAME,@TORICODE,@TORINAME "
+        SQLStr &= "  ,@SHUKABASHO,@SHUKANAME,@SHUKADATE,@SHUKADATE_S,@TODOKEDATE "
+        SQLStr &= "  ,@ZYUTYU,@ZISSEKI,@TANNI "
+        SQLStr &= "  ,@TANKNUMBER,@SYAGATA,@TRACTORNUMBER "
+        SQLStr &= "  ,@TRIP,@DRP,@SHUKODATE,@KIKODATE "
+        SQLStr &= "  ,@ROWSORTNO,@SETCELL01,@SETCELL02,@SETCELL03 "
+        SQLStr &= "  ,@SETLINE,@TODOKENAME_REP,@REMARK_REP "
+        SQLStr &= "  ,@DISPLAYCELL_START,@DISPLAYCELL_END,@DISPLAYCELL_KOTEICHI "
+        SQLStr &= "  ,@TODOKECELL_REP,@MASTERCELL_REP,@SHEETDISPLAY_REP,@SHEETSORTNO_REP,@SHEETNAME_REP "
+        SQLStr &= "  ,@DELFLG,@INITYMD,@INITUSER,@INITTERMID,@INITPGID "
+        SQLStr &= "  ,@UPDYMD,@UPDUSER,@UPDTERMID,@UPDPGID,@RECEIVEYMD ); "
+
+        Try
+            Using SQLDelcmd As New MySqlCommand(SQLDel, SQLcon), SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                '〇実績WORKテーブル削除
+                SQLDelcmd.CommandTimeout = 300
+                SQLDelcmd.ExecuteNonQuery()
+
+                Dim P_RECONO As MySqlParameter = SQLcmd.Parameters.Add("@RECONO", MySqlDbType.VarChar)                              '
+                Dim P_ORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORG", MySqlDbType.VarChar)                          '
+                Dim P_KASANORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANORDERORG", MySqlDbType.VarChar)                '
+                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar)                      '
+                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar)                      '
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                          '
+                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)                          '
+                Dim P_SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar)                      '
+                Dim P_SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar)                        '
+                Dim P_SHUKADATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE", MySqlDbType.VarChar)                        '
+                Dim P_SHUKADATE_S As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE_S", MySqlDbType.VarChar)                    '
+                Dim P_TODOKEDATE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE", MySqlDbType.VarChar)                      '
+                Dim P_ZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@ZYUTYU", MySqlDbType.VarChar)                              '
+                Dim P_ZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@ZISSEKI", MySqlDbType.VarChar)                            '
+                Dim P_TANNI As MySqlParameter = SQLcmd.Parameters.Add("@TANNI", MySqlDbType.VarChar)                                '
+                Dim P_TANKNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", MySqlDbType.VarChar)                      '
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar)                            '
+                Dim P_TRACTORNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUMBER", MySqlDbType.VarChar)                '
+                Dim P_TRIP As MySqlParameter = SQLcmd.Parameters.Add("@TRIP", MySqlDbType.VarChar)                                  '
+                Dim P_DRP As MySqlParameter = SQLcmd.Parameters.Add("@DRP", MySqlDbType.VarChar)                                    '
+                Dim P_SHUKODATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKODATE", MySqlDbType.VarChar)                        '
+                Dim P_KIKODATE As MySqlParameter = SQLcmd.Parameters.Add("@KIKODATE", MySqlDbType.VarChar)                          '
+                Dim P_ROWSORTNO As MySqlParameter = SQLcmd.Parameters.Add("@ROWSORTNO", MySqlDbType.VarChar)                        '
+                Dim P_SETCELL01 As MySqlParameter = SQLcmd.Parameters.Add("@SETCELL01", MySqlDbType.VarChar)                        '
+                Dim P_SETCELL02 As MySqlParameter = SQLcmd.Parameters.Add("@SETCELL02", MySqlDbType.VarChar)                        '
+                Dim P_SETCELL03 As MySqlParameter = SQLcmd.Parameters.Add("@SETCELL03", MySqlDbType.VarChar)                        '
+                Dim P_SETLINE As MySqlParameter = SQLcmd.Parameters.Add("@SETLINE", MySqlDbType.VarChar)                            '
+                Dim P_TODOKENAME_REP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME_REP", MySqlDbType.VarChar)              '
+                Dim P_REMARK_REP As MySqlParameter = SQLcmd.Parameters.Add("@REMARK_REP", MySqlDbType.VarChar)                      '
+                Dim P_DISPLAYCELL_START As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYCELL_START", MySqlDbType.VarChar)        '
+                Dim P_DISPLAYCELL_END As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYCELL_END", MySqlDbType.VarChar)            '
+                Dim P_DISPLAYCELL_KOTEICHI As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYCELL_KOTEICHI", MySqlDbType.VarChar)  '
+                Dim P_TODOKECELL_REP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECELL_REP", MySqlDbType.VarChar)              '
+                Dim P_MASTERCELL_REP As MySqlParameter = SQLcmd.Parameters.Add("@MASTERCELL_REP", MySqlDbType.VarChar)              '
+                Dim P_SHEETDISPLAY_REP As MySqlParameter = SQLcmd.Parameters.Add("@SHEETDISPLAY_REP", MySqlDbType.VarChar)          '
+                Dim P_SHEETSORTNO_REP As MySqlParameter = SQLcmd.Parameters.Add("@SHEETSORTNO_REP", MySqlDbType.VarChar)            '
+                Dim P_SHEETNAME_REP As MySqlParameter = SQLcmd.Parameters.Add("@SHEETNAME_REP", MySqlDbType.VarChar)                '
+
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)            '削除フラグ
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)             '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar)       '登録ユーザーID
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar)   '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar)       '登録プログラムＩＤ
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)               '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar)         '更新ユーザーID
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar)     '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar)         '更新プログラムＩＤ
+                Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.VarChar)       '集信日時
+
+                Dim WW_DATENOW As DateTime = Date.Now
+                For Each LNT0001tblrow As DataRow In LNT0001tbl.Rows
+                    P_RECONO.Value = LNT0001tblrow("RECONO")
+                    P_ORDERORG.Value = LNT0001tblrow("ORDERORG")
+                    P_KASANORDERORG.Value = LNT0001tblrow("KASANORDERORG")
+                    P_TODOKECODE.Value = LNT0001tblrow("TODOKECODE")
+                    P_TODOKENAME.Value = LNT0001tblrow("TODOKENAME")
+                    P_TORICODE.Value = LNT0001tblrow("TORICODE")
+                    P_TORINAME.Value = LNT0001tblrow("TORINAME")
+                    P_SHUKABASHO.Value = LNT0001tblrow("SHUKABASHO")
+                    P_SHUKANAME.Value = LNT0001tblrow("SHUKANAME")
+                    P_SHUKADATE.Value = LNT0001tblrow("SHUKADATE")
+                    'P_SHUKADATE_S.Value = LNT0001tblrow("SHUKADATE")
+                    If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                        P_SHUKADATE_S.Value = Date.Parse(LNT0001tblrow("TODOKEDATE")).ToString("yyyy/MM/dd")
+                    Else
+                        P_SHUKADATE_S.Value = Date.Parse(LNT0001tblrow("SHUKADATE")).ToString("yyyy/MM/dd")
+                    End If
+                    P_TODOKEDATE.Value = LNT0001tblrow("TODOKEDATE")
+                    P_ZYUTYU.Value = LNT0001tblrow("ZYUTYU")
+                    P_ZISSEKI.Value = LNT0001tblrow("ZISSEKI")
+                    P_TANNI.Value = LNT0001tblrow("TANNI")
+                    P_TANKNUMBER.Value = LNT0001tblrow("TANKNUMBER")
+                    P_SYAGATA.Value = LNT0001tblrow("SYAGATA")
+                    P_TRACTORNUMBER.Value = LNT0001tblrow("TRACTORNUMBER")
+                    P_TRIP.Value = LNT0001tblrow("TRIP")
+                    P_DRP.Value = LNT0001tblrow("DRP")
+                    P_SHUKODATE.Value = LNT0001tblrow("SHUKODATE")
+                    P_KIKODATE.Value = LNT0001tblrow("KIKODATE")
+                    P_ROWSORTNO.Value = LNT0001tblrow("ROWSORTNO")
+                    P_SETCELL01.Value = LNT0001tblrow("SETCELL01")
+                    P_SETCELL02.Value = LNT0001tblrow("SETCELL02")
+                    P_SETCELL03.Value = LNT0001tblrow("SETCELL03")
+                    P_SETLINE.Value = LNT0001tblrow("SETLINE")
+                    P_TODOKENAME_REP.Value = LNT0001tblrow("TODOKENAME_REP")
+                    P_REMARK_REP.Value = LNT0001tblrow("REMARK_REP").ToString()
+                    P_DISPLAYCELL_START.Value = LNT0001tblrow("DISPLAYCELL_START")
+                    P_DISPLAYCELL_END.Value = LNT0001tblrow("DISPLAYCELL_END")
+                    P_DISPLAYCELL_KOTEICHI.Value = LNT0001tblrow("DISPLAYCELL_KOTEICHI")
+                    P_TODOKECELL_REP.Value = LNT0001tblrow("TODOKECELL_REP")
+                    P_MASTERCELL_REP.Value = LNT0001tblrow("MASTERCELL_REP")
+                    P_SHEETDISPLAY_REP.Value = LNT0001tblrow("SHEETDISPLAY_REP")
+                    P_SHEETSORTNO_REP.Value = LNT0001tblrow("SHEETSORTNO_REP")
+                    P_SHEETNAME_REP.Value = LNT0001tblrow("SHEETNAME_REP")
+
+                    P_DELFLG.Value = LNT0001tblrow("DELFLG")                '削除フラグ
+                    P_INITYMD.Value = WW_DATENOW                            '登録年月日
+                    P_INITUSER.Value = Master.USERID                        '登録ユーザーID
+                    P_INITTERMID.Value = Master.USERTERMID                  '登録端末
+                    P_INITPGID.Value = Master.MAPID
+                    P_UPDYMD.Value = WW_DATENOW                             '更新年月日
+                    P_UPDUSER.Value = Master.USERID                         '更新ユーザーID
+                    P_UPDTERMID.Value = Master.USERTERMID                   '更新端末
+                    P_UPDPGID.Value = Master.MAPID
+                    P_RECEIVEYMD.Value = C_DEFAULT_YMD                      '集信日時
+
+                    SQLcmd.CommandTimeout = 300
+                    SQLcmd.ExecuteNonQuery()
+                Next
+
+            End Using
+
+            Dim SQLSUMStr As String = ""
+            '-- SELECT
+            SQLSUMStr &= " SELECT "
+            SQLSUMStr &= "   tmp0001.SHEETSORTNO_REP "
+            SQLSUMStr &= " , tmp0001.TODOKECODE "
+            SQLSUMStr &= " , tmp0001.TODOKENAME "
+            SQLSUMStr &= " , tmp0001.TODOKENAME_REP "
+            SQLSUMStr &= " , tmp0001.SHEETNAME_REP "
+            SQLSUMStr &= " , DATE_FORMAT(tmp0001.SHUKADATE_S, '%Y/%m/%d') AS SHUKADATE_S "
+            SQLSUMStr &= " , tmp0001.SYAGATA "
+            SQLSUMStr &= " , SUM(tmp0001.ZISSEKI) AS ZISSEKI "
+            SQLSUMStr &= " , COUNT(1) AS TANK_CNT "
+            '-- FROM
+            SQLSUMStr &= " FROM LNG.tmp0001_zisseki tmp0001 "
+            SQLSUMStr &= " GROUP BY "
+            SQLSUMStr &= "   tmp0001.SHEETSORTNO_REP "
+            SQLSUMStr &= " , tmp0001.TODOKECODE "
+            SQLSUMStr &= " , tmp0001.TODOKENAME "
+            SQLSUMStr &= " , tmp0001.TODOKENAME_REP "
+            SQLSUMStr &= " , tmp0001.SHEETNAME_REP "
+            SQLSUMStr &= " , tmp0001.SHUKADATE_S "
+            SQLSUMStr &= " , tmp0001.SYAGATA "
+            SQLSUMStr &= " ORDER BY "
+            SQLSUMStr &= "   tmp0001.SHEETSORTNO_REP "
+            SQLSUMStr &= " , tmp0001.TODOKECODE "
+            SQLSUMStr &= " , tmp0001.TODOKENAME "
+            SQLSUMStr &= " , tmp0001.TODOKENAME_REP "
+            SQLSUMStr &= " , tmp0001.SHEETNAME_REP "
+            SQLSUMStr &= " , tmp0001.SHUKADATE_S "
+            SQLSUMStr &= " , tmp0001.SYAGATA "
+
+            LNT0001Sumtbl = CMNPTS.SelectSearch(SQLSUMStr)
+
+        Catch ex As Exception
+        End Try
 
     End Sub
 
