@@ -327,7 +327,7 @@ Public Class LNGMasterPage
             If isNormal(CS0051UserInfo.ERR) Then
                 USERID = CS0051UserInfo.USERID
                 '                ROLE_COMP = CS0051UserInfo.CAMPROLE
-                '                ROLE_ORG = CS0051UserInfo.ORGROLE
+                ROLE_ORG = CS0051UserInfo.ORG
                 PROF_REPORT = CS0051UserInfo.RPRTPROFID
                 PROF_VIEW = CS0051UserInfo.VIEWPROFID
                 '20191101-追加-STRAT
@@ -384,7 +384,7 @@ Public Class LNGMasterPage
                 MF_USERID.Value = DirectCast(.FindControl("MF_USERID"), HiddenField).Value
                 MF_USERCAMP.Value = DirectCast(.FindControl("MF_USERCAMP"), HiddenField).Value                         'MAPID
                 '                MF_COMP_ROLE.Value = DirectCast(.FindControl("MF_COMP_ROLE"), HiddenField).Value
-                '                MF_ORG_ROLE.Value = DirectCast(.FindControl("MF_ORG_ROLE"), HiddenField).Value
+                MF_ORG_ROLE.Value = DirectCast(.FindControl("MF_ORG_ROLE"), HiddenField).Value
                 MF_PROF_REPORT.Value = DirectCast(.FindControl("MF_PROF_REPORT"), HiddenField).Value             '帳票プロフID
                 MF_PROF_VIEW.Value = DirectCast(.FindControl("MF_PROF_VIEW"), HiddenField).Value                 '画面プロフID
                 '20191101-追加-START
@@ -435,7 +435,7 @@ Public Class LNGMasterPage
             If isNormal(CS0051UserInfo.ERR) Then
                 USERID = CS0051UserInfo.USERID
                 'ROLE_COMP = CS0051UserInfo.CAMPROLE
-                'ROLE_ORG = CS0051UserInfo.ORGROLE
+                ROLE_ORG = CS0051UserInfo.ORG
                 PROF_VIEW = CS0051UserInfo.VIEWPROFID
                 PROF_REPORT = CS0051UserInfo.RPRTPROFID
                 '20191101-追加-START
