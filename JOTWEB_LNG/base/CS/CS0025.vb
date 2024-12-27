@@ -127,7 +127,7 @@ Public Structure CS0025AUTHORget
             '検索SQL文
             Dim SQLStr As String =
                      "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
-                   & " FROM       COM.lns0001_user        A                 " _
+                   & " FROM       COM.LNS0001_USER        A                 " _
                    & " INNER JOIN COM.LNS0005_ROLE        B              ON " _
                    & "       B.OBJECT   = @P2                         " _
                    & "   and B.ROLE     = CASE B.OBJECT               " _
@@ -146,7 +146,7 @@ Public Structure CS0025AUTHORget
                    & "   and A.DELFLG  <> '1'                         " _
                    & "ORDER BY B.SEQ                                  "
             '  "SELECT rtrim(B.PERMITCODE) as PERMITCODE        " _
-            '& " FROM       COM.lns0001_user        A                 " _
+            '& " FROM       COM.LNS0001_USER        A                 " _
             '& " INNER JOIN COM.LNS0005_ROLE        B              ON " _
             '& "       B.OBJECT   = @P2                         " _
             '& "   and B.ROLE     = CASE B.OBJECT               " _

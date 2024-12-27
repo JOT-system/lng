@@ -355,7 +355,7 @@ Public Class LNS0001WRKINC
             & "   , STYMD                                   " _
             & "   , UPDTIMSTP                               " _
             & " FROM                                        " _
-            & "     COM.lns0001_user                        " _
+            & "     COM.LNS0001_USER                        " _
             & " WHERE                                       " _
             & "         USERID  = @P1                       " _
             & "     AND STYMD   = @P2                       "

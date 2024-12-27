@@ -277,7 +277,7 @@ Public Class LNS0001UserDetail
         SQLStr.AppendLine("     USERID             ")
         SQLStr.AppendLine("   , STYMD              ")
         SQLStr.AppendLine(" FROM                   ")
-        SQLStr.AppendLine("     COM.lns0001_user   ")
+        SQLStr.AppendLine("     COM.LNS0001_USER   ")
         SQLStr.AppendLine(" WHERE                  ")
         SQLStr.AppendLine("         USERID  = @USERID  ")
         SQLStr.AppendLine("     AND STYMD   = @STYMD  ")
@@ -375,7 +375,7 @@ Public Class LNS0001UserDetail
             & "   ,STYMD            " _
             & "   ,ENDYMD           " _
             & "FROM                 " _
-            & "    COM.lns0001_user " _
+            & "    COM.LNS0001_USER " _
             & "WHERE                " _
             & "    USERID  = @P1    " _
             & "AND DELFLG  = @P2    " _
@@ -450,7 +450,7 @@ Public Class LNS0001UserDetail
             & "   ,STYMD            " _
             & "   ,ENDYMD           " _
             & "FROM                 " _
-            & "    COM.lns0001_user " _
+            & "    COM.LNS0001_USER " _
             & "WHERE                " _
             & "    USERID = @P1     " _
             & "AND DELFLG = @P2     " _
@@ -537,7 +537,7 @@ Public Class LNS0001UserDetail
 
         '○ DB更新SQL(ユーザーマスタ)
         Dim SQLStr As String =
-              "     INSERT INTO COM.lns0001_user            " _
+              "     INSERT INTO COM.LNS0001_USER            " _
             & "        (DELFLG                              " _
             & "       , USERID                              " _
             & "       , STAFFNAMES                          " _
@@ -635,7 +635,7 @@ Public Class LNS0001UserDetail
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.lns0001_user                       " _
+            & "     COM.LNS0001_USER                       " _
             & " WHERE                                      " _
             & "         USERID = @P01                      " _
             & "     AND STYMD  = @P08                      " _
@@ -782,7 +782,7 @@ Public Class LNS0001UserDetail
 
         '○ DB更新SQL(ユーザーパスワードマスタ)
         SQLStr =
-              "     INSERT INTO COM.LNS0002_userpass                                  " _
+              "     INSERT INTO COM.LNS0002_USERPASS                                  " _
             & "        (DELFLG                                                        " _
             & "       , USERID                                                        " _
             & "       , PASSWORD                                                      " _
@@ -835,7 +835,7 @@ Public Class LNS0001UserDetail
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.LNS0002_userpass                   " _
+            & "     COM.LNS0002_USERPASS                   " _
             & " WHERE                                      " _
             & "     USERID = @P01                          "
 
@@ -957,7 +957,7 @@ Public Class LNS0001UserDetail
 
         '○ DB更新SQL(ユーザーマスタ)
         Dim SQLStr As String =
-              "UPDATE COM.lns0001_user " _
+              "UPDATE COM.LNS0001_USER " _
             & "SET                     " _
             & "    ENDYMD     = @P03   " _
             & "   ,UPDYMD     = @P04   " _
@@ -998,7 +998,7 @@ Public Class LNS0001UserDetail
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.lns0001_user                       " _
+            & "     COM.LNS0001_USER                       " _
             & " WHERE                                      " _
             & "         USERID = @P01                      " _
             & "     AND STYMD  = @P02                      "
@@ -1095,7 +1095,7 @@ Public Class LNS0001UserDetail
 
             '○ DB更新SQL(ユーザーマスタ)
             SQLStr =
-              "UPDATE COM.lns0001_user " _
+              "UPDATE COM.LNS0001_USER " _
             & "SET                     " _
             & "    STYMD      = @P03   " _
             & "   ,UPDYMD     = @P04   " _

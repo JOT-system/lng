@@ -190,7 +190,7 @@ Public Class CS0051UserInfo : Implements IDisposable
             'SQLStr.AppendLine(" , rtrim(UR.APPROVALID) as APPROVALID")
             SQLStr.AppendLine(" , rtrim(ORG.CONTROLCODE) as CONTROLCODE")
             SQLStr.AppendLine(" , rtrim(CNTRL.NAME) as CONTROLNAME")
-            SQLStr.AppendLine("FROM  COM.lns0001_user UR")
+            SQLStr.AppendLine("FROM  COM.LNS0001_USER UR")
             SQLStr.AppendLine("INNER JOIN LNG.LNM0002_ORG ORG")
             SQLStr.AppendLine(" ON ORG.CAMPCODE = UR.CAMPCODE")
             SQLStr.AppendLine("   and ORG.ORGCODE = UR.ORG")

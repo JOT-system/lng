@@ -287,8 +287,8 @@ Public Class LNS0001UserList
             & "   , coalesce(RTRIM(LNS0001.RPRTPROFID), '')                                  AS RPRTPROFID          " _
             & "   , coalesce(RTRIM(LNS0001.VARIANT), '')                                     AS VARIANT             " _
             & " FROM                                                                                                " _
-            & "     COM.lns0001_user LNS0001                                                                        " _
-            & " INNER JOIN COM.LNS0002_userpass LNS0002                                                             " _
+            & "     COM.LNS0001_USER LNS0001                                                                        " _
+            & " INNER JOIN COM.LNS0002_USERPASS LNS0002                                                             " _
             & "     ON  LNS0002.USERID = LNS0001.USERID                                                             " _
             & "     AND LNS0002.DELFLG = LNS0001.DELFLG                                                             " _
             & " INNER JOIN LNG.LNM0002_ORG LNM0002                                                                  " _
@@ -772,7 +772,7 @@ Public Class LNS0001UserList
 
         '○ DB更新SQL(ユーザマスタ)
         Dim SQLStr As String =
-              "     INSERT INTO COM.lns0001_user            " _
+              "     INSERT INTO COM.LNS0001_USER            " _
             & "        (DELFLG                              " _
             & "       , USERID                              " _
             & "       , STAFFNAMES                          " _
@@ -870,7 +870,7 @@ Public Class LNS0001UserList
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.lns0001_user                       " _
+            & "     COM.LNS0001_USER                       " _
             & " WHERE                                      " _
             & "         USERID = @P01                      " _
             & "     AND STYMD  = @P08                      "
@@ -1007,7 +1007,7 @@ Public Class LNS0001UserList
 
         '○ DB更新SQL(ユーザパスワードマスタ)
         SQLStr =
-              "     INSERT INTO COM.LNS0002_userpass                                  " _
+              "     INSERT INTO COM.LNS0002_USERPASS                                  " _
             & "        (DELFLG                                                        " _
             & "       , USERID                                                        " _
             & "       , PASSWORD                                                      " _
@@ -1067,7 +1067,7 @@ Public Class LNS0001UserList
             & "   , RECEIVEYMD                             " _
             & "   , UPDTIMSTP                              " _
             & " FROM                                       " _
-            & "     COM.LNS0002_userpass                   " _
+            & "     COM.LNS0002_USERPASS                   " _
             & " WHERE                                      " _
             & "     USERID = @P01                          "
 

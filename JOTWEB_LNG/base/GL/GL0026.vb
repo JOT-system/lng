@@ -87,7 +87,7 @@ Public Class GL0026UserList
                    & " (SELECT DISTINCT                     " _
                    & "      RTRIM(A.USERID) AS CODE         " _
                    & "     ,RTRIM(A.STAFFNAMEL) AS NAMES    " _
-                   & "  FROM    COM.lns0001_user A          " _
+                   & "  FROM    COM.LNS0001_USER A          " _
                    & "  WHERE                               " _
                    & "          A.DELFLG   <> @P0           " _
                    & "      AND @P1 >= A.STYMD              " _
@@ -120,7 +120,7 @@ Public Class GL0026UserList
                    & "  FROM                                " _
                    & "      LNG.LNM0002_ORG A               " _
                    & "  INNER JOIN                          " _
-                   & "      COM.lns0001_user B              " _
+                   & "      COM.LNS0001_USER B              " _
                    & "  ON                                  " _
                    & "      B.ORG = A.CONTROLCODE           " _
                    & "  AND B.DELFLG   <> @P0               " _
