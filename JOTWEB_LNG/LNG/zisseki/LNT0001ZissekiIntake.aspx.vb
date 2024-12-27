@@ -26,6 +26,7 @@ Public Class LNT0001ZissekiIntake
     Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
 
     '○ 共通関数宣言(BASEDLL)
+    Private CS0007CheckAuthority As New CS0007CheckAuthority        '更新権限チェック
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
     Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
     Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
@@ -190,13 +191,22 @@ Public Class LNT0001ZissekiIntake
             Exit Sub
         End If
 
+        'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+
         Dim SaveIdx As Integer = 0
+        Dim FindFlg As Integer = 0
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To toriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
-            If work.WF_SEL_TORICODE.Text = toriList.Items(i).Value Then
-                SaveIdx = i + 1
+            'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
+            Dim wTori As String = toriList.Items(i).Value
+            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori = wTori)
+            If exists Then
+                WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
+                If work.WF_SEL_TORICODE.Text = toriList.Items(i).Value Then
+                    SaveIdx = i + 1
+                End If
             End If
         Next
         WF_TORI.SelectedIndex = SaveIdx
@@ -292,24 +302,55 @@ Public Class LNT0001ZissekiIntake
             & " FROM                                                                   " _
             & "     LNG.LNT0003_ZISSEKIHIST LT3                                        " _
             & " WHERE                                                                  " _
-            & "     LT3.TAISHOYM = @P1                                                 " _
-            & " AND LT3.TORICODE like @P2                                              " _
-            & " ORDER BY                                                               " _
-            & "     LT3.INTAKEDATE DESC                                                "
+            & "     LT3.TAISHOYM = @P1                                                 "
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        ' 取引先
+        If WF_TORI.SelectedIndex = 0 Then
+            If WF_TORI.Items.Count - 1 > 0 Then
+                SQLStr += " AND LT3.TORICODE in ("
+                'WF_TORIの先頭に"選択してください"があるためj=1とする
+                For j As Integer = 1 To WF_TORI.Items.Count - 1
+                    SQLStr += "'"
+                    SQLStr += WF_TORI.Items(j).Value
+                    SQLStr += "'"
+                    If j < WF_TORI.Items.Count - 1 Then
+                        SQLStr += ","
+                    Else
+                        SQLStr += ")"
+                    End If
+                Next
+            End If
+        Else
+            SQLStr += " AND LT3.TORICODE = '" & WF_TORI.SelectedValue & "'"
+        End If
+
+        '部署
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        If ApiInfo.Count > 0 Then
+            SQLStr += " AND LT3.SHIPORG in ("
+            For j As Integer = 0 To ApiInfo.Count - 1
+                SQLStr += "'"
+                SQLStr += ApiInfo(j).Org
+                SQLStr += "'"
+                If j < ApiInfo.Count - 1 Then
+                    SQLStr += ","
+                Else
+                    SQLStr += ")"
+                End If
+            Next
+        End If
+
+        SQLStr += " ORDER BY                                                               " _
+                & "     LT3.INTAKEDATE DESC                                                "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                 Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Decimal, 6)  '対象年月
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar, 20)  '取引先コード
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                     PARA1.Value = CDate(WF_TaishoYm.Value & "/01").ToString("yyyyMM")
                 Else
                     PARA1.Value = Date.Now.ToString("yyyyMM")
-                End If
-                If WF_TORI.SelectedIndex = 0 Then
-                    PARA2.Value = "%"
-                Else
-                    PARA2.Value = WF_TORI.SelectedValue
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -613,6 +654,15 @@ Public Class LNT0001ZissekiIntake
     ''' アボカド（Kintone）受信確認
     ''' </summary>
     Private Sub WF_KintoneGetconfirm_Click()
+
+        '○ 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            MAPDataGet(SQLcon)
+        End Using
+
+
         Dim result As DateTime
         If Not DateTime.TryParseExact(Me.WF_TaishoYm.Value & "/01", "yyyy/MM/dd", Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, result) Then
             Master.Output(C_MESSAGE_NO.CTN_INPUT_DATE_ERR, C_MESSAGE_TYPE.ERR, "対象年月", "", True)
@@ -624,9 +674,20 @@ Public Class LNT0001ZissekiIntake
             Exit Sub
         End If
 
-        Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
-        Msg += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
-        Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.INF, "実績取込を行います", Msg, True, "", True)
+        Dim Msg1 As String = ""
+        Dim MsgType As String = ""
+        If LNT0003tbl.Rows.Count = 0 Then
+            Msg1 = "実績取込を行います"
+            MsgType = C_MESSAGE_TYPE.INF
+        Else
+            Msg1 = "既に実績を取り込み済ですがよろしいですか？"
+            MsgType = C_MESSAGE_TYPE.WAR
+        End If
+
+        Dim Msg2 As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
+        Msg2 += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
+
+        Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, MsgType, Msg1, Msg2, True, "", True)
 
     End Sub
 
@@ -643,74 +704,37 @@ Public Class LNT0001ZissekiIntake
             CS0054KintoneApi.CreateDataTable(LNT0001tbl)
             LNT0001tbl_SV = LNT0001tbl.Clone
 
-            '------------------------------------------------------------
-            '指定された荷主に該当するアボカド接続情報（営業所毎）取得
-            '------------------------------------------------------------
-            Dim toriList1 As New ListBox
-            Dim toriList2 As New ListBox
-            Dim toriList3 As New ListBox
-            Dim toriList4 As New ListBox
-            Dim toriList5 As New ListBox
-            GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
-            GS0007FIXVALUElst.CLAS = "AVOCADOINFO"
-            GS0007FIXVALUElst.LISTBOX1 = toriList1
-            GS0007FIXVALUElst.LISTBOX2 = toriList2
-            GS0007FIXVALUElst.LISTBOX3 = toriList3
-            GS0007FIXVALUElst.LISTBOX4 = toriList4
-            GS0007FIXVALUElst.LISTBOX5 = toriList5
-            GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
-            GS0007FIXVALUElst.GS0007FIXVALUElst()
-            If Not isNormal(GS0007FIXVALUElst.ERR) Then
-                Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "固定値取得エラー")
-                Exit Sub
-            End If
-
-            Dim ApiInfo As New List(Of AVOCADOINFO)
-            'リスト３～５（VALUE3～5）に取引先コードが設定されている
-            For i As Integer = 0 To toriList1.Items.Count - 1
-                '■参考
-                'toriList1.Items(i).Value:対象部署
-                'toriList1.Items(i).Text:対象アプリID
-                'toriList2.Items(i).Text:対象トークン
-                If toriList3.Items(i).Text = WF_TORI.SelectedValue Then
-                    ApiInfo.Add(New AVOCADOINFO(toriList1.Items(i).Value, toriList1.Items(i).Text, toriList2.Items(i).Text))
-                End If
-                If toriList4.Items(i).Text = WF_TORI.SelectedValue Then
-                    ApiInfo.Add(New AVOCADOINFO(toriList1.Items(i).Value, toriList1.Items(i).Text, toriList2.Items(i).Text))
-                End If
-                If toriList5.Items(i).Text = WF_TORI.SelectedValue Then
-                    ApiInfo.Add(New AVOCADOINFO(toriList1.Items(i).Value, toriList1.Items(i).Text, toriList2.Items(i).Text))
-                End If
-            Next
-
-            '-----------------------------------------------------
-            '指定された荷主に該当する営業所分の処理を行う
-            '-----------------------------------------------------
-            For i As Integer = 0 To ApiInfo.Count - 1
-
-                'WebAPI実行（アボカドデータ取得）
-                CS0054KintoneApi.ApiApplId = ApiInfo(i).AppId
-                CS0054KintoneApi.ApiToken = ApiInfo(i).Token
-                CS0054KintoneApi.ToriCode = WF_TORI.SelectedValue
-                CS0054KintoneApi.YmdFrom = WF_TaishoYm.Value & "/01"
-                CS0054KintoneApi.YmdTo = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
-                LNT0001tbl = CS0054KintoneApi.GetRecords()
-
-                If LNT0001tbl.Rows.Count > 0 Then
-                    '実績テーブル、実績履歴テーブル更新（アボカドデータ保存）
-                    ZissekiUpdate(ApiInfo(i).Org, LNT0001tbl, WW_ErrSW)
-                    If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
-                        Exit Sub
-                    End If
-                End If
-
-                '取得データ保存（累積）
-                LNT0001tbl_SV.Merge(LNT0001tbl)
-            Next
+            'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
+            Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
 
             '○ 画面表示データ取得
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()  ' DataBase接続
+                '-----------------------------------------------------
+                '指定された荷主に該当する営業所分の処理を行う
+                '-----------------------------------------------------
+                For i As Integer = 0 To ApiInfo.Count - 1
+                    'WebAPI実行（アボカドデータ取得）
+                    CS0054KintoneApi.ApiApplId = ApiInfo(i).AppId
+                    CS0054KintoneApi.ApiToken = ApiInfo(i).Token
+                    CS0054KintoneApi.ToriCode = WF_TORI.SelectedValue
+                    CS0054KintoneApi.YmdFrom = WF_TaishoYm.Value & "/01"
+                    CS0054KintoneApi.YmdTo = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                    LNT0001tbl = CS0054KintoneApi.GetRecords()
+
+                    If LNT0001tbl.Rows.Count > 0 Then
+                        '実績テーブル、実績履歴テーブル更新（アボカドデータ保存）
+                        ZissekiUpdate(ApiInfo(i).Org, LNT0001tbl, WW_ErrSW)
+                        If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
+                            Exit Sub
+                        End If
+                    End If
+
+                    '取得データ保存（累積）
+                    LNT0001tbl_SV.Merge(LNT0001tbl)
+                Next
+
+                '○ 画面表示データ取得
                 MAPDataGet(SQLcon)
             End Using
 
@@ -760,32 +784,6 @@ Public Class LNT0001ZissekiIntake
 
 
     End Sub
-
-    ''' <summary>
-    ''' キントーンAPI
-    ''' </summary>
-    Private Class AVOCADOINFO
-        ''' <summary>
-        ''' 部署
-        ''' </summary>
-        Public Property Org As String
-        ''' <summary>
-        ''' アプリID
-        ''' </summary>
-        Public Property AppId As String
-        ''' <summary>
-        ''' トークン
-        ''' </summary>
-        Public Property Token As String
-        ''' <summary>
-        ''' コンストラクタ
-        ''' </summary>
-        Public Sub New(Org As String, AppId As String, Token As String)
-            Me.Org = Org
-            Me.AppId = AppId
-            Me.Token = Token
-        End Sub
-    End Class
 
     ''' <summary>
     ''' 実績テーブル更新
