@@ -1871,7 +1871,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("        AND A08.ORGCODE = A01.PAYKEIJYOBRANCHCD")
         SQLBldr.AppendLine("        AND A08.DELFLG = @P01")
         '[結合テーブル]ユーザーマスタ
-        SQLBldr.AppendLine("    LEFT JOIN com.lns0001_user A09")
+        SQLBldr.AppendLine("    LEFT JOIN COM.LNS0001_USER A09")
         SQLBldr.AppendLine("        ON A09.USERID = '" & htParm(PAYMENTLINK_KEY.PM_USERID).ToString & "'")
         SQLBldr.AppendLine("        AND A09.DELFLG = @P01")
         '[結合テーブル]支払先マスタ連携
@@ -2283,7 +2283,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("        AND A08.ORGCODE = A01.PAYKEIJYOBRANCHCD")
         SQLBldr.AppendLine("        AND A08.DELFLG = @P01")
         '[結合テーブル]ユーザーマスタ
-        SQLBldr.AppendLine("    LEFT JOIN com.lns0001_user A09")
+        SQLBldr.AppendLine("    LEFT JOIN COM.LNS0001_USER A09")
         SQLBldr.AppendLine("        ON A09.USERID = '" & htParm(PAYMENTLINK_KEY.PM_USERID).ToString & "'")
         SQLBldr.AppendLine("        AND A09.DELFLG = @P01")
         '[結合テーブル]支払先マスタ連携
@@ -2577,7 +2577,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("        AND A07.ORGCODE = A01.PAYFILINGBRANCH")
         SQLBldr.AppendLine("        AND A07.DELFLG = @P01")
         '[結合テーブル]ユーザーマスタ
-        SQLBldr.AppendLine("    LEFT JOIN com.lns0001_user A08")
+        SQLBldr.AppendLine("    LEFT JOIN COM.LNS0001_USER A08")
         SQLBldr.AppendLine("        ON A08.USERID = '" & htParm(PAYMENTLINK_KEY.PM_USERID).ToString & "'")
         SQLBldr.AppendLine("        AND A08.DELFLG = @P01")
         '[結合テーブル]支払ヘッダーデータ
@@ -3270,7 +3270,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("            T1.USERID                                                                                                              ")
         SQLBldr.AppendLine("           ,T1.STAFFNAMES                                                                                                          ")
         SQLBldr.AppendLine("        FROM                                                                                                                       ")
-        SQLBldr.AppendLine("            com.lns0001_user T1                                                                                                    ")
+        SQLBldr.AppendLine("            COM.LNS0001_USER T1                                                                                                    ")
         SQLBldr.AppendLine("        WHERE                                                                                                                      ")
         SQLBldr.AppendLine("            T1.USERID  = '" & htParm(DRAFTPAYMENTLINK_KEY.SL_LOGIN_USER).ToString & "'                                             ")
         SQLBldr.AppendLine("        AND '" & htParm(DRAFTPAYMENTLINK_KEY.SL_NOWDATE).ToString & "' BETWEEN T1.STYMD AND T1.ENDYMD                              ")
@@ -3703,7 +3703,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("            T1.USERID                                                                                                              ")
         SQLBldr.AppendLine("           ,T1.STAFFNAMES                                                                                                          ")
         SQLBldr.AppendLine("        FROM                                                                                                                       ")
-        SQLBldr.AppendLine("            com.lns0001_user T1                                                                                                    ")
+        SQLBldr.AppendLine("            COM.LNS0001_USER T1                                                                                                    ")
         SQLBldr.AppendLine("        WHERE                                                                                                                      ")
         SQLBldr.AppendLine("            T1.USERID  = '" & htParm(DRAFTPAYMENTLINK_KEY.SL_LOGIN_USER).ToString & "'                                             ")
         SQLBldr.AppendLine("        AND '" & htParm(DRAFTPAYMENTLINK_KEY.SL_NOWDATE).ToString & "' BETWEEN T1.STYMD AND T1.ENDYMD                              ")
@@ -3996,7 +3996,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("            T1.USERID                                                                                                              ")
         SQLBldr.AppendLine("           ,T1.STAFFNAMES                                                                                                          ")
         SQLBldr.AppendLine("        FROM                                                                                                                       ")
-        SQLBldr.AppendLine("            com.lns0001_user T1                                                                                                    ")
+        SQLBldr.AppendLine("            COM.LNS0001_USER T1                                                                                                    ")
         SQLBldr.AppendLine("        WHERE                                                                                                                      ")
         SQLBldr.AppendLine("            T1.USERID  = '" & htParm(DRAFTPAYMENTLINK_KEY.SL_LOGIN_USER).ToString & "'                                             ")
         SQLBldr.AppendLine("        AND '" & htParm(DRAFTPAYMENTLINK_KEY.SL_NOWDATE).ToString & "' BETWEEN T1.STYMD AND T1.ENDYMD                              ")
@@ -4670,7 +4670,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("            T1.USERID                                                                                                              ")
         SQLBldr.AppendLine("           ,T1.STAFFNAMES                                                                                                          ")
         SQLBldr.AppendLine("        FROM                                                                                                                       ")
-        SQLBldr.AppendLine("            com.lns0001_user T1                                                                                                    ")
+        SQLBldr.AppendLine("            COM.LNS0001_USER T1                                                                                                    ")
         SQLBldr.AppendLine("        WHERE                                                                                                                      ")
         SQLBldr.AppendLine("            T1.USERID  = '" & htParm(DRAFTPAYMENTLINK_KEY.SL_LOGIN_USER).ToString & "'                                             ")
         SQLBldr.AppendLine("        AND '" & htParm(DRAFTPAYMENTLINK_KEY.SL_NOWDATE).ToString & "' BETWEEN T1.STYMD AND T1.ENDYMD                              ")
@@ -5097,7 +5097,7 @@ Public Class EntryPaymentData
         SQLBldr.AppendLine("            T1.USERID                                                                                                              ")
         SQLBldr.AppendLine("           ,T1.STAFFNAMES                                                                                                          ")
         SQLBldr.AppendLine("        FROM                                                                                                                       ")
-        SQLBldr.AppendLine("            com.lns0001_user T1                                                                                                    ")
+        SQLBldr.AppendLine("            COM.LNS0001_USER T1                                                                                                    ")
         SQLBldr.AppendLine("        WHERE                                                                                                                      ")
         SQLBldr.AppendLine("            T1.USERID  = '" & htParm(DRAFTPAYMENTLINK_KEY.SL_LOGIN_USER).ToString & "'                                             ")
         SQLBldr.AppendLine("        AND '" & htParm(DRAFTPAYMENTLINK_KEY.SL_NOWDATE).ToString & "' BETWEEN T1.STYMD AND T1.ENDYMD                              ")

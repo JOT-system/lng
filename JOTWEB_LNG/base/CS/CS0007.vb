@@ -189,7 +189,7 @@ Public Class CS0007CheckAuthority
     ''' <param name="CODE" ></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Protected Function checkUserPermission(ByVal SQLcon As MySqlConnection, ByVal ROLECODE As String, ByVal OBJCODE As String, ByVal CODE As String) As Integer
+    Public Function checkUserPermission(ByVal SQLcon As MySqlConnection, ByVal ROLECODE As String, ByVal OBJCODE As String, ByVal CODE As String) As Integer
         Dim WW_PERMIT As Integer = CInt(C_PERMISSION.INVALID)
         '検索SQL文
         Try

@@ -240,8 +240,8 @@ Public Class M10000LOGON
                 sqlStat.AppendLine("      ,rtrim(A.VARIANT)    as VARIANT")
                 'sqlStat.AppendLine("      ,rtrim(A.APPROVALID) as APPROVALID")
                 sqlStat.AppendLine("      ,B.PASSENDYMD        as PASSENDYMD")
-                sqlStat.AppendLine("  FROM        COM.lns0001_user       A")
-                sqlStat.AppendLine("  INNER JOIN  COM.lns0002_userpass   B")
+                sqlStat.AppendLine("  FROM        COM.LNS0001_USER       A")
+                sqlStat.AppendLine("  INNER JOIN  COM.LNS0002_USERPASS   B")
                 sqlStat.AppendLine("    ON B.USERID      = A.USERID")
                 sqlStat.AppendLine("   and B.DELFLG     <> @P4 ")
                 sqlStat.AppendLine(" Where A.USERID      = @P1 ")
@@ -340,7 +340,7 @@ Public Class M10000LOGON
                 Try
                     'S0014_USER更新SQL文
                     Dim SQL_Str As String =
-                         "Update COM.lns0002_userpass " _
+                         "Update COM.LNS0002_USERPASS " _
                        & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                        & "Where  USERID  = @P3 "
                     Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
@@ -384,7 +384,7 @@ Public Class M10000LOGON
             Try
                 'S0014_USER更新SQL文
                 Dim SQL_Str As String =
-                     "Update COM.lns0002_userpass " _
+                     "Update COM.LNS0002_USERPASS " _
                    & "Set    MISSCNT = @P1 , UPDYMD = @P2 , UPDUSER = @P3 " _
                    & "Where  USERID  = @P3 "
                 Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
@@ -666,7 +666,7 @@ Public Class M10000LOGON
             sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
             sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
             sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
-            sqlStat.AppendLine("  FROM com.LNS0008_GUIDANCE GD")
+            sqlStat.AppendLine("  FROM COM.LNS0008_GUIDANCE GD")
             sqlStat.AppendLine(" WHERE CURDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
             sqlStat.AppendLine("   AND OUTFLG = '1'")

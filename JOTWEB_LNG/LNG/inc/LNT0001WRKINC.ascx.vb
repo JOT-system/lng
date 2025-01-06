@@ -10,6 +10,37 @@ Public Class LNT0001WRKINC
     Public Const MAPIDZ As String = "LNT0001Z"      'MAPID
 
     ''' <summary>
+    ''' アボカド接続情報
+    ''' </summary>
+    Public Class AVOCADOINFO
+        ''' <summary>
+        ''' 部署
+        ''' </summary>
+        Public Property Org As String
+        ''' <summary>
+        ''' 取引先
+        ''' </summary>
+        Public Property Tori As String
+        ''' <summary>
+        ''' アプリID
+        ''' </summary>
+        Public Property AppId As String
+        ''' <summary>
+        ''' トークン
+        ''' </summary>
+        Public Property Token As String
+        ''' <summary>
+        ''' コンストラクタ
+        ''' </summary>
+        Public Sub New(Org As String, Tori As String, AppId As String, Token As String)
+            Me.Org = Org
+            Me.Tori = Tori
+            Me.AppId = AppId
+            Me.Token = Token
+        End Sub
+    End Class
+
+    ''' <summary>
     ''' ワークデータ初期化処理
     ''' </summary>
     Public Sub Initialize()
@@ -36,7 +67,7 @@ Public Class LNT0001WRKINC
     ''' <param name="SHIPPERCD">荷主コード</param>
     ''' <param name="TIMESTAMP">タイムスタンプ</param>
     Public Sub HaitaCheck(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String,
-                             ByRef SHIPPERCD As String, ByRef TIMESTAMP As String)
+                          ByRef SHIPPERCD As String, ByRef TIMESTAMP As String)
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -161,5 +192,79 @@ Public Class LNT0001WRKINC
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' アボカド情報取得（組織、取引先、アプリID、トークン）
+    ''' </summary>
+    Public Function GetAvocadoInfo(ByVal iComp As String, ByVal iOrg As String, ByVal iTri As String) As List(Of AVOCADOINFO)
+
+        Dim CS0007CheckAuthority As New CS0007CheckAuthority        '更新権限チェック
+        Dim GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
+        Dim CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+
+        '------------------------------------------------------------
+        '指定された荷主に該当するアボカド接続情報（営業所毎）取得
+        '------------------------------------------------------------
+        Dim apiList1 As New ListBox
+        Dim apiList2 As New ListBox
+        Dim apiList3 As New ListBox
+        Dim apiList4 As New ListBox
+        Dim apiList5 As New ListBox
+        GS0007FIXVALUElst.CAMPCODE = iComp
+        GS0007FIXVALUElst.CLAS = "AVOCADOINFO"
+        GS0007FIXVALUElst.LISTBOX1 = apiList1
+        GS0007FIXVALUElst.LISTBOX2 = apiList2
+        GS0007FIXVALUElst.LISTBOX3 = apiList3
+        GS0007FIXVALUElst.LISTBOX4 = apiList4
+        GS0007FIXVALUElst.LISTBOX5 = apiList5
+        GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
+        GS0007FIXVALUElst.GS0007FIXVALUElst()
+        If Not isNormal(GS0007FIXVALUElst.ERR) Then
+            Throw New Exception("固定値取得エラー: " & GS0007FIXVALUElst.ERR)
+        End If
+
+        Dim ApiInfo As New List(Of AVOCADOINFO)
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            For i As Integer = 0 To apiList1.Items.Count - 1
+                '■参考
+                'apiList1.Items(i).Value:対象部署
+                'apiList1.Items(i).Text:対象アプリID
+                'apiList2.Items(i).Text:対象トークン
+
+                '操作可能な組織コードかチェック
+                If CS0007CheckAuthority.checkUserPermission(SQLcon, iOrg, C_ROLE_VARIANT.USER_ORG, apiList1.Items(i).Value) = "2" Then
+                    'リスト３～５（VALUE3～5）に取引先コードが設定されている
+                    If iTri = "" Then
+                        '画面指定なし（初期表示の場合）
+                        If apiList3.Items(i).Text <> "" Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList3.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                        If apiList4.Items(i).Text <> "" Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList4.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                        If apiList5.Items(i).Text <> "" Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList5.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                    Else
+                        If apiList3.Items(i).Text = iTri Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList3.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                        If apiList4.Items(i).Text = iTri Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList4.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                        If apiList5.Items(i).Text = iTri Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList5.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        End If
+                    End If
+                End If
+            Next
+        End Using
+
+        Return ApiInfo
+
+    End Function
 
 End Class

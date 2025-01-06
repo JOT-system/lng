@@ -79,7 +79,7 @@ Public Class CmnGuidanceData
         'SQLBldr.AppendLine("    , REPLACE(REPLACE(A01.NAIYOU, '@1', coalesce(A02.KENSU, 0)), '@2', coalesce(A03.KENSU, 0)) AS NAIYOU")  '内容
         SQLBldr.AppendLine("FROM")
         'メイン ガイダンスマスタ
-        SQLBldr.AppendLine("    com.LNS0008_GUIDANCE A01")
+        SQLBldr.AppendLine("    COM.LNS0008_GUIDANCE A01")
         'コンテナ清算ファイル(承認済み)   ※担当者用
         'SQLBldr.AppendLine("    LEFT JOIN (")
         'SQLBldr.AppendLine("        SELECT")
@@ -158,7 +158,7 @@ Public Class CmnGuidanceData
         SQLBldr.AppendLine("    , REPLACE(A01.NAIYOU, '@1', coalesce(A02.KENSU, 0)) AS NAIYOU")                                       '内容
         SQLBldr.AppendLine("FROM")
         'メイン ガイダンスマスタ
-        SQLBldr.AppendLine("    com.LNS0008_GUIDANCE A01")
+        SQLBldr.AppendLine("    COM.LNS0008_GUIDANCE A01")
         'コンテナ清算ファイル(申請中)    ※承認者用
         SQLBldr.AppendLine("    INNER JOIN (")
         SQLBldr.AppendLine("        SELECT")
@@ -224,7 +224,7 @@ Public Class CmnGuidanceData
         SQLBldr.AppendLine("    , REPLACE(REPLACE(A01.NAIYOU, '@1', coalesce(A02.KENSU, 0)), '@2', coalesce(A03.KENSU, 0)) AS NAIYOU")  '請求番号
         SQLBldr.AppendLine("FROM")
         'メイン ガイダンスマスタ
-        SQLBldr.AppendLine("    com.LNS0008_GUIDANCE A01")
+        SQLBldr.AppendLine("    COM.LNS0008_GUIDANCE A01")
         '請求ヘッダーデータ(承認済み)    ※担当者用
         SQLBldr.AppendLine("    LEFT JOIN (")
         SQLBldr.AppendLine("        SELECT")
@@ -304,7 +304,7 @@ Public Class CmnGuidanceData
         SQLBldr.AppendLine("    , REPLACE(A01.NAIYOU, '@1', coalesce(A02.KENSU, 0)) AS NAIYOU")                                       '請求番号
         SQLBldr.AppendLine("FROM")
         'メイン ガイダンスマスタ
-        SQLBldr.AppendLine("    com.LNS0008_GUIDANCE A01")
+        SQLBldr.AppendLine("    COM.LNS0008_GUIDANCE A01")
         '請求ヘッダーデータ(確認依頼中)   ※承認者用
         SQLBldr.AppendLine("    LEFT JOIN (")
         SQLBldr.AppendLine("        SELECT")

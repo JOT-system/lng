@@ -170,17 +170,29 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
+        'ログインユーザーの操作可能な組織コードを取得
+        Dim orgList = GetOrgList(Master.ROLE_ORG)
+
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To ListShippersInvoice.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(ListShippersInvoice.Items(i).Text, ListShippersInvoice.Items(i).Value))
+            Dim wOrg As String = ListShippersInvoice.Items(i).Value
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+            If exists Then
+                WF_TORI.Items.Add(New ListItem(ListShippersInvoice.Items(i).Text, ListShippersInvoice.Items(i).Value))
+            End If
+
         Next
         WF_TORI.SelectedIndex = 0
 
         WF_TORIEXL.Items.Clear()
         WF_TORIEXL.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To ListShippersInvoiceExcel.Items.Count - 1
-            WF_TORIEXL.Items.Add(New ListItem(ListShippersInvoiceExcel.Items(i).Text, ListShippersInvoiceExcel.Items(i).Value))
+            Dim wOrg As String = ListShippersInvoice.Items(i).Value
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+            If exists Then
+                WF_TORIEXL.Items.Add(New ListItem(ListShippersInvoiceExcel.Items(i).Text, ListShippersInvoiceExcel.Items(i).Value))
+            End If
         Next
         WF_TORIEXL.SelectedValue = 0
 
@@ -234,6 +246,75 @@ Public Class LNT0001InvoiceOutput
         TBLview = Nothing
 
     End Sub
+
+    ''' <summary>
+    ''' 操作可能な組織コードを取得する
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetOrgList(ByVal iOrg As String) As List(Of String)
+
+        Dim CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+        Dim oList As New List(Of String)
+
+        '検索SQL文
+        Try
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()  ' DataBase接続
+
+                Dim SQLStr As String =
+                     " SELECT " _
+                   & "             rtrim(A.CODE)    AS CODE                " _
+                   & " FROM        COM.LNS0005_ROLE A                      " _
+                   & " WHERE                                               " _
+                   & "           A.ROLE        = @P1                       " _
+                   & "       and A.OBJECT      = @P2                       " _
+                   & "       and A.PERMITCODE  = @P3                       " _
+                   & "       and A.STYMD      <= @P4                       " _
+                   & "       and A.ENDYMD     >= @P5                       " _
+                   & "       and A.DELFLG     <> @P6                       " _
+                   & " ORDER BY A.SEQ                                      "
+
+                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                    With SQLcmd.Parameters
+                        .Add("@P1", MySqlDbType.VarChar, 20).Value = iOrg
+                        .Add("@P2", MySqlDbType.VarChar, 20).Value = C_ROLE_VARIANT.USER_ORG
+                        .Add("@P3", MySqlDbType.Int16).Value = "2"
+                        .Add("@P4", MySqlDbType.Date).Value = Date.Now
+                        .Add("@P5", MySqlDbType.Date).Value = Date.Now
+                        .Add("@P6", MySqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+                    Dim SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+
+                    '権限コード初期値(権限なし)設定
+                    While SQLdr.Read
+                        oList.Add(SQLdr("CODE"))
+                    End While
+
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                    SQLdr = Nothing
+                End Using
+
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+            End Using
+        Catch ex As Exception
+            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+
+            CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:LNS0005_ROLE Select"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            Return oList
+        End Try
+
+        Return oList
+
+    End Function
 
     ''' <summary>
     ''' 画面表示データ取得
@@ -491,7 +572,7 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
                 Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
-                PARA1.Value = WF_TORI.SelectedValue
+                PARA1.Value = Mid(WF_TORI.SelectedValue, 1, 6)
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                     PARA2.Value = WF_TaishoYm.Value & "/01"
                     PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")

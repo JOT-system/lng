@@ -592,7 +592,7 @@ Public Class M00001MENU
             sqlStat.AppendLine("      ,GD.TITLE                      AS TITLE")
             sqlStat.AppendLine("      ,GD.NAIYOU                     AS NAIYOU")
             sqlStat.AppendLine("      ,GD.FILE1                      AS FILE1")
-            sqlStat.AppendLine("  FROM com.LNS0008_GUIDANCE GD")
+            sqlStat.AppendLine("  FROM COM.LNS0008_GUIDANCE GD")
             sqlStat.AppendLine(" WHERE CURDATE() BETWEEN GD.FROMYMD AND GD.ENDYMD")
             sqlStat.AppendLine("   AND DELFLG = @DELFLG_NO")
             sqlStat.AppendLine("   AND OUTFLG <> '1'")

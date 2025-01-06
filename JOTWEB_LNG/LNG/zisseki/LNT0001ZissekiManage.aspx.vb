@@ -176,10 +176,10 @@ Public Class LNT0001ZissekiManage
         End If
 
         ' ドロップダウンリスト（荷主）作成
-        Dim toriList As New ListBox
+        Dim apiList As New ListBox
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
         GS0007FIXVALUElst.CLAS = "TORICODEDROP"
-        GS0007FIXVALUElst.LISTBOX1 = toriList
+        GS0007FIXVALUElst.LISTBOX1 = apiList
         GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
         GS0007FIXVALUElst.GS0007FIXVALUElst()
         If Not isNormal(GS0007FIXVALUElst.ERR) Then
@@ -187,10 +187,17 @@ Public Class LNT0001ZissekiManage
             Exit Sub
         End If
 
+        'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To toriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
+        For i As Integer = 0 To apiList.Items.Count - 1
+            'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
+            Dim wTori As String = apiList.Items(i).Value
+            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori = wTori)
+            If exists Then
+                WF_TORI.Items.Add(New ListItem(apiList.Items(i).Text, apiList.Items(i).Value))
+            End If
         Next
 
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
@@ -284,42 +291,42 @@ Public Class LNT0001ZissekiManage
         '　検索説明
         '     条件指定に従い該当データを荷主マスタから取得する
         Dim SQLStr As String =
-              " Select                                                                            " _
-            & "      1                                                    AS 'SELECT'             " _
-            & "     ,0                                                    AS HIDDEN               " _
-            & "     ,0                                                    AS LINECNT              " _
-            & "     ,''                                                   AS OPERATION            " _
-            & "     ,coalesce(LT1.RECONO, '')                             AS RECONO			    " _
+              " Select                                                                              " _
+            & "      1                                                    AS 'SELECT'               " _
+            & "     ,0                                                    AS HIDDEN                 " _
+            & "     ,0                                                    AS LINECNT                " _
+            & "     ,''                                                   AS OPERATION              " _
+            & "     ,coalesce(LT1.RECONO, '')                             AS RECONO			        " _
             & "     ,coalesce(LT1.LOADUNLOTYPE, '')                       AS LOADUNLOTYPE		    " _
             & "     ,coalesce(LT1.STACKINGTYPE, '')                       AS STACKINGTYPE		    " _
-            & "     ,coalesce(LT1.HSETID, '')                             AS HSETID			    " _
-            & "     ,coalesce(LT1.ORDERORGSELECT, '')                     AS ORDERORGSELECT	    " _
+            & "     ,coalesce(LT1.HSETID, '')                             AS HSETID			        " _
+            & "     ,coalesce(LT1.ORDERORGSELECT, '')                     AS ORDERORGSELECT	        " _
             & "     ,coalesce(LT1.ORDERORGNAME, '')                       AS ORDERORGNAME		    " _
             & "     ,coalesce(LT1.ORDERORGCODE, '')                       AS ORDERORGCODE		    " _
-            & "     ,coalesce(LT1.ORDERORGNAMES, '')                      AS ORDERORGNAMES	    " _
+            & "     ,coalesce(LT1.ORDERORGNAMES, '')                      AS ORDERORGNAMES	        " _
             & "     ,coalesce(LT1.KASANAMEORDERORG, '')                   AS KASANAMEORDERORG	    " _
-            & "     ,coalesce(LT1.KASANCODEORDERORG, '')                  AS KASANCODEORDERORG	" _
-            & "     ,coalesce(LT1.KASANAMESORDERORG, '')                  AS KASANAMESORDERORG	" _
+            & "     ,coalesce(LT1.KASANCODEORDERORG, '')                  AS KASANCODEORDERORG	    " _
+            & "     ,coalesce(LT1.KASANAMESORDERORG, '')                  AS KASANAMESORDERORG	    " _
             & "     ,coalesce(LT1.ORDERORG, '')                           AS ORDERORG				" _
-            & "     ,coalesce(LT1.KASANORDERORG, '')                      AS KASANORDERORG		" _
+            & "     ,coalesce(LT1.KASANORDERORG, '')                      AS KASANORDERORG		    " _
             & "     ,coalesce(LT1.PRODUCTSLCT, '')                        AS PRODUCTSLCT			" _
-            & "     ,coalesce(LT1.PRODUCTSYOSAI, '')                      AS PRODUCTSYOSAI		" _
+            & "     ,coalesce(LT1.PRODUCTSYOSAI, '')                      AS PRODUCTSYOSAI		    " _
             & "     ,coalesce(LT1.PRODUCT2NAME, '')                       AS PRODUCT2NAME			" _
             & "     ,coalesce(LT1.PRODUCT2, '')                           AS PRODUCT2				" _
             & "     ,coalesce(LT1.PRODUCT1NAME, '')                       AS PRODUCT1NAME			" _
             & "     ,coalesce(LT1.PRODUCT1, '')                           AS PRODUCT1				" _
             & "     ,coalesce(LT1.OILNAME, '')                            AS OILNAME				" _
             & "     ,coalesce(LT1.OILTYPE, '')                            AS OILTYPE				" _
-            & "     ,coalesce(LT1.TODOKESLCT, '')                         AS TODOKESLCT			" _
-            & "     ,coalesce(LT1.TODOKECODE, '')                         AS TODOKECODE			" _
-            & "     ,coalesce(LT1.TODOKENAME, '')                         AS TODOKENAME			" _
+            & "     ,coalesce(LT1.TODOKESLCT, '')                         AS TODOKESLCT			    " _
+            & "     ,coalesce(LT1.TODOKECODE, '')                         AS TODOKECODE			    " _
+            & "     ,coalesce(LT1.TODOKENAME, '')                         AS TODOKENAME			    " _
             & "     ,coalesce(LT1.TODOKENAMES, '')                        AS TODOKENAMES			" _
             & "     ,coalesce(LT1.TORICODE, '')                           AS TORICODE				" _
             & "     ,coalesce(LT1.TORINAME, '')                           AS TORINAME				" _
-            & "     ,coalesce(LT1.TODOKEADDR, '')                         AS TODOKEADDR			" _
-            & "     ,coalesce(LT1.TODOKETEL, '')                          AS TODOKETEL			" _
-            & "     ,coalesce(LT1.TODOKEMAP, '')                          AS TODOKEMAP			" _
-            & "     ,coalesce(LT1.TODOKEIDO, '')                          AS TODOKEIDO			" _
+            & "     ,coalesce(LT1.TODOKEADDR, '')                         AS TODOKEADDR			    " _
+            & "     ,coalesce(LT1.TODOKETEL, '')                          AS TODOKETEL			    " _
+            & "     ,coalesce(LT1.TODOKEMAP, '')                          AS TODOKEMAP			    " _
+            & "     ,coalesce(LT1.TODOKEIDO, '')                          AS TODOKEIDO			    " _
             & "     ,coalesce(LT1.TODOKEKEIDO, '')                        AS TODOKEKEIDO			" _
             & "     ,coalesce(LT1.TODOKEBIKO1, '')                        AS TODOKEBIKO1			" _
             & "     ,coalesce(LT1.TODOKEBIKO2, '')                        AS TODOKEBIKO2			" _
@@ -327,34 +334,34 @@ Public Class LNT0001ZissekiManage
             & "     ,coalesce(LT1.TODOKECOLOR1, '')                       AS TODOKECOLOR1			" _
             & "     ,coalesce(LT1.TODOKECOLOR2, '')                       AS TODOKECOLOR2			" _
             & "     ,coalesce(LT1.TODOKECOLOR3, '')                       AS TODOKECOLOR3			" _
-            & "     ,coalesce(LT1.SHUKASLCT, '')                          AS SHUKASLCT			" _
-            & "     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			" _
-            & "     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			" _
-            & "     ,coalesce(LT1.SHUKANAMES, '')                         AS SHUKANAMES			" _
-            & "     ,coalesce(LT1.SHUKATORICODE, '')                      AS SHUKATORICODE		" _
-            & "     ,coalesce(LT1.SHUKATORINAME, '')                      AS SHUKATORINAME		" _
-            & "     ,coalesce(LT1.SHUKAADDR, '')                          AS SHUKAADDR			" _
+            & "     ,coalesce(LT1.SHUKASLCT, '')                          AS SHUKASLCT			    " _
+            & "     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			    " _
+            & "     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			    " _
+            & "     ,coalesce(LT1.SHUKANAMES, '')                         AS SHUKANAMES			    " _
+            & "     ,coalesce(LT1.SHUKATORICODE, '')                      AS SHUKATORICODE		    " _
+            & "     ,coalesce(LT1.SHUKATORINAME, '')                      AS SHUKATORINAME		    " _
+            & "     ,coalesce(LT1.SHUKAADDR, '')                          AS SHUKAADDR			    " _
             & "     ,coalesce(LT1.SHUKAADDRTEL, '')                       AS SHUKAADDRTEL			" _
             & "     ,coalesce(LT1.SHUKAMAP, '')                           AS SHUKAMAP				" _
             & "     ,coalesce(LT1.SHUKAIDO, '')                           AS SHUKAIDO				" _
-            & "     ,coalesce(LT1.SHUKAKEIDO, '')                         AS SHUKAKEIDO			" _
+            & "     ,coalesce(LT1.SHUKAKEIDO, '')                         AS SHUKAKEIDO			    " _
             & "     ,coalesce(LT1.SHUKABIKOU1, '')                        AS SHUKABIKOU1			" _
             & "     ,coalesce(LT1.SHUKABIKOU2, '')                        AS SHUKABIKOU2			" _
             & "     ,coalesce(LT1.SHUKABIKOU3, '')                        AS SHUKABIKOU3			" _
             & "     ,coalesce(LT1.SHUKACOLOR1, '')                        AS SHUKACOLOR1			" _
             & "     ,coalesce(LT1.SHUKACOLOR2, '')                        AS SHUKACOLOR2			" _
             & "     ,coalesce(LT1.SHUKACOLOR3, '')                        AS SHUKACOLOR3			" _
-            & "     ,coalesce(LT1.SHUKADATE, '')                          AS SHUKADATE			" _
+            & "     ,coalesce(LT1.SHUKADATE, '')                          AS SHUKADATE			    " _
             & "     ,coalesce(LT1.LOADTIME, '')                           AS LOADTIME				" _
-            & "     ,coalesce(LT1.LOADTIMEIN, '')                         AS LOADTIMEIN			" _
-            & "     ,coalesce(LT1.LOADTIMES, '')                          AS LOADTIMES			" _
-            & "     ,coalesce(LT1.TODOKEDATE, '')                         AS TODOKEDATE			" _
-            & "     ,coalesce(LT1.SHITEITIME, '')                         AS SHITEITIME			" _
+            & "     ,coalesce(LT1.LOADTIMEIN, '')                         AS LOADTIMEIN			    " _
+            & "     ,coalesce(LT1.LOADTIMES, '')                          AS LOADTIMES			    " _
+            & "     ,coalesce(LT1.TODOKEDATE, '')                         AS TODOKEDATE			    " _
+            & "     ,coalesce(LT1.SHITEITIME, '')                         AS SHITEITIME			    " _
             & "     ,coalesce(LT1.SHITEITIMEIN, '')                       AS SHITEITIMEIN			" _
             & "     ,coalesce(LT1.SHITEITIMES, '')                        AS SHITEITIMES			" _
-            & "     ,coalesce(LT1.ZYUTYU, '')                             AS ZYUTYU				" _
+            & "     ,coalesce(LT1.ZYUTYU, '')                             AS ZYUTYU				    " _
             & "     ,coalesce(LT1.ZISSEKI, '')                            AS ZISSEKI				" _
-            & "     ,coalesce(LT1.TANNI, '')                              AS TANNI				" _
+            & "     ,coalesce(LT1.TANNI, '')                              AS TANNI				    " _
             & "     ,coalesce(LT1.GYOUMUSIZI1, '')                        AS GYOUMUSIZI1			" _
             & "     ,coalesce(LT1.GYOUMUSIZI2, '')                        AS GYOUMUSIZI2			" _
             & "     ,coalesce(LT1.GYOUMUSIZI3, '')                        AS GYOUMUSIZI3			" _
@@ -365,69 +372,69 @@ Public Class LNT0001ZissekiManage
             & "     ,coalesce(LT1.SHIPORGNAMES, '')                       AS SHIPORGNAMES			" _
             & "     ,coalesce(LT1.KASANSHIPORGNAME, '')                   AS KASANSHIPORGNAME	    " _
             & "     ,coalesce(LT1.KASANSHIPORG, '')                       AS KASANSHIPORG			" _
-            & "     ,coalesce(LT1.KASANSHIPORGNAMES, '')                  AS KASANSHIPORGNAMES	" _
+            & "     ,coalesce(LT1.KASANSHIPORGNAMES, '')                  AS KASANSHIPORGNAMES	    " _
             & "     ,coalesce(LT1.TANKNUM, '')                            AS TANKNUM				" _
-            & "     ,coalesce(LT1.TANKNUMBER, '')                         AS TANKNUMBER			" _
+            & "     ,coalesce(LT1.TANKNUMBER, '')                         AS TANKNUMBER			    " _
             & "     ,coalesce(LT1.SYAGATA, '')                            AS SYAGATA				" _
             & "     ,coalesce(LT1.SYABARA, '')                            AS SYABARA				" _
             & "     ,coalesce(LT1.NINUSHINAME, '')                        AS NINUSHINAME			" _
             & "     ,coalesce(LT1.CONTYPE, '')                            AS CONTYPE				" _
             & "     ,coalesce(LT1.PRO1SYARYOU, '')                        AS PRO1SYARYOU			" _
             & "     ,coalesce(LT1.TANKMEMO, '')                           AS TANKMEMO				" _
-            & "     ,coalesce(LT1.TANKBIKOU1, '')                         AS TANKBIKOU1			" _
-            & "     ,coalesce(LT1.TANKBIKOU2, '')                         AS TANKBIKOU2			" _
-            & "     ,coalesce(LT1.TANKBIKOU3, '')                         AS TANKBIKOU3			" _
-            & "     ,coalesce(LT1.TRACTORNUM, '')                         AS TRACTORNUM			" _
-            & "     ,coalesce(LT1.TRACTORNUMBER, '')                      AS TRACTORNUMBER		" _
+            & "     ,coalesce(LT1.TANKBIKOU1, '')                         AS TANKBIKOU1			    " _
+            & "     ,coalesce(LT1.TANKBIKOU2, '')                         AS TANKBIKOU2			    " _
+            & "     ,coalesce(LT1.TANKBIKOU3, '')                         AS TANKBIKOU3			    " _
+            & "     ,coalesce(LT1.TRACTORNUM, '')                         AS TRACTORNUM			    " _
+            & "     ,coalesce(LT1.TRACTORNUMBER, '')                      AS TRACTORNUMBER		    " _
             & "     ,coalesce(LT1.TRIP, '')                               AS TRIP					" _
             & "     ,coalesce(LT1.DRP, '')                                AS DRP					" _
-            & "     ,coalesce(LT1.UNKOUMEMO, '')                          AS UNKOUMEMO			" _
+            & "     ,coalesce(LT1.UNKOUMEMO, '')                          AS UNKOUMEMO			    " _
             & "     ,coalesce(LT1.SHUKKINTIME, '')                        AS SHUKKINTIME			" _
-            & "     ,coalesce(LT1.STAFFSLCT, '')                          AS STAFFSLCT			" _
-            & "     ,coalesce(LT1.STAFFNAME, '')                          AS STAFFNAME			" _
-            & "     ,coalesce(LT1.STAFFCODE, '')                          AS STAFFCODE			" _
+            & "     ,coalesce(LT1.STAFFSLCT, '')                          AS STAFFSLCT			    " _
+            & "     ,coalesce(LT1.STAFFNAME, '')                          AS STAFFNAME			    " _
+            & "     ,coalesce(LT1.STAFFCODE, '')                          AS STAFFCODE			    " _
             & "     ,coalesce(LT1.SUBSTAFFSLCT, '')                       AS SUBSTAFFSLCT			" _
             & "     ,coalesce(LT1.SUBSTAFFNAME, '')                       AS SUBSTAFFNAME			" _
             & "     ,coalesce(LT1.SUBSTAFFNUM, '')                        AS SUBSTAFFNUM			" _
-            & "     ,coalesce(LT1.CALENDERMEMO1, '')                      AS CALENDERMEMO1		" _
-            & "     ,coalesce(LT1.CALENDERMEMO2, '')                      AS CALENDERMEMO2		" _
-            & "     ,coalesce(LT1.CALENDERMEMO3, '')                      AS CALENDERMEMO3		" _
-            & "     ,coalesce(LT1.CALENDERMEMO4, '')                      AS CALENDERMEMO4		" _
-            & "     ,coalesce(LT1.CALENDERMEMO5, '')                      AS CALENDERMEMO5		" _
-            & "     ,coalesce(LT1.CALENDERMEMO6, '')                      AS CALENDERMEMO6		" _
-            & "     ,coalesce(LT1.CALENDERMEMO7, '')                      AS CALENDERMEMO7		" _
-            & "     ,coalesce(LT1.CALENDERMEMO8, '')                      AS CALENDERMEMO8		" _
-            & "     ,coalesce(LT1.CALENDERMEMO9, '')                      AS CALENDERMEMO9		" _
-            & "     ,coalesce(LT1.CALENDERMEMO10, '')                     AS CALENDERMEMO10		" _
+            & "     ,coalesce(LT1.CALENDERMEMO1, '')                      AS CALENDERMEMO1		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO2, '')                      AS CALENDERMEMO2		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO3, '')                      AS CALENDERMEMO3		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO4, '')                      AS CALENDERMEMO4		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO5, '')                      AS CALENDERMEMO5		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO6, '')                      AS CALENDERMEMO6		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO7, '')                      AS CALENDERMEMO7		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO8, '')                      AS CALENDERMEMO8		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO9, '')                      AS CALENDERMEMO9		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO10, '')                     AS CALENDERMEMO10		    " _
             & "     ,coalesce(LT1.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM			" _
-            & "     ,coalesce(LT1.YOUSYA, '')                             AS YOUSYA				" _
-            & "     ,coalesce(LT1.RECOTITLE, '')                          AS RECOTITLE			" _
-            & "     ,coalesce(LT1.SHUKODATE, '')                          AS SHUKODATE			" _
+            & "     ,coalesce(LT1.YOUSYA, '')                             AS YOUSYA				    " _
+            & "     ,coalesce(LT1.RECOTITLE, '')                          AS RECOTITLE			    " _
+            & "     ,coalesce(LT1.SHUKODATE, '')                          AS SHUKODATE			    " _
             & "     ,coalesce(LT1.KIKODATE, '')                           AS KIKODATE				" _
             & "     ,coalesce(LT1.KIKOTIME, '')                           AS KIKOTIME				" _
-            & "     ,coalesce(LT1.CREWBIKOU1, '')                         AS CREWBIKOU1			" _
-            & "     ,coalesce(LT1.CREWBIKOU2, '')                         AS CREWBIKOU2			" _
-            & "     ,coalesce(LT1.SUBCREWBIKOU1, '')                      AS SUBCREWBIKOU1		" _
-            & "     ,coalesce(LT1.SUBCREWBIKOU2, '')                      AS SUBCREWBIKOU2		" _
-            & "     ,coalesce(LT1.SUBSHUKKINTIME, '')                     AS SUBSHUKKINTIME		" _
-            & "     ,coalesce(LT1.CALENDERMEMO11, '')                     AS CALENDERMEMO11		" _
-            & "     ,coalesce(LT1.CALENDERMEMO12, '')                     AS CALENDERMEMO12		" _
-            & "     ,coalesce(LT1.CALENDERMEMO13, '')                     AS CALENDERMEMO13		" _
+            & "     ,coalesce(LT1.CREWBIKOU1, '')                         AS CREWBIKOU1			    " _
+            & "     ,coalesce(LT1.CREWBIKOU2, '')                         AS CREWBIKOU2			    " _
+            & "     ,coalesce(LT1.SUBCREWBIKOU1, '')                      AS SUBCREWBIKOU1		    " _
+            & "     ,coalesce(LT1.SUBCREWBIKOU2, '')                      AS SUBCREWBIKOU2		    " _
+            & "     ,coalesce(LT1.SUBSHUKKINTIME, '')                     AS SUBSHUKKINTIME		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO11, '')                     AS CALENDERMEMO11		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO12, '')                     AS CALENDERMEMO12		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO13, '')                     AS CALENDERMEMO13		    " _
             & "     ,coalesce(LT1.SYABARATANNI, '')                       AS SYABARATANNI			" _
-            & "     ,coalesce(LT1.TAIKINTIME, '')                         AS TAIKINTIME			" _
+            & "     ,coalesce(LT1.TAIKINTIME, '')                         AS TAIKINTIME			    " _
             & "     ,coalesce(LT1.SUBTIKINTIME, '')                       AS SUBTIKINTIME			" _
             & "     ,coalesce(LT1.KVTITLE, '')                            AS KVTITLE				" _
             & "     ,coalesce(LT1.KVZYUTYU, '')                           AS KVZYUTYU				" _
-            & "     ,coalesce(LT1.KVZISSEKI, '')                          AS KVZISSEKI			" _
-            & "     ,coalesce(LT1.KVCREW, '')                             AS KVCREW				" _
+            & "     ,coalesce(LT1.KVZISSEKI, '')                          AS KVZISSEKI			    " _
+            & "     ,coalesce(LT1.KVCREW, '')                             AS KVCREW				    " _
             & "     ,coalesce(LT1.CREWCODE, '')                           AS CREWCODE				" _
             & "     ,coalesce(LT1.SUBCREWCODE, '')                        AS SUBCREWCODE			" _
-            & "     ,coalesce(LT1.KVSUBCREW, '')                          AS KVSUBCREW			" _
-            & "     ,coalesce(LT1.ORDERHENKO, '')                         AS ORDERHENKO			" _
+            & "     ,coalesce(LT1.KVSUBCREW, '')                          AS KVSUBCREW			    " _
+            & "     ,coalesce(LT1.ORDERHENKO, '')                         AS ORDERHENKO			    " _
             & "     ,coalesce(LT1.RIKUUNKYOKU, '')                        AS RIKUUNKYOKU			" _
             & "     ,coalesce(LT1.BUNRUINUMBER, '')                       AS BUNRUINUMBER			" _
             & "     ,coalesce(LT1.HIRAGANA, '')                           AS HIRAGANA				" _
-            & "     ,coalesce(LT1.ITIRENNUM, '')                          AS ITIRENNUM			" _
+            & "     ,coalesce(LT1.ITIRENNUM, '')                          AS ITIRENNUM			    " _
             & "     ,coalesce(LT1.TRACTER1, '')                           AS TRACTER1				" _
             & "     ,coalesce(LT1.TRACTER2, '')                           AS TRACTER2				" _
             & "     ,coalesce(LT1.TRACTER3, '')                           AS TRACTER3				" _
@@ -435,9 +442,9 @@ Public Class LNT0001ZissekiManage
             & "     ,coalesce(LT1.TRACTER5, '')                           AS TRACTER5				" _
             & "     ,coalesce(LT1.TRACTER6, '')                           AS TRACTER6				" _
             & "     ,coalesce(LT1.TRACTER7, '')                           AS TRACTER7				" _
-            & "     ,coalesce(LT1.HAISYAHUKA, '')                         AS HAISYAHUKA			" _
-            & "     ,coalesce(LT1.HYOZIZYUNT, '')                         AS HYOZIZYUNT			" _
-            & "     ,coalesce(LT1.HYOZIZYUNH, '')                         AS HYOZIZYUNH			" _
+            & "     ,coalesce(LT1.HAISYAHUKA, '')                         AS HAISYAHUKA			    " _
+            & "     ,coalesce(LT1.HYOZIZYUNT, '')                         AS HYOZIZYUNT			    " _
+            & "     ,coalesce(LT1.HYOZIZYUNH, '')                         AS HYOZIZYUNH			    " _
             & "     ,coalesce(LT1.HONTRACTER1, '')                        AS HONTRACTER1			" _
             & "     ,coalesce(LT1.HONTRACTER2, '')                        AS HONTRACTER2			" _
             & "     ,coalesce(LT1.HONTRACTER3, '')                        AS HONTRACTER3			" _
@@ -463,58 +470,89 @@ Public Class LNT0001ZissekiManage
             & "     ,coalesce(LT1.HONTRACTER23, '')                       AS HONTRACTER23			" _
             & "     ,coalesce(LT1.HONTRACTER24, '')                       AS HONTRACTER24			" _
             & "     ,coalesce(LT1.HONTRACTER25, '')                       AS HONTRACTER25			" _
-            & "     ,coalesce(LT1.CALENDERMEMO14, '')                     AS CALENDERMEMO14		" _
-            & "     ,coalesce(LT1.CALENDERMEMO15, '')                     AS CALENDERMEMO15		" _
-            & "     ,coalesce(LT1.CALENDERMEMO16, '')                     AS CALENDERMEMO16		" _
-            & "     ,coalesce(LT1.CALENDERMEMO17, '')                     AS CALENDERMEMO17		" _
-            & "     ,coalesce(LT1.CALENDERMEMO18, '')                     AS CALENDERMEMO18		" _
-            & "     ,coalesce(LT1.CALENDERMEMO19, '')                     AS CALENDERMEMO19		" _
-            & "     ,coalesce(LT1.CALENDERMEMO20, '')                     AS CALENDERMEMO20		" _
-            & "     ,coalesce(LT1.CALENDERMEMO21 , '')                    AS CALENDERMEMO21		" _
-            & "     ,coalesce(LT1.CALENDERMEMO22, '')                     AS CALENDERMEMO22		" _
-            & "     ,coalesce(LT1.CALENDERMEMO23, '')                     AS CALENDERMEMO23		" _
-            & "     ,coalesce(LT1.CALENDERMEMO24, '')                     AS CALENDERMEMO24		" _
-            & "     ,coalesce(LT1.CALENDERMEMO25, '')                     AS CALENDERMEMO25		" _
-            & "     ,coalesce(LT1.CALENDERMEMO26, '')                     AS CALENDERMEMO26		" _
-            & "     ,coalesce(LT1.CALENDERMEMO27, '')                     AS CALENDERMEMO27		" _
-            & "     ,coalesce(LT1.UPDATEUSER, '')                         AS UPDATEUSER			" _
-            & "     ,coalesce(LT1.CREATEUSER, '')                         AS CREATEUSER			" _
-            & "     ,coalesce(LT1.UPDATEYMD, '')                          AS UPDATEYMD			" _
-            & "     ,coalesce(LT1.CREATEYMD, '')                          AS CREATEYMD			" _
-            & "     ,coalesce(LT1.DELFLG, '')                             AS DELFLG				" _
+            & "     ,coalesce(LT1.CALENDERMEMO14, '')                     AS CALENDERMEMO14		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO15, '')                     AS CALENDERMEMO15		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO16, '')                     AS CALENDERMEMO16		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO17, '')                     AS CALENDERMEMO17		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO18, '')                     AS CALENDERMEMO18		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO19, '')                     AS CALENDERMEMO19		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO20, '')                     AS CALENDERMEMO20		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO21 , '')                    AS CALENDERMEMO21		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO22, '')                     AS CALENDERMEMO22		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO23, '')                     AS CALENDERMEMO23		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO24, '')                     AS CALENDERMEMO24		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO25, '')                     AS CALENDERMEMO25		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO26, '')                     AS CALENDERMEMO26		    " _
+            & "     ,coalesce(LT1.CALENDERMEMO27, '')                     AS CALENDERMEMO27		    " _
+            & "     ,coalesce(LT1.UPDATEUSER, '')                         AS UPDATEUSER			    " _
+            & "     ,coalesce(LT1.CREATEUSER, '')                         AS CREATEUSER			    " _
+            & "     ,coalesce(LT1.UPDATEYMD, '')                          AS UPDATEYMD			    " _
+            & "     ,coalesce(LT1.CREATEYMD, '')                          AS CREATEYMD			    " _
+            & "     ,coalesce(LT1.DELFLG, '')                             AS DELFLG				    " _
             & "     ,coalesce(LT1.INITYMD, '')                            AS INITYMD				" _
             & "     ,coalesce(LT1.INITUSER, '')                           AS INITUSER				" _
-            & "     ,coalesce(LT1.INITTERMID, '')                         AS INITTERMID			" _
+            & "     ,coalesce(LT1.INITTERMID, '')                         AS INITTERMID			    " _
             & "     ,coalesce(LT1.INITPGID, '')                           AS INITPGID				" _
-            & "     ,coalesce(LT1.UPDYMD, '')                             AS UPDYMD				" _
+            & "     ,coalesce(LT1.UPDYMD, '')                             AS UPDYMD				    " _
             & "     ,coalesce(LT1.UPDUSER, '')                            AS UPDUSER				" _
-            & "     ,coalesce(LT1.UPDTERMID, '')                          AS UPDTERMID			" _
+            & "     ,coalesce(LT1.UPDTERMID, '')                          AS UPDTERMID			    " _
             & "     ,coalesce(LT1.UPDPGID, '')                            AS UPDPGID				" _
-            & "     ,coalesce(LT1.RECEIVEYMD, '')                         AS RECEIVEYMD			" _
-            & "     ,coalesce(LT1.UPDTIMSTP, '')                          AS UPDTIMSTP			" _
-            & " FROM                                                                " _
-            & "     LNG.LNT0001_ZISSEKI LT1                                         " _
-            & " WHERE                                                               " _
-            & "     date_format(LT1.CREATEYMD, '%Y/%m/%d') = @P1                    " _
-            & " AND LT1.TORICODE like @P2                                           " _
-            & " AND LT1.DELFLG = '0'                                                " _
-            & " ORDER BY                                                            " _
-            & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
+            & "     ,coalesce(LT1.RECEIVEYMD, '')                         AS RECEIVEYMD			    " _
+            & "     ,coalesce(LT1.UPDTIMSTP, '')                          AS UPDTIMSTP			    " _
+            & " FROM                                                                                " _
+            & "     LNG.LNT0001_ZISSEKI LT1                                                         " _
+            & " WHERE                                                                               " _
+            & "     date_format(LT1.CREATEYMD, '%Y/%m/%d') = @YMD                                   "
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        ' 取引先
+        If WF_TORI.SelectedIndex = 0 Then
+            If WF_TORI.Items.Count - 1 > 0 Then
+                SQLStr += " AND LT1.TORICODE in ("
+                'WF_TORIの先頭に"選択してください"があるためj=1とする
+                For j As Integer = 1 To WF_TORI.Items.Count - 1
+                    SQLStr += "'"
+                    SQLStr += WF_TORI.Items(j).Value
+                    SQLStr += "'"
+                    If j < WF_TORI.Items.Count - 1 Then
+                        SQLStr += ","
+                    Else
+                        SQLStr += ")"
+                    End If
+                Next
+            End If
+        Else
+            SQLStr += " AND LT1.TORICODE = '" & WF_TORI.SelectedValue & "'"
+        End If
+
+        '部署
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        If ApiInfo.Count > 0 Then
+            SQLStr += " AND LT1.ORDERORG in ("
+            For j As Integer = 0 To ApiInfo.Count - 1
+                SQLStr += "'"
+                SQLStr += ApiInfo(j).Org
+                SQLStr += "'"
+                If j < ApiInfo.Count - 1 Then
+                    SQLStr += ","
+                Else
+                    SQLStr += ")"
+                End If
+            Next
+        End If
+
+        SQLStr += " AND LT1.DELFLG = '0'                                                " _
+                & " ORDER BY                                                            " _
+                & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
 
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)        '作成日
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.VarChar)     '取引先
+                Dim YMD As MySqlParameter = SQLcmd.Parameters.Add("@YMD", MySqlDbType.Date)        '作成日
                 If Not String.IsNullOrEmpty(WF_CreateYmd.Value) AndAlso IsDate(WF_CreateYmd.Value) Then
-                    PARA1.Value = WF_CreateYmd.Value
+                    YMD.Value = WF_CreateYmd.Value
                 Else
-                    PARA1.Value = Date.Now.ToString("yyyy/MM/dd")
-                End If
-                If WF_TORI.SelectedIndex = 0 Then
-                    PARA2.Value = "%"
-                Else
-                    PARA2.Value = WF_TORI.SelectedValue
+                    YMD.Value = Date.Now.ToString("yyyy/MM/dd")
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
