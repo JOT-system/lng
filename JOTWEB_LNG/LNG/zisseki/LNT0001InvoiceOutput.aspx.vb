@@ -1174,7 +1174,7 @@ Public Class LNT0001InvoiceOutput
             SQLSUMStr &= " , SUM(tmp0001.ZISSEKI) AS ZISSEKI "
             SQLSUMStr &= " , COUNT(1) AS TANK_CNT "
             '-- FROM
-            SQLSUMStr &= " FROM LNG.tmp0001_zisseki tmp0001 "
+            SQLSUMStr &= " FROM LNG.TMP0001_ZISSEKI tmp0001 "
             SQLSUMStr &= " GROUP BY "
             SQLSUMStr &= "   tmp0001.SHEETSORTNO_REP "
             SQLSUMStr &= " , tmp0001.TODOKECODE "

@@ -222,7 +222,7 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
 
         '-- FROM
-        SQLStr &= " FROM LNG.LNM0006_tanka LNM0006 "
+        SQLStr &= " FROM LNG.LNM0006_TANKA LNM0006 "
         SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
         SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
         SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", "AVOCADO_TODOKE_MAS")
