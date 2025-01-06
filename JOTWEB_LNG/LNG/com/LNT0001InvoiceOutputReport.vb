@@ -17,6 +17,7 @@ Public Class LNT0001InvoiceOutputReport
     Private UploadRootPath As String = ""
     Private UrlRoot As String = ""
     Private PrintData As DataTable
+    Private PrintTankData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -28,12 +29,13 @@ Public Class LNT0001InvoiceOutputReport
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
     ''' <param name="printDataClass">帳票データ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
-    Public Sub New(mapId As String, excelFileName As String, printDataClass As DataTable,
+    Public Sub New(mapId As String, excelFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
         Try
             Dim CS0050SESSION As New CS0050SESSION
             Me.PrintData = printDataClass
+            Me.PrintTankData = printTankDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -251,6 +253,19 @@ Public Class LNT0001InvoiceOutputReport
 
                 '表示用セル保管
                 cellStay = PrintDatarow("TODOKECELL_REP").ToString()
+            Next
+
+            '〇届先(単価)設定
+            For Each PrintDatarow As DataRow In PrintTankData.Select("", "MASTERNO")
+                '〇シート「マスタ」
+                Dim iTanka As Integer = Integer.Parse(PrintDatarow("TANKA").ToString())
+                If Convert.ToString(PrintDatarow("SYAGATA")) = "1" Then
+                    '★単車
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                ElseIf Convert.ToString(PrintDatarow("SYAGATA")) = "2" Then
+                    '★トレーラ
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                End If
             Next
 
             '★計算エンジンの有効化

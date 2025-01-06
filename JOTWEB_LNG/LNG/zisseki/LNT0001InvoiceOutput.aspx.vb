@@ -19,6 +19,7 @@ Public Class LNT0001InvoiceOutput
     '○ 検索結果格納Table
     Private LNT0001tbl As DataTable                                  '実績（アボカド）データ格納用テーブル
     Private LNT0001Sumtbl As DataTable                               '実績（アボカド）サマリーデータ格納用テーブル
+    Private LNT0001Tanktbl As DataTable                              '実績（アボカド）単価データ格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -650,7 +651,7 @@ Public Class LNT0001InvoiceOutput
             '〇(帳票)項目チェック処理
             WW_ReportCheck(Me.WF_TORI.SelectedItem.Text)
 
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
@@ -831,10 +832,12 @@ Public Class LNT0001InvoiceOutput
             Case "ENEOS_八戸　輸送費請求書"
                 Dim dtHachinoheTank As New DataTable
                 Dim dtAvocadoTodoke As New DataTable
+                'Dim dtENEOSHachinoheTanka As New DataTable
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()  ' DataBase接続
                     CMNPTS.SelectCONVERTMaster(SQLcon, "ENEOS_HACHINOHE_TANK", dtHachinoheTank)
                     CMNPTS.SelectCONVERTMaster(SQLcon, "AVOCADO_TODOKE_MAS", dtAvocadoTodoke)
+                    CMNPTS.SelectTANKAMaster(SQLcon, "0005700000", "020202", Me.WF_TaishoYm.Value + "/01", LNT0001Tanktbl)
                 End Using
 
                 LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号

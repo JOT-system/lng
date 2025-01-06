@@ -178,4 +178,83 @@ Public Class CmnParts
 
     End Sub
 
+    ''' <summary>
+    ''' 単価マスタTBL検索
+    ''' </summary>
+    Public Sub SelectTANKAMaster(ByVal SQLcon As MySqlConnection,
+                                 ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtTANKAMas As DataTable)
+        If IsNothing(O_dtTANKAMas) Then
+            O_dtTANKAMas = New DataTable
+        End If
+        If O_dtTANKAMas.Columns.Count <> 0 Then
+            O_dtTANKAMas.Columns.Clear()
+        End If
+        O_dtTANKAMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0006.TORICODE "
+        SQLStr &= "   ,LNM0006.TORINAME "
+        SQLStr &= "   ,LNM0006.ORGCODE "
+        SQLStr &= "   ,LNM0006.ORGNAME "
+        SQLStr &= "   ,LNM0006.KASANORGCODE "
+        SQLStr &= "   ,LNM0006.KASANORGNAME "
+        SQLStr &= "   ,LNM0006.TODOKECODE "
+        SQLStr &= "   ,LNM0006.BRANCHCODE AS TODOKEBRANCHCODE "
+        SQLStr &= "   ,LNM0006.TODOKENAME "
+        SQLStr &= "   ,LNM0006.STYMD "
+        SQLStr &= "   ,LNM0006.ENDYMD "
+        SQLStr &= "   ,LNM0006.TANKA "
+        SQLStr &= "   ,LNM0006.SYAGATA "
+        SQLStr &= "   ,CASE "
+        SQLStr &= "    WHEN LNM0006.SYAGATA='1' THEN '単車' "
+        SQLStr &= "    ELSE 'トレーラ' END AS SYAGATANAME "
+        SQLStr &= "   ,LNM0006.SYAGOU "
+        SQLStr &= "   ,LNM0006.SYABARA "
+        SQLStr &= "   ,LNM0006.SYUBETSU "
+        SQLStr &= "   ,LNM0006.BIKOU1 "
+        SQLStr &= "   ,LNM0006.BIKOU2 "
+        SQLStr &= "   ,LNM0006.BIKOU3 "
+        SQLStr &= "   ,CAST(lnm0005.KEYCODE03 AS SIGNED) AS SORTNO "
+        SQLStr &= "   ,CAST(lnm0005.VALUE04 AS SIGNED) AS MASTERNO "
+        SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
+        SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0006_tanka LNM0006 "
+        SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
+        SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", "AVOCADO_TODOKE_MAS")
+        SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.TODOKECODE "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0006.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0006.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0006.ENDYMD >= '{0}' ", I_TAISHOYM)
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtTANKAMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtTANKAMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
 End Class
