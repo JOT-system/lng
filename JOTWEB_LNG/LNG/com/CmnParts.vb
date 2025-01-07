@@ -182,7 +182,7 @@ Public Class CmnParts
     ''' 単価マスタTBL検索
     ''' </summary>
     Public Sub SelectTANKAMaster(ByVal SQLcon As MySqlConnection,
-                                 ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtTANKAMas As DataTable)
+                                 ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable)
         If IsNothing(O_dtTANKAMas) Then
             O_dtTANKAMas = New DataTable
         End If
@@ -216,8 +216,8 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0006.BIKOU1 "
         SQLStr &= "   ,LNM0006.BIKOU2 "
         SQLStr &= "   ,LNM0006.BIKOU3 "
-        SQLStr &= "   ,CAST(lnm0005.KEYCODE03 AS SIGNED) AS SORTNO "
-        SQLStr &= "   ,CAST(lnm0005.VALUE04 AS SIGNED) AS MASTERNO "
+        SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
+        SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
         SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
         SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
 
@@ -225,7 +225,7 @@ Public Class CmnParts
         SQLStr &= " FROM LNG.LNM0006_TANKA LNM0006 "
         SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
         SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", "AVOCADO_TODOKE_MAS")
+        SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
         SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.TODOKECODE "
 
         '-- WHERE

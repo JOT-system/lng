@@ -301,6 +301,35 @@ Public Module BaseDllConst
 
 #End Region
 
+#Region "届先取引先"
+    ''' <summary>
+    ''' ＥＮＥＯＳ
+    ''' </summary>
+    Public Const CONST_TORICODE_0005700000 As String = "0005700000"
+#End Region
+
+#Region "受注受付部署"
+    ''' <summary>
+    ''' EX_八戸営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_020202 As String = "020202"
+    ''' <summary>
+    ''' EX_水島営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_023301 As String = "023301"
+#End Region
+
+#Region "届先"
+    ''' <summary>
+    ''' 三井Ｅ＆Ｓマシナリー（デ組）
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004002 As String = "004002"
+    ''' <summary>
+    ''' コカ・コーラ　ボトラーズジャパン
+    ''' </summary>
+    Public Const CONST_TODOKECODE_005509 As String = "005509"
+#End Region
+
 #Region "業務ID"
     ''' <summary>
     ''' 業務ID

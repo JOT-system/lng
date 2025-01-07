@@ -21,15 +21,17 @@ Public Class LNT0001InvoiceOutputReport
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
+    Private OutputFileName As String = ""
 
     ''' <summary>
     ''' コンストラクタ
     ''' </summary>
     ''' <param name="mapId">帳票格納先のMAPID</param>
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
+    ''' <param name="outputFileName">(出力用)Excelファイル名（フルパスではない)</param>
     ''' <param name="printDataClass">帳票データ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
-    Public Sub New(mapId As String, excelFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
+    Public Sub New(mapId As String, excelFileName As String, outputFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
         Try
@@ -39,6 +41,7 @@ Public Class LNT0001InvoiceOutputReport
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
+            Me.OutputFileName = outputFileName
             Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                           "PRINTFORMAT",
                                                           defaultDatakey,
@@ -71,16 +74,19 @@ Public Class LNT0001InvoiceOutputReport
             'ファイルopen
             WW_Workbook.Open(Me.ExcelTemplatePath)
 
-            If excelFileName = "④ENEOS_八戸　輸送費請求書.xlsx" Then
+            If excelFileName = "④ENEOS_八戸　輸送費請求書.xlsx" _
+                OrElse excelFileName = "④ENEOS_水島　輸送費請求書.xlsx" Then
                 Dim j As Integer = 0
                 For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
                     If WW_Workbook.Worksheets(i).Name = "入力表" Then
                         WW_SheetNo = i
-                    ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" Then
+                    ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" Then
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
                         WW_SheetNoTmp02 = i
-                    ElseIf WW_Workbook.Worksheets(i).Name = "届先毎" Then
+                    ElseIf WW_Workbook.Worksheets(i).Name = "届先毎" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "水島（届先別）" Then
                         WW_SheetNoTmp03 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
                         WW_SheetNoTmp04 = i
@@ -103,7 +109,8 @@ Public Class LNT0001InvoiceOutputReport
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData() As String
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName As String = Date.Parse(TaishoYm + "/" + "01").ToString("yyyy年MM月_") & Me.OutputFileName & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -239,8 +246,13 @@ Public Class LNT0001InvoiceOutputReport
                 '〇シート「マスタ」
                 '★ 表示
                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("{0}:{0}", PrintDatarow("MASTERCELL_REP").ToString())).Hidden = False
-                '★ 設定
+                '★ 設定(配送先)
                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("TODOKENAME_REP").ToString()
+                '〇水島営業所の場合
+                If PrintDatarow("ORDERORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                    '★ 設定(向け先)
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
+                End If
 
                 Try
                     '★ シート表示
@@ -263,8 +275,17 @@ Public Class LNT0001InvoiceOutputReport
                     '★単車
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                 ElseIf Convert.ToString(PrintDatarow("SYAGATA")) = "2" Then
-                    '★トレーラ
-                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    '〇水島営業所(三井Ｅ＆Ｓ, コカ・コーラ)独自仕様
+                    If PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 _
+                        AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004002 _
+                                 OrElse PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509) _
+                        AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                        '★トレーラ
+                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    Else
+                        '★トレーラ
+                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    End If
                 End If
             Next
 

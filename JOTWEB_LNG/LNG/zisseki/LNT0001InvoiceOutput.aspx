@@ -61,6 +61,7 @@
                                         <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
                                         <div style="display:none;">
                                         <asp:DropDownList ID="WF_TORIEXL" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
+                                        <asp:DropDownList ID="WF_FILENAME" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
                                         </div>
                                     </div>
                                 </div>

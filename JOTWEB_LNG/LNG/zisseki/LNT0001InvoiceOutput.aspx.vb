@@ -45,6 +45,7 @@ Public Class LNT0001InvoiceOutput
 
     Private ListShippersInvoice As New ListBox
     Private ListShippersInvoiceExcel As New ListBox
+    Private ListFileName As New ListBox
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -163,6 +164,7 @@ Public Class LNT0001InvoiceOutput
         GS0007FIXVALUElst.CLAS = "INVOICE"
         GS0007FIXVALUElst.LISTBOX1 = ListShippersInvoice
         GS0007FIXVALUElst.LISTBOX2 = ListShippersInvoiceExcel
+        GS0007FIXVALUElst.LISTBOX3 = ListFileName
         GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
         GS0007FIXVALUElst.GS0007FIXVALUElst()
         If Not isNormal(GS0007FIXVALUElst.ERR) Then
@@ -195,6 +197,17 @@ Public Class LNT0001InvoiceOutput
             End If
         Next
         WF_TORIEXL.SelectedValue = 0
+
+        WF_FILENAME.Items.Clear()
+        WF_FILENAME.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To ListFileName.Items.Count - 1
+            Dim wOrg As String = ListShippersInvoice.Items(i).Value
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+            If exists Then
+                WF_FILENAME.Items.Add(New ListItem(ListFileName.Items(i).Text, ListFileName.Items(i).Value))
+            End If
+        Next
+        WF_FILENAME.SelectedValue = 0
 
     End Sub
 
@@ -597,6 +610,7 @@ Public Class LNT0001InvoiceOutput
                 For Each LNT0001row As DataRow In LNT0001tbl.Rows
                     i += 1
                     LNT0001row("LINECNT") = i        'LINECNT
+                    LNT0001row("TANKNUMBER") = Replace(LNT0001row("TANKNUMBER").ToString(), Space(1), String.Empty)
                 Next
             End Using
         Catch ex As Exception
@@ -728,11 +742,12 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
-        If Me.WF_TORI.SelectedItem.Text = "ENEOS_八戸　輸送費請求書" Then
-            '〇(帳票)項目チェック処理
-            WW_ReportCheck(Me.WF_TORI.SelectedItem.Text)
+        If Me.WF_TORI.SelectedItem.Text = "ENEOS_八戸　輸送費請求書" _
+            OrElse Me.WF_TORI.SelectedItem.Text = "ENEOS_水島　輸送費請求書" Then
+            '〇(帳票)項目チェック処理(ENEOS)
+            WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text)
 
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
@@ -899,114 +914,133 @@ Public Class LNT0001InvoiceOutput
             '〇荷主リスト変更
             Case "WF_TORI"
                 Me.WF_TORIEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
+                Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
         End Select
 
     End Sub
 
     ''' <summary>
-    ''' (帳票)項目チェック処理
+    ''' (帳票)項目チェック処理(ENEOS)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_ReportCheck(ByVal reportName As String)
+    Protected Sub WW_ReportCheckEneos(ByVal reportName As String)
+        Dim dtEneosTank As New DataTable
+        Dim dtAvocadoTodoke As New DataTable
+        'Dim dtENEOSHachinoheTanka As New DataTable
+        Dim eneosTankClass As String = ""
+        Dim avocadoTodokeClass As String = ""
+        Dim arrToriCode As String() = {"", ""}
 
         Select Case reportName
             Case "ENEOS_八戸　輸送費請求書"
-                Dim dtHachinoheTank As New DataTable
-                Dim dtAvocadoTodoke As New DataTable
-                'Dim dtENEOSHachinoheTanka As New DataTable
-                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                    SQLcon.Open()  ' DataBase接続
-                    CMNPTS.SelectCONVERTMaster(SQLcon, "ENEOS_HACHINOHE_TANK", dtHachinoheTank)
-                    CMNPTS.SelectCONVERTMaster(SQLcon, "AVOCADO_TODOKE_MAS", dtAvocadoTodoke)
-                    CMNPTS.SelectTANKAMaster(SQLcon, "0005700000", "020202", Me.WF_TaishoYm.Value + "/01", LNT0001Tanktbl)
-                End Using
+                eneosTankClass = "ENEOS_HACHINOHE_TANK"
+                avocadoTodokeClass = "AVOCADO_TODOKE_MAS"
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0005700000
+                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020202
 
-                LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
-                LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
-                LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
-                LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
-                LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
-                LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
-                LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
-                LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
-                LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
-                LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-                LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-                LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
-                LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-                LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-                LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
+            Case "ENEOS_水島　輸送費請求書"
+                eneosTankClass = "ENEOS_MIZUSHIMA_TANK"
+                avocadoTodokeClass = "MIZUSHIMA_TODOKE_MAS"
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0005700000
+                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_023301
 
-                '〇陸事番号マスタ設定
-                For Each dtHachinoheTankrow As DataRow In dtHachinoheTank.Rows
-                    Dim condition As String = String.Format("TANKNUMBER='{0}'", dtHachinoheTankrow("KEYCODE01"))
-                    For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                        '★届日より日を取得(セル(行数)の設定のため)
-                        Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
-                        Dim lastMonth As Boolean = False
-                        If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                            setDay = "1"
-                            lastMonth = True
-                        End If
-                        Dim iLine As Integer = Integer.Parse(setDay) - 1
-                        iLine = (iLine * Integer.Parse(dtHachinoheTankrow("VALUE06"))) + Integer.Parse(dtHachinoheTankrow("VALUE05"))
-                        '★トリップより位置を取得
-                        Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-                        iTrip += iLine
-                        LNT0001tblrow("ROWSORTNO") = dtHachinoheTankrow("VALUE01")
-                        LNT0001tblrow("SETCELL01") = dtHachinoheTankrow("VALUE02") + iTrip.ToString()
-                        LNT0001tblrow("SETCELL02") = dtHachinoheTankrow("VALUE03") + iTrip.ToString()
-                        LNT0001tblrow("SETCELL03") = dtHachinoheTankrow("VALUE04") + iTrip.ToString()
-                        LNT0001tblrow("SETLINE") = iTrip.ToString()
-                        If dtHachinoheTankrow("VALUE07").ToString() = "1" Then
-                            LNT0001tblrow("DISPLAYCELL_START") = dtHachinoheTankrow("VALUE02").ToString()
-                            LNT0001tblrow("DISPLAYCELL_END") = dtHachinoheTankrow("VALUE04").ToString()
-                            LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtHachinoheTankrow("VALUE08").ToString()
-                        Else
-                            LNT0001tblrow("DISPLAYCELL_START") = ""
-                            LNT0001tblrow("DISPLAYCELL_END") = ""
-                            LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
-                        End If
-
-                        '★備考設定用(出荷日と届日が不一致の場合)
-                        If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-                            If lastMonth = True Then
-                                LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-                            Else
-                                LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
-                            End If
-                        End If
-                    Next
-                Next
-
-                '〇(AVOCADO)届先出荷場所車庫マスタ設定
-                For Each dtAvocadoTodokerow As DataRow In dtAvocadoTodoke.Rows
-                    Dim condition As String = String.Format("TODOKECODE='{0}'", dtAvocadoTodokerow("KEYCODE01"))
-                    For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                        LNT0001tblrow("SHEETSORTNO_REP") = dtAvocadoTodokerow("KEYCODE03")
-                        LNT0001tblrow("TODOKENAME_REP") = dtAvocadoTodokerow("VALUE01")
-                        LNT0001tblrow("SHEETNAME_REP") = dtAvocadoTodokerow("VALUE06")
-
-                        If dtAvocadoTodokerow("VALUE02").ToString() = "1" Then
-                            LNT0001tblrow("TODOKECELL_REP") = dtAvocadoTodokerow("VALUE03")
-                            LNT0001tblrow("MASTERCELL_REP") = dtAvocadoTodokerow("VALUE04")
-                            LNT0001tblrow("SHEETDISPLAY_REP") = dtAvocadoTodokerow("VALUE05")
-                        Else
-                            LNT0001tblrow("TODOKECELL_REP") = ""
-                            LNT0001tblrow("MASTERCELL_REP") = ""
-                            LNT0001tblrow("SHEETDISPLAY_REP") = ""
-                        End If
-                    Next
-                Next
-
-                ''○各シート(届先名)抽出処理
-                'Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                '    SQLcon.Open()  ' DataBase接続
-                '    '〇実績WORK作成
-                '    WW_InsertHachinoheMoment(SQLcon, reportName)
-                'End Using
-
+            Case Else
+                Exit Sub
         End Select
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
+            CMNPTS.SelectCONVERTMaster(SQLcon, avocadoTodokeClass, dtAvocadoTodoke)
+            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", avocadoTodokeClass, LNT0001Tanktbl)
+        End Using
+
+        '〇(帳票)使用項目の設定
+        LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
+        LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
+        LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
+        LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
+        LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
+        LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
+        LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
+        LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
+        LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
+        LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
+        LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
+        LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
+        LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
+        LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
+        LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
+
+        '〇陸事番号マスタ設定
+        For Each dtEneosTankrow As DataRow In dtEneosTank.Rows
+            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtEneosTankrow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                '★届日より日を取得(セル(行数)の設定のため)
+                Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
+                Dim lastMonth As Boolean = False
+                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                    setDay = "1"
+                    lastMonth = True
+                End If
+                Dim iLine As Integer = Integer.Parse(setDay) - 1
+                iLine = (iLine * Integer.Parse(dtEneosTankrow("VALUE06"))) + Integer.Parse(dtEneosTankrow("VALUE05"))
+                '★トリップより位置を取得
+                Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+                iTrip += iLine
+                LNT0001tblrow("ROWSORTNO") = dtEneosTankrow("VALUE01")
+                LNT0001tblrow("SETCELL01") = dtEneosTankrow("VALUE02") + iTrip.ToString()
+                LNT0001tblrow("SETCELL02") = dtEneosTankrow("VALUE03") + iTrip.ToString()
+                LNT0001tblrow("SETCELL03") = dtEneosTankrow("VALUE04") + iTrip.ToString()
+                LNT0001tblrow("SETLINE") = iTrip.ToString()
+                If dtEneosTankrow("VALUE07").ToString() = "1" Then
+                    LNT0001tblrow("DISPLAYCELL_START") = dtEneosTankrow("VALUE02").ToString()
+                    LNT0001tblrow("DISPLAYCELL_END") = dtEneosTankrow("VALUE04").ToString()
+                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtEneosTankrow("VALUE08").ToString()
+                Else
+                    LNT0001tblrow("DISPLAYCELL_START") = ""
+                    LNT0001tblrow("DISPLAYCELL_END") = ""
+                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+                End If
+
+                '★備考設定用(出荷日と届日が不一致の場合)
+                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                    If lastMonth = True Then
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                    Else
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                    End If
+                End If
+            Next
+        Next
+
+        '〇(AVOCADO)届先出荷場所車庫マスタ設定
+        For Each dtAvocadoTodokerow As DataRow In dtAvocadoTodoke.Rows
+            Dim condition As String = String.Format("TODOKECODE='{0}'", dtAvocadoTodokerow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                LNT0001tblrow("SHEETSORTNO_REP") = dtAvocadoTodokerow("KEYCODE03")
+                LNT0001tblrow("TODOKENAME_REP") = dtAvocadoTodokerow("VALUE01")
+                LNT0001tblrow("SHEETNAME_REP") = dtAvocadoTodokerow("VALUE06")
+
+                '〇届先が追加された場合
+                If dtAvocadoTodokerow("VALUE02").ToString() = "1" Then
+                    LNT0001tblrow("TODOKECELL_REP") = dtAvocadoTodokerow("VALUE03")
+                    LNT0001tblrow("MASTERCELL_REP") = dtAvocadoTodokerow("VALUE04")
+                    LNT0001tblrow("SHEETDISPLAY_REP") = dtAvocadoTodokerow("VALUE05")
+                Else
+                    LNT0001tblrow("TODOKECELL_REP") = ""
+                    LNT0001tblrow("MASTERCELL_REP") = ""
+                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
+                End If
+            Next
+        Next
+
+        ''○各シート(届先名)抽出処理
+        'Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+        '    SQLcon.Open()  ' DataBase接続
+        '    '〇実績WORK作成
+        '    WW_InsertHachinoheMoment(SQLcon, reportName)
+        'End Using
 
     End Sub
 
