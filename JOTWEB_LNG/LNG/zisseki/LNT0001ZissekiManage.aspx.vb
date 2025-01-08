@@ -51,7 +51,7 @@ Public Class LNT0001ZissekiManage
                     Master.RecoverTable(LNT0001tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonExtract"         '絞り込みボタンクリック
+                        Case "WF_ButtonExtract"         '検索ボタンクリック
                             WF_ButtonExtract_Click()
                         Case "WF_ButtonZisseki"         '実績取込ボタンクリック
                             WF_ButtonZisseki_Click()
@@ -165,21 +165,21 @@ Public Class LNT0001ZissekiManage
             work.Initialize()
 
             ' 初期変数設定処理
-            WF_CreateYmd.Value = Date.Now.ToString("yyyy/MM/dd")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
             ' 実行画面からの遷移
-            WF_CreateYmd.Value = work.WF_SEL_YMD.Text
+            WF_TaishoYm.Value = work.WF_SEL_YM.Text
         Else
             ' 再度メニューからの遷移
-            WF_CreateYmd.Value = Date.Now.ToString("yyyy/MM/dd")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         End If
 
         ' ドロップダウンリスト（荷主）作成
-        Dim apiList As New ListBox
+        Dim toriList As New ListBox
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
         GS0007FIXVALUElst.CLAS = "TORICODEDROP"
-        GS0007FIXVALUElst.LISTBOX1 = apiList
+        GS0007FIXVALUElst.LISTBOX1 = toriList
         GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
         GS0007FIXVALUElst.GS0007FIXVALUElst()
         If Not isNormal(GS0007FIXVALUElst.ERR) Then
@@ -188,30 +188,17 @@ Public Class LNT0001ZissekiManage
         End If
 
         'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
-        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, "")
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To apiList.Items.Count - 1
+        For i As Integer = 0 To toriList.Items.Count - 1
             'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
-            Dim wTori As String = apiList.Items(i).Value
-            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori = wTori)
+            Dim toriLike As String = "*" & toriList.Items(i).Value & "*"
+            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori Like toriLike)
             If exists Then
-                WF_TORI.Items.Add(New ListItem(apiList.Items(i).Text, apiList.Items(i).Value))
+                WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
             End If
         Next
-
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
-           Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
-            ' 実行画面からの遷移
-            For i As Integer = 0 To WF_TORI.Items.Count - 1
-                If WF_TORI.Items(i).Value = work.WF_SEL_TORICODE.Text Then
-                    WF_TORI.SelectedIndex = i
-                    Exit For
-                End If
-            Next
-        Else
-            WF_TORI.SelectedIndex = 0
-        End If
 
     End Sub
 
@@ -262,7 +249,7 @@ Public Class LNT0001ZissekiManage
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
 
-        work.WF_SEL_YMD.Text = WF_CreateYmd.Value
+        work.WF_SEL_YM.Text = WF_TaishoYm.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
@@ -502,7 +489,8 @@ Public Class LNT0001ZissekiManage
             & " FROM                                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                                         " _
             & " WHERE                                                                               " _
-            & "     date_format(LT1.CREATEYMD, '%Y/%m/%d') = @YMD                                   "
+            & "     date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P1                                  " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P2                                  " _
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         ' 取引先
@@ -543,16 +531,19 @@ Public Class LNT0001ZissekiManage
 
         SQLStr += " AND LT1.DELFLG = '0'                                                " _
                 & " ORDER BY                                                            " _
-                & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
+                & "     LT1.ORDERORGCODE, LT1.TORICODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.STAFFCODE  "
 
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim YMD As MySqlParameter = SQLcmd.Parameters.Add("@YMD", MySqlDbType.Date)        '作成日
-                If Not String.IsNullOrEmpty(WF_CreateYmd.Value) AndAlso IsDate(WF_CreateYmd.Value) Then
-                    YMD.Value = WF_CreateYmd.Value
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)  '届日FROM
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日TO
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    PARA1.Value = WF_TaishoYm.Value & "/01"
+                    PARA2.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                 Else
-                    YMD.Value = Date.Now.ToString("yyyy/MM/dd")
+                    PARA1.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    PARA2.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -665,7 +656,7 @@ Public Class LNT0001ZissekiManage
             WF_GridPosition.Text = TBLview.Item(0)("SELECT")
         End If
 
-        work.WF_SEL_YMD.Text = WF_CreateYmd.Value
+        work.WF_SEL_YM.Text = WF_TaishoYm.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
@@ -686,6 +677,8 @@ Public Class LNT0001ZissekiManage
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0001tbl)
+
+        WF_GridPosition.Text = "1"
     End Sub
 
     ''' <summary>
@@ -724,8 +717,8 @@ Public Class LNT0001ZissekiManage
                     Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
                         ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
                         Select Case WF_FIELD.Value
-                            Case "WF_CreateYmd"         '作成日時
-                                .WF_Calendar.Text = WF_CreateYmd.Value
+                            Case "WF_TaishoYm"         '作成日時
+                                .WF_Calendar.Text = WF_TaishoYm.Value
                         End Select
                         .ActiveCalendar()
                 End Select
@@ -757,17 +750,17 @@ Public Class LNT0001ZissekiManage
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "WF_CreateYmd"             '作成日時
+            Case "WF_TaishoYm"             '作成日時
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
-                        WF_CreateYmd.Value = ""
+                        WF_TaishoYm.Value = ""
                     Else
-                        WF_CreateYmd.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                        WF_TaishoYm.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM")
                     End If
                 Catch ex As Exception
                 End Try
-                WF_CreateYmd.Focus()
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
@@ -785,8 +778,8 @@ Public Class LNT0001ZissekiManage
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_CreateYmd"             '作成日時
-                WF_CreateYmd.Focus()
+            Case "WF_TaishoYm"             '作成日時
+                WF_TaishoYm.Focus()
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行

@@ -32,13 +32,13 @@ Partial Public Class LNT0001ZissekiManage
     Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_CreateYmd コントロール。
+    '''WF_TaishoYm コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_CreateYmd As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_TaishoYm As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_TORI コントロール。

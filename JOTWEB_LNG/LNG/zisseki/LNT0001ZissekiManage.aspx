@@ -52,9 +52,9 @@
                                 </div>
                                 <!-- 有効年月日(開始） -->
                                 <div class="d-flex align-items-center gap-2 me-3">
-                                    <strong class="flex-shrink-0">作成日時</strong>
+                                    <strong class="flex-shrink-0">対象年月</strong>
                                     <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                        <input type="text" id="WF_CreateYmd" runat="server" class="WF_TEXTBOX_CSS" data-input >
+                                        <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" data-input >
                                         <span class="input-group-text" data-toggle >
                                             <span class="material-symbols-outlined">calendar_month</span>
                                         </span>
@@ -66,7 +66,7 @@
                                 </div>
                             </div>
                             <div class="rightSide">
-                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
+                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
                                 <input type="button" id="WF_ButtonZisseki" class="btn-sticky" value="実績取込" onclick="ButtonClick('WF_ButtonZisseki');" />
                                 <input type="button" id="WF_ButtonInvoice" class="btn-sticky" value="請求書出力" onclick="ButtonClick('WF_ButtonInvoice');" />
                                 <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>

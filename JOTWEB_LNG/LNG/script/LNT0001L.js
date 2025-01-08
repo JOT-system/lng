@@ -8,7 +8,7 @@ function InitDisplay() {
     document.querySelectorAll('.datetimepicker').forEach(picker => {
         flatpickr(picker, {
             wrap: true,
-            dateFormat: 'Y/m/d',
+            dateFormat: 'Y/m',
             locale: 'ja',
             clickOpens: false,
             allowInput: true,
