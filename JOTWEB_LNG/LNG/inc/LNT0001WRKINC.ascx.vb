@@ -18,10 +18,6 @@ Public Class LNT0001WRKINC
         ''' </summary>
         Public Property Org As String
         ''' <summary>
-        ''' 取引先
-        ''' </summary>
-        Public Property Tori As String
-        ''' <summary>
         ''' アプリID
         ''' </summary>
         Public Property AppId As String
@@ -30,13 +26,17 @@ Public Class LNT0001WRKINC
         ''' </summary>
         Public Property Token As String
         ''' <summary>
+        ''' 取引先
+        ''' </summary>
+        Public Property Tori As String
+        ''' <summary>
         ''' コンストラクタ
         ''' </summary>
-        Public Sub New(Org As String, Tori As String, AppId As String, Token As String)
+        Public Sub New(Org As String, AppId As String, Token As String, Tori As String)
             Me.Org = Org
-            Me.Tori = Tori
             Me.AppId = AppId
             Me.Token = Token
+            Me.Tori = Tori
         End Sub
     End Class
 
@@ -196,11 +196,14 @@ Public Class LNT0001WRKINC
     ''' <summary>
     ''' アボカド情報取得（組織、取引先、アプリID、トークン）
     ''' </summary>
-    Public Function GetAvocadoInfo(ByVal iComp As String, ByVal iOrg As String, ByVal iTri As String) As List(Of AVOCADOINFO)
+    Public Function GetAvocadoInfo(ByVal iComp As String, ByVal iOrg As String, ByVal iTori As String) As List(Of AVOCADOINFO)
 
         Dim CS0007CheckAuthority As New CS0007CheckAuthority        '更新権限チェック
         Dim GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
         Dim CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+
+        Dim ApiInfo As New List(Of AVOCADOINFO)
+        Dim toriList As String() = iTori.Split(",")
 
         '------------------------------------------------------------
         '指定された荷主に該当するアボカド接続情報（営業所毎）取得
@@ -223,7 +226,6 @@ Public Class LNT0001WRKINC
             Throw New Exception("固定値取得エラー: " & GS0007FIXVALUElst.ERR)
         End If
 
-        Dim ApiInfo As New List(Of AVOCADOINFO)
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
@@ -237,26 +239,39 @@ Public Class LNT0001WRKINC
                 '操作可能な組織コードかチェック
                 If CS0007CheckAuthority.checkUserPermission(SQLcon, iOrg, C_ROLE_VARIANT.USER_ORG, apiList1.Items(i).Value) = "2" Then
                     'リスト３～５（VALUE3～5）に取引先コードが設定されている
-                    If iTri = "" Then
+                    Dim toriCode As String = ""
+                    If iTori.Count = 0 Then
                         '画面指定なし（初期表示の場合）
                         If apiList3.Items(i).Text <> "" Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList3.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                            If toriCode.Length > 0 Then toriCode += ","
+                            toriCode += apiList3.Items(i).Text
                         End If
                         If apiList4.Items(i).Text <> "" Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList4.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                            If toriCode.Length > 0 Then toriCode += ","
+                            toriCode += apiList4.Items(i).Text
                         End If
                         If apiList5.Items(i).Text <> "" Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList5.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                            If toriCode.Length > 0 Then toriCode += ","
+                            toriCode += apiList5.Items(i).Text
                         End If
+                        ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList1.Items(i).Text, apiList2.Items(i).Text, toriCode))
                     Else
-                        If apiList3.Items(i).Text = iTri Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList3.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
-                        End If
-                        If apiList4.Items(i).Text = iTri Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList4.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
-                        End If
-                        If apiList5.Items(i).Text = iTri Then
-                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList5.Items(i).Text, apiList1.Items(i).Text, apiList2.Items(i).Text))
+                        For Each toriFor In toriList
+                            If apiList3.Items(i).Text = toriFor Then
+                                If toriCode.Length > 0 Then toriCode += ","
+                                toriCode += apiList3.Items(i).Text
+                            End If
+                            If apiList4.Items(i).Text = toriFor Then
+                                If toriCode.Length > 0 Then toriCode += ","
+                                toriCode += apiList4.Items(i).Text
+                            End If
+                            If apiList5.Items(i).Text = toriFor Then
+                                If toriCode.Length > 0 Then toriCode += ","
+                                toriCode += apiList5.Items(i).Text
+                            End If
+                        Next
+                        If toriCode.Length > 0 Then
+                            ApiInfo.Add(New AVOCADOINFO(apiList1.Items(i).Value, apiList1.Items(i).Text, apiList2.Items(i).Text, toriCode))
                         End If
                     End If
                 End If

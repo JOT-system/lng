@@ -32,13 +32,22 @@ Partial Public Class LNT0001ZissekiIntake
     Protected WithEvents WF_TaishoYm As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_TORI_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORI_L As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_TORI コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.ListBox
     
     '''<summary>
     '''pnlListArea コントロール。
@@ -201,6 +210,24 @@ Partial Public Class LNT0001ZissekiIntake
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORIhdn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORIhdn As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORINAMEhdn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORINAMEhdn As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

@@ -90,6 +90,7 @@ Public Class CS0054KintoneApi
         Dim GetFields As String = ""
         Dim GetTotalCnt As String = "totalCount=true"
         Dim GetUrl As String = ""
+        Dim repTori As String = ToriCode.Replace(",", """,""")
 
         If String.IsNullOrEmpty(YmdFrom) Then
             YmdFrom = Date.Now.ToString("yyyy-MM-dd")
@@ -103,8 +104,8 @@ Public Class CS0054KintoneApi
         End If
 
         While GetOffset < 10000
-            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届先取引先コード = ""{0}"" and 届日 >= ""{1}"" and 届日 <= ""{2}"" limit " & GetLimit & " offset " & GetOffset
-            Dim GetQuery As String = String.Format(EditQuery, ToriCode, YmdFrom, YmdTo)
+            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届先取引先コード in (""{0}"") and 届日 >= ""{1}"" and 届日 <= ""{2}"" and 実績数量 != ""0"" limit " & GetLimit & " offset " & GetOffset
+            Dim GetQuery As String = String.Format(EditQuery, repTori, YmdFrom, YmdTo)
             'Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
 
             GetUrl = Me.ApiBaseUrl + "?"

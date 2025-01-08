@@ -56,13 +56,21 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2">
+<%--                                <div class="d-flex align-items-center gap-2">
                                     <strong class="flex-shrink-0">荷主</strong>
                                     <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
+                                </div>--%>
+                                <div class="divItem">
+                                    <div class="divDdlArea">
+                                        <asp:TextBox ID="WF_TORI_L" class="txtlblbox" runat="server" ReadOnly="true" disabled="disabled" Text ="荷主"></asp:TextBox>
+                                    </div>
+                                    <a class="divDdlAreaLeft">
+                                        <asp:ListBox ID="WF_TORI" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" SelectionMode="Multiple"></asp:ListBox>
+                                    </a>
                                 </div>
                             </div>
                             <div class="rightSide">
-                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
+                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
                                 <input type="button" id="WF_ButtonKintone" class="btn-sticky" value="実績取込" onclick="ButtonClick('WF_ButtonKintone');" />
                                 <input type="button" id="WF_ButtonZero" class="btn-sticky" value="実績数量ゼロ" onclick="ButtonClick('WF_ButtonZero');" />
                                 <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
@@ -118,5 +126,8 @@
         <!-- ボタン押下 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 権限 -->
+
+        <input id="WF_TORIhdn" runat="server" value="" type="text" />
+        <input id="WF_TORINAMEhdn" runat="server" value="" type="text" />
     </div>
 </asp:Content>

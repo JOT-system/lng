@@ -58,7 +58,7 @@ Public Class LNT0001ZissekiIntake
                     Master.RecoverTable(LNT0003tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonExtract"         '絞り込みボタンクリック
+                        Case "WF_ButtonExtract"         '検索ボタンクリック
                             WF_ButtonExtract_Click()
                         Case "WF_ButtonKintone"         '実績取込（アボカド）ボタンクリック（確認ポップアップ表示）
                             WF_KintoneGetconfirm_Click()
@@ -192,24 +192,20 @@ Public Class LNT0001ZissekiIntake
         End If
 
         'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
-        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, "")
 
         Dim SaveIdx As Integer = 0
         Dim FindFlg As Integer = 0
         WF_TORI.Items.Clear()
-        WF_TORI.Items.Add(New ListItem("選択してください", ""))
+        'WF_TORI.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To toriList.Items.Count - 1
             'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
-            Dim wTori As String = toriList.Items(i).Value
-            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori = wTori)
+            Dim toriLike As String = "*" & toriList.Items(i).Value & "*"
+            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori Like toriLike)
             If exists Then
                 WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
-                If work.WF_SEL_TORICODE.Text = toriList.Items(i).Value Then
-                    SaveIdx = i + 1
-                End If
             End If
         Next
-        WF_TORI.SelectedIndex = SaveIdx
 
     End Sub
 
@@ -306,27 +302,12 @@ Public Class LNT0001ZissekiIntake
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         ' 取引先
-        If WF_TORI.SelectedIndex = 0 Then
-            If WF_TORI.Items.Count - 1 > 0 Then
-                SQLStr += " AND LT3.TORICODE in ("
-                'WF_TORIの先頭に"選択してください"があるためj=1とする
-                For j As Integer = 1 To WF_TORI.Items.Count - 1
-                    SQLStr += "'"
-                    SQLStr += WF_TORI.Items(j).Value
-                    SQLStr += "'"
-                    If j < WF_TORI.Items.Count - 1 Then
-                        SQLStr += ","
-                    Else
-                        SQLStr += ")"
-                    End If
-                Next
-            End If
-        Else
-            SQLStr += " AND LT3.TORICODE = '" & WF_TORI.SelectedValue & "'"
+        If WF_TORIhdn.Value <> "" Then
+            SQLStr += " AND LT3.TORICODE in (" & WF_TORIhdn.Value & ")"
         End If
 
         '部署
-        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORIhdn.Value)
         If ApiInfo.Count > 0 Then
             SQLStr += " AND LT3.SHIPORG in ("
             For j As Integer = 0 To ApiInfo.Count - 1
@@ -476,11 +457,18 @@ Public Class LNT0001ZissekiIntake
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
 
+            ' 画面選択された荷主を取得
+            SelectTori()
+
+            ' 画面表示データを取得
             MAPDataGet(SQLcon)
         End Using
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0003tbl)
+
+        WF_GridPosition.Text = "1"
+
     End Sub
 
     ''' <summary>
@@ -490,7 +478,7 @@ Public Class LNT0001ZissekiIntake
     Protected Sub WF_ButtonZero_Click()
 
         work.WF_SEL_YM.Text = WF_TaishoYm.Value
-        work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
+        work.WF_SEL_TORICODE.Text = WF_TORIhdn.Value
 
         Dim WW_URL As String = ""
         work.GetURL(LNT0001WRKINC.MAPIDZ, WW_URL)
@@ -655,39 +643,105 @@ Public Class LNT0001ZissekiIntake
     ''' </summary>
     Private Sub WF_KintoneGetconfirm_Click()
 
-        '○ 画面表示データ取得
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-
-            MAPDataGet(SQLcon)
-        End Using
-
-
+        '対象年月チェック
         Dim result As DateTime
         If Not DateTime.TryParseExact(Me.WF_TaishoYm.Value & "/01", "yyyy/MM/dd", Globalization.CultureInfo.InvariantCulture, Globalization.DateTimeStyles.None, result) Then
             Master.Output(C_MESSAGE_NO.CTN_INPUT_DATE_ERR, C_MESSAGE_TYPE.ERR, "対象年月", "", True)
             Exit Sub
         End If
 
-        If Me.WF_TORI.SelectedIndex = 0 Then
+        ' 画面選択された荷主を取得
+        SelectTori()
+
+        '荷主選択チェック
+        If Me.WF_TORIhdn.Value = "" Then
             Master.Output(C_MESSAGE_NO.CTN_INPUT_ERR, C_MESSAGE_TYPE.ERR, "荷主", "", True)
             Exit Sub
         End If
 
-        Dim Msg1 As String = ""
-        Dim MsgType As String = ""
-        If LNT0003tbl.Rows.Count = 0 Then
-            Msg1 = "実績取込を行います"
-            MsgType = C_MESSAGE_TYPE.INF
-        Else
-            Msg1 = "既に実績を取り込み済ですがよろしいですか？"
-            MsgType = C_MESSAGE_TYPE.WAR
-        End If
+        ' 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
 
-        Dim Msg2 As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
-        Msg2 += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
+            MAPDataGet(SQLcon)
+        End Using
+
+        Dim Msg1 As String = ""
+        Dim Msg2 As String = ""
+        Dim selCnt As Integer = 0
+        Dim MsgType As String = C_MESSAGE_TYPE.INF
+        Dim toriList() As String = WF_TORIhdn.Value.Split(",")
+        Dim toriNameList() As String = WF_TORINAMEhdn.Value.Split(",")
+        Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+
+        Msg1 += "実績取込を行います"
+        Msg1 += "<BR>対象年月：" & Me.WF_TaishoYm.Value
+        For i As Integer = 0 To toriList.Count - 1
+            Dim condition As String = String.Format("TORICODE='{0}'", toriList(i))
+            Dim selRow() = LNT0003tbl.Select(condition)
+            If selRow.Count = 0 Then
+                Msg1 += "<BR>" & sp & "荷主：" & toriNameList(i)
+            End If
+        Next
+
+        selCnt = 0
+        For i As Integer = 0 To toriList.Count - 1
+            Dim condition As String = String.Format("TORICODE='{0}'", toriList(i))
+            Dim selRow() = LNT0003tbl.Select(condition)
+            If selRow.Count = 0 Then
+            Else
+                selCnt += 1
+                If selCnt = 1 Then
+                    MsgType = C_MESSAGE_TYPE.WAR
+                    Msg1 += "<BR>" & sp & "<span style='color:red;'>次の荷主は、既に実績を取り込み済ですがよろしいですか？</span>"
+                End If
+                Msg1 += "<BR>" & sp & "荷主：" & toriNameList(i)
+            End If
+        Next
+
+
+        'If LNT0003tbl.Rows.Count = 0 Then
+        '    Msg1 = "実績取込を行います"
+        '    MsgType = C_MESSAGE_TYPE.INF
+        'Else
+        '    Msg1 = "既に実績を取り込み済ですがよろしいですか？"
+        '    MsgType = C_MESSAGE_TYPE.WAR
+        'End If
+
+        'Dim Msg2 As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
+        'Msg2 += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
 
         Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, MsgType, Msg1, Msg2, True, "", True)
+
+    End Sub
+    ''' <summary>
+    ''' 荷主プルダウン選択値取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub SelectTori()
+
+        Me.WF_TORIhdn.Value = ""
+        Me.WF_TORINAMEhdn.Value = ""
+
+        If Me.WF_TORI.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To WF_TORI.Items.Count - 1
+                If WF_TORI.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_TORIhdn.Value = WF_TORI.Items(index).Value
+                        Me.WF_TORINAMEhdn.Value = WF_TORI.Items(index).Text
+                        intSelCnt = 1
+                    Else
+                        Me.WF_TORIhdn.Value = Me.WF_TORIhdn.Value & "," & WF_TORI.Items(index).Value
+                        Me.WF_TORINAMEhdn.Value = Me.WF_TORINAMEhdn.Value & "," & WF_TORI.Items(index).Text
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
 
     End Sub
 
@@ -705,7 +759,7 @@ Public Class LNT0001ZissekiIntake
             LNT0001tbl_SV = LNT0001tbl.Clone
 
             'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
-            Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+            Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORIhdn.Value)
 
             '○ 画面表示データ取得
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
@@ -717,7 +771,7 @@ Public Class LNT0001ZissekiIntake
                     'WebAPI実行（アボカドデータ取得）
                     CS0054KintoneApi.ApiApplId = ApiInfo(i).AppId
                     CS0054KintoneApi.ApiToken = ApiInfo(i).Token
-                    CS0054KintoneApi.ToriCode = WF_TORI.SelectedValue
+                    CS0054KintoneApi.ToriCode = WF_TORIhdn.Value
                     CS0054KintoneApi.YmdFrom = WF_TaishoYm.Value & "/01"
                     CS0054KintoneApi.YmdTo = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                     LNT0001tbl = CS0054KintoneApi.GetRecords()
@@ -734,6 +788,8 @@ Public Class LNT0001ZissekiIntake
                     LNT0001tbl_SV.Merge(LNT0001tbl)
                 Next
 
+                ' 画面選択された荷主を取得
+                SelectTori()
                 '○ 画面表示データ取得
                 MAPDataGet(SQLcon)
             End Using
@@ -744,14 +800,32 @@ Public Class LNT0001ZissekiIntake
             'アボカドデータ保存（念のため調査用にダウンロードできるようにする）
             Master.SaveTable(LNT0001tbl_SV, work.WF_SEL_INPTBL.Text)
 
-            '実績数量=0の存在確認
+            '実績数量=未入力の存在確認（数量=0は、AVOCADOではキャンセルオーダーはCS0054KintoneApiで既に読み飛ばし）
             Dim dv As New DataView(LNT0001tbl_SV)
-            dv.RowFilter = "積置区分 <> '積置' and (実績数量 = '0' or 実績数量 = '')"
+            dv.RowFilter = "積置区分 <> '積置' and 実績数量 = ''"
             If dv.Count > 0 Then
+                ' LINQを使用してグループ化とカウントを取得
+                Dim query = From row In dv.ToTable().AsEnumerable()
+                            Group row By toricode = row.Field(Of String)("届先取引先コード") Into Group
+                            Select New With {
+                            .toricode = toricode,
+                            .Count = Group.Count()
+                        }
+
+                ' 結果を表示
+                Dim Msg1 As String = ""
+                Dim Msg2 As String = ""
+                Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                Msg1 += "実績数量=0のデータが存在します。画面表示しますか"
+                Msg1 += "<BR>対象年月：" & Me.WF_TaishoYm.Value
+                For Each result In query
+                    If result.Count > 0 Then
+                        Dim tori = WF_TORI.Items.FindByValue(result.toricode)
+                        Msg1 += "<BR>" & sp & "荷主：" & tori.Text
+                    End If
+                Next
                 '実績数量ゼロありメッセージ出力
-                Dim Msg As String = "<BR>対象年月：" & Me.WF_TaishoYm.Value
-                Msg += "&nbsp;&nbsp;&nbsp;&nbsp;荷主：" & Me.WF_TORI.Items(Me.WF_TORI.SelectedIndex).Text
-                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, "実績数量=0のデータが存在します。画面表示しますか", Msg, True, "", True, "btnCommonConfirmYes")
+                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True, "", True, "btnCommonConfirmYes")
                 Exit Sub
             End If
 
