@@ -32,9 +32,10 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
-                        <li class="breadcrumb-item active">ユーザーマスタ</li>
-                        <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ変更履歴</li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
+                        <li class="breadcrumb-item active">ユーザーマスタ（検索）</li>
+                        <li class="breadcrumb-item active">ユーザーマスタ（一覧）</li>
+                        <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ（変更履歴）</li>
                     </ol>
                 </nav>
             <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">

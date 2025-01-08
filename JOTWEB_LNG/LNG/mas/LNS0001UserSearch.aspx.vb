@@ -116,6 +116,17 @@ Public Class LNS0001UserSearch
             End If
             '○ 名称設定処理
             CODENAME_get("ORG", TxtOrgCode.Text, LblOrgName.Text, WW_Dummy)  '組織コード
+        Else
+            ' サブメニューからの画面遷移
+            ' 画面間の情報クリア
+            work.Initialize()
+
+            ' 初期変数設定処理
+            Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
+            WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
+
+            WF_EndYMDCode.Value = ""                                            '有効年月日(To)
+            TxtOrgCode.Text = ""                                               '組織コード
         End If
         Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
 
