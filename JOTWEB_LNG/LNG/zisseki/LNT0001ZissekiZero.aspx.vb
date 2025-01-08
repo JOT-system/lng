@@ -51,7 +51,7 @@ Public Class LNT0001ZissekiZero
                     Master.RecoverTable(LNT0001tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonExtract"         '絞り込みボタンクリック
+                        Case "WF_ButtonExtract"         '検索ボタンクリック
                             WF_ButtonExtract_Click()
                         Case "WF_ButtonDOWNLOAD"        'ダウンロードボタン押下
                             WF_ButtonDOWNLOAD_Click()
@@ -171,17 +171,18 @@ Public Class LNT0001ZissekiZero
             Exit Sub
         End If
 
-        Dim SaveIdx As Integer = 0
+        'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, "")
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To toriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
-            If work.WF_SEL_TORICODE.Text = toriList.Items(i).Value Then
-                SaveIdx = i + 1
+            'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
+            Dim toriLike As String = "*" & toriList.Items(i).Value & "*"
+            Dim exists As Boolean = ApiInfo.Any(Function(p) p.Tori Like toriLike)
+            If exists Then
+                WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
             End If
         Next
-        WF_TORI.SelectedIndex = SaveIdx
-
     End Sub
 
     ''' <summary>
@@ -471,7 +472,7 @@ Public Class LNT0001ZissekiZero
             & " FROM                                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                                         " _
             & " WHERE                                                                               " _
-            & "     LT1.TORICODE = @P1                                                              " _
+            & "     LT1.TORICODE like @P1                                                           " _
             & " AND LT1.STACKINGTYPE <> '積置'                                                      " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                                  " _
@@ -482,10 +483,14 @@ Public Class LNT0001ZissekiZero
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar) '部署
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar) '取引先
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)    '届日FROM
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)    '届日TO
-                PARA1.Value = WF_TORI.SelectedValue
+                If WF_TORI.SelectedValue = "" Then
+                    PARA1.Value = "%"
+                Else
+                    PARA1.Value = WF_TORI.SelectedValue
+                End If
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                     PARA2.Value = WF_TaishoYm.Value & "/01"
                     PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
@@ -625,6 +630,9 @@ Public Class LNT0001ZissekiZero
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0001tbl)
+
+        WF_GridPosition.Text = "1"
+
     End Sub
 
     ''' <summary>

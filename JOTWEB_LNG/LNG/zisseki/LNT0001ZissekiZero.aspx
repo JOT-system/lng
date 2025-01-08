@@ -67,7 +67,7 @@
                                 </div>
                             </div>
                             <div class="rightSide">
-                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="絞り込み" onclick="ButtonClick('WF_ButtonExtract');" />
+                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
                                 <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
                                 <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
                                 <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 
