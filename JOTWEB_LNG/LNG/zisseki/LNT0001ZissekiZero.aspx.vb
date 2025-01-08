@@ -472,31 +472,59 @@ Public Class LNT0001ZissekiZero
             & " FROM                                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                                         " _
             & " WHERE                                                                               " _
-            & "     LT1.TORICODE like @P1                                                           " _
-            & " AND LT1.STACKINGTYPE <> '積置'                                                      " _
-            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                                  " _
-            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                                  " _
+            & "     LT1.STACKINGTYPE <> '積置'                                                      " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P1                                  " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P2                                  " _
             & " AND LT1.ZISSEKI = 0                                                                 " _
-            & " ORDER BY                                                                            " _
-            & "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE                 "
+        ' 取引先
+        If WF_TORI.SelectedIndex = 0 Then
+            If WF_TORI.Items.Count - 1 > 0 Then
+                SQLStr += " AND LT1.TORICODE in ("
+                'WF_TORIの先頭に"選択してください"があるためj=1とする
+                For j As Integer = 1 To WF_TORI.Items.Count - 1
+                    SQLStr += "'"
+                    SQLStr += WF_TORI.Items(j).Value
+                    SQLStr += "'"
+                    If j < WF_TORI.Items.Count - 1 Then
+                        SQLStr += ","
+                    Else
+                        SQLStr += ")"
+                    End If
+                Next
+            End If
+        Else
+            SQLStr += " AND LT1.TORICODE = '" & WF_TORI.SelectedValue & "'"
+        End If
+        '部署
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        If ApiInfo.Count > 0 Then
+            SQLStr += " AND LT1.ORDERORG in ("
+            For j As Integer = 0 To ApiInfo.Count - 1
+                SQLStr += "'"
+                SQLStr += ApiInfo(j).Org
+                SQLStr += "'"
+                If j < ApiInfo.Count - 1 Then
+                    SQLStr += ","
+                Else
+                    SQLStr += ")"
+                End If
+            Next
+        End If
 
+        SQLStr += " AND LT1.DELFLG = '0'                                                " _
+            & " ORDER BY                                                                            " _
+            & "     LT1.ORDERORGCODE, LT1.TORICODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE                 "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar) '取引先
-                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)    '届日FROM
-                Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)    '届日TO
-                If WF_TORI.SelectedValue = "" Then
-                    PARA1.Value = "%"
-                Else
-                    PARA1.Value = WF_TORI.SelectedValue
-                End If
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)    '届日FROM
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)    '届日TO
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
-                    PARA2.Value = WF_TaishoYm.Value & "/01"
-                    PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                    PARA1.Value = WF_TaishoYm.Value & "/01"
+                    PARA2.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                 Else
-                    PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
-                    PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
+                    PARA1.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    PARA2.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
