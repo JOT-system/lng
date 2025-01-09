@@ -15,7 +15,8 @@
     <link href="<%=ResolveUrl("~/LNG/css/M00001.css")%>" rel="stylesheet" type="text/css" />
     <link href="<%= ResolveUrl("~/css/jquery-ui-1.10.4.custom.min.css")%>" rel="stylesheet" type="text/css"/>
     <link href="<%= ResolveUrl("~/css/jquery.multiselect.css")%>" rel="stylesheet" type="text/css"/>
-    <link rel="shortcut icon" type="image/x-icon" href="~/img/favicon2.ico" />
+    <link rel="icon" type="image/png" href="~/img/favicon.png"/>
+    <%--<link rel="shortcut icon" type="image/x-icon" href="~/img/favicon2.ico" />--%>
     <%--個別のスタイルは以下に記載 OR 外部ファイルに逃す --%>
     <%--共通利用するJavaScript --%>
     <script src='<%= ResolveUrl("~/script/common.js")%>' type="text/javascript" charset="utf-8"></script>
