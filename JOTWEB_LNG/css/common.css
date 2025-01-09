@@ -2020,7 +2020,7 @@ span[class^="WF_DViewRep"] table td:nth-child(7n+1) span {
 }
 
 #pnlCommonMessageTitle {
-    width: calc(100%);
+    /*width: calc(100%);*/
     font-weight: bold;
     padding: 10px;
     height: 20px;
