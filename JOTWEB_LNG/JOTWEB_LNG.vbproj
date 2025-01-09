@@ -235,6 +235,7 @@
     <Content Include="css\images\ui-icons_ffffff_256x240.png" />
     <Content Include="css\jquery-ui-1.10.4.custom.min.css" />
     <Content Include="css\jquery.multiselect.css" />
+    <Content Include="img\favicon.png" />
     <Content Include="img\kronos_logo.svg" />
     <Content Include="LNG\css\LNS0001D.css" />
     <Content Include="LNG\css\LNS0001H.css" />
