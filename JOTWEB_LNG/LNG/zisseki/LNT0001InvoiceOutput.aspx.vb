@@ -766,7 +766,7 @@ Public Class LNT0001InvoiceOutput
             '〇(帳票)項目チェック処理
             WW_ReportCheckSAIBU(Me.WF_TORI.SelectedItem.Text, prtTbl)
 
-            Dim LNT0001InvoiceOutputSAIBU As New LNT0001InvoiceOutputSAIBU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, prtTbl, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim LNT0001InvoiceOutputSAIBU As New LNT0001InvoiceOutputSAIBU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, prtTbl, taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputSAIBU.CreateExcelPrintData()
@@ -1239,16 +1239,45 @@ Public Class LNT0001InvoiceOutput
     ''' <remarks></remarks>
     Protected Sub WW_ReportCheckSAIBU(ByVal reportName As String, ByRef oTbl As DataTable)
 
+        Dim TODOKE_003769 As String = "003769"      'エコア中津ガス
         Dim dtKyushuTodoke As New DataTable
+        Dim arrToriCode As String() = {"", ""}
+
+        arrToriCode(0) = BaseDllConst.CONST_TORICODE_0045300000
+        arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_024001
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, "SAIBU_KYUSHU_TODOKE", dtKyushuTodoke, I_ORDERBY_KEY:="VALUE01")
+            '単価取得は、とりあえず使えそうなのでそのまま利用する
+            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", "SAIBU_KYUSHU_TODOKE", LNT0001Tanktbl)
         End Using
 
         '届先毎グルーピングして数量をサマリー（LINQを使う）
+        'エコア以外
         Dim query = From row In LNT0001tbl.AsEnumerable()
+                    Where row.Field(Of String)("TODOKECODE") <> TODOKE_003769
                     Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
                     Select New With {
+                            .TODOKECODE = TODOKECODE,
+                            .DAISU = Group.Count(),
+                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
+                        }
+        'エコア１回転
+        Dim query01 = From row In LNT0001tbl.AsEnumerable()
+                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
+                            row.Field(Of String)("TRIP") = 1
+                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+                      Select New With {
+                            .TODOKECODE = TODOKECODE,
+                            .DAISU = Group.Count(),
+                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
+                        }
+        'エコア２回転
+        Dim query02 = From row In LNT0001tbl.AsEnumerable()
+                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
+                            row.Field(Of String)("TRIP") = 2
+                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+                      Select New With {
                             .TODOKECODE = TODOKECODE,
                             .DAISU = Group.Count(),
                             .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
@@ -1286,14 +1315,49 @@ Public Class LNT0001InvoiceOutput
             prtTbl.Rows.Add(prtRow)
         Next
 
-        ' 表示情報を付加
+        ' 表示情報を付加（台数、数量）
+        'エコア以外
         For Each result In query
             For Each prtRow In prtTbl.Rows
                 If prtRow("TODOKECODE") = result.TODOKECODE Then
-                    prtRow("TODOKECODE") = result.TODOKECODE
                     prtRow("TANKA") = 0
                     prtRow("DAISU") = result.DAISU
                     prtRow("ZISSEKI") = result.ZISSEKI
+                    Exit For
+                End If
+            Next
+        Next
+        'エコア１回転
+        For Each result In query01
+            For Each prtRow In prtTbl.Rows
+                If prtRow("TODOKECODE") = result.TODOKECODE AndAlso
+                   prtRow("TODOKECLASS") = "1" Then
+                    prtRow("TANKA") = 0
+                    prtRow("DAISU") = result.DAISU
+                    prtRow("ZISSEKI") = result.ZISSEKI
+                    Exit For
+                End If
+            Next
+        Next
+        'エコア２回転
+        For Each result In query02
+            For Each prtRow In prtTbl.Rows
+                If prtRow("TODOKECODE") = result.TODOKECODE AndAlso
+                   prtRow("TODOKECLASS") = "2" Then
+                    prtRow("TANKA") = 0
+                    prtRow("DAISU") = result.DAISU
+                    prtRow("ZISSEKI") = result.ZISSEKI
+                    Exit For
+                End If
+            Next
+        Next
+
+        '単価設定
+        For Each result As DataRow In LNT0001Tanktbl.Rows
+            For Each prtRow In prtTbl.Rows
+                If prtRow("TODOKECODE") = result("TODOKECODE") AndAlso
+                   prtRow("TODOKECLASS") = CInt(result("TODOKEBRANCHCODE")).ToString Then
+                    prtRow("TANKA") = result("TANKA")
                     Exit For
                 End If
             Next

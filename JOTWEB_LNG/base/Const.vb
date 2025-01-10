@@ -306,6 +306,10 @@ Public Module BaseDllConst
     ''' ＥＮＥＯＳ
     ''' </summary>
     Public Const CONST_TORICODE_0005700000 As String = "0005700000"
+    ''' <summary>
+    ''' エスジーリキッドサービス
+    ''' </summary>
+    Public Const CONST_TORICODE_0045300000 As String = "0045300000"
 #End Region
 
 #Region "受注受付部署"
@@ -317,6 +321,10 @@ Public Module BaseDllConst
     ''' EX_水島営業所
     ''' </summary>
     Public Const CONST_ORDERORGCODE_023301 As String = "023301"
+    ''' <summary>
+    ''' EX 九州営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_024001 As String = "024001"
 #End Region
 
 #Region "届先"

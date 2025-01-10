@@ -16,15 +16,17 @@ Public Class LNT0001InvoiceOutputSAIBU
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
+    Private OutputFileName As String = ""
 
     ''' <summary>
     ''' コンストラクタ
     ''' </summary>
     ''' <param name="mapId">帳票格納先のMAPID</param>
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
+    ''' <param name="outputFileName">(出力用)Excelファイル名（フルパスではない)</param>
     ''' <param name="printDataClass">帳票データ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
-    Public Sub New(mapId As String, excelFileName As String, printDataClass As DataTable,
+    Public Sub New(mapId As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
         Try
@@ -33,6 +35,7 @@ Public Class LNT0001InvoiceOutputSAIBU
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
+            Me.OutputFileName = outputFileName
             Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                           "PRINTFORMAT",
                                                           defaultDatakey,
@@ -83,7 +86,8 @@ Public Class LNT0001InvoiceOutputSAIBU
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
     Public Function CreateExcelPrintData() As String
-        Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        'Dim tmpFileName As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString & ".xlsx"
+        Dim tmpFileName As String = Date.Parse(TaishoYm + "/" + "01").ToString("yyyy年MM月_") & Me.OutputFileName & ".xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
 
@@ -143,7 +147,7 @@ Public Class LNT0001InvoiceOutputSAIBU
                 '◯ 届先名
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
                 '◯ 単価
-                'WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("TANKA").ToString())
+                WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("TANKA").ToString())
 
                 '合計行の編集（エコア合計（1回転＋2回転））
                 '変換マスタ（lnm0005_convert）の内容を参照
