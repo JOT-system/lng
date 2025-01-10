@@ -37,7 +37,7 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active">実績管理</li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0001L');">実績管理</a></li>
                         <li class="breadcrumb-item active" aria-current="page">実績取込</li>
                     </ol>
                 </nav>

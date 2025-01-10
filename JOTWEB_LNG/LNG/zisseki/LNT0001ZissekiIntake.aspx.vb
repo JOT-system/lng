@@ -72,7 +72,7 @@ Public Class LNT0001ZissekiIntake
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNT0001L" '戻るボタン押下（LNT0001Lは、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
