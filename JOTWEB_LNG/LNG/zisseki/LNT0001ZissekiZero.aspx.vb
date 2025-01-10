@@ -61,12 +61,14 @@ Public Class LNT0001ZissekiZero
                             WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNT0001D" '戻るボタン押下（LNT0001Dは、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
                         Case "WF_ButtonLAST"            '最終頁ボタン押下
                             WF_ButtonLAST_Click()
+                        Case "LNT0001L"                 'パンくず（実績管理）押下
+                            Topic_Path_Click(WF_ButtonClick.Value)
                     End Select
 
                     '○ 一覧再表示処理
@@ -802,6 +804,19 @@ Public Class LNT0001ZissekiZero
     Protected Sub WF_ButtonEND_Click()
 
         Master.TransitionPrevPage()
+
+    End Sub
+
+    ''' <summary>
+    ''' 戻るボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub Topic_Path_Click(ByVal iMapId As String)
+
+        Dim WW_URL As String = ""
+        GetURL(iMapId, WW_URL)
+
+        Server.Transfer(WW_URL)
 
     End Sub
 
