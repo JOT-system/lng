@@ -167,7 +167,8 @@ Public Class LNT0001ZissekiManage
             ' 初期変数設定処理
             WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
-               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I Then
+               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I OrElse
+            Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
             ' 実行画面からの遷移
             WF_TaishoYm.Value = work.WF_SEL_YM.Text
         Else
