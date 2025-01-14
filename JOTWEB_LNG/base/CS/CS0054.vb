@@ -6,7 +6,7 @@ Imports System.Runtime.Serialization.Json
 Imports Newtonsoft.Json.Linq
 
 ''' <summary>
-''' Kintoneの管理データを取得するAPI共通クラス
+''' Kintoneの管理データを取得するAPI共通クラス 
 ''' </summary>
 ''' <remarks>基本的に例外はThrowするので呼出し元で制御</remarks>
 Public Class CS0054KintoneApi
