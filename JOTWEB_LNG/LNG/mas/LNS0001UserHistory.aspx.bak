@@ -40,6 +40,7 @@
                 </nav>
             <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
                 <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ変更履歴</h2>
+                <div class="headerboxOnly" id="headerbox">
                     <div class="Operation">
                         <div class="actionButtonBox">
                             <div class="leftSide">
@@ -66,6 +67,7 @@
 
                     </div> <!-- End class="Operation" -->
                     <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+                </div>
             </div>
         </div>
         </div>

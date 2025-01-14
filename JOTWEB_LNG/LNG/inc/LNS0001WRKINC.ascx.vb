@@ -39,12 +39,12 @@ Public Class LNS0001WRKINC
         STAFFNAMES   '社員名（短）
         STAFFNAMEL   '社員名（長）
         EMAIL   'メールアドレス
-        MENUROLE   'メニュー表示制御ロール
-        MAPROLE   '画面参照更新制御ロール
-        VIEWPROFID   '画面表示項目制御ロール
-        RPRTPROFID   'エクセル出力制御ロール
         MAPID   '画面ＩＤ
-        _VARIANT   '画面初期値ロール
+        'MENUROLE   'メニュー表示制御ロール
+        'MAPROLE   '画面参照更新制御ロール
+        'VIEWPROFID   '画面表示項目制御ロール
+        'RPRTPROFID   'エクセル出力制御ロール
+        '_VARIANT   '画面初期値ロール
     End Enum
 
     ''' <summary>
@@ -64,12 +64,12 @@ Public Class LNS0001WRKINC
         STAFFNAMES   '社員名（短）
         STAFFNAMEL   '社員名（長）
         EMAIL   'メールアドレス
-        MENUROLE   'メニュー表示制御ロール
-        MAPROLE   '画面参照更新制御ロール
-        VIEWPROFID   '画面表示項目制御ロール
-        RPRTPROFID   'エクセル出力制御ロール
         MAPID   '画面ＩＤ
-        _VARIANT   '画面初期値ロール
+        'MENUROLE   'メニュー表示制御ロール
+        'MAPROLE   '画面参照更新制御ロール
+        'VIEWPROFID   '画面表示項目制御ロール
+        'RPRTPROFID   'エクセル出力制御ロール
+        '_VARIANT   '画面初期値ロール
     End Enum
 
     '操作区分
@@ -91,6 +91,19 @@ Public Class LNS0001WRKINC
     ''' </summary>
     Public Sub Initialize()
     End Sub
+
+    ''' <summary>
+    ''' 管理権限のある組織コードか確認する
+    ''' </summary>
+    ''' <param name="I_ORG">対象組織コード</param>
+    ''' <remarks></remarks>
+    Public Shared Function AdminCheck(ByVal I_ORG As Object) As Boolean
+        Dim WW_HT As New Hashtable
+        WW_HT.Add("011308", "情報システム部")
+        WW_HT.Add("011310", "高圧ガス１部")
+
+        Return WW_HT.ContainsKey(I_ORG)
+    End Function
 
     ''' <summary>
     ''' 日付がシリアル値になっている場合正しい日付に変換する
@@ -272,6 +285,56 @@ Public Class LNS0001WRKINC
         errMsg = ""
         Return True
     End Function
+
+    ''' <summary>
+    ''' 操作権限のある組織コード取得
+    ''' </summary>
+    Public Sub GetPermitOrg(ByVal SQLcon As MySqlConnection,
+                                   ByVal I_CAMPCODE As String,
+                                   ByVal I_ROLEORG As String,
+                                   ByRef O_ORGHT As Hashtable)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT ")
+        SQLStr.AppendLine("       CODE AS CODE")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     COM.LNS0005_ROLE")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("        CAMPCODE  = @CAMPCODE                 ")
+        SQLStr.AppendLine("   AND  OBJECT  = 'ORG'                       ")
+        SQLStr.AppendLine("   AND  ROLE  = @ROLE                         ")
+        SQLStr.AppendLine("   AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN STYMD AND ENDYMD")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar, 20) '会社コード
+                Dim P_ROLE As MySqlParameter = SQLcmd.Parameters.Add("@ROLE", MySqlDbType.VarChar, 20) 'ロール
+
+                P_CAMPCODE.Value = I_CAMPCODE '会社コード
+                P_ROLE.Value = I_ROLEORG 'ロール
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                End Using
+                'ハッシュテーブルにコードと名称を格納
+                For Each WW_Row As DataRow In WW_Tbl.Rows
+                    '組織コード格納
+                    If Not O_ORGHT.ContainsKey(WW_Row("CODE")) Then
+                        O_ORGHT.Add(WW_Row("CODE"), WW_Row("CODE"))
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+        End Try
+
+    End Sub
 
     ''' <summary>
     ''' 会社コード取得のパラメータ設定

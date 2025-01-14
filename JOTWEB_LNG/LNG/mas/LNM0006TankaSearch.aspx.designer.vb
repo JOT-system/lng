@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNS0001UserSearch
+Partial Public Class LNM0006TankaSearch
     
     '''<summary>
     '''leftmenu コントロール。
@@ -59,13 +59,22 @@ Partial Public Class LNS0001UserSearch
     Protected WithEvents WF_StYMDCode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_EndYMDCode コントロール。
+    '''TxtTORICode コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_EndYMDCode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents TxtTORICode As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''LblTORIName コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents LblTORIName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''ddlSelectORG コントロール。
@@ -110,7 +119,16 @@ Partial Public Class LNS0001UserSearch
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNS0001WRKINC
+    Protected WithEvents work As Global.JOTWEB_LNG.LNM0006WRKINC
+    
+    '''<summary>
+    '''mspToriOrgCodeSingle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mspToriOrgCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
     
     '''<summary>
     '''WF_FIELD コントロール。

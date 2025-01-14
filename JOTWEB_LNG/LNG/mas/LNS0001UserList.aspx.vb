@@ -290,11 +290,10 @@ Public Class LNS0001UserList
             & "     COM.LNS0001_USER LNS0001                                                                        " _
             & " INNER JOIN COM.LNS0002_USERPASS LNS0002                                                             " _
             & "     ON  LNS0002.USERID = LNS0001.USERID                                                             " _
-            & "     AND LNS0002.DELFLG = LNS0001.DELFLG                                                             " _
             & " INNER JOIN LNG.LNM0002_ORG LNM0002                                                                  " _
             & "     ON  LNM0002.ORGCODE = LNS0001.ORG                                                               " _
             & "     AND CURDATE() BETWEEN LNM0002.STYMD AND LNM0002.ENDYMD                                          " _
-            & "     AND LNM0002.DELFLG = LNS0001.DELFLG                                                             "
+            & "     AND LNM0002.DELFLG = '0'                                                                        "
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim SQLWhereStr As String = ""
@@ -438,11 +437,11 @@ Public Class LNS0001UserList
         work.WF_SEL_ENDYMD2.Text = ""                                            '終了年月日
         work.WF_SEL_ORG2.Text = ""                                               '組織コード
         work.WF_SEL_EMAIL.Text = ""                                              'メールアドレス
-        work.WF_SEL_MENUROLE.Text = ""                                           'メニュー表示制御ロール
-        work.WF_SEL_MAPROLE.Text = ""                                            '画面参照更新制御ロール
-        work.WF_SEL_VIEWPROFID.Text = ""                                         '画面表示項目制御ロール
-        work.WF_SEL_RPRTPROFID.Text = ""                                         'エクセル出力制御ロール
-        work.WF_SEL_VARIANT.Text = ""                                            '画面初期値ロール
+        'work.WF_SEL_MENUROLE.Text = ""                                           'メニュー表示制御ロール
+        'work.WF_SEL_MAPROLE.Text = ""                                            '画面参照更新制御ロール
+        'work.WF_SEL_VIEWPROFID.Text = ""                                         '画面表示項目制御ロール
+        'work.WF_SEL_RPRTPROFID.Text = ""                                         'エクセル出力制御ロール
+        'work.WF_SEL_VARIANT.Text = ""                                            '画面初期値ロール
         'work.WF_SEL_APPROVALID.Text = ""                                         '承認権限ロール
         work.WF_SEL_TIMESTAMP.Text = ""         　                               'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
@@ -641,11 +640,11 @@ Public Class LNS0001UserList
         work.WF_SEL_ENDYMD2.Text = LNS0001tbl.Rows(WW_LineCNT)("ENDYMD")         '終了年月日
         work.WF_SEL_ORG2.Text = LNS0001tbl.Rows(WW_LineCNT)("ORG")               '組織コード
         work.WF_SEL_EMAIL.Text = LNS0001tbl.Rows(WW_LineCNT)("EMAIL")            'メールアドレス
-        work.WF_SEL_MENUROLE.Text = LNS0001tbl.Rows(WW_LineCNT)("MENUROLE")      'メニュー表示制御ロール
-        work.WF_SEL_MAPROLE.Text = LNS0001tbl.Rows(WW_LineCNT)("MAPROLE")        '画面参照更新制御ロール
-        work.WF_SEL_VIEWPROFID.Text = LNS0001tbl.Rows(WW_LineCNT)("VIEWPROFID")  '画面表示項目制御ロール
-        work.WF_SEL_RPRTPROFID.Text = LNS0001tbl.Rows(WW_LineCNT)("RPRTPROFID")  'エクセル出力制御ロール
-        work.WF_SEL_VARIANT.Text = LNS0001tbl.Rows(WW_LineCNT)("VARIANT")        '画面初期値ロール
+        'work.WF_SEL_MENUROLE.Text = LNS0001tbl.Rows(WW_LineCNT)("MENUROLE")      'メニュー表示制御ロール
+        'work.WF_SEL_MAPROLE.Text = LNS0001tbl.Rows(WW_LineCNT)("MAPROLE")        '画面参照更新制御ロール
+        'work.WF_SEL_VIEWPROFID.Text = LNS0001tbl.Rows(WW_LineCNT)("VIEWPROFID")  '画面表示項目制御ロール
+        'work.WF_SEL_RPRTPROFID.Text = LNS0001tbl.Rows(WW_LineCNT)("RPRTPROFID")  'エクセル出力制御ロール
+        'work.WF_SEL_VARIANT.Text = LNS0001tbl.Rows(WW_LineCNT)("VARIANT")        '画面初期値ロール
         'work.WF_SEL_APPROVALID.Text = LNS0001tbl.Rows(WW_LineCNT)("APPROVALID")  '承認権限ロール
         work.WF_SEL_DELFLG.Text = LNS0001tbl.Rows(WW_LineCNT)("DELFLG")          '削除フラグ
         work.WF_SEL_TIMESTAMP.Text = LNS0001tbl.Rows(WW_LineCNT)("UPDTIMSTP")    'タイムスタンプ
@@ -830,11 +829,6 @@ Public Class LNS0001UserList
             & "       , ENDYMD     = @P09                   " _
             & "       , ORG        = @P11                   " _
             & "       , EMAIL      = @P12                   " _
-            & "       , MENUROLE   = @P13                   " _
-            & "       , MAPROLE    = @P14                   " _
-            & "       , VIEWPROFID = @P15                   " _
-            & "       , RPRTPROFID = @P16                   " _
-            & "       , VARIANT    = @P17                   " _
             & "       , UPDYMD     = @P23                   " _
             & "       , UPDUSER    = @P24                   " _
             & "       , UPDTERMID  = @P25                   " _
@@ -932,11 +926,18 @@ Public Class LNS0001UserList
                 PARA10.Value = LNS0001row("CAMPCODE")                          '会社コード
                 PARA11.Value = LNS0001row("ORG")                               '組織コード
                 PARA12.Value = LNS0001row("EMAIL")                             'メールアドレス
-                PARA13.Value = LNS0001row("MENUROLE")                          'メニュー表示制御ロール
-                PARA14.Value = LNS0001row("MAPROLE")                           '画面参照更新制御ロール
-                PARA15.Value = LNS0001row("VIEWPROFID")                        '画面表示項目制御ロール
-                PARA16.Value = LNS0001row("RPRTPROFID")                        'エクセル出力制御ロール
-                PARA17.Value = LNS0001row("VARIANT")                           '画面初期値ロール
+                'PARA13.Value = LNS0001row("MENUROLE")                          'メニュー表示制御ロール
+                'PARA14.Value = LNS0001row("MAPROLE")                           '画面参照更新制御ロール
+                'PARA15.Value = LNS0001row("VIEWPROFID")                        '画面表示項目制御ロール
+                'PARA16.Value = LNS0001row("RPRTPROFID")                        'エクセル出力制御ロール
+                'PARA17.Value = LNS0001row("VARIANT")                           '画面初期値ロール
+
+                Master.GetFirstValue(Master.USERCAMP, "MENUROLE", PARA13.Value) 'メニュー表示制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "MAPROLE", PARA14.Value) '画面参照更新制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "VIEWPROFID", PARA15.Value) '画面表示項目制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "RPRTPROFID", PARA16.Value) 'エクセル出力制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "VARIANT", PARA17.Value) '画面初期値ロール
+
                 'PARA18.Value = LNS0001row("APPROVALID")                        '承認権限ロール
                 PARA19.Value = WW_DateNow                                      '登録年月日
                 PARA20.Value = Master.USERID                                   '登録ユーザーＩＤ
@@ -1351,11 +1352,11 @@ Public Class LNS0001UserList
         sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMES).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '社員名（短）
         sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMEL).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '社員名（長）
         sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.EMAIL).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'メールアドレス
-        sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'メニュー表示制御ロール
-        sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '画面参照更新制御ロール
-        sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '画面表示項目制御ロール
-        sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'エクセル出力制御ロール
         sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.MAPID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '画面ＩＤ
+        'sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'メニュー表示制御ロール
+        'sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '画面参照更新制御ロール
+        'sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '画面表示項目制御ロール
+        'sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'エクセル出力制御ロール
 
         '入力不要列網掛け
         'sheet.Columns(LNS0001WRKINC.INOUTEXCELCOL.DEPSTATIONNM).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '発駅名称
@@ -1418,12 +1419,12 @@ Public Class LNS0001UserList
         sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMES).Value = "（必須）社員名（短）"
         sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMEL).Value = "（必須）社員名（長）"
         sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.EMAIL).Value = "（必須）メールアドレス"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Value = "（必須）メニュー表示制御ロール"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Value = "（必須）画面参照更新制御ロール"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Value = "（必須）画面表示項目制御ロール"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Value = "（必須）エクセル出力制御ロール"
         sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPID).Value = "（必須）画面ＩＤ"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT).Value = "画面初期値ロール"
+        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Value = "（必須）メニュー表示制御ロール"
+        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Value = "（必須）画面参照更新制御ロール"
+        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Value = "（必須）画面表示項目制御ロール"
+        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Value = "（必須）エクセル出力制御ロール"
+        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT).Value = "画面初期値ロール"
 
         Dim WW_TEXT As String = ""
         Dim WW_CNT As Integer = 0
@@ -1461,45 +1462,45 @@ Public Class LNS0001UserList
                 End With
             End If
 
-            'メニュー表示制御ロール
-            COMMENT_get(SQLcon, "MENU", WW_TEXT, WW_CNT)
-            If Not WW_CNT = 0 Then
-                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).AddComment(WW_TEXT)
-                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Comment.Shape
-                    .Width = 150
-                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                End With
-            End If
+            ''メニュー表示制御ロール
+            'COMMENT_get(SQLcon, "MENU", WW_TEXT, WW_CNT)
+            'If Not WW_CNT = 0 Then
+            '    sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).AddComment(WW_TEXT)
+            '    With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Comment.Shape
+            '        .Width = 150
+            '        .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+            '    End With
+            'End If
 
-            '画面参照更新制御ロール
-            COMMENT_get(SQLcon, "MAP", WW_TEXT, WW_CNT)
-            If Not WW_CNT = 0 Then
-                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).AddComment(WW_TEXT)
-                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Comment.Shape
-                    .Width = 150
-                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                End With
-            End If
+            ''画面参照更新制御ロール
+            'COMMENT_get(SQLcon, "MAP", WW_TEXT, WW_CNT)
+            'If Not WW_CNT = 0 Then
+            '    sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).AddComment(WW_TEXT)
+            '    With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Comment.Shape
+            '        .Width = 150
+            '        .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+            '    End With
+            'End If
 
-            '画面表示項目制御ロール
-            COMMENT_get(SQLcon, "VIEW", WW_TEXT, WW_CNT)
-            If Not WW_CNT = 0 Then
-                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).AddComment(WW_TEXT)
-                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Comment.Shape
-                    .Width = 150
-                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                End With
-            End If
+            ''画面表示項目制御ロール
+            'COMMENT_get(SQLcon, "VIEW", WW_TEXT, WW_CNT)
+            'If Not WW_CNT = 0 Then
+            '    sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).AddComment(WW_TEXT)
+            '    With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Comment.Shape
+            '        .Width = 150
+            '        .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+            '    End With
+            'End If
 
-            'エクセル出力制御ロール
-            COMMENT_get(SQLcon, "XML", WW_TEXT, WW_CNT)
-            If Not WW_CNT = 0 Then
-                sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).AddComment(WW_TEXT)
-                With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Comment.Shape
-                    .Width = 150
-                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                End With
-            End If
+            ''エクセル出力制御ロール
+            'COMMENT_get(SQLcon, "XML", WW_TEXT, WW_CNT)
+            'If Not WW_CNT = 0 Then
+            '    sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).AddComment(WW_TEXT)
+            '    With sheet.Cells(WW_HEADERROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Comment.Shape
+            '        .Width = 150
+            '        .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+            '    End With
+            'End If
 
         End Using
 
@@ -1551,57 +1552,57 @@ Public Class LNS0001UserList
             End With
         End If
 
-        'メニュー表示制御ロール
-        SETFIXVALUELIST(subsheet, "MENU", LNS0001WRKINC.INOUTEXCELCOL.MENUROLE, WW_FIXENDROW)
-        If Not WW_FIXENDROW = -1 Then
-            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
-            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
-            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
-            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
-            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-            End With
-        End If
+        ''メニュー表示制御ロール
+        'SETFIXVALUELIST(subsheet, "MENU", LNS0001WRKINC.INOUTEXCELCOL.MENUROLE, WW_FIXENDROW)
+        'If Not WW_FIXENDROW = -1 Then
+        '    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+        '    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+        '    WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+        '    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE)
+        '    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+        '    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+        '        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+        '    End With
+        'End If
 
-        '画面参照更新制御ロール
-        SETFIXVALUELIST(subsheet, "MAP", LNS0001WRKINC.INOUTEXCELCOL.MAPROLE, WW_FIXENDROW)
-        If Not WW_FIXENDROW = -1 Then
-            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
-            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
-            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
-            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
-            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-            End With
-        End If
+        ''画面参照更新制御ロール
+        'SETFIXVALUELIST(subsheet, "MAP", LNS0001WRKINC.INOUTEXCELCOL.MAPROLE, WW_FIXENDROW)
+        'If Not WW_FIXENDROW = -1 Then
+        '    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+        '    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+        '    WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+        '    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE)
+        '    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+        '    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+        '        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+        '    End With
+        'End If
 
-        '画面表示項目制御ロール
-        SETFIXVALUELIST(subsheet, "VIEW", LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID, WW_FIXENDROW)
-        If Not WW_FIXENDROW = -1 Then
-            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
-            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
-            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
-            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
-            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-            End With
-        End If
+        ''画面表示項目制御ロール
+        'SETFIXVALUELIST(subsheet, "VIEW", LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID, WW_FIXENDROW)
+        'If Not WW_FIXENDROW = -1 Then
+        '    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+        '    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+        '    WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+        '    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID)
+        '    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+        '    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+        '        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+        '    End With
+        'End If
 
-        'エクセル出力制御ロール
-        SETFIXVALUELIST(subsheet, "XML", LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID, WW_FIXENDROW)
-        If Not WW_FIXENDROW = -1 Then
-            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
-            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
-            WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
-            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
-            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-            End With
-        End If
+        ''エクセル出力制御ロール
+        'SETFIXVALUELIST(subsheet, "XML", LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID, WW_FIXENDROW)
+        'If Not WW_FIXENDROW = -1 Then
+        '    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+        '    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+        '    WW_SUB_STRANGE = subsheet.Cells(0, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+        '    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID)
+        '    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+        '    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+        '        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+        '    End With
+        'End If
 
         'メインシートをアクティブにする
         mainsheet.Activate()
@@ -1637,12 +1638,12 @@ Public Class LNS0001UserList
             sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMES).Value = Row("STAFFNAMES") '社員名（短）
             sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMEL).Value = Row("STAFFNAMEL") '社員名（長）
             sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.EMAIL).Value = Row("EMAIL") 'メールアドレス
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Value = Row("MENUROLE") 'メニュー表示制御ロール
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Value = Row("MAPROLE") '画面参照更新制御ロール
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Value = Row("VIEWPROFID") '画面表示項目制御ロール
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Value = Row("RPRTPROFID") 'エクセル出力制御ロール
             sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.MAPID).Value = Row("MAPID") '画面ＩＤ
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT).Value = Row("VARIANT") '画面初期値ロール
+            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE).Value = Row("MENUROLE") 'メニュー表示制御ロール
+            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE).Value = Row("MAPROLE") '画面参照更新制御ロール
+            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID).Value = Row("VIEWPROFID") '画面表示項目制御ロール
+            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID).Value = Row("RPRTPROFID") 'エクセル出力制御ロール
+            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT).Value = Row("VARIANT") '画面初期値ロール
 
             WW_ACTIVEROW += 1
         Next
@@ -2260,38 +2261,7 @@ Public Class LNS0001UserList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            'メニュー表示制御ロール
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE))
-            WW_DATATYPE = DataTypeHT("MENUROLE")
-            LNS0001Exceltblrow("MENUROLE") = LNS0001WRKINC.DataConvert("メニュー表示制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '画面参照更新制御ロール
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE))
-            WW_DATATYPE = DataTypeHT("MAPROLE")
-            LNS0001Exceltblrow("MAPROLE") = LNS0001WRKINC.DataConvert("画面参照更新制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '画面表示項目制御ロール
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID))
-            WW_DATATYPE = DataTypeHT("VIEWPROFID")
-            LNS0001Exceltblrow("VIEWPROFID") = LNS0001WRKINC.DataConvert("画面表示項目制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'エクセル出力制御ロール
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID))
-            WW_DATATYPE = DataTypeHT("RPRTPROFID")
-            LNS0001Exceltblrow("RPRTPROFID") = LNS0001WRKINC.DataConvert("エクセル出力制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+
             '画面ＩＤ
             WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPID))
             WW_DATATYPE = DataTypeHT("MAPID")
@@ -2300,14 +2270,48 @@ Public Class LNS0001UserList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            '画面初期値ロール
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT))
-            WW_DATATYPE = DataTypeHT("VARIANT")
-            LNS0001Exceltblrow("VARIANT") = LNS0001WRKINC.DataConvert("画面初期値ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+
+            ''メニュー表示制御ロール
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE))
+            'WW_DATATYPE = DataTypeHT("MENUROLE")
+            'LNS0001Exceltblrow("MENUROLE") = LNS0001WRKINC.DataConvert("メニュー表示制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
+            ''画面参照更新制御ロール
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE))
+            'WW_DATATYPE = DataTypeHT("MAPROLE")
+            'LNS0001Exceltblrow("MAPROLE") = LNS0001WRKINC.DataConvert("画面参照更新制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
+            ''画面表示項目制御ロール
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID))
+            'WW_DATATYPE = DataTypeHT("VIEWPROFID")
+            'LNS0001Exceltblrow("VIEWPROFID") = LNS0001WRKINC.DataConvert("画面表示項目制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
+            ''エクセル出力制御ロール
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID))
+            'WW_DATATYPE = DataTypeHT("RPRTPROFID")
+            'LNS0001Exceltblrow("RPRTPROFID") = LNS0001WRKINC.DataConvert("エクセル出力制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
+
+            ''画面初期値ロール
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT))
+            'WW_DATATYPE = DataTypeHT("VARIANT")
+            'LNS0001Exceltblrow("VARIANT") = LNS0001WRKINC.DataConvert("画面初期値ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
 
             '削除フラグ
             WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG))
@@ -2356,12 +2360,12 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("    AND  COALESCE(STAFFNAMES, '')             = @STAFFNAMES ")
         SQLStr.AppendLine("    AND  COALESCE(STAFFNAMEL, '')             = @STAFFNAMEL ")
         SQLStr.AppendLine("    AND  COALESCE(EMAIL, '')             = @EMAIL ")
-        SQLStr.AppendLine("    AND  COALESCE(MENUROLE, '')             = @MENUROLE ")
-        SQLStr.AppendLine("    AND  COALESCE(MAPROLE, '')             = @MAPROLE ")
-        SQLStr.AppendLine("    AND  COALESCE(VIEWPROFID, '')             = @VIEWPROFID ")
-        SQLStr.AppendLine("    AND  COALESCE(RPRTPROFID, '')             = @RPRTPROFID ")
+        'SQLStr.AppendLine("    AND  COALESCE(MENUROLE, '')             = @MENUROLE ")
+        'SQLStr.AppendLine("    AND  COALESCE(MAPROLE, '')             = @MAPROLE ")
+        'SQLStr.AppendLine("    AND  COALESCE(VIEWPROFID, '')             = @VIEWPROFID ")
+        'SQLStr.AppendLine("    AND  COALESCE(RPRTPROFID, '')             = @RPRTPROFID ")
         SQLStr.AppendLine("    AND  COALESCE(MAPID, '')             = @MAPID ")
-        SQLStr.AppendLine("    AND  COALESCE(VARIANT, '')             = @VARIANT ")
+        'SQLStr.AppendLine("    AND  COALESCE(VARIANT, '')             = @VARIANT ")
         SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')             = @DELFLG ")
 
         Try
@@ -2375,12 +2379,12 @@ Public Class LNS0001UserList
                 Dim P_STAFFNAMES As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAMES", MySqlDbType.VarChar, 20)     '社員名（短）
                 Dim P_STAFFNAMEL As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAMEL", MySqlDbType.VarChar, 50)     '社員名（長）
                 Dim P_EMAIL As MySqlParameter = SQLcmd.Parameters.Add("@EMAIL", MySqlDbType.VarChar, 128)     'メールアドレス
-                Dim P_MENUROLE As MySqlParameter = SQLcmd.Parameters.Add("@MENUROLE", MySqlDbType.VarChar, 20)     'メニュー表示制御ロール
-                Dim P_MAPROLE As MySqlParameter = SQLcmd.Parameters.Add("@MAPROLE", MySqlDbType.VarChar, 20)     '画面参照更新制御ロール
-                Dim P_VIEWPROFID As MySqlParameter = SQLcmd.Parameters.Add("@VIEWPROFID", MySqlDbType.VarChar, 20)     '画面表示項目制御ロール
-                Dim P_RPRTPROFID As MySqlParameter = SQLcmd.Parameters.Add("@RPRTPROFID", MySqlDbType.VarChar, 20)     'エクセル出力制御ロール
+                'Dim P_MENUROLE As MySqlParameter = SQLcmd.Parameters.Add("@MENUROLE", MySqlDbType.VarChar, 20)     'メニュー表示制御ロール
+                'Dim P_MAPROLE As MySqlParameter = SQLcmd.Parameters.Add("@MAPROLE", MySqlDbType.VarChar, 20)     '画面参照更新制御ロール
+                'Dim P_VIEWPROFID As MySqlParameter = SQLcmd.Parameters.Add("@VIEWPROFID", MySqlDbType.VarChar, 20)     '画面表示項目制御ロール
+                'Dim P_RPRTPROFID As MySqlParameter = SQLcmd.Parameters.Add("@RPRTPROFID", MySqlDbType.VarChar, 20)     'エクセル出力制御ロール
                 Dim P_MAPID As MySqlParameter = SQLcmd.Parameters.Add("@MAPID", MySqlDbType.VarChar, 20)     '画面ＩＤ
-                Dim P_VARIANT As MySqlParameter = SQLcmd.Parameters.Add("@VARIANT", MySqlDbType.VarChar, 20)     '画面初期値ロール
+                'Dim P_VARIANT As MySqlParameter = SQLcmd.Parameters.Add("@VARIANT", MySqlDbType.VarChar, 20)     '画面初期値ロール
 
                 Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
 
@@ -2393,12 +2397,12 @@ Public Class LNS0001UserList
                 P_STAFFNAMES.Value = WW_ROW("STAFFNAMES")           '社員名（短）
                 P_STAFFNAMEL.Value = WW_ROW("STAFFNAMEL")           '社員名（長）
                 P_EMAIL.Value = WW_ROW("EMAIL")           'メールアドレス
-                P_MENUROLE.Value = WW_ROW("MENUROLE")           'メニュー表示制御ロール
-                P_MAPROLE.Value = WW_ROW("MAPROLE")           '画面参照更新制御ロール
-                P_VIEWPROFID.Value = WW_ROW("VIEWPROFID")           '画面表示項目制御ロール
-                P_RPRTPROFID.Value = WW_ROW("RPRTPROFID")           'エクセル出力制御ロール
+                'P_MENUROLE.Value = WW_ROW("MENUROLE")           'メニュー表示制御ロール
+                'P_MAPROLE.Value = WW_ROW("MAPROLE")           '画面参照更新制御ロール
+                'P_VIEWPROFID.Value = WW_ROW("VIEWPROFID")           '画面表示項目制御ロール
+                'P_RPRTPROFID.Value = WW_ROW("RPRTPROFID")           'エクセル出力制御ロール
                 P_MAPID.Value = WW_ROW("MAPID")           '画面ＩＤ
-                P_VARIANT.Value = WW_ROW("VARIANT")           '画面初期値ロール
+                'P_VARIANT.Value = WW_ROW("VARIANT")           '画面初期値ロール
 
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
 
@@ -2626,12 +2630,7 @@ Public Class LNS0001UserList
         SQLStrUSER.AppendLine("     ,STAFFNAMES =  @STAFFNAMES ")
         SQLStrUSER.AppendLine("     ,STAFFNAMEL =  @STAFFNAMEL ")
         SQLStrUSER.AppendLine("     ,EMAIL =  @EMAIL ")
-        SQLStrUSER.AppendLine("     ,MENUROLE =  @MENUROLE ")
-        SQLStrUSER.AppendLine("     ,MAPROLE =  @MAPROLE ")
-        SQLStrUSER.AppendLine("     ,VIEWPROFID =  @VIEWPROFID ")
-        SQLStrUSER.AppendLine("     ,RPRTPROFID =  @RPRTPROFID ")
         SQLStrUSER.AppendLine("     ,MAPID =  @MAPID ")
-        SQLStrUSER.AppendLine("     ,VARIANT =  @VARIANT ")
         SQLStrUSER.AppendLine("     ,DELFLG =  @DELFLG ")
         SQLStrUSER.AppendLine("     ,UPDYMD =  @UPDYMD ")
         SQLStrUSER.AppendLine("     ,UPDUSER =  @UPDUSER ")
@@ -2674,12 +2673,19 @@ Public Class LNS0001UserList
                 P_STAFFNAMES.Value = WW_ROW("STAFFNAMES")           '社員名（短）
                 P_STAFFNAMEL.Value = WW_ROW("STAFFNAMEL")           '社員名（長）
                 P_EMAIL.Value = WW_ROW("EMAIL")           'メールアドレス
-                P_MENUROLE.Value = WW_ROW("MENUROLE")           'メニュー表示制御ロール
-                P_MAPROLE.Value = WW_ROW("MAPROLE")           '画面参照更新制御ロール
-                P_VIEWPROFID.Value = WW_ROW("VIEWPROFID")           '画面表示項目制御ロール
-                P_RPRTPROFID.Value = WW_ROW("RPRTPROFID")           'エクセル出力制御ロール
                 P_MAPID.Value = WW_ROW("MAPID")           '画面ＩＤ
-                P_VARIANT.Value = WW_ROW("VARIANT")           '画面初期値ロール
+
+                'P_MENUROLE.Value = WW_ROW("MENUROLE")           'メニュー表示制御ロール
+                'P_MAPROLE.Value = WW_ROW("MAPROLE")           '画面参照更新制御ロール
+                'P_VIEWPROFID.Value = WW_ROW("VIEWPROFID")           '画面表示項目制御ロール
+                'P_RPRTPROFID.Value = WW_ROW("RPRTPROFID")           'エクセル出力制御ロール
+                'P_VARIANT.Value = WW_ROW("VARIANT")           '画面初期値ロール
+
+                Master.GetFirstValue(Master.USERCAMP, "MENUROLE", P_MENUROLE.Value) 'メニュー表示制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "MAPROLE", P_MAPROLE.Value) '画面参照更新制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "VIEWPROFID", P_VIEWPROFID.Value) '画面表示項目制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "RPRTPROFID", P_RPRTPROFID.Value) 'エクセル出力制御ロール
+                Master.GetFirstValue(Master.USERCAMP, "VARIANT", P_VARIANT.Value) '画面初期値ロール
 
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
                 P_INITYMD.Value = WW_DATENOW                '登録年月日
@@ -2958,14 +2964,22 @@ Public Class LNS0001UserList
         ' 組織コード(バリデーションチェック）
         Master.CheckField(Master.USERCAMP, "ORG", WW_ROW("ORG"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
-            ' 名称存在チェック
-            CODENAME_get("ORG", WW_ROW("ORG"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・組織コード入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '情シス、高圧ガス以外
+            If LNS0001WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                Dim WW_OrgPermitHt As New Hashtable
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    '操作権限のある組織コード一覧を取得
+                    work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
+                    '操作権限のある組織コード一覧に含まれていない場合
+                    If WW_OrgPermitHt.ContainsKey(WW_ROW("ORG")) = False And WW_ROW("ORG") <> Master.ROLE_ORG Then
+                        WW_CheckMES1 = "・組織コード入力エラーです。"
+                        WW_CheckMES2 = "対象の組織コードは登録権限がありません。"
+                        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                        WW_LineErr = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End Using
             End If
         Else
             WW_CheckMES1 = "・組織コード入力エラーです。"
@@ -2983,91 +2997,91 @@ Public Class LNS0001UserList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' メニュー表示制御ロール(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "MENUROLE", WW_ROW("MENUROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            ' 名称存在チェック
-            CODENAME_get("MENU", WW_ROW("MENUROLE"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        Else
-            WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
-        ' 画面参照更新制御ロール(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "MAPROLE", WW_ROW("MAPROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            ' 名称存在チェック
-            CODENAME_get("MAP", WW_ROW("MAPROLE"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        Else
-            WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
-        '画面表示項目制御ロール(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "VIEWPROFID", WW_ROW("VIEWPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            '名称存在チェック
-            CODENAME_get("VIEW", WW_ROW("VIEWPROFID"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        Else
-            WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
-        'エクセル出力制御ロール(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "RPRTPROFID", WW_ROW("RPRTPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            '名称存在チェック
-            CODENAME_get("XML", WW_ROW("RPRTPROFID"), WW_Dummy, WW_RtnSW)
-            If Not isNormal(WW_RtnSW) Then
-                WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
-                WW_CheckMES2 = "マスタに存在しません。"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        Else
-            WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
-        '画面初期値ロール(バリデーションチェック）
-        Master.CheckField(Master.USERCAMP, "VARIANT", WW_ROW("VARIANT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・画面初期値ロール入力エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        '' メニュー表示制御ロール(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "MENUROLE", WW_ROW("MENUROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    ' 名称存在チェック
+        '    CODENAME_get("MENU", WW_ROW("MENUROLE"), WW_Dummy, WW_RtnSW)
+        '    If Not isNormal(WW_RtnSW) Then
+        '        WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
+        '        WW_CheckMES2 = "マスタに存在しません。"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'Else
+        '    WW_CheckMES1 = "・メニュー表示制御ロール入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        '' 画面参照更新制御ロール(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "MAPROLE", WW_ROW("MAPROLE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    ' 名称存在チェック
+        '    CODENAME_get("MAP", WW_ROW("MAPROLE"), WW_Dummy, WW_RtnSW)
+        '    If Not isNormal(WW_RtnSW) Then
+        '        WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
+        '        WW_CheckMES2 = "マスタに存在しません。"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'Else
+        '    WW_CheckMES1 = "・画面参照更新制御ロール入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        ''画面表示項目制御ロール(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "VIEWPROFID", WW_ROW("VIEWPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    '名称存在チェック
+        '    CODENAME_get("VIEW", WW_ROW("VIEWPROFID"), WW_Dummy, WW_RtnSW)
+        '    If Not isNormal(WW_RtnSW) Then
+        '        WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
+        '        WW_CheckMES2 = "マスタに存在しません。"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'Else
+        '    WW_CheckMES1 = "・画面表示項目制御ロール入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        ''エクセル出力制御ロール(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "RPRTPROFID", WW_ROW("RPRTPROFID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    '名称存在チェック
+        '    CODENAME_get("XML", WW_ROW("RPRTPROFID"), WW_Dummy, WW_RtnSW)
+        '    If Not isNormal(WW_RtnSW) Then
+        '        WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
+        '        WW_CheckMES2 = "マスタに存在しません。"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'Else
+        '    WW_CheckMES1 = "・エクセル出力制御ロール入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        ''画面初期値ロール(バリデーションチェック）
+        'Master.CheckField(Master.USERCAMP, "VARIANT", WW_ROW("VARIANT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・画面初期値ロール入力エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
 
         ' 日付大小チェック
         If Not String.IsNullOrEmpty(WW_ROW("STYMD")) AndAlso

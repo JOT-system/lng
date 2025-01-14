@@ -237,6 +237,10 @@
     <Content Include="css\jquery.multiselect.css" />
     <Content Include="img\favicon.png" />
     <Content Include="img\kronos_logo.svg" />
+    <Content Include="LNG\css\LNM0006D.css" />
+    <Content Include="LNG\css\LNM0006H.css" />
+    <Content Include="LNG\css\LNM0006L.css" />
+    <Content Include="LNG\css\LNM0006S.css" />
     <Content Include="LNG\css\LNS0001D.css" />
     <Content Include="LNG\css\LNS0001H.css" />
     <Content Include="LNG\css\LNS0001L.css" />
@@ -294,14 +298,23 @@
     <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
+    <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
+    <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
+    <Content Include="LNG\mas\LNM0006TankaList.aspx" />
+    <Content Include="LNG\mas\LNM0006TankaSearch.aspx" />
     <Content Include="LNG\mas\LNS0001UserDetail.aspx" />
     <Content Include="LNG\mas\LNS0001UserHistory.aspx" />
     <Content Include="LNG\mas\LNS0001UserList.aspx" />
     <Content Include="LNG\mas\LNS0001UserSearch.aspx" />
+    <Content Include="LNG\script\LNM0006D.js" />
+    <Content Include="LNG\script\LNM0006H.js" />
+    <Content Include="LNG\script\LNM0006L.js" />
+    <Content Include="LNG\script\LNM0006S.js" />
     <Content Include="LNG\script\LNS0001D.js" />
     <Content Include="LNG\script\LNS0001H.js" />
     <Content Include="LNG\script\LNS0001L.js" />
@@ -505,6 +518,13 @@
       <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNM0006WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0006WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0006WRKINC.ascx.vb">
+      <DependentUpon>LNM0006WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\inc\LNM0023WRKINC.ascx.designer.vb">
       <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
     </Compile>
@@ -534,6 +554,34 @@
     </Compile>
     <Compile Include="LNG\inc\LNT0001WRKINC.ascx.vb">
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaDetail.aspx.designer.vb">
+      <DependentUpon>LNM0006TankaDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaDetail.aspx.vb">
+      <DependentUpon>LNM0006TankaDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaHistory.aspx.designer.vb">
+      <DependentUpon>LNM0006TankaHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaHistory.aspx.vb">
+      <DependentUpon>LNM0006TankaHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaList.aspx.designer.vb">
+      <DependentUpon>LNM0006TankaList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaList.aspx.vb">
+      <DependentUpon>LNM0006TankaList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaSearch.aspx.designer.vb">
+      <DependentUpon>LNM0006TankaSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0006TankaSearch.aspx.vb">
+      <DependentUpon>LNM0006TankaSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNS0001UserDetail.aspx.designer.vb">

@@ -1,19 +1,25 @@
-﻿[id^="WF_DDL"] {
-    font-size: 12px;
-    font-family: sans-serif;
-    letter-spacing: 1px;
-    box-sizing: border-box;
-    ime-mode: inactive;
-    color: #404040;
-    /*padding: 6px 4px 6px 4px;*/
-    border-color: skyblue;
-    border-style: solid;
-    border-width: thin;
-    border-radius: 3px;
-    width: 80px;
-    height: 25px;
+﻿/*アップロードボタン*/
+#WF_UPLOAD_LABEL {
+    display: block;
 }
 
+input#WF_UPLOAD_BTN {
+    display: none;
+}
+
+#WF_UPLOAD_LABEL:hover {
+    cursor: pointer;
+}
+
+#WF_UPLOAD_LABEL:has(input:disabled) {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+    #WF_UPLOAD_LABEL:has(input:disabled):hover {
+        border-color: #cfcfcf;
+        cursor: default;
+    }
 /*--------------------------------------------------------------
 # 調整（k.miyake)
 --------------------------------------------------------------*/
@@ -50,4 +56,13 @@ th {
 p {
     margin-top: 0;
     margin-bottom: 0rem;
+}
+
+.calendararea {
+    display: inline-block;
+    width: 190px !important;
+}
+
+#ListCount{
+    margin-right:10px;
 }

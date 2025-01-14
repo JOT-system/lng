@@ -1,4 +1,4 @@
-﻿<%@ Page Title="LNS0001S" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master"  CodeBehind="LNS0001UserSearch.aspx.vb" Inherits="JOTWEB_LNG.LNS0001UserSearch" %>
+﻿<%@ Page Title="LNM0006S" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master"  CodeBehind="LNM0006TankaSearch.aspx.vb" Inherits="JOTWEB_LNG.LNM0006TankaSearch" %>
 <%@ MasterType VirtualPath="~/LNG/LNGMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB_LNG.GRIS0005LeftBox" %>
@@ -6,22 +6,25 @@
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0006LeftMenu.ascx" TagName="leftmenu" TagPrefix="MSINC" %>
-<%@ Register Src="~/LNG/inc/LNS0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/LNM0006WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/GRC0002SELECTIONPOPUPWORKINC.ascx" TagName="multiselect" TagPrefix="MSINC"  %>
 
-<asp:content id="LNS0001SH" contentplaceholderid="head" runat="server">
+<asp:content id="LNM0006SH" contentplaceholderid="head" runat="server">
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link href='<%=ResolveUrl("~/LNG/css/LNS0001S.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNS0001S.js")%>'></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css" />
+    <link href='<%=ResolveUrl("~/LNG/css/LNM0006S.css")%>' rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNM0006S.js")%>'></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
 </asp:content>
 
-<asp:Content ID="LNS0001S" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="LNM0006S" ContentPlaceHolderID="contents1" runat="server">
     <!-- 全体レイアウト　searchbox -->
     <div class="d-inline-flex align-items-center flex-column w-100">
         <div class="d-flex w-100 wrap">
@@ -30,12 +33,12 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ（検索）</li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">単価マスタ（検索）</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ検索</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title">単価マスタ検索</h2>
                     <div class="searchbox" id="searchbox">
                         <!-- ○ 固定項目 ○ -->
 <%--                        <div class="actionButtonBox">
@@ -59,9 +62,10 @@
                                     <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                                 </a>
                             </div>
-                            <!-- 有効年月日(開始） -->
+
+                            <!-- 有効開始日 -->
                             <div class="inputItem">
-                                <a id="WF_STYMD_LABEL">有効年月日（開始）</a>                
+                                <a id="WF_STYMD_LABEL">有効開始日</a>                
                                 <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
                                     <input type="text" id="WF_StYMDCode" runat="server" class="WF_TEXTBOX_CSS" data-input>
                                     <span class="input-group-text" data-toggle>
@@ -70,20 +74,20 @@
                                 </div>
                             </div>
 
-                            <!-- 有効年月日(終了） -->
+                            <!-- 取引先コード -->
                             <div class="inputItem">
-                                <a id="WF_ENDYMD_LABEL" >有効年月日（終了）</a>            
-                                <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                    <input type="text" id="WF_EndYMDCode" runat="server" class="WF_TEXTBOX_CSS" data-input>
-                                    <span class="input-group-text" data-toggle>
-                                        <span class="material-symbols-outlined">calendar_month</span>
-                                    </span>
-                                </div>
+                                <a id="WF_TORI_LABEL" >取引先コード</a>
+                                <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORICode', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORICode');">
+                                    <asp:TextBox ID="TxtTORICode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                </a>
+                                <a id="WF_TORI_TEXT">
+                                    <asp:Label ID="LblTORIName" runat="server" CssClass="WF_TEXT"></asp:Label>
+                                </a>
                             </div>
 
-                            <!-- 組織コード -->
+                            <!-- 部門コード -->
                             <div class="inputItem">
-                                <a id="WF_ORG_LABEL" >組織コード</a>
+                                <a id="WF_ORG_LABEL" >部門名称</a>
                                 <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl"/>
                             </div>
 
@@ -116,6 +120,10 @@
 
     <!-- Work レイアウト -->
     <MSINC:wrklist id="work" runat="server" />
+
+    <!-- multiSelect レイアウト -->
+    <!-- 取引先部門コード単一選択 -->
+    <MSINC:multiselect runat="server" id="mspToriOrgCodeSingle" />
 
     <!-- イベント用 -->
     <div hidden="hidden">

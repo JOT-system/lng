@@ -93,10 +93,15 @@ p {
     margin-top: calc(100% - 0px) !important;
 }
 
+/* 明細位置調整 */
+.contentsInner {
+    height: 100% !important;
+    width: 90% !important;
+}
+
 .ddlSelectControl {
     height: 30px;
     width: 180px;
     font-size: 12pt;
     padding: 2px;
 }
-

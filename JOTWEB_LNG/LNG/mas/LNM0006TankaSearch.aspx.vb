@@ -1,31 +1,31 @@
 ﻿''************************************************************
-' ユーザーマスタメンテ検索画面
-' 作成日 2024/12/02
+' 単価マスタメンテ検索画面
+' 作成日 2024/12/16
 ' 更新日 
 ' 作成者 大浜
 ' 更新者 
 '
-' 修正履歴 : 2024/12/02 新規作成
+' 修正履歴 : 2024/12/16 新規作成
 '          : 
 ''************************************************************
-Imports MySql.Data.MySqlClient
 Imports JOTWEB_LNG.GRIS0005LeftBox
+Imports MySql.Data.MySqlClient
 
 ''' <summary>
-''' ユーザマスタ登録（検索）
+''' 単価マスタ登録（検索）
 ''' </summary>
 ''' <remarks></remarks>
-Public Class LNS0001UserSearch
+Public Class LNM0006TankaSearch
     Inherits Page
 
     ''' <summary>
     ''' ユーザ情報取得
     ''' </summary>
     Private CS0051UserInfo As New CS0051UserInfo            'ユーザ情報取得
-    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
 
     ''' <summary>
     ''' 共通処理結果
@@ -60,6 +60,8 @@ Public Class LNS0001UserSearch
                         WF_ButtonCan_Click()
                     Case "WF_ListboxDBclick"            '左ボックスダブルクリック
                         WF_ButtonSel_Click()
+                    Case "mspToriOrgCodeSingleRowSelected"  '[共通]取引先部門コード選択ポップアップで行選択
+                        RowSelected_mspToriOrgCodeSingle()
                 End Select
             End If
         Else
@@ -76,7 +78,7 @@ Public Class LNS0001UserSearch
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = LNS0001WRKINC.MAPIDS
+        Master.MAPID = LNM0006WRKINC.MAPIDS
 
         WF_StYMDCode.Focus()
         WF_FIELD.Value = ""
@@ -101,31 +103,18 @@ Public Class LNS0001UserSearch
     Protected Sub createListBox()
 
         Try
-            '組織ドロップダウンのクリア
+            '部門ドロップダウンのクリア
             Me.ddlSelectORG.Items.Clear()
             Me.ddlSelectORG.Items.Add("")
 
-            '組織ドロップダウンの生成
-            Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+            '部門ドロップダウンの生成
+            'Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+            Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList("02", "ORGCODEDROP")
 
             If retOfficeList.Items.Count > 0 Then
-                '情シス、高圧ガス以外
-                If LNS0001WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-                    Dim WW_OrgPermitHt As New Hashtable
-                    Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()  ' DataBase接続
-                        work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
-                        For index As Integer = 0 To retOfficeList.Items.Count - 1
-                            If WW_OrgPermitHt.ContainsKey(retOfficeList.Items(index).Value) = True Or retOfficeList.Items(index).Value = Master.ROLE_ORG Then
-                                ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
-                            End If
-                        Next
-                    End Using
-                Else
-                    For index As Integer = 0 To retOfficeList.Items.Count - 1
-                        ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
-                    Next
-                End If
+                For index As Integer = 0 To retOfficeList.Items.Count - 1
+                    ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
+                Next
             End If
 
         Catch ex As Exception
@@ -147,52 +136,52 @@ Public Class LNS0001UserSearch
 
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
             ' メニューからの画面遷移
+            '情シス、高圧ガス以外
+            If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                ' 画面遷移
+                Master.TransitionPage()
+            End If
+
             ' 画面間の情報クリア
             work.Initialize()
 
             ' 初期変数設定処理
-            Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
-            WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
+            'Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効開始日
+            WF_StYMDCode.Value = Date.Now.ToString("yyyy/MM/dd")
 
-            WF_EndYMDCode.Value = ""                                            '有効年月日(To)
-            ddlSelectORG.SelectedValue = ""                                               '組織コード
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Then
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006L Then
             ' 実行画面からの遷移
-            WF_StYMDCode.Value = work.WF_SEL_STYMD.Text    '有効年月日(From)
-            WF_EndYMDCode.Value = work.WF_SEL_ENDYMD.Text  '有効年月日(To)
-            ddlSelectORG.SelectedValue = work.WF_SEL_ORG.Text        '組織コード
+            '情シス、高圧ガス以外
+            If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                '○ メニュー画面遷移
+                Master.TransitionPrevPage(, LNM0006WRKINC.TITLEKBNS)
+            End If
+
+            WF_StYMDCode.Value = work.WF_SEL_STYMD_S.Text    '有効開始日
+            TxtTORICode.Text = work.WF_SEL_TORICODE_S.Text   '取引先コード
+            ddlSelectORG.SelectedValue = work.WF_SEL_ORGCODE_S.Text     '部門コード
+
             ' 論理削除フラグ
-            If work.WF_SEL_DELDATAFLG.Text = "1" Then
+            If work.WF_SEL_DELFLG_S.Text = "1" Then
                 ChkDelDataFlg.Checked = True
             Else
                 ChkDelDataFlg.Checked = False
             End If
             '○ 名称設定処理
-            'CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_Dummy)  '組織コード
-        Else
-            ' サブメニューからの画面遷移
-            ' 画面間の情報クリア
-            work.Initialize()
-
-            ' 初期変数設定処理
-            Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
-            WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
-
-            WF_EndYMDCode.Value = ""                                            '有効年月日(To)
-            ddlSelectORG.SelectedValue = ""                                               '組織コード
+            CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_Dummy)  '取引先コード
         End If
-        Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
+        'Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
+        TxtCampCode.Text = Master.USERCAMP
 
-        ' 会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
-        'Me.TxtOrgCode.Attributes("onkeyPress") = "CheckNum()"
+        ' 取引先コードを入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtTORICode.Attributes("onkeyPress") = "CheckNum()"
 
-        ' 有効年月日(開始)・有効年月日(終了)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
+        ' 有効年月日(開始)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
         Me.WF_StYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
-        Me.WF_EndYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
 
         '○ RightBox情報設定
-        rightview.MAPIDS = LNS0001WRKINC.MAPIDS
-        rightview.MAPID = LNS0001WRKINC.MAPIDL
+        rightview.MAPIDS = LNM0006WRKINC.MAPIDS
+        rightview.MAPID = LNM0006WRKINC.MAPIDL
         rightview.COMPCODE = TxtCampCode.Text
         rightview.MAPVARI = Master.MAPvariant
         rightview.PROFID = Master.PROF_VIEW
@@ -221,9 +210,8 @@ Public Class LNS0001UserSearch
     Protected Sub WF_ButtonSEARCH_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
-        Master.EraseCharToIgnore(WF_StYMDCode.Value)             '有効年月日(From)
-        Master.EraseCharToIgnore(WF_EndYMDCode.Value)            '有効年月日(To)
-        Master.EraseCharToIgnore(ddlSelectORG.SelectedValue)               '組織コード
+        Master.EraseCharToIgnore(WF_StYMDCode.Value)             '有効開始日
+        Master.EraseCharToIgnore(TxtTORICode.Text)               '取引先コード
 
         '○ チェック処理
         WW_Check(WW_ErrSW)
@@ -232,14 +220,15 @@ Public Class LNS0001UserSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_STYMD.Text = WF_StYMDCode.Value.ToString     '有効年月日(From)
-        work.WF_SEL_ENDYMD.Text = WF_EndYMDCode.Value.ToString   '有効年月日(To)
-        work.WF_SEL_ORG.Text = ddlSelectORG.SelectedValue                  '組織コード
+        work.WF_SEL_STYMD_S.Text = WF_StYMDCode.Value.ToString     '有効開始日
+        work.WF_SEL_TORICODE_S.Text = TxtTORICode.Text             '取引先コード
+        work.WF_SEL_ORGCODE_S.Text = ddlSelectORG.SelectedValue               '部門コード
+
         ' 論理削除フラグ
         If ChkDelDataFlg.Checked = True Then
-            work.WF_SEL_DELDATAFLG.Text = "1"
+            work.WF_SEL_DELFLG_S.Text = "1"
         Else
-            work.WF_SEL_DELDATAFLG.Text = "0"
+            work.WF_SEL_DELFLG_S.Text = "0"
         End If
 
         '○ 画面レイアウト設定
@@ -265,12 +254,10 @@ Public Class LNS0001UserSearch
         O_RTN = ""
         Dim WW_CS0024FCheckerr As String = ""
         Dim WW_CS0024FCheckReport As String = ""
-        Dim WW_StrDate As Date
-        Dim WW_EndDate As Date
 
-        ' 有効年月日(From)
+        ' 有効開始日
         If WF_StYMDCode.Value = "" Then
-            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(From)", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効開始日", needsPopUp:=True)
             WF_StYMDCode.Focus()
             O_RTN = "ERR"
             Exit Sub
@@ -281,64 +268,28 @@ Public Class LNS0001UserSearch
                 WF_StYMDCode.Value = CDate(WF_StYMDCode.Value)
             End If
         Else
-            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(From)", needsPopUp:=True)
+            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "有効開始日", needsPopUp:=True)
             WF_StYMDCode.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
-        ' 有効年月日(To)
-        'If WF_EndYMDCode.Value = "" Then
-        '    Master.Output(C_MESSAGE_NO.PREREQUISITE_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(To)", needsPopUp:=True)
-        '    WF_StYMDCode.Focus()
-        '    O_RTN = "ERR"
-        '    Exit Sub
-        'End If
-        Master.CheckField(Master.USERCAMP, "ENDYMD", WF_EndYMDCode.Value, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            If Not String.IsNullOrEmpty(WF_EndYMDCode.Value) Then
-                WF_EndYMDCode.Value = CDate(WF_EndYMDCode.Value)
-            End If
-        Else
-            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "有効年月日(To)", needsPopUp:=True)
-            WF_EndYMDCode.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
-        ' 日付大小チェック
-        If Not String.IsNullOrEmpty(WF_StYMDCode.Value) AndAlso Not String.IsNullOrEmpty(WF_EndYMDCode.Value) Then
-            Try
-                Date.TryParse(WF_StYMDCode.Value, WW_StrDate)
-                Date.TryParse(WF_EndYMDCode.Value, WW_EndDate)
 
-                If WW_StrDate > WW_EndDate Then
-                    Master.Output(C_MESSAGE_NO.START_END_DATE_RELATION_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
-                    WF_StYMDCode.Focus()
+        '取引先コード
+        Master.CheckField(Master.USERCAMP, "TORICODE", TxtTORICode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            If Not String.IsNullOrEmpty(TxtTORICode.Text) Then
+                ' 名称存在チェック
+                CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)
+                If Not isNormal(WW_RtnSW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード : " & TxtTORICode.Text, needsPopUp:=True)
+                    TxtTORICode.Focus()
                     O_RTN = "ERR"
                     Exit Sub
                 End If
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DATE_FORMAT_ERROR, C_MESSAGE_TYPE.ABORT, WF_StYMDCode.Value & ":" & WF_EndYMDCode.Value)
-                WF_StYMDCode.Focus()
-                O_RTN = "ERR"
-                Exit Sub
-            End Try
-        End If
-        ' 組織コード
-        Master.CheckField(Master.USERCAMP, "ORG", ddlSelectORG.SelectedValue, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            'If Not String.IsNullOrEmpty(ddlSelectORG.SelectedValue) Then
-            '    ' 名称存在チェック
-            '    CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_RtnSW)
-            '    If Not isNormal(WW_RtnSW) Then
-            '        Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "組織コード : " & ddlSelectORG.SelectedValue, needsPopUp:=True)
-            '        TxtOrgCode.Focus()
-            '        O_RTN = "ERR"
-            '        Exit Sub
-            '    End If
-            'End If
+            End If
         Else
-            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "組織コード", needsPopUp:=True)
-            ddlSelectORG.Focus()
+            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード", needsPopUp:=True)
+            TxtTORICode.Focus()
             O_RTN = "ERR"
             Exit Sub
         End If
@@ -355,7 +306,7 @@ Public Class LNS0001UserSearch
     Protected Sub WF_ButtonEND_Click()
 
         '○ メニュー画面遷移
-        Master.TransitionPrevPage(, LNS0001WRKINC.TITLEKBNS)
+        Master.TransitionPrevPage(, LNM0006WRKINC.TITLEKBNS)
 
     End Sub
 
@@ -375,28 +326,19 @@ Public Class LNS0001UserSearch
             End Try
 
             With leftview
-                Select Case WF_LeftMViewChange.Value
-                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
-                        ' 日付の場合、入力日付のカレンダーが表示されるように入力値をカレンダーに渡す
-                        Select Case WF_FIELD.Value
-                            Case "WF_StYMDCode"         '有効年月日(From)
-                                .WF_Calendar.Text = WF_StYMDCode.Value
-                            Case "WF_EndYMDCode"        '有効年月日(To)
-                                .WF_Calendar.Text = WF_EndYMDCode.Value
-                        End Select
-                        .ActiveCalendar()
-                    Case Else
-                        If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
-                            ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
-                            WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, TxtCampCode.Text)
-                        Else
-                            ' その他の場合、操作ユーザーの組織のみ取得
-                            WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, TxtCampCode.Text)
-                        End If
+                ' フィールドによってパラメータを変える
+                Select Case WF_FIELD.Value
+                    Case "TxtTORICode"       '取引先コード
+                        leftview.Visible = False
+                        '検索画面
+                        DisplayView_mspToriOrgCodeSingle()
+                        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+                        WF_LeftboxOpen.Value = ""
+                        Exit Sub
 
-                        .SetListBox(WF_LeftMViewChange.Value, WW_Dummy, WW_PrmData)
-                        .ActiveListBox()
                 End Select
+                .SetListBox(WF_LeftMViewChange.Value, WW_Dummy, WW_PrmData)
+                .ActiveListBox()
             End With
         End If
 
@@ -411,6 +353,13 @@ Public Class LNS0001UserSearch
         '○ 変更した項目の名称をセット
         'CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_RtnSW)  '組織コード
         'TxtOrgCode.Focus()
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            Case "TxtTORICode"
+                CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)  '取引先コード
+                TxtTORICode.Focus()
+        End Select
 
         '○ メッセージ表示
         If Not isNormal(WW_RtnSW) Then
@@ -442,7 +391,7 @@ Public Class LNS0001UserSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
-            Case "WF_StYMDCode"             '有効年月日(From)
+            Case "WF_StYMDCode"             '有効開始日
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
                     If WW_SelectDate < C_DEFAULT_YMD Then
@@ -453,18 +402,18 @@ Public Class LNS0001UserSearch
                 Catch ex As Exception
                 End Try
                 WF_StYMDCode.Focus()
-            Case "WF_EndYMDCode"            '有効年月日(To)
-                Try
-                    Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
-                    If WW_SelectDate < C_DEFAULT_YMD Then
-                        WF_EndYMDCode.Value = ""
-                    Else
-                        WF_EndYMDCode.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
-                    End If
-                Catch ex As Exception
+                'Case "WF_EndYMDCode"            '有効終了日
+                '    Try
+                '        Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
+                '        If WW_SelectDate < C_DEFAULT_YMD Then
+                '            WF_EndYMDCode.Value = ""
+                '        Else
+                '            WF_EndYMDCode.Value = CDate(leftview.WF_Calendar.Text).ToString("yyyy/MM/dd")
+                '        End If
+                '    Catch ex As Exception
 
-                End Try
-                WF_EndYMDCode.Focus()
+                '    End Try
+                '    WF_EndYMDCode.Focus()
                 'Case "TxtOrgCode"               '組織コード
                 '    ddlSelectORG.SelectedValue = WW_SelectValue
                 '    LblOrgName.Text = WW_SelectText
@@ -486,18 +435,51 @@ Public Class LNS0001UserSearch
 
         '○ フォーカスセット
         Select Case WF_FIELD.Value
-            Case "WF_StYMDCode"             '有効年月日(From)
+            Case "WF_StYMDCode"             '有効開始日
                 WF_StYMDCode.Focus()
-            Case "WF_EndYMDCode"            '有効年月日(To)
-                WF_EndYMDCode.Focus()
-                'Case "TxtOrgCode"               '組織コード
-                '    TxtOrgCode.Focus()
+
         End Select
 
         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
         WF_FIELD.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_LeftMViewChange.Value = ""
+
+    End Sub
+
+    ''' <summary>
+    ''' 取引先部門コード検索時処理
+    ''' </summary>
+    Protected Sub DisplayView_mspToriOrgCodeSingle()
+
+        Me.mspToriOrgCodeSingle.InitPopUp()
+        Me.mspToriOrgCodeSingle.SelectionMode = ListSelectionMode.Single
+        Me.mspToriOrgCodeSingle.SQL = CmnSearchSQL.GetTankaToriOrgSQL(ddlSelectORG.SelectedValue)
+
+        Me.mspToriOrgCodeSingle.KeyFieldName = "KEYCODE"
+        Me.mspToriOrgCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaToriOrgTitle)
+
+        Me.mspToriOrgCodeSingle.ShowPopUpList()
+
+    End Sub
+
+    ''' <summary>
+    ''' 取引先部門コード選択ポップアップで行選択
+    ''' </summary>
+    Protected Sub RowSelected_mspToriOrgCodeSingle()
+
+        Dim selData = Me.mspToriOrgCodeSingle.SelectedSingleItem
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+
+            Case TxtTORICode.ID
+                Me.TxtTORICode.Text = selData("TORICODE").ToString '取引先コード
+                Me.LblTORIName.Text = selData("TORINAME").ToString '取引先名
+        End Select
+
+        'ポップアップの非表示
+        Me.mspToriOrgCodeSingle.HidePopUp()
 
     End Sub
 
@@ -523,6 +505,16 @@ Public Class LNS0001UserSearch
             Exit Sub
         End If
 
+        '名称取得
+        Dim WW_NAMEht = New Hashtable '名称格納HT
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            Select Case I_FIELD
+                Case "TORICODE"             '取引先コード
+                    work.CODENAMEGetTORI(SQLcon, WW_NAMEht)
+            End Select
+        End Using
+
         Try
             Select Case I_FIELD
                 Case "CAMPCODE"         '会社コード
@@ -532,14 +524,12 @@ Public Class LNS0001UserSearch
                     Else
                         leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_COMPANY, I_VALUE, O_TEXT, O_RTN, work.CreateCOMPANYParam(GL0001CompList.LC_COMPANY_TYPE.ROLE, TxtCampCode.Text))
                     End If
-                Case "ORG"              '組織コード
-                    If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
-                        ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, TxtCampCode.Text))
-                    Else
-                        ' その他の場合、操作ユーザーの管轄組織のみ取得
-                        leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_ORG, I_VALUE, O_TEXT, O_RTN, work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, TxtCampCode.Text))
+                Case "TORICODE"              '取引先コード
+                    If WW_NAMEht.ContainsKey(I_VALUE) Then
+                        O_TEXT = WW_NAMEht(I_VALUE)
+                        O_RTN = C_MESSAGE_NO.NORMAL
                     End If
+
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR

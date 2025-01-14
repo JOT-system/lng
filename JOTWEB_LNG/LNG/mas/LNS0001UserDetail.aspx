@@ -138,7 +138,6 @@
                         <p id="USER_LINE_6"> 
                         </p>--%>
 
-
                         <p id="USER_LINE_6">
                             <span class="ef">
                                 <asp:Label ID="WF_STYMD_L" runat="server" Text="開始年月日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
@@ -164,9 +163,6 @@
                             </span>
                         </p>
 
-
-
-
                         <p id="USER_LINE_7">
                             <span class="ef">
                                 <!-- 会社コード -->
@@ -180,10 +176,7 @@
                             <span class="ef magnifier">
                                 <!-- 組織コード -->
                                 <asp:Label ID="WF_ORG_L" runat="server" Text="組織コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                <a ondblclick="Field_DBclick('TxtOrg', <%=LIST_BOX_CLASSIFICATION.LC_ORG%>);" onchange="TextBox_change('TxtOrg');">
-                                    <asp:TextBox ID="TxtOrg" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="6"></asp:TextBox>
-                                </a>
-                                <asp:Label ID="LblOrgName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl"/>
                             </span>
                         </p>
 
@@ -195,7 +188,7 @@
                             </span>
                         </p>
 
-                        <p id="USER_LINE_10">
+<%--                        <p id="USER_LINE_10">
                             <span class="ef magnifier">
                                 <!-- メニュー表示制御ロール -->
                                 <asp:Label ID="WF_MENUROLE_L" runat="server" Text="メニュー表示制御ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
@@ -210,9 +203,9 @@
                                 </a>
                                 <asp:Label ID="LblMapRoleName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                             </span>
-                        </p>
+                        </p>--%>
 
-                        <p id="USER_LINE_11">
+<%--                        <p id="USER_LINE_11">
                             <span class="ef magnifier">
                                 <!-- 画面表示項目制御ロール -->
                                 <asp:Label ID="WF_VIEWPROFID_L" runat="server" Text="画面表示項目制御ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
@@ -227,9 +220,9 @@
                                 </a>
                                 <asp:Label ID="LblRprtProfIdName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                             </span>
-                        </p>
+                        </p>--%>
 
-                        <p id="USER_LINE_12">
+<%--                        <p id="USER_LINE_12">
                             <span class="ef">
                                 <!-- 画面初期値ロール -->
                                 <asp:Label ID="WF_VARIANT_L" runat="server" Text="画面初期値ロール" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
@@ -237,15 +230,15 @@
                                 <asp:Label ID="WF_VARIANT_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                             </span>
 
-        <%--                    <!-- 承認権限ロール -->
+                            <!-- 承認権限ロール -->
                             <span class="ef">
                                 <asp:Label ID="WF_APPROVALID_L" runat="server" Text="承認権限ロール" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 <span ondblclick="Field_DBclick('TxtApproValid', <%=LIST_BOX_CLASSIFICATION.LC_ROLE%>);" onchange="TextBox_change('TxtApproValid');">
                                     <asp:TextBox ID="TxtApproValid" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="20"></asp:TextBox>
                                 </span>
                                 <asp:Label ID="LblApproValidName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                            </span>--%>
-                        </p>
+                            </span>
+                        </p>--%>
 
                     </div>
                 </div>

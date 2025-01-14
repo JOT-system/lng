@@ -14,10 +14,6 @@ input[type=text].disabledcalendarIcon {
     padding-left: 25px;
 }
 
-input[type=password][readonly] {
-    background-color: rgb(237, 237, 237) !important;
-}
-
 input[type=date][readonly] {
     background-color: rgb(237, 237, 237) !important;
 }
@@ -127,153 +123,6 @@ input[type=date][readonly] {
     margin-right: 5px;
 }
 
-/* ************************** */
-/* 期間重複調整画面           */
-/* ************************** */
-#pnlOverlapPeriodsWrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    justify-content: space-around;
-    opacity: 1;
-    z-index: 19;
-    background-color: rgba(55, 55, 55, 0.6);
-    vertical-align: middle;
-    text-align: center;
-    display: flex;
-    visibility: hidden;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
-}
-
-#pnlOverlapPeriodsContents {
-    text-align: left;
-    left: calc(50% - 250px);
-    background-color: rgb(240,240,240);
-    box-shadow: 10px 10px 10px rgba(0,0,0,0.4);
-    border-radius: 10px;
-}
-
-#pnlOverlapPeriodsMessageArea {
-    padding: 8px 0px 8px 8px;
-    margin: 10px 10px 10px 10px;
-    min-height: 30px;
-    font-size: 15px;
-    background-color: #fff;
-    border: 1px solid #cfcfcf;
-}
-#pnlOverlapPeriodsMessageArea div[id^=pnlOverlapPeriodsMessage_] {
-    font-weight: bolder;
-}
-
-#pnlOverlapPeriodsArea {
-    padding: 15px 10px 0px 0px;
-    margin: 10px 10px 15px 10px;
-    min-height: 120px;
-    background-color: #fff;
-    border: 1px solid #cfcfcf;
-}
-
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] {
-    box-sizing: border-box;
-    flex-wrap: wrap;
-}
-/* 1項目(名称 文言) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span {
-    display: inline-block;
-    margin-bottom: 15px;
-}
-/* 項目名欄(1行目の入力欄の列に適用するスタイル) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span > :nth-child(2n+1) {
-    width: 7em;
-    padding-left: 20px;
-}
-/* 入力欄(2行目の入力欄の列に適用するスタイル) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsArea_] > span > :nth-child(2n+2) {
-    display: inline-block;
-    width: 10em;
-}
-
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] {
-    box-sizing: border-box;
-    flex-wrap: wrap;
-}
-/* 1項目(名称 文言) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span {
-    display: inline-block;
-}
-/* 項目名欄(1行目の入力欄の列に適用するスタイル) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span > :nth-child(2n+1) {
-    width: 7em;
-    padding-left: 20px;
-}
-/* 入力欄(2行目の入力欄の列に適用するスタイル) */
-#pnlOverlapPeriodsArea div[id^=pnlOverlapPeriodsLabelArea] > span > :nth-child(2n+2) {
-    display: inline-block;
-    width: 155px;
-    color: red;
-    font-size: 17.5px;
-    font-family: sans-serif;
-}
-
-#pnlTxtAdjustLastStYMD {
-    margin-left: 80px;
-}
-
-#pnlTxtAdjustLastEndYMD {
-    margin-left: 100px;
-}
-
-#pnlTxtAdjustNextStYMD {
-    margin-left: 100px;
-    margin-right: -21px;
-}
-
-#pnlTxtAdjustNextEndYMD {
-    margin-left: 80px;
-}
-
-#pnlOverlapPeriodsButton {
-    text-align: right;
-    padding-bottom: 10px;
-}
-
-#pnlOverlapPeriodsButton input[type=button] {
-    font-size: 15px;
-    min-width: 100px;
-    margin-right: 10px;
-    padding: 5px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    height: 30px;
-    overflow: hidden;
-    vertical-align: middle;
-}
-
-/* ************************** */
-/* カレンダーテキストボックス */
-/* ************************** */
-
-.TxtDate {
-    width: 180px;
-    height: 39px;
-    font-size: 16px;
-    font-family: sans-serif;
-    letter-spacing: 1px;
-    box-sizing: border-box;
-    ime-mode: inactive;
-    /* color: #000000; /* 黒 */
-    /* color: #737373; */ /* 4/14変更前 */
-    color: #404040;
-    padding: 6px 4px 6px 4px; /* Top Right Bottom Left */
-    /* border-color: rgba(176, 176, 276, 0.6); */
-    border-color: #cfcfcf;
-    border-style: solid;
-    border-width: thin;
-}
 /*--------------------------------------------------------------
 # 調整（k.miyake)
 --------------------------------------------------------------*/
@@ -322,7 +171,7 @@ p {
 /* 明細位置調整 */
 .detailboxOnly {
     height: 100% !important;
-    width: 90% !important;
+    /*width: 90% !important;*/
 }
 #detailkeybox {
     height: 73% !important;
@@ -332,7 +181,12 @@ p {
     position: fixed;
 }
 
-#detailkeybox p[id^=USER_LINE_] {
+/* 左ボックス */
+#LF_LEFTBOX {
+    width: 30em !important;
+}
+
+#detailkeybox p[id^=TANKA_LINE_] {
     min-width: 500px;
     display: flex;
     box-sizing: border-box;
@@ -342,91 +196,75 @@ p {
 /* 単票入力欄の列定義         */
 /* ************************** */
 /* 1項目(名称 文言 列幅) */
-#detailkeybox p[id^=USER_LINE_] > span {
+#detailkeybox p[id^=TANKA_LINE_] > span {
     display: inline-block;
     margin-bottom: 8px;
 }
 
-#detailkeybox p[id^=USER_LINE_]:last-of-type > span {
+#detailkeybox p[id^=TANKA_LINE_]:last-of-type > span {
     margin-bottom: 0;
 }
 
 /* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(1) {
+#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(1) {
     display: inline-block;
-    width: 12em;
+    width: 10em;
     font-weight: bold;
 }
 /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(2) {
+#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(2) {
     display: inline-block;
     width: 11em;
 }
 /* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(3) {
-    display: inline-block;
-    width: 14.5em;
-}
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(4) {
-    display: inline-block;
-    width: 13em;
-    font-weight: bold;
-}
-/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(5) {
-    display: inline-block;
-    width: 11em;
-}
-/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-#detailkeybox p[id^=USER_LINE_] > span > :nth-child(6) {
-    display: inline-block;
-    width: 4.5em;
-}
-
-/* 項目名、テキストボックス構成（n行目2,5,8,11・・・列に適用するスタイル)  
-入力欄 + 名称欄のWidthを足す
-*/
-#detailkeybox p[id^=USER_LINE_] > span.colCodeOnly > :nth-child(3n+2) {
-    width: 24.5em;
-    margin-right: 2px;
-}
-
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(1) {
+    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(3) {
         display: inline-block;
-        width: 12em;
+        width: 5.5em;
     }
-
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(2) {
+    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(4) {
         display: inline-block;
-        width: 11.5em;
-    }
-
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(3) {
-        display: inline-block;
-        width: 14.5em;
-    }
-
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(4) {
-        display: inline-block;
-        width: 12em;
+        width: 10em;
         font-weight: bold;
     }
+/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(5) {
+    display: inline-block;
+    width: 11em;
+}
+/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
+#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(6) {
+    display: inline-block;
+    width: 15.5em;
+}
 
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(5) {
-        display: inline-block;
-        width: 11em;
-    }
-    #detailkeybox p[id^=USER_LINE_] > span.magnifier > :nth-child(6) {
-        display: inline-block;
-        width: 8.5em;
-    }
+#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(1) {
+    display: inline-block;
+    width: 10em;
+}
+#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(2) {
+    display: inline-block;
+    width: 11.5em;
+}
+#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(3) {
+    display: inline-block;
+    width: 5.5em;
+}
+#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(4) {
+    display: inline-block;
+    width: 10em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(5) {
+    display: inline-block;
+    width: 11em;
+}
 
 
-#TxtSelLineCNT, #TxtDelFlg, #TxtMissCNT, #TxtOrg, #TxtSYABARA {
+#TxtSelLineCNT, #TxtDelFlg, #TxtCampCode, #TxtTORICODE, #TxtORGCODE, #TxtKASANORGCODE, #TxtTODOKECODE, #TxtTANKA {
     text-align: right !important;
 }
 
-#detailkeybox p[id^=USER_LINE_] > span > b {
+#detailkeybox p[id^=TANKA_LINE_] > span > b {
     display: inline-block;
     width: 190px !important;
 }

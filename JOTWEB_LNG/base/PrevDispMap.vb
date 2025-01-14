@@ -172,6 +172,19 @@ Public Module PrevDispMap
         Public Const LNM0003D As String = "ASP.LNG_MAS_LNM0003REKEJMDETAIL_ASPX"
 
         ''' <summary>
+        ''' 単価マスタメンテナンス（検索）
+        ''' </summary>
+        Public Const LNM0006S As String = "ASP.LNG_MAS_LNM0006TANKASEARCH_ASPX"
+        ''' <summary>
+        ''' 単価マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const LNM0006L As String = "ASP.LNG_MAS_LNM0006TANKALIST_ASPX"
+        ''' <summary>
+        ''' 単価マスタメンテナンス（詳細）
+        ''' </summary>
+        Public Const LNM0006D As String = "ASP.LNG_MAS_LNM0006TANKADETAIL_ASPX"
+
+        ''' <summary>
         ''' コード変換特例１マスタメンテナンス（検索）
         ''' </summary>
         Public Const LNM0007S As String = "ASP.LNG_MAS_LNM0007RECT1MSEARCH_ASPX"

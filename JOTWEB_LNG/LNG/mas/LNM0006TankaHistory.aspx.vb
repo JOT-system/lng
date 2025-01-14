@@ -1,11 +1,11 @@
 ﻿''************************************************************
-' ユーザーマスタメンテ変更履歴画面
-' 作成日 2024/12/02
+' 単価マスタメンテ変更履歴画面
+' 作成日 2024/12/16
 ' 更新日 
 ' 作成者 大浜
 ' 更新者 
 '
-' 修正履歴 : 2024/12/02 新規作成
+' 修正履歴 : 2024/12/16 新規作成
 '          : 
 ''************************************************************
 Imports MySql.Data.MySqlClient
@@ -13,14 +13,14 @@ Imports System.Drawing
 Imports GrapeCity.Documents.Excel
 
 ''' <summary>
-''' ユーザマスタ変更履歴
+''' 単価マスタ変更履歴
 ''' </summary>
 ''' <remarks></remarks>
-Public Class LNS0001UserHistory
+Public Class LNM0006TankaHistory
     Inherits Page
 
     '○ 検索結果格納Table
-    Private LNS0001tbl As DataTable                                  '一覧格納用テーブル
+    Private LNM0006tbl As DataTable                                  '一覧格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -58,13 +58,13 @@ Public Class LNS0001UserHistory
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
-                    Master.RecoverTable(LNS0001tbl)
+                    Master.RecoverTable(LNM0006tbl)
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonDOWNLOAD"        'ダウンロードボタン押下
-                            WF_EXCELPDF(LNS0001WRKINC.FILETYPE.EXCEL)
+                            WF_EXCELPDF(LNM0006WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
-                            WF_EXCELPDF(LNS0001WRKINC.FILETYPE.PDF)
+                            WF_EXCELPDF(LNM0006WRKINC.FILETYPE.PDF)
 
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
@@ -90,9 +90,9 @@ Public Class LNS0001UserHistory
                             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                                 SQLcon.Open()  ' DataBase接続
                                 MAPDataGet(SQLcon)
-                                Master.SaveTable(LNS0001tbl)
+                                Master.SaveTable(LNM0006tbl)
                                 '〇 一覧の件数を取得
-                                Me.ListCount.Text = "件数：" + LNS0001tbl.Rows.Count.ToString()
+                                Me.ListCount.Text = "件数：" + LNM0006tbl.Rows.Count.ToString()
                             End Using
                     End Select
 
@@ -113,10 +113,10 @@ Public Class LNS0001UserHistory
 
         Finally
             '○ 格納Table Close
-            If Not IsNothing(LNS0001tbl) Then
-                LNS0001tbl.Clear()
-                LNS0001tbl.Dispose()
-                LNS0001tbl = Nothing
+            If Not IsNothing(LNM0006tbl) Then
+                LNM0006tbl.Clear()
+                LNM0006tbl.Dispose()
+                LNM0006tbl = Nothing
             End If
         End Try
 
@@ -129,7 +129,7 @@ Public Class LNS0001UserHistory
     Protected Sub Initialize()
 
         '○ 画面ID設定
-        Master.MAPID = LNS0001WRKINC.MAPIDH
+        Master.MAPID = LNM0006WRKINC.MAPIDH
         '○ HELP表示有無設定
         Master.dispHelp = False
         '○ D&D有無設定
@@ -196,13 +196,13 @@ Public Class LNS0001UserHistory
         End Using
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNS0001tbl)
+        Master.SaveTable(LNM0006tbl)
 
         '〇 一覧の件数を取得
-        Me.ListCount.Text = "件数：" + LNS0001tbl.Rows.Count.ToString()
+        Me.ListCount.Text = "件数：" + LNM0006tbl.Rows.Count.ToString()
 
         '○ 一覧表示データ編集(性能対策)
-        Dim TBLview As DataView = New DataView(LNS0001tbl)
+        Dim TBLview As DataView = New DataView(LNM0006tbl)
 
         TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
 
@@ -241,15 +241,15 @@ Public Class LNS0001UserHistory
     ''' <remarks></remarks>
     Protected Sub MAPDataGet(ByVal SQLcon As MySqlConnection)
 
-        If IsNothing(LNS0001tbl) Then
-            LNS0001tbl = New DataTable
+        If IsNothing(LNM0006tbl) Then
+            LNM0006tbl = New DataTable
         End If
 
-        If LNS0001tbl.Columns.Count <> 0 Then
-            LNS0001tbl.Columns.Clear()
+        If LNM0006tbl.Columns.Count <> 0 Then
+            LNM0006tbl.Columns.Clear()
         End If
 
-        LNS0001tbl.Clear()
+        LNM0006tbl.Clear()
 
         '○ 検索SQL
         '　検索説明
@@ -262,20 +262,26 @@ Public Class LNS0001UserHistory
         SQLStr.AppendLine("   , ''                                                                           AS OPERATION                ")
         SQLStr.AppendLine("   , UPDTIMSTP                                                        AS UPDTIMSTP           ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(DELFLG), '')                                                    AS DELFLG                   ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(USERID), '')                                      AS USERID                       ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(STAFFNAMES), '')                                  AS STAFFNAMES                   ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(STAFFNAMEL), '')                                  AS STAFFNAMEL                   ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(MAPID), '')                                       AS MAPID                        ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '')                     AS STYMD                        ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD                       ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(CAMPCODE), '')                                    AS CAMPCODE                     ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(ORG), '')                                         AS ORG                          ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(EMAIL), '')                                       AS EMAIL                        ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(MENUROLE), '')                                    AS MENUROLE                     ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(MAPROLE), '')                                     AS MAPROLE                      ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIEWPROFID), '')                                  AS VIEWPROFID                   ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(RPRTPROFID), '')                                  AS RPRTPROFID                   ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VARIANT), '')                                     AS VARIANT                      ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TORICODE), '')                                    AS TORICODE            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TORINAME), '')                                    AS TORINAME            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ORGCODE), '')                                     AS ORGCODE             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ORGNAME), '')                                     AS ORGNAME             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGCODE), '')                                AS KASANORGCODE        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGNAME), '')                                AS KASANORGNAME        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKECODE), '')                                  AS TODOKECODE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKENAME), '')                                  AS TODOKENAME          ")
+        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
+        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BRANCHCODE), '')                                  AS BRANCHCODE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TANKA), '')                                       AS TANKA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATA), '')                                     AS SYAGATA             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATANAME), '')                                 AS SYAGATANAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGOU), '')                                      AS SYAGOU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYABARA), '')                                     AS SYABARA             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYUBETSU), '')                                    AS SYUBETSU            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU1), '')                                      AS BIKOU1              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU2), '')                                      AS BIKOU2              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
         SQLStr.AppendLine("   , CASE                 ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
@@ -294,7 +300,7 @@ Public Class LNS0001UserHistory
         SQLStr.AppendLine("   , DATE_FORMAT(MODIFYYMD, '%Y/%m/%d %T')                                     AS MODIFYYMD                 ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(MODIFYUSER), '')                                           AS MODIFYUSER                ")
         SQLStr.AppendLine(" FROM                                                                                                          ")
-        SQLStr.AppendLine("     LNG.LNT0002_USERHIST                                                                                     ")
+        SQLStr.AppendLine("     LNG.LNT0005_TANKAHIST                                                                                     ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -308,9 +314,12 @@ Public Class LNS0001UserHistory
         End If
         SQLStr.AppendLine(" ORDER BY                                                                                              ")
         SQLStr.AppendLine("    MODIFYYMD DESC                                                                                     ")
-        SQLStr.AppendLine("   ,USERID                                                                                        ")
-        SQLStr.AppendLine("   ,STYMD                                                                                        ")
-        SQLStr.AppendLine("   ,MODIFYKBN                                                                                          ")
+        SQLStr.AppendLine("    ,TORICODE                                                           ")
+        SQLStr.AppendLine("    ,ORGCODE                                                            ")
+        SQLStr.AppendLine("    ,KASANORGCODE                                                       ")
+        SQLStr.AppendLine("    ,TODOKECODE                                                         ")
+        SQLStr.AppendLine("    ,STYMD                                                              ")
+        SQLStr.AppendLine("    ,BRANCHCODE                                                         ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -333,24 +342,24 @@ Public Class LNS0001UserHistory
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
-                        LNS0001tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        LNM0006tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
                     Next
 
                     '○ テーブル検索結果をテーブル格納
-                    LNS0001tbl.Load(SQLdr)
+                    LNM0006tbl.Load(SQLdr)
                 End Using
 
                 Dim i As Integer = 0
-                For Each LNS0001row As DataRow In LNS0001tbl.Rows
+                For Each LNM0006row As DataRow In LNM0006tbl.Rows
                     i += 1
-                    LNS0001row("LINECNT") = i        'LINECNT
+                    LNM0006row("LINECNT") = i        'LINECNT
                 Next
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0001H SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006H SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNS0001H Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006H Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -371,7 +380,7 @@ Public Class LNS0001UserHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'yyyy/MM') AS MODIFYYM ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%Y/%m') AS MODIFYYM ")
-        SQLStr.AppendLine(" FROM LNG.LNT0002_USERHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
         SQLStr.AppendLine(" ORDER BY MODIFYYM DESC ")
 
         Try
@@ -403,10 +412,10 @@ Public Class LNS0001UserHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0002_USERHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0002_USERHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -427,7 +436,7 @@ Public Class LNS0001UserHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'dd') AS MODIFYDD ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%d') AS MODIFYDD ")
-        SQLStr.AppendLine(" FROM LNG.LNT0002_USERHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         'SQLStr.AppendLine("    FORMAT(MODIFYYMD, 'yyyy/MM')  = @MODIFYYM                                                         ")
         SQLStr.AppendLine("    DATE_FORMAT(MODIFYYMD, '%Y/%m')  = @MODIFYYM                                                         ")
@@ -457,10 +466,10 @@ Public Class LNS0001UserHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0002_USERHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0002_USERHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -480,7 +489,7 @@ Public Class LNS0001UserHistory
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT ")
         SQLStr.AppendLine("     MODIFYUSER ")
-        SQLStr.AppendLine(" FROM LNG.LNT0002_USERHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -522,10 +531,10 @@ Public Class LNS0001UserHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0002_USERHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0002_USERHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -545,11 +554,11 @@ Public Class LNS0001UserHistory
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
-        For Each LNS0001row As DataRow In LNS0001tbl.Rows
-            If LNS0001row("HIDDEN") = 0 Then
+        For Each LNM0006row As DataRow In LNM0006tbl.Rows
+            If LNM0006row("HIDDEN") = 0 Then
                 WW_DataCNT += 1
                 ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
-                LNS0001row("SELECT") = WW_DataCNT
+                LNM0006row("SELECT") = WW_DataCNT
             End If
         Next
 
@@ -581,7 +590,7 @@ Public Class LNS0001UserHistory
         End If
 
         '○ 画面(GridView)表示
-        Dim TBLview As DataView = New DataView(LNS0001tbl)
+        Dim TBLview As DataView = New DataView(LNM0006tbl)
 
         '○ ソート
         TBLview.Sort = "LINECNT"
@@ -644,7 +653,7 @@ Public Class LNS0001UserHistory
     Protected Sub WF_ButtonLAST_Click()
 
         '○ ソート
-        Dim TBLview As New DataView(LNS0001tbl)
+        Dim TBLview As New DataView(LNM0006tbl)
         TBLview.RowFilter = "HIDDEN = 0"
 
         '○ 最終頁に移動
@@ -699,7 +708,7 @@ Public Class LNS0001UserHistory
         Dim wb As Workbook = New GrapeCity.Documents.Excel.Workbook
 
         '最大列(RANGE)を取得
-        Dim WW_MAXCOL As Integer = [Enum].GetValues(GetType(LNS0001WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
+        Dim WW_MAXCOL As Integer = [Enum].GetValues(GetType(LNM0006WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
 
         'シート名
         wb.ActiveSheet.Name = Left(WF_DDL_MODIFYYM.SelectedValue, 4) + "年" + Right(WF_DDL_MODIFYYM.SelectedValue, 2) + "月"
@@ -729,7 +738,7 @@ Public Class LNS0001UserHistory
         wb.ActiveSheet.Range("A1").Value = "ID:" + Master.MAPID
         wb.ActiveSheet.Range("A2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)
         wb.ActiveSheet.Range("B2").Value = "は変更項目"
-        wb.ActiveSheet.Range("C1").Value = "ユーザマスタ変更履歴一覧"
+        wb.ActiveSheet.Range("C1").Value = "単価マスタ変更履歴一覧"
 
         '列幅自動調整
         wb.ActiveSheet.Range("A3:" + WW_MAXRANGE).EntireColumn.AutoFit()
@@ -752,8 +761,8 @@ Public Class LNS0001UserHistory
         Dim FileName As String
         Dim FilePath As String
         Select Case WW_FILETYPE
-            Case LNS0001WRKINC.FILETYPE.EXCEL
-                FileName = "ユーザマスタ変更履歴.xlsx"
+            Case LNM0006WRKINC.FILETYPE.EXCEL
+                FileName = "単価マスタ変更履歴.xlsx"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -762,8 +771,8 @@ Public Class LNS0001UserHistory
                 'ダウンロード
                 WF_PrintURL.Value = UrlRoot & FileName
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-            Case LNS0001WRKINC.FILETYPE.PDF
-                FileName = "ユーザマスタ変更履歴.pdf"
+            Case LNM0006WRKINC.FILETYPE.PDF
+                FileName = "単価マスタ変更履歴.pdf"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -849,24 +858,31 @@ Public Class LNS0001UserHistory
 
         '値
         Dim WW_HEADERROW As Integer = 2
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = "操作区分"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = "変更区分"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = "変更日時"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = "変更USER"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.DELFLG).Value = "削除フラグ"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.USERID).Value = "ユーザーID"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.STYMD).Value = "開始年月日"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "終了年月日"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.ORG).Value = "組織コード"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.STAFFNAMES).Value = "社員名（短）"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.STAFFNAMEL).Value = "社員名（長）"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.EMAIL).Value = "メールアドレス"
-        sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MAPID).Value = "画面ＩＤ"
-        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MENUROLE).Value = "メニュー表示制御ロール"
-        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.MAPROLE).Value = "画面参照更新制御ロール"
-        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.VIEWPROFID).Value = "画面表示項目制御ロール"
-        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL.RPRTPROFID).Value = "エクセル出力制御ロール"
-        'sheet.Cells(WW_HEADERROW, LNS0001WRKINC.HISTORYEXCELCOL._VARIANT).Value = "画面初期値ロール"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = "操作区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = "変更区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = "変更日時"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = "変更USER"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.DELFLG).Value = "削除フラグ"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TORICODE).Value = "取引先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TORINAME).Value = "取引先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGCODE).Value = "部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGNAME).Value = "部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = "届先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = "届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = "枝番"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = "単価"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATA).Value = "車型"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = "車型名"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGOU).Value = "車号"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = "車腹"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYUBETSU).Value = "種別"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU1).Value = "備考1"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU2).Value = "備考2"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU3).Value = "備考3"
 
     End Sub
 
@@ -877,29 +893,36 @@ Public Class LNS0001UserHistory
     Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
 
-        For Each Row As DataRow In LNS0001tbl.Rows
+        For Each Row As DataRow In LNM0006tbl.Rows
             '値
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.USERID).Value = Row("USERID") 'ユーザーID
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.STYMD).Value = Row("STYMD") '開始年月日
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.ENDYMD).Value = Row("ENDYMD") '終了年月日
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.ORG).Value = Row("ORG") '組織コード
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.STAFFNAMES).Value = Row("STAFFNAMES") '社員名（短）
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.STAFFNAMEL).Value = Row("STAFFNAMEL") '社員名（長）
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.EMAIL).Value = Row("EMAIL") 'メールアドレス
-            sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MAPID).Value = Row("MAPID") '画面ＩＤ
-            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MENUROLE).Value = Row("MENUROLE") 'メニュー表示制御ロール
-            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.MAPROLE).Value = Row("MAPROLE") '画面参照更新制御ロール
-            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.VIEWPROFID).Value = Row("VIEWPROFID") '画面表示項目制御ロール
-            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL.RPRTPROFID).Value = Row("RPRTPROFID") 'エクセル出力制御ロール
-            'sheet.Cells(WW_ACTIVEROW, LNS0001WRKINC.HISTORYEXCELCOL._VARIANT).Value = Row("VARIANT") '画面初期値ロール
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TORICODE).Value = Row("TORICODE") '取引先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TORINAME).Value = Row("TORINAME") '取引先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGCODE).Value = Row("ORGCODE") '部門コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = Row("BRANCHCODE") '枝番
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA") '単価
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGOU).Value = Row("SYAGOU") '車号
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYUBETSU).Value = Row("SYUBETSU") '種別
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
 
             '変更区分が変更後の行の場合
-            If Row("MODIFYKBN") = LNS0001WRKINC.MODIFYKBN.AFTDATA Then
+            If Row("MODIFYKBN") = LNM0006WRKINC.MODIFYKBN.AFTDATA Then
                 '変更箇所を塗りつぶし
                 SetMODIFYHATCHING(sheet, WW_ACTIVEROW)
             End If
@@ -914,10 +937,10 @@ Public Class LNS0001UserHistory
     ''' <remarks></remarks>
     Public Sub SetMODIFYHATCHING(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
         '最大列(RANGE)を取得
-        Dim WW_MAXCOL As Integer = [Enum].GetValues(GetType(LNS0001WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
+        Dim WW_MAXCOL As Integer = [Enum].GetValues(GetType(LNM0006WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
 
         '変更チェック開始列を取得
-        Dim WW_STCOL As Integer = LNS0001WRKINC.HISTORYEXCELCOL.DELFLG   '削除フラグ
+        Dim WW_STCOL As Integer = LNM0006WRKINC.HISTORYEXCELCOL.DELFLG   '削除フラグ
 
         '開始列から最大列まで変更前後の値を確認
         For index As Integer = WW_STCOL To WW_MAXCOL

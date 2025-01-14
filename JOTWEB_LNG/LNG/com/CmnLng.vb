@@ -155,7 +155,8 @@ Public Class CmnLng
         sqlStat.AppendLine("     AND FIX.CLASS  = @CLASS")
         sqlStat.AppendLine("     AND FIX.DELFLG = @DELFLG")
         sqlStat.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN FIX.STYMD AND FIX.ENDYMD")
-        sqlStat.AppendLine(" ORDER BY CONVERT(DECIMAL, (CASE coalesce(FIX.KEYCODE, '') WHEN '' THEN '0' ELSE FIX.KEYCODE END))")
+        'sqlStat.AppendLine(" ORDER BY CONVERT(DECIMAL, (CASE coalesce(FIX.KEYCODE, '') WHEN '' THEN '0' ELSE FIX.KEYCODE END))")
+        sqlStat.AppendLine(" ORDER BY CASE coalesce(FIX.KEYCODE, '') WHEN '' THEN '0' ELSE FIX.KEYCODE END")
 
         Try
             '空白行判定
