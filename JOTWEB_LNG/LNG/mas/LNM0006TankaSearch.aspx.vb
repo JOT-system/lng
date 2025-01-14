@@ -169,6 +169,20 @@ Public Class LNM0006TankaSearch
             End If
             '○ 名称設定処理
             CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_Dummy)  '取引先コード
+        Else
+            ' サブメニューからの画面遷移
+            ' メニューからの画面遷移
+            '情シス、高圧ガス以外
+            If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                ' 画面遷移
+                Master.TransitionPage()
+            End If
+
+            ' 画面間の情報クリア
+            work.Initialize()
+
+            ' 初期変数設定処理
+            WF_StYMDCode.Value = Date.Now.ToString("yyyy/MM/dd")
         End If
         'Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
         TxtCampCode.Text = Master.USERCAMP
