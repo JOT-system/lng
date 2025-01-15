@@ -21,7 +21,9 @@ Public Class LNT0001InvoiceOutputReport
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
+    Private OutputOrgCode As String = ""
     Private OutputFileName As String = ""
+    Private calcZissekiNumber As Integer
 
     ''' <summary>
     ''' コンストラクタ
@@ -31,8 +33,9 @@ Public Class LNT0001InvoiceOutputReport
     ''' <param name="outputFileName">(出力用)Excelファイル名（フルパスではない)</param>
     ''' <param name="printDataClass">帳票データ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
-    Public Sub New(mapId As String, excelFileName As String, outputFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
+    Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
                    Optional ByVal taishoYm As String = Nothing,
+                   Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
         Try
             Dim CS0050SESSION As New CS0050SESSION
@@ -41,7 +44,9 @@ Public Class LNT0001InvoiceOutputReport
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
+            Me.OutputOrgCode = orgCode
             Me.OutputFileName = outputFileName
+            Me.calcZissekiNumber = calcNumber
             Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                                           "PRINTFORMAT",
                                                           defaultDatakey,
@@ -74,14 +79,19 @@ Public Class LNT0001InvoiceOutputReport
             'ファイルopen
             WW_Workbook.Open(Me.ExcelTemplatePath)
 
-            If excelFileName = "④ENEOS_八戸　輸送費請求書.xlsx" _
-                OrElse excelFileName = "④ENEOS_水島　輸送費請求書.xlsx" Then
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" Then
                 Dim j As Integer = 0
                 For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
-                    If WW_Workbook.Worksheets(i).Name = "入力表" Then
+                    If WW_Workbook.Worksheets(i).Name = "入力表" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "実績入力表" Then
                         WW_SheetNo = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" Then
+                        OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "東洋ウレタン" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" Then
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
                         WW_SheetNoTmp02 = i
@@ -148,13 +158,25 @@ Public Class LNT0001InvoiceOutputReport
     ''' 帳票のヘッダー設定
     ''' </summary>
     Private Sub EditHeaderArea()
+        Dim dayCellsSub As String() = {"", "", ""}
         Try
             '◯ 年月
-            WW_Workbook.Worksheets(WW_SheetNo).Range("B1").Value = Integer.Parse(Me.TaishoYYYY)
-            WW_Workbook.Worksheets(WW_SheetNo).Range("B2").Value = Integer.Parse(Me.TaishoMM)
+            Select Case Me.OutputOrgCode
+                Case BaseDllConst.CONST_ORDERORGCODE_020202,
+                     BaseDllConst.CONST_ORDERORGCODE_023301
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("B1").Value = Integer.Parse(Me.TaishoYYYY)
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("B2").Value = Integer.Parse(Me.TaishoMM)
+                    dayCellsSub = {"91", "94", "97"}
+                Case BaseDllConst.CONST_ORDERORGCODE_022702 + "01",
+                     BaseDllConst.CONST_ORDERORGCODE_022702 + "02"
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("C4").Value = Integer.Parse(Me.TaishoYYYY)
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("E4").Value = Integer.Parse(Me.TaishoMM)
+                    dayCellsSub = {"36", "37", "38"}
+            End Select
 
             '〇 日付(セルチェック)
-            Dim dayCells As String() = {"91", "94", "97"}
+            'Dim dayCells As String() = {"91", "94", "97"}
+            Dim dayCells As String() = dayCellsSub
             Dim lastDay As String = Date.Parse(Me.TaishoYYYY + "/" + Me.TaishoMM + "/01").AddMonths(1).AddDays(-1).ToString("dd")
             Dim i As Integer = 0
             For Each dayCell As String In dayCells
@@ -199,8 +221,9 @@ Public Class LNT0001InvoiceOutputReport
                 '◯ 届先名
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME_REP").ToString()
                 '◯ 実績数量
-                WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
                 '◯ 備考
+                If PrintDatarow("SETCELL03").ToString() = "" Then Continue For
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = PrintDatarow("REMARK_REP").ToString()
             Next
 
@@ -269,22 +292,66 @@ Public Class LNT0001InvoiceOutputReport
 
             '〇届先(単価)設定
             For Each PrintDatarow As DataRow In PrintTankData.Select("", "MASTERNO")
+                If PrintDatarow("MASTERNO").ToString() = "" OrElse PrintDatarow("MASTERNO").ToString() = "0" Then Continue For
                 '〇シート「マスタ」
                 Dim iTanka As Integer = Integer.Parse(PrintDatarow("TANKA").ToString())
                 If Convert.ToString(PrintDatarow("SYAGATA")) = "1" Then
                     '★単車
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                 ElseIf Convert.ToString(PrintDatarow("SYAGATA")) = "2" Then
+                    '★トレーラ
                     '〇水島営業所(三井Ｅ＆Ｓ, コカ・コーラ)独自仕様
                     If PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 _
                         AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004002 _
                                  OrElse PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509) _
                         AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
-                        '★トレーラ
                         WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+
+                        '〇西日本支店車庫(泉北)独自仕様
+                    ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
+                        Dim cellValue As String = ""
+                        cellValue = WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERNO").ToString())).Value.ToString()
+
+                        '☆(日本栄船)独自仕様
+                        If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
+                            AndAlso PrintDatarow("SYUBETSU").ToString() = "運行単価" _
+                            AndAlso PrintDatarow("BIKOU1").ToString() = "2名乗車" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+
+                            '☆(昭和産業㈱)独自仕様※[休日加算金]以外
+                        ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005866 _
+                            AndAlso PrintDatarow("SYUBETSU").ToString() <> "休日加算金" Then
+                            If cellValue = "昭和産業1" _
+                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン単価" _
+                                AndAlso PrintDatarow("BIKOU1").ToString() = "1運行目" Then
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            ElseIf cellValue = "昭和産業2" _
+                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン単価" _
+                                AndAlso PrintDatarow("BIKOU1").ToString() = "2運行目" Then
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            End If
+
+                        Else
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        End If
                     Else
-                        '★トレーラ
                         WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    End If
+                Else
+                    '〇西日本支店車庫(泉北)独自仕様
+                    If PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
+                        '★休日加算金
+                        If PrintDatarow("SYUBETSU").ToString() = "休日加算金" Then
+
+                            '(日本栄船)独自仕様
+                            If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
+                                AndAlso PrintDatarow("BIKOU1").ToString() = "3名乗車" Then
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Else
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            End If
+
+                        End If
                     End If
                 End If
             Next

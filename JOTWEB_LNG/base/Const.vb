@@ -310,6 +310,10 @@ Public Module BaseDllConst
     ''' エスジーリキッドサービス
     ''' </summary>
     Public Const CONST_TORICODE_0045300000 As String = "0045300000"
+    ''' <summary>
+    ''' ＤＧＥ
+    ''' </summary>
+    Public Const CONST_TORICODE_0051200000 As String = "0051200000"
 #End Region
 
 #Region "受注受付部署"
@@ -325,6 +329,10 @@ Public Module BaseDllConst
     ''' EX 九州営業所
     ''' </summary>
     Public Const CONST_ORDERORGCODE_024001 As String = "024001"
+    ''' <summary>
+    ''' EX_西日本支店車庫
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_022702 As String = "022702"
 #End Region
 
 #Region "届先"
@@ -336,6 +344,18 @@ Public Module BaseDllConst
     ''' コカ・コーラ　ボトラーズジャパン
     ''' </summary>
     Public Const CONST_TODOKECODE_005509 As String = "005509"
+    ''' <summary>
+    ''' 新宮ガス
+    ''' </summary>
+    Public Const CONST_TODOKECODE_001640 As String = "001640"
+    ''' <summary>
+    ''' 日本栄船
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004916 As String = "004916"
+    ''' <summary>
+    ''' 昭和産業㈱
+    ''' </summary>
+    Public Const CONST_TODOKECODE_005866 As String = "005866"
 #End Region
 
 #Region "業務ID"

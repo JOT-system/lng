@@ -182,7 +182,8 @@ Public Class CmnParts
     ''' 単価マスタTBL検索
     ''' </summary>
     Public Sub SelectTANKAMaster(ByVal SQLcon As MySqlConnection,
-                                 ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable)
+                                 ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable,
+                                 Optional ByVal I_TODOKECODE As String = Nothing)
         If IsNothing(O_dtTANKAMas) Then
             O_dtTANKAMas = New DataTable
         End If
@@ -235,6 +236,9 @@ Public Class CmnParts
         SQLStr &= String.Format(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
         SQLStr &= String.Format(" AND LNM0006.STYMD <= '{0}' ", I_TAISHOYM)
         SQLStr &= String.Format(" AND LNM0006.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_TODOKECODE) Then
+            SQLStr &= String.Format(" AND LNM0006.TODOKECODE = '{0}' ", I_TODOKECODE)
+        End If
 
         '-- ORDER BY
         SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
