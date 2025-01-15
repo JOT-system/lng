@@ -1156,7 +1156,7 @@ Public Class LNT0001InvoiceOutput
                 Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
                 Dim lastMonth As Boolean = False
                 If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                    setDay = "1"
+                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
                     lastMonth = True
                 End If
                 Dim iLine As Integer = Integer.Parse(setDay) - 1
