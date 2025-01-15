@@ -478,7 +478,12 @@ Public Class LNT0001ZissekiIntake
     Protected Sub WF_ButtonZero_Click()
 
         work.WF_SEL_YM.Text = WF_TaishoYm.Value
-        work.WF_SEL_TORICODE.Text = WF_TORIhdn.Value
+        '実績数量ゼロボタン押下の場合
+        If WF_ButtonClick.Value = "WF_ButtonZero" Then
+            ' 画面選択された荷主を取得
+            SelectTori()
+            work.WF_SEL_TORICODE.Text = WF_TORIhdn.Value
+        End If
 
         Dim WW_URL As String = ""
         work.GetURL(LNT0001WRKINC.MAPIDZ, WW_URL)
@@ -813,6 +818,7 @@ Public Class LNT0001ZissekiIntake
                         }
 
                 ' 結果を表示
+                Dim Cnt As Integer = 0
                 Dim Msg1 As String = ""
                 Dim Msg2 As String = ""
                 Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -822,6 +828,14 @@ Public Class LNT0001ZissekiIntake
                     If result.Count > 0 Then
                         Dim tori = WF_TORI.Items.FindByValue(result.toricode)
                         Msg1 += "<BR>" & sp & "荷主：" & tori.Text
+
+                        '実績数量ゼロ画面への引き渡し情報（複数存在する場合、カンマ区切り：取1,取2,取3）
+                        Cnt += 1
+                        If Cnt = 1 Then
+                            work.WF_SEL_TORICODE.Text = tori.Value
+                        Else
+                            work.WF_SEL_TORICODE.Text += "," & tori.Value
+                        End If
                     End If
                 Next
                 '実績数量ゼロありメッセージ出力
