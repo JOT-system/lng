@@ -176,7 +176,7 @@ Public Class LNT0001ZissekiZero
         'ログインユーザーと指定された荷主より操作可能なアボカド接続情報（営業所毎）取得
         Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, "")
         WF_TORI.Items.Clear()
-        WF_TORI.Items.Add(New ListItem("選択してください", ""))
+        'WF_TORI.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To toriList.Items.Count - 1
             'ApiInfo(リスト）中に指定された取引先が存在した場合、ドロップダウンリストを作成する
             Dim toriLike As String = "*" & toriList.Items(i).Value & "*"
@@ -185,6 +185,19 @@ Public Class LNT0001ZissekiZero
                 WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
             End If
         Next
+
+        Dim SelToriList = work.WF_SEL_TORICODE.Text.Split(","c)
+        For intCnt As Integer = 0 To UBound(SelToriList)
+            For index As Integer = 0 To WF_TORI.Items.Count - 1
+                If WF_TORI.Items(index).Value = SelToriList(intCnt) Then
+                    '選択状態にする
+                    WF_TORI.Items(index).Selected = True
+                    Exit For
+                End If
+            Next
+        Next
+        WF_TORIhdn.Value = work.WF_SEL_TORICODE.Text
+
     End Sub
 
     ''' <summary>
@@ -479,26 +492,11 @@ Public Class LNT0001ZissekiZero
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P2                                  " _
             & " AND LT1.ZISSEKI = 0                                                                 " _
         ' 取引先
-        If WF_TORI.SelectedIndex = 0 Then
-            If WF_TORI.Items.Count - 1 > 0 Then
-                SQLStr += " AND LT1.TORICODE in ("
-                'WF_TORIの先頭に"選択してください"があるためj=1とする
-                For j As Integer = 1 To WF_TORI.Items.Count - 1
-                    SQLStr += "'"
-                    SQLStr += WF_TORI.Items(j).Value
-                    SQLStr += "'"
-                    If j < WF_TORI.Items.Count - 1 Then
-                        SQLStr += ","
-                    Else
-                        SQLStr += ")"
-                    End If
-                Next
-            End If
-        Else
-            SQLStr += " AND LT1.TORICODE = '" & WF_TORI.SelectedValue & "'"
+        If WF_TORIhdn.Value <> "" Then
+            SQLStr += " AND LT1.TORICODE in (" & WF_TORIhdn.Value & ")"
         End If
         '部署
-        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORI.SelectedValue)
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORIhdn.Value)
         If ApiInfo.Count > 0 Then
             SQLStr += " AND LT1.ORDERORG in ("
             For j As Integer = 0 To ApiInfo.Count - 1
@@ -640,7 +638,7 @@ Public Class LNT0001ZissekiZero
         End If
 
         work.WF_SEL_YM.Text = WF_TaishoYm.Value
-        work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
+        'work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -654,6 +652,9 @@ Public Class LNT0001ZissekiZero
         '○ 画面表示データ取得
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+
+            ' 画面選択された荷主を取得
+            SelectTori()
 
             MAPDataGet(SQLcon)
         End Using
@@ -929,6 +930,36 @@ Public Class LNT0001ZissekiZero
             CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+
+    End Sub
+    ''' <summary>
+    ''' 荷主プルダウン選択値取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub SelectTori()
+
+        Me.WF_TORIhdn.Value = ""
+        Me.WF_TORINAMEhdn.Value = ""
+
+        If Me.WF_TORI.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To WF_TORI.Items.Count - 1
+                If WF_TORI.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_TORIhdn.Value = WF_TORI.Items(index).Value
+                        Me.WF_TORINAMEhdn.Value = WF_TORI.Items(index).Text
+                        intSelCnt = 1
+                    Else
+                        Me.WF_TORIhdn.Value = Me.WF_TORIhdn.Value & "," & WF_TORI.Items(index).Value
+                        Me.WF_TORINAMEhdn.Value = Me.WF_TORINAMEhdn.Value & "," & WF_TORI.Items(index).Text
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
 
     End Sub
 
