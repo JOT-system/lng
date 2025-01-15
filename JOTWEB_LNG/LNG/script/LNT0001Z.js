@@ -17,6 +17,22 @@ function InitDisplay() {
         });
     });
 
+    //　荷主複数選択
+    $(document).ready(function () {
+        $("#contents1_WF_TORI").multiselect({
+            menuHeight: 390,
+            noneSelectedText: "選択してください",
+            selectedText: "# 個選択",
+            autoopen: false,
+            multiple: true,
+            buttonWidth: 330,
+
+            position: {
+                my: 'center',
+                at: 'center'
+            }
+        });
+    });
 }
 
 /**

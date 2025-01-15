@@ -35,3 +35,84 @@ p {
     margin-bottom: 0rem;
 }
 
+/*--------------------------------------------------------------
+# 荷主複数選択
+--------------------------------------------------------------*/
+.divDdlArea select.ddlSelectControl {
+    height: 32px;
+    width: 150px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+    .divDdlArea select.ddlSelectControl:not(:disabled) {
+        cursor: pointer;
+    }
+
+    .divDdlArea select.ddlSelectControl:disabled {
+        background-color: #f3f3f3;
+    }
+
+    .divDdlArea select.ddlSelectControl:not(:disabled):hover {
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+
+.divItem {
+    width: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 8px;
+}
+
+.divDdlArea select.ddlSelectControl {
+    height: 32px;
+    width: 150px;
+    font-size: 12pt;
+    padding: 2px;
+    border-color: #cfcfcf;
+    outline: none;
+}
+
+.divDdlArea input.txtlblbox {
+    text-align: left;
+    border: none;
+    width: 40px;
+    height: 30px;
+    vertical-align: middle;
+    background: transparent;
+}
+
+    .divDdlArea input.txtlblbox:hover {
+        background: transparent;
+        color: #333;
+    }
+
+.divDdlArea input.txtlblbox2 {
+    text-align: left;
+    border: none;
+    width: 70px;
+    height: 30px;
+    vertical-align: middle;
+    background: transparent;
+}
+
+    .divDdlArea input.txtlblbox2:hover {
+        background: transparent;
+        color: #333;
+    }
+
+/* ui-multiselect*/
+.ui-multiselect {
+    height: 32px;
+    border-color: #cfcfcf;
+    border-radius: 0;
+    color: #333;
+    font-weight: normal;
+    font-size: 13px;
+}
