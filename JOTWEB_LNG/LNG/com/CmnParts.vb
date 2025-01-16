@@ -261,4 +261,199 @@ Public Class CmnParts
 
     End Sub
 
+    ''' <summary>
+    ''' 固定費マスタTBL検索
+    ''' </summary>
+    Public Sub SelectKOTEIHIMaster(ByVal SQLcon As MySqlConnection,
+                                   ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtKOTEIHIMas As DataTable,
+                                   Optional ByVal I_RIKUBAN As String = Nothing)
+        If IsNothing(O_dtKOTEIHIMas) Then
+            O_dtKOTEIHIMas = New DataTable
+        End If
+        If O_dtKOTEIHIMas.Columns.Count <> 0 Then
+            O_dtKOTEIHIMas.Columns.Clear()
+        End If
+        O_dtKOTEIHIMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0007.TORICODE "
+        SQLStr &= "   ,LNM0007.TORINAME "
+        SQLStr &= "   ,LNM0007.ORGCODE "
+        SQLStr &= "   ,LNM0007.ORGNAME "
+        SQLStr &= "   ,LNM0007.KASANORGCODE "
+        SQLStr &= "   ,LNM0007.KASANORGNAME "
+        SQLStr &= "   ,LNM0007.STYMD "
+        SQLStr &= "   ,LNM0007.ENDYMD "
+        SQLStr &= "   ,LNM0007.SYABAN "
+        SQLStr &= "   ,LNM0007.RIKUBAN "
+        SQLStr &= "   ,LNM0007.SYAGATA "
+        SQLStr &= "   ,LNM0007.SYAGATANAME "
+        SQLStr &= "   ,LNM0007.SYABARA "
+        SQLStr &= "   ,LNM0007.KOTEIHI "
+        SQLStr &= "   ,LNM0007.BIKOU1 "
+        SQLStr &= "   ,LNM0007.BIKOU2 "
+        SQLStr &= "   ,LNM0007.BIKOU3 "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0007_KOTEIHI LNM0007 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0007.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0007.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0007.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0007.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0007.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_RIKUBAN) Then
+            SQLStr &= String.Format(" AND LNM0007.RIKUBAN = '{0}' ", I_RIKUBAN)
+        End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtKOTEIHIMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtKOTEIHIMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 八戸特別料金マスタTBL検索
+    ''' </summary>
+    Public Sub SelectHACHINOHESPRATEMaster(ByVal SQLcon As MySqlConnection,
+                                           ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtHACHINOHESPRATEMas As DataTable,
+                                           Optional ByVal I_KASANORGCODE As String = Nothing)
+        If IsNothing(O_dtHACHINOHESPRATEMas) Then
+            O_dtHACHINOHESPRATEMas = New DataTable
+        End If
+        If O_dtHACHINOHESPRATEMas.Columns.Count <> 0 Then
+            O_dtHACHINOHESPRATEMas.Columns.Clear()
+        End If
+        O_dtHACHINOHESPRATEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0010.RECOID "
+        SQLStr &= "   ,LNM0010.RECONAME "
+        SQLStr &= "   ,LNM0010.TORICODE "
+        SQLStr &= "   ,LNM0010.TORINAME "
+        SQLStr &= "   ,LNM0010.ORGCODE "
+        SQLStr &= "   ,LNM0010.ORGNAME "
+        SQLStr &= "   ,LNM0010.KASANORGCODE "
+        SQLStr &= "   ,LNM0010.KASANORGNAME "
+        SQLStr &= "   ,LNM0010.STYMD "
+        SQLStr &= "   ,LNM0010.ENDYMD "
+        SQLStr &= "   ,LNM0010.KINGAKU "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0010_HACHINOHESPRATE LNM0010 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0010.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0010.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0010.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0010.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0010.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_KASANORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0010.KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtHACHINOHESPRATEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtHACHINOHESPRATEMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' ENEOS業務委託料マスタTBL検索
+    ''' </summary>
+    Public Sub SelectENEOSCOMFEEMaster(ByVal SQLcon As MySqlConnection,
+                                       ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtENEOSCOMFEEMas As DataTable,
+                                       Optional ByVal I_KASANORGCODE As String = Nothing)
+        If IsNothing(O_dtENEOSCOMFEEMas) Then
+            O_dtENEOSCOMFEEMas = New DataTable
+        End If
+        If O_dtENEOSCOMFEEMas.Columns.Count <> 0 Then
+            O_dtENEOSCOMFEEMas.Columns.Clear()
+        End If
+        O_dtENEOSCOMFEEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0011.RECOID "
+        SQLStr &= "   ,LNM0011.RECONAME "
+        SQLStr &= "   ,LNM0011.TORICODE "
+        SQLStr &= "   ,LNM0011.TORINAME "
+        SQLStr &= "   ,LNM0011.ORGCODE "
+        SQLStr &= "   ,LNM0011.ORGNAME "
+        SQLStr &= "   ,LNM0011.KASANORGCODE "
+        SQLStr &= "   ,LNM0011.KASANORGNAME "
+        SQLStr &= "   ,LNM0011.STYMD "
+        SQLStr &= "   ,LNM0011.ENDYMD "
+        SQLStr &= "   ,LNM0011.KINGAKU "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0011_ENEOSCOMFEE LNM0011 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0011.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0011.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0011.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0011.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0011.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_KASANORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0011.KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtENEOSCOMFEEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtENEOSCOMFEEMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
 End Class
