@@ -23,6 +23,7 @@ Public Class LNT0001InvoiceOutput
     Private LNT0001Koteihi As DataTable                              '-- 固定費マスタ
     Private LNT0001HachinoheSprate As DataTable                      '-- 八戸特別料金マスタ
     Private LNT0001EneosComfee As DataTable                          '-- ENEOS業務委託料マスタ
+    Private LNS0006tbl As DataTable                                  '固定値マスタ格納用テーブル
     ''' <summary>
     ''' 定数
     ''' </summary>
@@ -44,10 +45,6 @@ Public Class LNT0001InvoiceOutput
     Private WW_RtnSW As String = ""
     Private WW_Dummy As String = ""
     Private WW_ErrCode As String                                    'サブ用リターンコード
-
-    Private ListShippersInvoice As New ListBox
-    Private ListShippersInvoiceExcel As New ListBox
-    Private ListFileName As New ListBox
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -164,11 +161,8 @@ Public Class LNT0001InvoiceOutput
         ' ドロップダウンリスト（荷主）作成
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
         GS0007FIXVALUElst.CLAS = "INVOICE"
-        GS0007FIXVALUElst.LISTBOX1 = ListShippersInvoice
-        GS0007FIXVALUElst.LISTBOX2 = ListShippersInvoiceExcel
-        GS0007FIXVALUElst.LISTBOX3 = ListFileName
-        GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
-        GS0007FIXVALUElst.GS0007FIXVALUElst()
+        GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = "VALUE4 ASC"
+        LNS0006tbl = GS0007FIXVALUElst.GS0007FIXVALUETbl()
         If Not isNormal(GS0007FIXVALUElst.ERR) Then
             Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "固定値取得エラー")
             Exit Sub
@@ -179,11 +173,11 @@ Public Class LNT0001InvoiceOutput
 
         WF_TORI.Items.Clear()
         WF_TORI.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To ListShippersInvoice.Items.Count - 1
-            Dim wOrg As String = ListShippersInvoice.Items(i).Value
-            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+        For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
             If exists Then
-                WF_TORI.Items.Add(New ListItem(ListShippersInvoice.Items(i).Text, ListShippersInvoice.Items(i).Value))
+                WF_TORI.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE1"), LNS0006tbl.Rows(i)("KEYCODE")))
             End If
 
         Next
@@ -191,27 +185,57 @@ Public Class LNT0001InvoiceOutput
 
         WF_TORIEXL.Items.Clear()
         WF_TORIEXL.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To ListShippersInvoiceExcel.Items.Count - 1
-            Dim wOrg As String = ListShippersInvoice.Items(i).Value
-            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+        For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
             If exists Then
-                WF_TORIEXL.Items.Add(New ListItem(ListShippersInvoiceExcel.Items(i).Text, ListShippersInvoiceExcel.Items(i).Value))
+                WF_TORIEXL.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE2"), LNS0006tbl.Rows(i)("KEYCODE")))
             End If
         Next
-        WF_TORIEXL.SelectedValue = 0
+        WF_TORIEXL.SelectedIndex = 0
 
         WF_FILENAME.Items.Clear()
         WF_FILENAME.Items.Add(New ListItem("選択してください", ""))
-        For i As Integer = 0 To ListFileName.Items.Count - 1
-            Dim wOrg As String = ListShippersInvoice.Items(i).Value
-            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like p + "*")
+        For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
             If exists Then
-                WF_FILENAME.Items.Add(New ListItem(ListFileName.Items(i).Text, ListFileName.Items(i).Value))
+                WF_FILENAME.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE3"), LNS0006tbl.Rows(i)("KEYCODE")))
             End If
         Next
-        WF_FILENAME.SelectedValue = 0
+        WF_FILENAME.SelectedIndex = 0
 
+        '取引先、部署（部署は、カンマ区切りで複数あり）
+        WF_TORIORG.Items.Clear()
+        WF_TORIORG.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_TORIORG.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE5"), wOrg))
+            End If
+
+        Next
+        WF_TORIORG.SelectedIndex = 0
     End Sub
+
+    Protected Function EditOrgCsv(ByVal iRow As DataRow) As String
+        Dim rtnStr As String = ""
+
+        For i As Integer = 6 To 20
+            Dim colName As String = "VALUE" & i.ToString
+            If iRow(colName) <> "" Then
+                If rtnStr.Length = 0 Then
+                    rtnStr = iRow(colName)
+                Else
+                    rtnStr += ","
+                    rtnStr += iRow(colName)
+                End If
+            End If
+        Next
+
+        Return rtnStr
+    End Function
 
     ''' <summary>
     ''' GridViewデータ設定
@@ -572,10 +596,12 @@ Public Class LNT0001InvoiceOutput
             & " FROM                                                                " _
             & "     LNG.LNT0001_ZISSEKI LT1                                         " _
             & " WHERE                                                               " _
-            & "     LT1.ORDERORGCODE = @P1                                          " _
-            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
+            & "     date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
+            & " AND LT1.TORICODE = @P5                                              " _
             & " AND LT1.ZISSEKI <> 0                                                "
+
+        SQLStr &= " AND LT1.ORDERORGCODE in (" & WF_TORIORG.SelectedValue & ")"
 
         '〇西日本支店車庫
         If Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022702 + "01" Then
@@ -598,7 +624,8 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
                 Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
-                PARA1.Value = Mid(WF_TORI.SelectedValue, 1, 6)
+                Dim PARA5 As MySqlParameter = SQLcmd.Parameters.Add("@P5", MySqlDbType.VarChar)  '取引先コード
+                PARA1.Value = WF_TORIORG.SelectedValue
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                     PARA2.Value = WF_TaishoYm.Value & "/01"
                     PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
@@ -608,6 +635,7 @@ Public Class LNT0001InvoiceOutput
                 End If
                 Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
                 PARA4.Value = lastMonth
+                PARA5.Value = WF_TORIORG.SelectedItem.Text
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -801,12 +829,11 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
-        If Me.WF_TORI.SelectedItem.Text = "西部ガス　LNG請求書明細" Then
-            Dim prtTbl As New DataTable
-            '〇(帳票)項目チェック処理
-            WW_ReportCheckSAIBU(Me.WF_TORI.SelectedItem.Text, prtTbl)
+        'エスジーリキッドサービス（西部ガス）
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_024001 Then
+            '〇(帳票)項目チェック処理(西部ガス)
+            Dim LNT0001InvoiceOutputSAIBU As New LNT0001InvoiceOutputSAIBU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, taishoYm:=Me.WF_TaishoYm.Value)
 
-            Dim LNT0001InvoiceOutputSAIBU As New LNT0001InvoiceOutputSAIBU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, prtTbl, taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputSAIBU.CreateExcelPrintData()
@@ -955,6 +982,7 @@ Public Class LNT0001InvoiceOutput
             Case "WF_TORI"
                 Me.WF_TORIEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
+                Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
         End Select
 
     End Sub
@@ -1420,139 +1448,6 @@ Public Class LNT0001InvoiceOutput
 
         Catch ex As Exception
         End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' (帳票)項目チェック処理（西部ガス）
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckSAIBU(ByVal reportName As String, ByRef oTbl As DataTable)
-
-        Dim TODOKE_003769 As String = "003769"      'エコア中津ガス
-        Dim dtKyushuTodoke As New DataTable
-        Dim arrToriCode As String() = {"", ""}
-
-        arrToriCode(0) = BaseDllConst.CONST_TORICODE_0045300000
-        arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_024001
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, "SAIBU_KYUSHU_TODOKE", dtKyushuTodoke, I_ORDERBY_KEY:="VALUE01")
-            '単価取得は、とりあえず使えそうなのでそのまま利用する
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", "SAIBU_KYUSHU_TODOKE", LNT0001Tanktbl)
-        End Using
-
-        '届先毎グルーピングして数量をサマリー（LINQを使う）
-        'エコア以外
-        Dim query = From row In LNT0001tbl.AsEnumerable()
-                    Where row.Field(Of String)("TODOKECODE") <> TODOKE_003769
-                    Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-                    Select New With {
-                            .TODOKECODE = TODOKECODE,
-                            .DAISU = Group.Count(),
-                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-                        }
-        'エコア１回転
-        Dim query01 = From row In LNT0001tbl.AsEnumerable()
-                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-                            row.Field(Of String)("TRIP") = 1
-                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-                      Select New With {
-                            .TODOKECODE = TODOKECODE,
-                            .DAISU = Group.Count(),
-                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-                        }
-        'エコア２回転
-        Dim query02 = From row In LNT0001tbl.AsEnumerable()
-                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-                            row.Field(Of String)("TRIP") = 2
-                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-                      Select New With {
-                            .TODOKECODE = TODOKECODE,
-                            .DAISU = Group.Count(),
-                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-                        }
-
-        ' 保存データ領域
-        Dim prtTbl As New DataTable
-
-        prtTbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
-        prtTbl.Columns.Add("TODOKECODE", Type.GetType("System.String"))
-        prtTbl.Columns.Add("TODOKECLASS", Type.GetType("System.String"))
-        prtTbl.Columns.Add("TODOKENAME", Type.GetType("System.String"))
-        prtTbl.Columns.Add("TANKA", Type.GetType("System.Int32"))
-        prtTbl.Columns.Add("DAISU", Type.GetType("System.Int32"))
-        prtTbl.Columns.Add("ZISSEKI", Type.GetType("System.Decimal"))
-        prtTbl.Columns.Add("SETCELL01", Type.GetType("System.String"))
-        prtTbl.Columns.Add("SETCELL02", Type.GetType("System.String"))
-        prtTbl.Columns.Add("SETCELL03", Type.GetType("System.String"))
-        prtTbl.Columns.Add("SETCELL04", Type.GetType("System.String"))
-
-        '〇請求書出力情報を保存
-        For Each dtKyushuTodokerow As DataRow In dtKyushuTodoke.Rows
-            Dim prtRow As DataRow = prtTbl.NewRow
-            prtRow("ROWSORTNO") = dtKyushuTodokerow("VALUE01")
-            prtRow("SETCELL01") = dtKyushuTodokerow("VALUE02") & dtKyushuTodokerow("VALUE06")
-            prtRow("SETCELL02") = dtKyushuTodokerow("VALUE03") & dtKyushuTodokerow("VALUE06")
-            prtRow("SETCELL03") = dtKyushuTodokerow("VALUE04") & dtKyushuTodokerow("VALUE06")
-            prtRow("SETCELL04") = dtKyushuTodokerow("VALUE05") & dtKyushuTodokerow("VALUE06")
-            prtRow("TODOKECODE") = dtKyushuTodokerow("KEYCODE01")
-            prtRow("TODOKECLASS") = dtKyushuTodokerow("KEYCODE02")
-            prtRow("TODOKENAME") = dtKyushuTodokerow("KEYCODE03")
-            prtRow("TANKA") = 0
-            prtRow("DAISU") = 0
-            prtRow("ZISSEKI") = 0
-            prtTbl.Rows.Add(prtRow)
-        Next
-
-        ' 表示情報を付加（台数、数量）
-        'エコア以外
-        For Each result In query
-            For Each prtRow In prtTbl.Rows
-                If prtRow("TODOKECODE") = result.TODOKECODE Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
-        'エコア１回転
-        For Each result In query01
-            For Each prtRow In prtTbl.Rows
-                If prtRow("TODOKECODE") = result.TODOKECODE AndAlso
-                   prtRow("TODOKECLASS") = "1" Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
-        'エコア２回転
-        For Each result In query02
-            For Each prtRow In prtTbl.Rows
-                If prtRow("TODOKECODE") = result.TODOKECODE AndAlso
-                   prtRow("TODOKECLASS") = "2" Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
-
-        '単価設定
-        For Each result As DataRow In LNT0001Tanktbl.Rows
-            For Each prtRow In prtTbl.Rows
-                If prtRow("TODOKECODE") = result("TODOKECODE") AndAlso
-                   prtRow("TODOKECLASS") = CInt(result("TODOKEBRANCHCODE")).ToString Then
-                    prtRow("TANKA") = result("TANKA")
-                    Exit For
-                End If
-            Next
-        Next
-        oTbl = prtTbl.Copy
 
     End Sub
 
