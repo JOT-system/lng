@@ -149,7 +149,10 @@ Public Class LNM0006TankaSearch
             'Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効開始日
             WF_StYMDCode.Value = Date.Now.ToString("yyyy/MM/dd")
 
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006L Then
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006L Or
+                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006D Or
+                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006H Then
+
             ' 実行画面からの遷移
             '情シス、高圧ガス以外
             If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then

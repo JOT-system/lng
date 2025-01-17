@@ -65,7 +65,7 @@ Public Class LNS0001UserDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonUPDATE"          '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_ButtonCLEAR"           '戻るボタン押下
+                        Case "WF_ButtonCLEAR", "LNS0001L", "LNS0001S"  '戻るボタン押下（LNS0001L、LNS0001Sは、パンくずより）
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -170,8 +170,14 @@ Public Class LNS0001UserDetail
             Me.ddlSelectORG.Items.Clear()
             Me.ddlSelectORG.Items.Add("")
 
+            Dim retOfficeList As New DropDownList
+
             '組織ドロップダウンの生成
-            Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+            If TxtCampCode.Text = "" Then
+                retOfficeList = CmnLng.getDowpDownFixedList(work.WF_SEL_CAMPCODE_D.Text, "ORGCODEDROP")
+            Else
+                retOfficeList = CmnLng.getDowpDownFixedList(TxtCampCode.Text, "ORGCODEDROP")
+            End If
 
             If retOfficeList.Items.Count > 0 Then
                 '情シス、高圧ガス以外
@@ -239,7 +245,7 @@ Public Class LNS0001UserDetail
         '終了年月日
         WF_EndYMD.Value = work.WF_SEL_ENDYMD2.Text.ToString.Replace("/", "-")
         '会社コード
-        TxtCampCode.Text = work.WF_SEL_CAMPCODE.Text
+        TxtCampCode.Text = work.WF_SEL_CAMPCODE_D.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
         '組織コード
         ddlSelectORG.SelectedValue = work.WF_SEL_ORG2.Text
@@ -304,6 +310,15 @@ Public Class LNS0001UserDetail
             If TxtUserId.Text <> Master.USERID Then
                 DisabledKeyItemPass.Value = work.WF_SEL_USERID.Text
             End If
+        End If
+
+        '情報システム部の場合
+        If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+            DisabledKeySystem.Value = CONST_OFFICECODE_SYSTEM
+            TxtCampCode.Enabled = True
+        Else
+            DisabledKeySystem.Value = ""
+            TxtCampCode.Enabled = False
         End If
 
         '○ サイドメニューへの値設定
@@ -1776,6 +1791,13 @@ Public Class LNS0001UserDetail
             End If
         Next
 
+        'パンくずから検索を選択した場合
+        If WF_ButtonClick.Value = "LNS0001S" Then
+            WF_BeforeMAPID.Value = LNS0001WRKINC.MAPIDL
+        Else
+            WF_BeforeMAPID.Value = LNS0001WRKINC.MAPIDD
+        End If
+
         If WW_InputChangeFlg Then
             ' 変更がある場合は、確認ダイアログを表示
             Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
@@ -1804,6 +1826,7 @@ Public Class LNS0001UserDetail
         WF_FIELD_REP.Value = ""
         WF_LeftboxOpen.Value = ""
 
+        Master.MAPID = WF_BeforeMAPID.Value
         Master.TransitionPrevPage()
 
     End Sub
@@ -1899,6 +1922,13 @@ Public Class LNS0001UserDetail
                     Case Else
                         ' フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
+                            Case "TxtCampCode"               '会社コード
+                                If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+                                    ' 情報システムの場合
+                                    WW_PrmData = work.CreateCOMPANYParam(GL0001CompList.LC_COMPANY_TYPE.ALL, TxtCampCode.Text)
+                                Else
+                                    WW_PrmData = work.CreateCOMPANYParam(GL0001CompList.LC_COMPANY_TYPE.ROLE, TxtCampCode.Text)
+                                End If
                             Case "TxtOrg"         '組織コード
                                 If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
                                     ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
@@ -1936,6 +1966,10 @@ Public Class LNS0001UserDetail
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
+            Case "TxtCampCode"                   '会社コード
+                CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_Dummy)
+                createListBox()
+                TxtCampCode.Focus()
             Case "TxtPassword"    'パスワード
                 TxtPassword.Attributes("Value") = work.WF_SEL_PASSWORD.Text
                 TxtPassword.Focus()
@@ -2122,6 +2156,11 @@ Public Class LNS0001UserDetail
         '○ 選択内容を画面項目へセット
         If String.IsNullOrEmpty(WF_FIELD_REP.Value) Then
             Select Case WF_FIELD.Value
+                Case "TxtCampCode"      '会社コード
+                    TxtCampCode.Text = WW_SelectValue
+                    LblCampCodeName.Text = WW_SelectText
+                    createListBox()
+                    TxtCampCode.Focus()
                 Case "TxtDelFlg"      '削除フラグ
                     TxtDelFlg.Text = WW_SelectValue
                     LblDelFlgName.Text = WW_SelectText
@@ -2205,6 +2244,8 @@ Public Class LNS0001UserDetail
             Select Case WF_FIELD.Value
                 Case "TxtDelFlg"            '削除フラグ
                     TxtDelFlg.Focus()
+                Case "TxtCampCode"          '会社コード
+                    TxtCampCode.Focus()
                 Case "TxtPassEndYMD"        'パスワード有効期限
                     TxtPassEndYMD.Focus()
                 Case "WF_StYMD"             '有効年月日(From)

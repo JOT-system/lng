@@ -15,6 +15,17 @@ function InitDisplay() {
 
 }
 
+// 画面読み込み時処理
+window.onload = function () {
+    //表示判断キー
+    const DisabledKeySystem = document.getElementById('DisabledKeySystem').value;
+
+    //情報システム部以外でログインした場合、変更履歴をを非表示にする
+    if (DisabledKeySystem == "") {
+        document.getElementById('WF_ButtonHISTORY').style.display = "none";
+    }
+}
+
 /**
  * スプレッドシート・ダブルクリック処理
  */

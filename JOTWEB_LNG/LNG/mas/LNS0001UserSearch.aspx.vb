@@ -105,8 +105,17 @@ Public Class LNS0001UserSearch
             Me.ddlSelectORG.Items.Clear()
             Me.ddlSelectORG.Items.Add("")
 
+            Dim retOfficeList As New DropDownList
+
             '組織ドロップダウンの生成
-            Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+            Select Case True
+                Case TxtCampCode.Text <> ""
+                    retOfficeList = CmnLng.getDowpDownFixedList(TxtCampCode.Text, "ORGCODEDROP")
+                Case work.WF_SEL_CAMPCODE_S.Text <> ""
+                    retOfficeList = CmnLng.getDowpDownFixedList(work.WF_SEL_CAMPCODE_S.Text, "ORGCODEDROP")
+                Case Else
+                    retOfficeList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+            End Select
 
             If retOfficeList.Items.Count > 0 Then
                 '情シス、高圧ガス以外
@@ -151,16 +160,21 @@ Public Class LNS0001UserSearch
             work.Initialize()
 
             ' 初期変数設定処理
+            Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
             Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
             WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
 
             WF_EndYMDCode.Value = ""                                            '有効年月日(To)
             ddlSelectORG.SelectedValue = ""                                               '組織コード
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Then
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001L Or
+                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001D Or
+                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNS0001H Then
+
             ' 実行画面からの遷移
-            WF_StYMDCode.Value = work.WF_SEL_STYMD.Text    '有効年月日(From)
-            WF_EndYMDCode.Value = work.WF_SEL_ENDYMD.Text  '有効年月日(To)
-            ddlSelectORG.SelectedValue = work.WF_SEL_ORG.Text        '組織コード
+            TxtCampCode.Text = work.WF_SEL_CAMPCODE_S.Text   '会社コード
+            WF_StYMDCode.Value = work.WF_SEL_STYMD_S.Text    '有効年月日(From)
+            WF_EndYMDCode.Value = work.WF_SEL_ENDYMD_S.Text  '有効年月日(To)
+            ddlSelectORG.SelectedValue = work.WF_SEL_ORG_S.Text        '組織コード
             ' 論理削除フラグ
             If work.WF_SEL_DELDATAFLG.Text = "1" Then
                 ChkDelDataFlg.Checked = True
@@ -175,13 +189,13 @@ Public Class LNS0001UserSearch
             work.Initialize()
 
             ' 初期変数設定処理
+            Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
             Master.GetFirstValue(Master.USERCAMP, "STYMD", WF_StYMDCode.Value)  '有効年月日(From)
             WF_StYMDCode.Value = WF_StYMDCode.Value.ToString
 
             WF_EndYMDCode.Value = ""                                            '有効年月日(To)
             ddlSelectORG.SelectedValue = ""                                               '組織コード
         End If
-        Master.GetFirstValue(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text)  '会社コード
 
         ' 会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
         'Me.TxtOrgCode.Attributes("onkeyPress") = "CheckNum()"
@@ -207,9 +221,18 @@ Public Class LNS0001UserSearch
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
 
-
         '○ 名称設定処理
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_Dummy)  '会社コード
+
+        'Disabled制御項目
+        '情報システム部の場合
+        If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+            DisabledKeySystem.Value = CONST_OFFICECODE_SYSTEM
+            TxtCampCode.Enabled = True
+        Else
+            DisabledKeySystem.Value = ""
+            TxtCampCode.Enabled = False
+        End If
 
     End Sub
 
@@ -221,6 +244,7 @@ Public Class LNS0001UserSearch
     Protected Sub WF_ButtonSEARCH_Click()
 
         '○ 入力文字置き換え(使用禁止文字排除)
+        Master.EraseCharToIgnore(TxtCampCode.Text)             '会社コード
         Master.EraseCharToIgnore(WF_StYMDCode.Value)             '有効年月日(From)
         Master.EraseCharToIgnore(WF_EndYMDCode.Value)            '有効年月日(To)
         Master.EraseCharToIgnore(ddlSelectORG.SelectedValue)               '組織コード
@@ -232,9 +256,10 @@ Public Class LNS0001UserSearch
         End If
 
         '○ 条件選択画面の入力値退避
-        work.WF_SEL_STYMD.Text = WF_StYMDCode.Value.ToString     '有効年月日(From)
-        work.WF_SEL_ENDYMD.Text = WF_EndYMDCode.Value.ToString   '有効年月日(To)
-        work.WF_SEL_ORG.Text = ddlSelectORG.SelectedValue                  '組織コード
+        work.WF_SEL_CAMPCODE_S.Text = TxtCampCode.Text     '会社コード
+        work.WF_SEL_STYMD_S.Text = WF_StYMDCode.Value.ToString     '有効年月日(From)
+        work.WF_SEL_ENDYMD_S.Text = WF_EndYMDCode.Value.ToString   '有効年月日(To)
+        work.WF_SEL_ORG_S.Text = ddlSelectORG.SelectedValue                  '組織コード
         ' 論理削除フラグ
         If ChkDelDataFlg.Checked = True Then
             work.WF_SEL_DELDATAFLG.Text = "1"
@@ -267,6 +292,26 @@ Public Class LNS0001UserSearch
         Dim WW_CS0024FCheckReport As String = ""
         Dim WW_StrDate As Date
         Dim WW_EndDate As Date
+
+        ' 会社コード
+        Master.CheckField(Master.USERCAMP, "CAMPCODE", TxtCampCode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            If Not String.IsNullOrEmpty(ddlSelectORG.SelectedValue) Then
+                ' 名称存在チェック
+                CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
+                If Not isNormal(WW_RtnSW) Then
+                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "会社コード : " & ddlSelectORG.SelectedValue, needsPopUp:=True)
+                    TxtCampCode.Focus()
+                    O_RTN = "ERR"
+                    Exit Sub
+                End If
+            End If
+        Else
+            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "会社コード", needsPopUp:=True)
+            ddlSelectORG.Focus()
+            O_RTN = "ERR"
+            Exit Sub
+        End If
 
         ' 有効年月日(From)
         If WF_StYMDCode.Value = "" Then
@@ -386,13 +431,24 @@ Public Class LNS0001UserSearch
                         End Select
                         .ActiveCalendar()
                     Case Else
-                        If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
-                            ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
-                            WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, TxtCampCode.Text)
-                        Else
-                            ' その他の場合、操作ユーザーの組織のみ取得
-                            WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, TxtCampCode.Text)
-                        End If
+                        ' フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "TxtCampCode"               '会社コード
+                                If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+                                    ' 情報システムの場合
+                                    WW_PrmData = work.CreateCOMPANYParam(GL0001CompList.LC_COMPANY_TYPE.ALL, TxtCampCode.Text)
+                                Else
+                                    WW_PrmData = work.CreateCOMPANYParam(GL0001CompList.LC_COMPANY_TYPE.ROLE, TxtCampCode.Text)
+                                End If
+                        End Select
+
+                        'If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+                        '    ' 情報システムの場合、操作ユーザーが所属する会社の組織を全て取得
+                        '    WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY_WITH_CMPORG, TxtCampCode.Text)
+                        'Else
+                        '    ' その他の場合、操作ユーザーの組織のみ取得
+                        '    WW_PrmData = work.CreateORGParam(GL0002OrgList.LS_AUTHORITY_WITH.NO_AUTHORITY, TxtCampCode.Text)
+                        'End If
 
                         .SetListBox(WF_LeftMViewChange.Value, WW_Dummy, WW_PrmData)
                         .ActiveListBox()
@@ -409,6 +465,13 @@ Public Class LNS0001UserSearch
     Protected Sub WF_FiledChange()
 
         '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+            Case "TxtCampCode"                   '会社コード
+                CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_Dummy)
+                                    createListBox()
+                TxtCampCode.Focus()
+        End Select
+
         'CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_RtnSW)  '組織コード
         'TxtOrgCode.Focus()
 
@@ -442,6 +505,11 @@ Public Class LNS0001UserSearch
 
         '○ 選択内容を画面項目へセット
         Select Case WF_FIELD.Value
+            Case "TxtCampCode"      '会社コード
+                TxtCampCode.Text = WW_SelectValue
+                LblCampCodeName.Text = WW_SelectText
+                createListBox()
+                TxtCampCode.Focus()
             Case "WF_StYMDCode"             '有効年月日(From)
                 Try
                     Date.TryParse(leftview.WF_Calendar.Text, WW_SelectDate)
@@ -490,6 +558,8 @@ Public Class LNS0001UserSearch
                 WF_StYMDCode.Focus()
             Case "WF_EndYMDCode"            '有効年月日(To)
                 WF_EndYMDCode.Focus()
+            Case "TxtCampCode"      '会社コード
+                TxtCampCode.Focus()
                 'Case "TxtOrgCode"               '組織コード
                 '    TxtOrgCode.Focus()
         End Select

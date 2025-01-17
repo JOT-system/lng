@@ -422,7 +422,7 @@ p {
     }
 
 
-#TxtSelLineCNT, #TxtDelFlg, #TxtMissCNT, #TxtOrg, #TxtSYABARA {
+#TxtSelLineCNT, #TxtDelFlg, #TxtMissCNT, #TxtOrg, #TxtCampCode, #TxtSYABARA {
     text-align: right !important;
 }
 
@@ -433,6 +433,10 @@ p {
 
 #WF_ENDYMD_L {
     margin-left: -13px;
+}
+
+#LF_LEFTBOX {
+    width: 450px !important;
 }
 
 .ddlSelectControl {

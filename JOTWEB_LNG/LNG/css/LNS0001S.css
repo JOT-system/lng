@@ -93,10 +93,15 @@ p {
     margin-top: calc(100% - 0px) !important;
 }
 
+#LF_LEFTBOX {
+    width: 450px !important;
+}
+
 .ddlSelectControl {
     height: 30px;
     width: 180px;
     font-size: 12pt;
     padding: 2px;
 }
+
 

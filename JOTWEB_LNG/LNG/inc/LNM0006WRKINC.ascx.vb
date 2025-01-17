@@ -493,8 +493,9 @@ Public Class LNM0006WRKINC
         SQLStr.AppendLine("   AND KASANORGCODE  = @KASANORGCODE         ")
         SQLStr.AppendLine("   AND TODOKECODE  = @TODOKECODE             ")
         SQLStr.AppendLine("   AND BRANCHCODE  = @BRANCHCODE             ")
+        SQLStr.AppendLine("   AND DELFLG  = '0'             ")
         'SQLStr.AppendLine("   AND  @STYMD BETWEEN STYMD AND ENDYMD      ")
-        SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        'SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -504,7 +505,7 @@ Public Class LNM0006WRKINC
                 Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6) '届先コード
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
                 'Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date) '有効開始日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date) '有効終了日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date) '有効終了日
 
                 P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
@@ -512,7 +513,7 @@ Public Class LNM0006WRKINC
                 P_TODOKECODE.Value = WW_ROW("TODOKECODE") '届先コード
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
                 'P_STYMD.Value = CDate(WW_ROW("STYMD")) '有効開始日
-                P_ENDYMD.Value = CDate(MAX_ENDYMD) '有効終了日
+                'P_ENDYMD.Value = CDate(MAX_ENDYMD) '有効終了日
 
                 Dim WW_Tbl = New DataTable
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -565,6 +566,7 @@ Public Class LNM0006WRKINC
         SQLStr.AppendLine("   AND BRANCHCODE  = @BRANCHCODE             ")
         SQLStr.AppendLine("   AND  @STYMD BETWEEN STYMD AND ENDYMD      ")
         SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') <> COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        SQLStr.AppendLine("   AND DELFLG  = '0'             ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)

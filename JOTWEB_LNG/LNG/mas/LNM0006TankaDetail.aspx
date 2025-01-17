@@ -32,14 +32,14 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
-                        <li class="breadcrumb-item active">単価マスタ（検索）</li>
-                        <li class="breadcrumb-item active">単価マスタ（一覧）</li>
-                        <li class="breadcrumb-item active" aria-current="page">単価マスタ（詳細）</li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
+                        <li class="breadcrumb-item active" id="PAGE_SEARCH"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006S');">単価マスタ（検索）</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006L');">単価マスタ（一覧）</a></li>
+                        <li class="breadcrumb-item active" id="PAGE_NAME1" aria-current="page">単価マスタ（詳細）</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">単価マスタ詳細</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title" id="PAGE_NAME2">単価マスタ詳細</h2>
                     <div class="Operation">
                             <div class="actionButtonBox">
                                 <div class="rightSide">
@@ -250,6 +250,8 @@
 
         <!-- 入力不可制御項目 -->
         <input id="DisabledKeyItem" runat="server" value="" type="text" />
+        <input id="DisabledKeyOrgCount" runat="server" value="" type="text" />
+        <input id="DisabledKeyToriCount" runat="server" value="" type="text" />
         <!-- 表示制御項目 -->
         <input id="VisibleKeyOrgCode" runat="server" value="" type="text" />
 
@@ -282,6 +284,8 @@
             
         <!-- ボタン押下 -->
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
+        <!-- 前の遷移先 -->
+        <input id="WF_BeforeMAPID" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
 

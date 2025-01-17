@@ -86,6 +86,15 @@ Partial Public Class LNS0001UserList
     Protected WithEvents work As Global.JOTWEB_LNG.LNS0001WRKINC
     
     '''<summary>
+    '''DisabledKeySystem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents DisabledKeySystem As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
     '''<remarks>

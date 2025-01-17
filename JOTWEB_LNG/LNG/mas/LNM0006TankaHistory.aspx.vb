@@ -65,8 +65,7 @@ Public Class LNM0006TankaHistory
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.PDF)
-
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNM0006L", "LNM0006S"  '戻るボタン押下（LNS0001L、LNS0001Sは、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
@@ -630,6 +629,10 @@ Public Class LNM0006TankaHistory
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
+        'パンくずから検索を選択した場合
+        If WF_ButtonClick.Value = "LNM0006S" Then
+            Master.MAPID = LNM0006WRKINC.MAPIDL
+        End If
 
         Master.TransitionPrevPage()
 

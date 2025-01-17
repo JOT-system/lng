@@ -49,16 +49,15 @@
                         <div class="inputBox">
                             <!-- 会社コード -->
                             <div class="inputItem">
-                                <a id="WF_CAMPCODE_LABEL">
-                                    <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード"></asp:Label>
-                                </a>
-                                <a id="WF_CAMPCODE">
-                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2" Enabled="false"></asp:TextBox>
+                                <a id="WF_CAMPCODE_LABEL" >会社コード</a>
+                                <a class="ef" id="WF_CAMPCODE" ondblclick="Field_DBclick('TxtCampCode', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>);" onchange="TextBox_change('TxtCampCode');">
+                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="2"></asp:TextBox>
                                 </a>
                                 <a id="WF_CAMPCODE_TEXT">
                                     <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT"></asp:Label>
                                 </a>
                             </div>
+
                             <!-- 有効年月日(開始） -->
                             <div class="inputItem">
                                 <a id="WF_STYMD_LABEL">有効年月日（開始）</a>                
@@ -119,6 +118,9 @@
 
     <!-- イベント用 -->
     <div hidden="hidden">
+        <!-- 入力不可制御項目 -->
+        <input id="DisabledKeySystem" runat="server" value="" type="text" />
+
         <input id="WF_FIELD" runat="server" value="" type="text" />                 <!-- Textbox DBクリックフィールド -->
         <input id="WF_SelectedIndex" runat="server" value="" type="text" />         <!-- Textbox DBクリックフィールド -->
         <input id="WF_LeftboxOpen" runat="server" value="" type="text" />           <!-- LeftBox 開閉 -->

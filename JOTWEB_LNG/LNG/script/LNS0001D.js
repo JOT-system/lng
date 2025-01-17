@@ -8,6 +8,7 @@ window.onload = function () {
     const DisabledKeyItem = document.getElementById('DisabledKeyItem').value;
     const DisabledKeyItemUserId = document.getElementById('DisabledKeyItemUserId').value;
     const DisabledKeyItemPass = document.getElementById('DisabledKeyItemPass').value;
+    const DisabledKeySystem = document.getElementById('DisabledKeySystem').value;
     //ユーザーID
     const TxtUserId = document.getElementById('TxtUserId');
     //開始年月日
@@ -34,7 +35,14 @@ window.onload = function () {
 
     //入力不可キー
     document.getElementById('TxtSelLineCNT').readOnly = true;
-    document.getElementById('TxtCampCode').readOnly = true;
+    //document.getElementById('TxtCampCode').readOnly = true;
+
+    //変更不可判断キーに値が入っていない場合、名称を変更する
+    if (DisabledKeyItem == "") {
+        document.getElementById('PAGE_NAME1').innerText = "ユーザーマスタ（追加）"
+        document.getElementById('PAGE_NAME2').innerText = "ユーザーマスタ追加"
+        document.getElementById('WF_ButtonUPDATE').value = "追加"
+    }
 
     //変更不可判断キーに値が入っている場合、一意項目を入力不可にする
     if (DisabledKeyItem != "") {
@@ -64,6 +72,13 @@ window.onload = function () {
         if (DisabledKeyItemPass != "") {
             TxtPassword.readOnly = true;
         };
+
+        //情報システム部以外でログインした場合会社コードを入力不可にする
+        if (DisabledKeySystem == "") {
+            document.getElementById('TxtCampCode').readOnly = true;
+            document.getElementById('TxtCampCodecommonIcon').style.display = "none";
+        };
+
     };
 };
 

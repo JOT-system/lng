@@ -662,6 +662,24 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents DisabledKeyItem As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''DisabledKeyOrgCount コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents DisabledKeyOrgCount As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''DisabledKeyToriCount コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents DisabledKeyToriCount As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''VisibleKeyOrgCode コントロール。
     '''</summary>
     '''<remarks>
@@ -777,6 +795,15 @@ Partial Public Class LNM0006TankaDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_BeforeMAPID コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BeforeMAPID As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_MAPpermitcode コントロール。

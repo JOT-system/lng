@@ -33,8 +33,8 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
-                        <li class="breadcrumb-item active">単価マスタ（検索）</li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
+                        <li class="breadcrumb-item active" id="PAGE_SEARCH"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006S');">単価マスタ（検索）</a></li>
                         <li class="breadcrumb-item active" aria-current="page">単価マスタ（一覧）</li>
                     </ol>
                 </nav>

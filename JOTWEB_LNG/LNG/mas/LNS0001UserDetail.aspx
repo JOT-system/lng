@@ -32,13 +32,13 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active">ユーザーマスタ（検索）</li>
-                        <li class="breadcrumb-item active">ユーザーマスタ（一覧）</li>
-                        <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ（詳細）</li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNS0001S');">ユーザーマスタ（検索）</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNS0001L');">ユーザーマスタ（一覧）</a></li>
+                        <li class="breadcrumb-item active" id="PAGE_NAME1" aria-current="page">ユーザーマスタ（詳細）</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ詳細</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title" id="PAGE_NAME2">ユーザーマスタ詳細</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
                             <div class="rightSide">
@@ -164,10 +164,11 @@
                         </p>
 
                         <p id="USER_LINE_7">
-                            <span class="ef">
-                                <!-- 会社コード -->
-                                <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                            <span class="ef magnifier">
+                                <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                <a ondblclick="Field_DBclick('TxtCampCode', <%=LIST_BOX_CLASSIFICATION.LC_COMPANY%>)" onchange="TextBox_change('TxtCampCode');">
+                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="2"></asp:TextBox>
+                                </a>
                                 <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                             </span>
                         </p>
@@ -367,6 +368,7 @@
         <input id="DisabledKeyItem" runat="server" value="" type="text" />
         <input id="DisabledKeyItemUserId" runat="server" value="" type="text" />
         <input id="DisabledKeyItemPass" runat="server" value="" type="text" />
+        <input id="DisabledKeySystem" runat="server" value="" type="text" />
 
         <!-- 期間重複子画面制御項目 -->
         <input id="WF_OverlapPeriodsSrc" runat="server" value="" type="text" />
@@ -407,6 +409,9 @@
             
         <!-- ボタン押下 -->
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
+        <!-- 前の遷移先 -->
+        <input id="WF_BeforeMAPID" runat="server" value="" type="text" />
+
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
     </div>

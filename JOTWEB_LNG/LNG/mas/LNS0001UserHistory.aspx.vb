@@ -65,8 +65,7 @@ Public Class LNS0001UserHistory
                             WF_EXCELPDF(LNS0001WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNS0001WRKINC.FILETYPE.PDF)
-
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNS0001L", "LNS0001S"  '戻るボタン押下（LNS0001L、LNS0001Sは、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
@@ -621,6 +620,10 @@ Public Class LNS0001UserHistory
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
+        'パンくずから検索を選択した場合
+        If WF_ButtonClick.Value = "LNS0001S" Then
+            Master.MAPID = LNS0001WRKINC.MAPIDL
+        End If
 
         Master.TransitionPrevPage()
 

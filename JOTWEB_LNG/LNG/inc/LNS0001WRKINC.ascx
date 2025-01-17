@@ -3,6 +3,13 @@
 <!-- Work レイアウト -->
 <div hidden="hidden">
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>                 <!-- 会社コード -->
+
+    <asp:TextBox ID="WF_SEL_CAMPCODE_S" runat="server"></asp:TextBox>               <!-- 会社コード(検索) -->
+    <asp:TextBox ID="WF_SEL_STYMD_S" runat="server"></asp:TextBox>                  <!-- 開始年月日(検索) -->
+    <asp:TextBox ID="WF_SEL_ENDYMD_S" runat="server"></asp:TextBox>                 <!-- 終了年月日(検索) -->
+    <asp:TextBox ID="WF_SEL_ORG_S" runat="server"></asp:TextBox>                    <!-- 組織コード(検索) -->
+
+    <asp:TextBox ID="WF_SEL_CAMPCODE_D" runat="server"></asp:TextBox>               <!-- 会社コード(詳細) -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>                  <!-- 選択行 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_DELDATAFLG" runat="server"></asp:TextBox>               <!-- 論理削除フラグ -->

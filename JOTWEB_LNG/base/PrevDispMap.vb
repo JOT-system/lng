@@ -131,6 +131,10 @@ Public Module PrevDispMap
         ''' ユーザIDマスタメンテナンス（詳細）
         ''' </summary>
         Public Const LNS0001D As String = "ASP.LNG_MAS_LNS0001USERDETAIL_ASPX"
+        ''' <summary>
+        ''' ユーザIDマスタメンテナンス（履歴）
+        ''' </summary>
+        Public Const LNS0001H As String = "ASP.LNG_MAS_LNS0001USERHISTORY_ASPX"
 
         ''' <summary>
         ''' ガイダンスマスタメンテナンス（検索）
@@ -183,6 +187,10 @@ Public Module PrevDispMap
         ''' 単価マスタメンテナンス（詳細）
         ''' </summary>
         Public Const LNM0006D As String = "ASP.LNG_MAS_LNM0006TANKADETAIL_ASPX"
+        ''' <summary>
+        ''' 単価マスタメンテナンス（履歴）
+        ''' </summary>
+        Public Const LNM0006H As String = "ASP.LNG_MAS_LNM0006TANKAHISTORY_ASPX"
 
         ''' <summary>
         ''' コード変換特例１マスタメンテナンス（検索）

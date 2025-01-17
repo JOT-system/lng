@@ -33,7 +33,7 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active">ユーザーマスタ（検索）</li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNS0001S');">ユーザーマスタ（検索）</a></li>
                         <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ（一覧）</li>
                     </ol>
                 </nav>
@@ -79,6 +79,9 @@
 
     <!-- イベント用 -->
     <div style="display:none;">
+        <!-- 入力不可制御項目 -->
+        <input id="DisabledKeySystem" runat="server" value="" type="text" />
+
         <!-- GridView DBクリック-->
         <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
         <!-- GridView表示位置フィールド -->

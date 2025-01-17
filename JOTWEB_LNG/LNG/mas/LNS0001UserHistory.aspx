@@ -33,8 +33,8 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active">ユーザーマスタ（検索）</li>
-                        <li class="breadcrumb-item active">ユーザーマスタ（一覧）</li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNS0001S');">ユーザーマスタ（検索）</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNS0001L');">ユーザーマスタ（一覧）</a></li>
                         <li class="breadcrumb-item active" aria-current="page">ユーザーマスタ（変更履歴）</li>
                     </ol>
                 </nav>

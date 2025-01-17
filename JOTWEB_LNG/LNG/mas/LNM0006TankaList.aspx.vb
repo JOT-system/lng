@@ -85,7 +85,7 @@ Public Class LNM0006TankaList
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNM0006S" '戻るボタン押下 （LNM0006S、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
@@ -95,6 +95,13 @@ Public Class LNM0006TankaList
                             WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
+                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()  ' DataBase接続
+                                MAPDataGet(SQLcon)
+                                Master.SaveTable(LNM0006tbl)
+                                '〇 一覧の件数を取得
+                                Me.ListCount.Text = "件数：" + LNM0006tbl.Rows.Count.ToString()
+                            End Using
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
                         Case "WF_SelectCALENDARChange"  'カレンダー変更時
@@ -922,7 +929,6 @@ Public Class LNM0006TankaList
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.KASANORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '加算先部門コード
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '届先コード
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
-        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効終了日
 
         '入力不要列網掛け
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '枝番
@@ -1230,101 +1236,12 @@ Public Class LNM0006TankaList
             rightview.InitMemoErrList(WW_Dummy)
             rightview.AddErrorReport("以下のデータが登録されませんでした。")
             Dim WW_DBDataCheck As String = ""
-            Dim WW_BeforeSTYMD As String = ""
+            Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_ENDYMD_SAVE As String = ""
             Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
             Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
 
             For Each Row As DataRow In LNM0006Exceltbl.Rows
-                If Not Row("TORICODE") = "" And
-                   Not Row("ORGCODE") = "" And
-                   Not Row("KASANORGCODE") = "" And
-                   Not Row("TODOKECODE") = "" And
-                   Not Row("STYMD") = Date.MinValue Then
-
-                    '枝番が新規、有効開始日が変更されたときの対応
-                    If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
-                        '枝番を生成
-                        Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-                    Else
-                        '更新前の有効開始日取得
-                        WW_BeforeSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, Row, WW_DBDataCheck)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-
-                        Select Case True
-                            '更新前有効開始日 <　入力有効開始日
-                            Case Not WW_BeforeSTYMD = "" AndAlso WW_BeforeSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                '変更後の有効開始日、有効終了日退避
-                                WW_STYMD_SAVE = Row("STYMD")
-                                WW_ENDYMD_SAVE = Row("ENDYMD")
-                                '変更後テーブルに変更前の有効開始日格納
-                                Row("STYMD") = WW_BeforeSTYMD
-                                '変更後テーブルに更新用の有効終了日格納
-                                Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                '履歴テーブルに変更前データを登録
-                                InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '変更前の有効終了日更新
-                                UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
-                                If Not isNormal(WW_DBDataCheck) Then
-                                    Exit Sub
-                                End If
-                                '履歴テーブルに変更後データを登録
-                                InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '退避した有効開始日、有効終了日を元に戻す
-                                Row("STYMD") = WW_STYMD_SAVE
-                                Row("ENDYMD") = WW_ENDYMD_SAVE
-
-                            '更新前有効開始日 >　入力有効開始日
-                            Case Not WW_BeforeSTYMD = "" AndAlso WW_BeforeSTYMD > CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                '過去の有効開始日、有効終了日取得
-                                work.GetPastSTENDYMD(SQLcon, Row, WW_PASTSTYMD, WW_PASTENDYMD)
-                                '取得できた場合
-                                If Not WW_PASTSTYMD = "" Then
-                                    '変更後の有効開始日退避
-                                    WW_STYMD_SAVE = Row("STYMD")
-                                    '変更後テーブルに取得した有効開始日格納
-                                    Row("STYMD") = WW_PASTSTYMD
-                                    '変更後テーブルに更新用の有効終了日格納
-                                    Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                    '履歴テーブルに変更前データを登録
-                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                        Exit Sub
-                                    End If
-                                    '変更前の有効終了日更新
-                                    UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
-                                    If Not isNormal(WW_DBDataCheck) Then
-                                        Exit Sub
-                                    End If
-                                    '履歴テーブルに変更後データを登録
-                                    InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                        Exit Sub
-                                    End If
-                                    '退避した有効開始日を元に戻す
-                                    Row("STYMD") = WW_STYMD_SAVE
-                                    '有効終了日を取得した過去の有効終了日に設定する
-                                    Row("ENDYMD") = WW_PASTENDYMD
-                                Else
-                                    '取得できなかった場合(過去のデータが1件もなかった場合)
-                                    '有効終了日を変更前の開始日-1にする
-                                    Row("ENDYMD") = DateTime.Parse(WW_BeforeSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
-                                End If
-                        End Select
-                    End If
-                End If
 
                 'テーブルに同一データが存在しない場合
                 If Not SameDataChk(SQLcon, Row) = False Then
@@ -1355,6 +1272,105 @@ Public Class LNM0006TankaList
                     If Not isNormal(WW_ErrSW) Then
                         WW_ErrData = True
                         Continue For
+                    End If
+
+                    '有効開始日、有効終了日更新
+                    If Not Row("TORICODE") = "" And
+                       Not Row("ORGCODE") = "" And
+                       Not Row("KASANORGCODE") = "" And
+                       Not Row("TODOKECODE") = "" And
+                       Not Row("STYMD") = Date.MinValue Then
+
+                        '枝番が新規、有効開始日が変更されたときの対応
+                        If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
+                            '枝番を生成
+                            Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
+                            Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                            If Not isNormal(WW_DBDataCheck) Then
+                                Exit Sub
+                            End If
+                        Else
+                            '更新前の最大有効開始日取得
+                            WW_BeforeMAXSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, Row, WW_DBDataCheck)
+                            If Not isNormal(WW_DBDataCheck) Then
+                                Exit Sub
+                            End If
+
+                            Select Case True
+                                Case WW_BeforeMAXSTYMD = "" '無いと思うが1件も対象の枝番データが無い場合
+                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
+                                    '何もしない
+
+                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
+                                Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
+                                    'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+
+                                    '変更後の有効開始日退避
+                                    WW_STYMD_SAVE = Row("STYMD")
+                                    '変更後テーブルに変更前の有効開始日格納
+                                    Row("STYMD") = WW_BeforeMAXSTYMD
+                                    '変更後テーブルに更新用の有効終了日格納
+                                    Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                    '履歴テーブルに変更前データを登録
+                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                        Exit Sub
+                                    End If
+                                    '変更前の有効終了日更新
+                                    UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
+                                    If Not isNormal(WW_DBDataCheck) Then
+                                        Exit Sub
+                                    End If
+                                    '履歴テーブルに変更後データを登録
+                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                        Exit Sub
+                                    End If
+                                    '退避した有効開始日を元に戻す
+                                    Row("STYMD") = WW_STYMD_SAVE
+                                    '有効終了日に最大値を入れる
+                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+
+                                '更新前有効開始日 >　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が小さい場合)
+                                Case WW_BeforeMAXSTYMD > CDate(Row("STYMD")).ToString("yyyy/MM/dd")
+                                    'DBに登録されている該当する有効範囲の有効開始日を取得する
+                                    work.GetPastSTENDYMD(SQLcon, Row, WW_PASTSTYMD, WW_PASTENDYMD)
+                                    '取得できた場合
+                                    If Not WW_PASTSTYMD = "" Then
+                                        'DBに登録されている該当する有効範囲の有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+                                        '変更後の有効開始日退避
+                                        WW_STYMD_SAVE = Row("STYMD")
+                                        '変更後テーブルに取得した有効開始日格納
+                                        Row("STYMD") = WW_PASTSTYMD
+                                        '変更後テーブルに更新用の有効終了日格納
+                                        Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                        '履歴テーブルに変更前データを登録
+                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                            Exit Sub
+                                        End If
+                                        '変更前の有効終了日更新
+                                        UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
+                                        If Not isNormal(WW_DBDataCheck) Then
+                                            Exit Sub
+                                        End If
+                                        '履歴テーブルに変更後データを登録
+                                        InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                            Exit Sub
+                                        End If
+                                        '退避した有効開始日を元に戻す
+                                        Row("STYMD") = WW_STYMD_SAVE
+                                        '有効終了日を取得した過去の有効終了日に設定する
+                                        Row("ENDYMD") = WW_PASTENDYMD
+                                    Else
+                                        '取得できなかった場合(過去のデータが1件もなかった場合)
+                                        '有効終了日を変更前の開始日-1にする
+                                        Row("ENDYMD") = DateTime.Parse(WW_BeforeMAXSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
+                                    End If
+                            End Select
+                        End If
                     End If
 
                     Dim WW_MODIFYKBN As String = ""
@@ -1497,102 +1513,12 @@ Public Class LNM0006TankaList
             Dim WW_UplErrCnt As Integer = 0                             'アップロード件数(エラー)
             Dim WW_UplUnnecessaryCnt As Integer = 0                     'アップロード件数(更新不要)
             Dim WW_DBDataCheck As String = ""
-            Dim WW_BeforeSTYMD As String = ""
+            Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_ENDYMD_SAVE As String = ""
             Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
             Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
 
             For Each Row As DataRow In LNM0006Exceltbl.Rows
-                If Not Row("TORICODE") = "" And
-                   Not Row("ORGCODE") = "" And
-                   Not Row("KASANORGCODE") = "" And
-                   Not Row("TODOKECODE") = "" And
-                   Not Row("STYMD") = Date.MinValue Then
-
-                    '枝番が新規、有効開始日が変更されたときの対応
-                    '枝番が新規、有効開始日が変更されたときの対応
-                    If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
-                        '枝番を生成
-                        Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-                    Else
-                        '更新前の有効開始日取得
-                        WW_BeforeSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, Row, WW_DBDataCheck)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-
-                        Select Case True
-                            '更新前有効開始日 <　入力有効開始日
-                            Case Not WW_BeforeSTYMD = "" AndAlso WW_BeforeSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                '変更後の有効開始日、有効終了日退避
-                                WW_STYMD_SAVE = Row("STYMD")
-                                WW_ENDYMD_SAVE = Row("ENDYMD")
-                                '変更後テーブルに変更前の有効開始日格納
-                                Row("STYMD") = WW_BeforeSTYMD
-                                '変更後テーブルに更新用の有効終了日格納
-                                Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                '履歴テーブルに変更前データを登録
-                                InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '変更前の有効終了日更新
-                                UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
-                                If Not isNormal(WW_DBDataCheck) Then
-                                    Exit Sub
-                                End If
-                                '履歴テーブルに変更後データを登録
-                                InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '退避した有効開始日、有効終了日を元に戻す
-                                Row("STYMD") = WW_STYMD_SAVE
-                                Row("ENDYMD") = WW_ENDYMD_SAVE
-
-                            '更新前有効開始日 >　入力有効開始日
-                            Case Not WW_BeforeSTYMD = "" AndAlso WW_BeforeSTYMD > CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                '過去の有効開始日、有効終了日取得
-                                work.GetPastSTENDYMD(SQLcon, Row, WW_PASTSTYMD, WW_PASTENDYMD)
-                                '取得できた場合
-                                If Not WW_PASTSTYMD = "" Then
-                                    '変更後の有効開始日退避
-                                    WW_STYMD_SAVE = Row("STYMD")
-                                    '変更後テーブルに取得した有効開始日格納
-                                    Row("STYMD") = WW_PASTSTYMD
-                                    '変更後テーブルに更新用の有効終了日格納
-                                    Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                    '履歴テーブルに変更前データを登録
-                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                        Exit Sub
-                                    End If
-                                    '変更前の有効終了日更新
-                                    UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
-                                    If Not isNormal(WW_DBDataCheck) Then
-                                        Exit Sub
-                                    End If
-                                    '履歴テーブルに変更後データを登録
-                                    InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                        Exit Sub
-                                    End If
-                                    '退避した有効開始日を元に戻す
-                                    Row("STYMD") = WW_STYMD_SAVE
-                                    '有効終了日を取得した過去の有効終了日に設定する
-                                    Row("ENDYMD") = WW_PASTENDYMD
-                                Else
-                                    '取得できなかった場合(過去のデータが1件もなかった場合)
-                                    '有効終了日を変更前の開始日-1にする
-                                    Row("ENDYMD") = DateTime.Parse(WW_BeforeSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
-                                End If
-                        End Select
-                    End If
-                End If
 
                 'テーブルに同一データが存在しない場合
                 If Not SameDataChk(SQLcon, Row) = False Then
@@ -1625,6 +1551,105 @@ Public Class LNM0006TankaList
                         WW_ErrData = True
                         WW_UplErrCnt += 1
                         Continue For
+                    End If
+
+                    '有効開始日、有効終了日更新
+                    If Not Row("TORICODE") = "" And
+                       Not Row("ORGCODE") = "" And
+                       Not Row("KASANORGCODE") = "" And
+                       Not Row("TODOKECODE") = "" And
+                       Not Row("STYMD") = Date.MinValue Then
+
+                        '枝番が新規、有効開始日が変更されたときの対応
+                        If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
+                            '枝番を生成
+                            Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
+                            Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                            If Not isNormal(WW_DBDataCheck) Then
+                                Exit Sub
+                            End If
+                        Else
+                            '更新前の最大有効開始日取得
+                            WW_BeforeMAXSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, Row, WW_DBDataCheck)
+                            If Not isNormal(WW_DBDataCheck) Then
+                                Exit Sub
+                            End If
+
+                            Select Case True
+                                Case WW_BeforeMAXSTYMD = "" '無いと思うが1件も対象の枝番データが無い場合
+                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
+                                    '何もしない
+
+                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
+                                Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
+                                    'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+
+                                    '変更後の有効開始日退避
+                                    WW_STYMD_SAVE = Row("STYMD")
+                                    '変更後テーブルに変更前の有効開始日格納
+                                    Row("STYMD") = WW_BeforeMAXSTYMD
+                                    '変更後テーブルに更新用の有効終了日格納
+                                    Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                    '履歴テーブルに変更前データを登録
+                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                        Exit Sub
+                                    End If
+                                    '変更前の有効終了日更新
+                                    UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
+                                    If Not isNormal(WW_DBDataCheck) Then
+                                        Exit Sub
+                                    End If
+                                    '履歴テーブルに変更後データを登録
+                                    InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                                    If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                        Exit Sub
+                                    End If
+                                    '退避した有効開始日を元に戻す
+                                    Row("STYMD") = WW_STYMD_SAVE
+                                    '有効終了日に最大値を入れる
+                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+
+                                '更新前有効開始日 >　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が小さい場合)
+                                Case WW_BeforeMAXSTYMD > CDate(Row("STYMD")).ToString("yyyy/MM/dd")
+                                    'DBに登録されている該当する有効範囲の有効開始日を取得する
+                                    work.GetPastSTENDYMD(SQLcon, Row, WW_PASTSTYMD, WW_PASTENDYMD)
+                                    '取得できた場合
+                                    If Not WW_PASTSTYMD = "" Then
+                                        'DBに登録されている該当する有効範囲の有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+                                        '変更後の有効開始日退避
+                                        WW_STYMD_SAVE = Row("STYMD")
+                                        '変更後テーブルに取得した有効開始日格納
+                                        Row("STYMD") = WW_PASTSTYMD
+                                        '変更後テーブルに更新用の有効終了日格納
+                                        Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                        '履歴テーブルに変更前データを登録
+                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                            Exit Sub
+                                        End If
+                                        '変更前の有効終了日更新
+                                        UpdateENDYMD(SQLcon, Row, WW_DBDataCheck, DATENOW)
+                                        If Not isNormal(WW_DBDataCheck) Then
+                                            Exit Sub
+                                        End If
+                                        '履歴テーブルに変更後データを登録
+                                        InsertHist(SQLcon, Row, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                            Exit Sub
+                                        End If
+                                        '退避した有効開始日を元に戻す
+                                        Row("STYMD") = WW_STYMD_SAVE
+                                        '有効終了日を取得した過去の有効終了日に設定する
+                                        Row("ENDYMD") = WW_PASTENDYMD
+                                    Else
+                                        '取得できなかった場合(過去のデータが1件もなかった場合)
+                                        '有効終了日を変更前の開始日-1にする
+                                        Row("ENDYMD") = DateTime.Parse(WW_BeforeMAXSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
+                                    End If
+                            End Select
+                        End If
                     End If
 
                     Dim WW_MODIFYKBN As String = ""
@@ -1868,14 +1893,14 @@ Public Class LNM0006TankaList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            '有効終了日
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD))
-            WW_DATATYPE = DataTypeHT("ENDYMD")
-            LNM0006Exceltblrow("ENDYMD") = LNM0006WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+            ''有効終了日
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD))
+            'WW_DATATYPE = DataTypeHT("ENDYMD")
+            'LNM0006Exceltblrow("ENDYMD") = LNM0006WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
             '枝番
             WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE))
             WW_DATATYPE = DataTypeHT("BRANCHCODE")
@@ -1985,7 +2010,6 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
         SQLStr.AppendLine("    AND  COALESCE(TODOKENAME, '')             = @TODOKENAME ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
         SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
         SQLStr.AppendLine("    AND  COALESCE(TANKA, '0')             = @TANKA ")
         SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
@@ -2030,7 +2054,6 @@ Public Class LNM0006TankaList
                 P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '届先コード
                 P_TODOKENAME.Value = WW_ROW("TODOKENAME")           '届先名称
                 P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")           '有効終了日
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
                 P_TANKA.Value = WW_ROW("TANKA")           '単価
                 P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
@@ -2556,17 +2579,17 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 有効終了日(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            WW_ROW("ENDYMD") = CDate(WW_ROW("ENDYMD")).ToString("yyyy/MM/dd")
-        Else
-            WW_CheckMES1 = "・有効終了日エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        '' 有効終了日(バリデーションチェック)
+        'Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    WW_ROW("ENDYMD") = CDate(WW_ROW("ENDYMD")).ToString("yyyy/MM/dd")
+        'Else
+        '    WW_CheckMES1 = "・有効終了日エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         ' 単価(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TANKA", WW_ROW("TANKA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2640,17 +2663,17 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
 
-        ' 日付大小チェック
-        If Not String.IsNullOrEmpty(WW_ROW("STYMD")) AndAlso
-                    Not String.IsNullOrEmpty(WW_ROW("ENDYMD")) Then
-            If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
-                WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-                WW_CheckMES2 = "日付大小入力エラー"
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
-        End If
+        '' 日付大小チェック
+        'If Not String.IsNullOrEmpty(WW_ROW("STYMD")) AndAlso
+        '            Not String.IsNullOrEmpty(WW_ROW("ENDYMD")) Then
+        '    If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
+        '        WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
+        '        WW_CheckMES2 = "日付大小入力エラー"
+        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '        WW_LineErr = "ERR"
+        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        '    End If
+        'End If
 
     End Sub
 

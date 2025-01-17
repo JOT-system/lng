@@ -671,6 +671,15 @@ Partial Public Class LNS0001UserDetail
     Protected WithEvents DisabledKeyItemPass As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''DisabledKeySystem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents DisabledKeySystem As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''WF_OverlapPeriodsSrc コントロール。
     '''</summary>
     '''<remarks>
@@ -822,6 +831,15 @@ Partial Public Class LNS0001UserDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_BeforeMAPID コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BeforeMAPID As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_MAPpermitcode コントロール。

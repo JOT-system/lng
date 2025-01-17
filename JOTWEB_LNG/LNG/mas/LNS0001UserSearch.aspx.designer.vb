@@ -23,15 +23,6 @@ Partial Public Class LNS0001UserSearch
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
-    '''WF_CAMPCODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_CAMPCODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''TxtCampCode コントロール。
     '''</summary>
     '''<remarks>
@@ -111,6 +102,15 @@ Partial Public Class LNS0001UserSearch
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB_LNG.LNS0001WRKINC
+    
+    '''<summary>
+    '''DisabledKeySystem コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents DisabledKeySystem As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_FIELD コントロール。

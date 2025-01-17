@@ -87,7 +87,7 @@ Public Class LNS0001UserList
                             WF_EXCELPDF(LNS0001WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNS0001WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND"             '戻るボタン押下
+                        Case "WF_ButtonEND", "LNS0001S" '戻るボタン押下 （LNS0001S、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
@@ -97,6 +97,13 @@ Public Class LNS0001UserList
                             WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
+                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                                SQLcon.Open()  ' DataBase接続
+                                MAPDataGet(SQLcon)
+                                Master.SaveTable(LNS0001tbl)
+                                '〇 一覧の件数を取得
+                                Me.ListCount.Text = "件数：" + LNS0001tbl.Rows.Count.ToString()
+                            End Using
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
                     End Select
@@ -189,6 +196,14 @@ Public Class LNS0001UserList
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
+
+        'Disabled制御項目
+        '情報システム部の場合
+        If Master.USER_ORG = CONST_OFFICECODE_SYSTEM Then
+            DisabledKeySystem.Value = CONST_OFFICECODE_SYSTEM
+        Else
+            DisabledKeySystem.Value = ""
+        End If
 
     End Sub
 
@@ -298,12 +313,12 @@ Public Class LNS0001UserList
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim SQLWhereStr As String = ""
         ' 会社コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE.Text) Then
+        If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE_S.Text) Then
             SQLWhereStr = " WHERE                      " _
                         & "     LNS0001.CAMPCODE = @P1 "
         End If
         ' 有効年月日(From)
-        If Not String.IsNullOrEmpty(work.WF_SEL_STYMD.Text) Then
+        If Not String.IsNullOrEmpty(work.WF_SEL_STYMD_S.Text) Then
             If String.IsNullOrEmpty(SQLWhereStr) Then
                 SQLWhereStr = " WHERE                         " _
                             & "    ((LNS0001.STYMD <= @P2 " _
@@ -314,7 +329,7 @@ Public Class LNS0001UserList
             End If
         End If
         ' 有効年月日(To)
-        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+        If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD_S.Text) Then
             '有効年月日(From)が必須項目のため不要
             'If String.IsNullOrEmpty(SQLWhereStr) Then
             '    SQLWhereStr = " WHERE                         " _
@@ -331,7 +346,7 @@ Public Class LNS0001UserList
             SQLWhereStr &= "            AND LNS0001.ENDYMD <= @P2)) "
         End If
         ' 組織コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
+        If Not String.IsNullOrEmpty(work.WF_SEL_ORG_S.Text) Then
             If String.IsNullOrEmpty(SQLWhereStr) Then
                 SQLWhereStr = " WHERE                     " _
                             & "     LNS0001.ORG = @P4     "
@@ -365,21 +380,21 @@ Public Class LNS0001UserList
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE.Text) Then
+                If Not String.IsNullOrEmpty(work.WF_SEL_CAMPCODE_S.Text) Then
                     Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 20)  '会社コード
-                    PARA1.Value = work.WF_SEL_CAMPCODE.Text
+                    PARA1.Value = work.WF_SEL_CAMPCODE_S.Text
                 End If
-                If Not String.IsNullOrEmpty(work.WF_SEL_STYMD.Text) Then
+                If Not String.IsNullOrEmpty(work.WF_SEL_STYMD_S.Text) Then
                     Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)          '有効年月日(From)
-                    PARA2.Value = work.WF_SEL_STYMD.Text
+                    PARA2.Value = work.WF_SEL_STYMD_S.Text
                 End If
-                If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD.Text) Then
+                If Not String.IsNullOrEmpty(work.WF_SEL_ENDYMD_S.Text) Then
                     Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)          '有効年月日(To)
-                    PARA3.Value = work.WF_SEL_ENDYMD.Text
+                    PARA3.Value = work.WF_SEL_ENDYMD_S.Text
                 End If
-                If Not String.IsNullOrEmpty(work.WF_SEL_ORG.Text) Then
+                If Not String.IsNullOrEmpty(work.WF_SEL_ORG_S.Text) Then
                     Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar, 6)   '組織コード
-                    PARA4.Value = work.WF_SEL_ORG.Text
+                    PARA4.Value = work.WF_SEL_ORG_S.Text
                 ElseIf Master.USER_ORG <> CONST_OFFICECODE_SYSTEM Or Master.USER_ORG <> CONST_OFFICECODE_011310 Then
                     Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar, 6)   '組織コード
                     PARA4.Value = Master.USER_ORG
@@ -425,6 +440,7 @@ Public Class LNS0001UserList
     Protected Sub WF_ButtonINSERT_Click()
 
         work.WF_SEL_LINECNT.Text = ""                                            '選択行
+        work.WF_SEL_CAMPCODE_D.Text = work.WF_SEL_CAMPCODE_S.Text                '会社コード
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)   '削除
         work.WF_SEL_USERID.Text = ""                                             'ユーザID
         work.WF_SEL_STAFFNAMES.Text = ""                                         '社員名（短）
@@ -629,6 +645,7 @@ Public Class LNS0001UserList
 
         work.WF_SEL_USER_CAMPCODE.Text = Master.USERCAMP                         '操作ユーザー会社コード
         work.WF_SEL_LINECNT.Text = LNS0001tbl.Rows(WW_LineCNT)("LINECNT")        '選択行
+        work.WF_SEL_CAMPCODE_D.Text = LNS0001tbl.Rows(WW_LineCNT)("CAMPCODE")    '会社コード
         work.WF_SEL_USERID.Text = LNS0001tbl.Rows(WW_LineCNT)("USERID")          'ユーザID
         work.WF_SEL_STAFFNAMES.Text = LNS0001tbl.Rows(WW_LineCNT)("STAFFNAMES")  '社員名（短）
         work.WF_SEL_STAFFNAMEL.Text = LNS0001tbl.Rows(WW_LineCNT)("STAFFNAMEL")  '社員名（長）

@@ -33,7 +33,7 @@
             <div class="w-100 contents">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a href="#">TOP</a></li>
+                        <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
                         <li class="breadcrumb-item active" aria-current="page">単価マスタ（検索）</li>
                     </ol>
                 </nav>
@@ -51,7 +51,7 @@
                         <!-- ○ 変動項目 ○ -->
                         <div class="inputBox">
                             <!-- 会社コード -->
-                            <div class="inputItem">
+                            <div class="inputItem" style="display:none;">
                                 <a id="WF_CAMPCODE_LABEL">
                                     <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード"></asp:Label>
                                 </a>

@@ -20,9 +20,10 @@ window.onload = function () {
     //表示判断キー
     const VisibleKeyOrgCode = document.getElementById('VisibleKeyOrgCode').value;
 
-    //情シス、高圧ガス以外の場合、変更履歴をを非表示にする
+    //情シス、高圧ガス以外の場合、変更履歴、パンくず(検索)をを非表示にする
     if (VisibleKeyOrgCode == "") {
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
+        document.getElementById('PAGE_SEARCH').style.display = "none";
     }
 }
 

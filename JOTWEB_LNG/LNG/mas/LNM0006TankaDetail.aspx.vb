@@ -59,7 +59,7 @@ Public Class LNM0006TankaDetail
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonUPDATE"          '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_ButtonCLEAR"           '戻るボタン押下
+                        Case "WF_ButtonCLEAR", "LNM0006L", "LNM0006S"  '戻るボタン押下（LNM0006L、LNM0006Sは、パンくずより）
                             WF_CLEAR_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
@@ -240,8 +240,8 @@ Public Class LNM0006TankaDetail
         TxtTORINAME.Text = work.WF_SEL_TORINAME.Text
         '部門コード
         ddlSelectORG.SelectedValue = work.WF_SEL_ORGCODE.Text
-        '部門名称
-        ddlSelectORG.SelectedValue = work.WF_SEL_ORGNAME.Text
+        ''部門名称
+        'ddlSelectORG.SelectedValue = work.WF_SEL_ORGNAME.Text
         '加算先部門コード
         TxtKASANORGCODE.Text = work.WF_SEL_KASANORGCODE.Text
         '加算先部門名称
@@ -283,6 +283,43 @@ Public Class LNM0006TankaDetail
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
 
+        If DisabledKeyItem.Value = "" Then
+            '部門コード件数取得
+            DisabledKeyOrgCount.Value = ddlSelectORG.Items.Count
+            '部門コード件数が2件(空白行1件と選択可能行1件)の場合取引先件数取得
+            If ddlSelectORG.Items.Count = 2 Then
+                If TxtKASANORGCODE.Text = "" Then
+                    Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                        SQLcon.Open()  ' DataBase接続
+                        ddlSelectORG.SelectedIndex = 1
+                        ddlSelectORG.Enabled = False
+                        DisabledKeyToriCount.Value = GetToriCnt(SQLcon, ddlSelectORG.SelectedValue)
+                        '取引先件数1件の場合取引先、加算先、届け先取得
+                        If CInt(DisabledKeyToriCount.Value) = 1 Then
+                            GetKasanTodoke(SQLcon, ddlSelectORG.SelectedValue,
+                                       TxtTORICODE.Text, TxtTORINAME.Text,
+                                       TxtKASANORGCODE.Text, TxtKASANORGNAME.Text)
+                            TxtTORICODE.Enabled = False
+                            TxtTORINAME.Enabled = False
+                            TxtKASANORGCODE.Enabled = False
+                            TxtKASANORGNAME.Enabled = False
+
+                        End If
+                    End Using
+                End If
+
+            End If
+        Else
+            TxtTORICODE.Enabled = False
+            TxtTORINAME.Enabled = False
+            ddlSelectORG.Enabled = False
+            TxtKASANORGCODE.Enabled = False
+            TxtKASANORGNAME.Enabled = False
+            TxtTODOKECODE.Enabled = False
+            TxtTODOKENAME.Enabled = False
+            TxtSYAGOU.Enabled = False
+        End If
+
         ' 削除フラグ・取引先コード・加算先部門コード・届先コード・単価を入力するテキストボックスは数値(0～9)のみ可能とする。
         Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtTORICODE.Attributes("onkeyPress") = "CheckNum()"
@@ -301,6 +338,99 @@ Public Class LNM0006TankaDetail
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
     End Sub
+
+    ''' <summary>
+    ''' 取引先件数取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Function GetToriCnt(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String) As Integer
+        GetToriCnt = 0
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT DISTINCT ")
+        SQLStr.AppendLine("       TORICODE")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0006_TANKA")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
+        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                P_ORGCODE.Value = WW_ORGCODE '部門コード
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                End Using
+
+                GetToriCnt = WW_Tbl.Rows.Count
+            End Using
+        Catch ex As Exception
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' 取引先、加算先、届け先取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub GetKasanTodoke(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String,
+                                 ByRef WW_TORICODE As String, ByRef WW_TORINAME As String,
+                                 ByRef WW_KASANORGCODE As String, ByRef WW_KASANORGNAME As String)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT DISTINCT ")
+        SQLStr.AppendLine("       TORICODE")
+        SQLStr.AppendLine("      ,TORINAME")
+        SQLStr.AppendLine("      ,KASANORGCODE")
+        SQLStr.AppendLine("      ,KASANORGNAME")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0006_TANKA")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
+        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                P_ORGCODE.Value = WW_ORGCODE '部門コード
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    If WW_Tbl.Rows.Count > 0 Then
+                        WW_TORICODE = WW_Tbl.Rows(0)("TORICODE")
+                        WW_TORINAME = WW_Tbl.Rows(0)("TORINAME")
+                        WW_KASANORGCODE = WW_Tbl.Rows(0)("KASANORGCODE")
+                        WW_KASANORGNAME = WW_Tbl.Rows(0)("KASANORGNAME")
+
+                    End If
+
+                End Using
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+
 
     ''' <summary>
     ''' 単価マスタ登録更新
@@ -1112,6 +1242,13 @@ Public Class LNM0006TankaDetail
             End If
         Next
 
+        'パンくずから検索を選択した場合
+        If WF_ButtonClick.Value = "LNM0006S" Then
+            WF_BeforeMAPID.Value = LNM0006WRKINC.MAPIDL
+        Else
+            WF_BeforeMAPID.Value = LNM0006WRKINC.MAPIDD
+        End If
+
         If WW_InputChangeFlg Then
             ' 変更がある場合は、確認ダイアログを表示
             Master.Output(C_MESSAGE_NO.UPDATE_CANCEL_CONFIRM, C_MESSAGE_TYPE.QUES, I_PARA02:="W",
@@ -1140,6 +1277,7 @@ Public Class LNM0006TankaDetail
         WF_FIELD_REP.Value = ""
         WF_LeftboxOpen.Value = ""
 
+        Master.MAPID = WF_BeforeMAPID.Value
         Master.TransitionPrevPage()
 
     End Sub
@@ -1184,8 +1322,8 @@ Public Class LNM0006TankaDetail
         TxtDelFlg.Text = ""                  '削除フラグ
         TxtTORICODE.Text = ""                '取引先コード
         TxtTORINAME.Text = ""                '取引先名称
-        ddlSelectORG.SelectedValue = ""                 '部門コード
-        ddlSelectORG.SelectedValue = ""                 '部門名称
+        'ddlSelectORG.SelectedValue = ""                 '部門コード
+        'ddlSelectORG.SelectedValue = ""                 '部門名称
         TxtKASANORGCODE.Text = ""            '加算先部門コード
         TxtKASANORGNAME.Text = ""            '加算先部門名称
         TxtTODOKECODE.Text = ""              '届先コード
@@ -1497,12 +1635,7 @@ Public Class LNM0006TankaDetail
         Me.mspToriCodeSingle.InitPopUp()
         Me.mspToriCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        '情シス、高圧ガス以外
-        If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-            Me.mspToriCodeSingle.SQL = CmnSearchSQL.GetTankaToriSQL(ddlSelectORG.SelectedValue)
-        Else
-            Me.mspToriCodeSingle.SQL = CmnSearchSQL.GetTankaToriSQL()
-        End If
+        Me.mspToriCodeSingle.SQL = CmnSearchSQL.GetTankaToriSQL(ddlSelectORG.SelectedValue)
 
         Me.mspToriCodeSingle.KeyFieldName = "KEYCODE"
         Me.mspToriCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaToriTitle)
@@ -1541,13 +1674,7 @@ Public Class LNM0006TankaDetail
         Me.mspKasanOrgCodeSingle.InitPopUp()
         Me.mspKasanOrgCodeSingle.SelectionMode = ListSelectionMode.Single
 
-
-        '情シス、高圧ガス以外
-        If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-            Me.mspKasanOrgCodeSingle.SQL = CmnSearchSQL.GetTankaKasanOrgSQL(ddlSelectORG.SelectedValue)
-        Else
-            Me.mspKasanOrgCodeSingle.SQL = CmnSearchSQL.GetTankaKasanOrgSQL()
-        End If
+        Me.mspKasanOrgCodeSingle.SQL = CmnSearchSQL.GetTankaKasanOrgSQL(ddlSelectORG.SelectedValue)
 
         Me.mspKasanOrgCodeSingle.KeyFieldName = "KEYCODE"
         Me.mspKasanOrgCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaKasanOrgTitle)
@@ -1585,12 +1712,7 @@ Public Class LNM0006TankaDetail
         Me.mspTodokeCodeSingle.InitPopUp()
         Me.mspTodokeCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        '情シス、高圧ガス以外
-        If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-            Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetTankaTodokeSQL(ddlSelectORG.SelectedValue)
-        Else
-            Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetTankaTodokeSQL()
-        End If
+        Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetTankaTodokeSQL(ddlSelectORG.SelectedValue)
 
         Me.mspTodokeCodeSingle.KeyFieldName = "KEYCODE"
         Me.mspTodokeCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaTodokeTitle)
@@ -1998,55 +2120,34 @@ Public Class LNM0006TankaDetail
                 Dim WW_MODIFYKBN As String = ""
                 Dim WW_DATE As Date = Date.Now
                 Dim WW_DBDataCheck As String = ""
+                Dim WW_BeforeMAXSTYMD As String = ""
                 Dim WW_STYMD_SAVE As String = ""
-                Dim WW_ENDYMD_SAVE As String = ""
                 Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
                 Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
 
                 '枝番が新規、有効開始日が変更されたときの対応
-                Select Case True
-                    Case LNM0006INPtbl.Rows(0)("BRANCHCODE").ToString = "" '枝番なし(新規の場合)
-                        '枝番を生成
-                        LNM0006INPtbl.Rows(0)("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-                    Case LNM0006tbl.Rows(0)("STYMD") < LNM0006INPtbl.Rows(0)("STYMD") '更新前有効開始日 <　入力有効開始日
-                        '変更後の有効開始日、有効終了日退避
-                        WW_STYMD_SAVE = LNM0006INPtbl.Rows(0)("STYMD")
-                        WW_ENDYMD_SAVE = LNM0006INPtbl.Rows(0)("ENDYMD")
-                        '変更後テーブルに変更前の有効開始日格納
-                        LNM0006INPtbl.Rows(0)("STYMD") = LNM0006tbl.Rows(0)("STYMD")
-                        '変更後テーブルに更新用の有効終了日格納
-                        LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                If LNM0006INPtbl.Rows(0)("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
+                    '枝番を生成
+                    LNM0006INPtbl.Rows(0)("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck)
+                    If Not isNormal(WW_DBDataCheck) Then
+                        Exit Sub
+                    End If
+                Else
+                    '更新前の最大有効開始日取得
+                    WW_BeforeMAXSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck)
+                    If Not isNormal(WW_DBDataCheck) Then
+                        Exit Sub
+                    End If
 
-                        '履歴テーブルに変更前データを登録
-                        InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.BEFDATA, WW_DATE)
-                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                            Exit Sub
-                        End If
-                        '変更前の有効終了日更新
-                        UpdateENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
-                        If Not isNormal(WW_DBDataCheck) Then
-                            Exit Sub
-                        End If
-                        '履歴テーブルに変更後データを登録
-                        InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.AFTDATA, WW_DATE)
-                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                            Exit Sub
-                        End If
-                        '退避した有効開始日、有効終了日を元に戻す
-                        LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
-                        LNM0006INPtbl.Rows(0)("ENDYMD") = WW_ENDYMD_SAVE
-                    Case LNM0006tbl.Rows(0)("STYMD") > LNM0006INPtbl.Rows(0)("STYMD") '更新前有効開始日 >　入力有効開始日
-                        '過去の有効開始日、有効終了日取得
-                        work.GetPastSTENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_PASTSTYMD, WW_PASTENDYMD)
-                        '取得できた場合
-                        If Not WW_PASTSTYMD = "" Then
+                    Select Case True
+                        '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
+                        Case WW_BeforeMAXSTYMD < CDate(LNM0006INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
+                            'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+
                             '変更後の有効開始日退避
                             WW_STYMD_SAVE = LNM0006INPtbl.Rows(0)("STYMD")
-                            '変更後テーブルに取得した有効開始日格納
-                            LNM0006INPtbl.Rows(0)("STYMD") = WW_PASTSTYMD
+                            '変更後テーブルに変更前の有効開始日格納
+                            LNM0006INPtbl.Rows(0)("STYMD") = WW_BeforeMAXSTYMD
                             '変更後テーブルに更新用の有効終了日格納
                             LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
                             '履歴テーブルに変更前データを登録
@@ -2066,14 +2167,48 @@ Public Class LNM0006TankaDetail
                             End If
                             '退避した有効開始日を元に戻す
                             LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
-                            '有効終了日を取得した過去の有効終了日に設定する
-                            LNM0006INPtbl.Rows(0)("ENDYMD") = WW_PASTENDYMD
-                        Else
-                            '取得できなかった場合(過去のデータが1件もなかった場合)
-                            '有効終了日を変更前の開始日-1にする
-                            LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(LNM0006tbl.Rows(0)("STYMD")).AddDays(-1).ToString("yyyy/MM/dd")
-                        End If
-                End Select
+                            '有効終了日に最大値を入れる
+                            LNM0006INPtbl.Rows(0)("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+
+                        '更新前有効開始日 >　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が小さい場合)
+                        Case WW_BeforeMAXSTYMD > CDate(LNM0006INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
+                            'DBに登録されている該当する有効範囲の有効開始日を取得する
+                            work.GetPastSTENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_PASTSTYMD, WW_PASTENDYMD)
+                            '取得できた場合
+                            If Not WW_PASTSTYMD = "" Then
+                                'DBに登録されている該当する有効範囲の有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+                                '変更後の有効開始日退避
+                                WW_STYMD_SAVE = LNM0006INPtbl.Rows(0)("STYMD")
+                                '変更後テーブルに取得した有効開始日格納
+                                LNM0006INPtbl.Rows(0)("STYMD") = WW_PASTSTYMD
+                                '変更後テーブルに更新用の有効終了日格納
+                                LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                '履歴テーブルに変更前データを登録
+                                InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.BEFDATA, WW_DATE)
+                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                    Exit Sub
+                                End If
+                                '変更前の有効終了日更新
+                                UpdateENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
+                                If Not isNormal(WW_DBDataCheck) Then
+                                    Exit Sub
+                                End If
+                                '履歴テーブルに変更後データを登録
+                                InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.AFTDATA, WW_DATE)
+                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                    Exit Sub
+                                End If
+                                '退避した有効開始日を元に戻す
+                                LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
+                                '有効終了日を取得した過去の有効終了日に設定する
+                                LNM0006INPtbl.Rows(0)("ENDYMD") = WW_PASTENDYMD
+                            Else
+                                '取得できなかった場合(過去のデータが1件もなかった場合)
+                                '有効終了日を変更前の開始日-1にする
+                                LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_BeforeMAXSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
+                            End If
+                    End Select
+                End If
 
                 '変更チェック
                 MASTEREXISTS(SQLcon, WW_MODIFYKBN)
