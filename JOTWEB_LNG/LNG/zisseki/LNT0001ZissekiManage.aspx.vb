@@ -71,6 +71,8 @@ Public Class LNT0001ZissekiManage
                             WF_ButtonFIRST_Click()
                         Case "WF_ButtonLAST"            '最終頁ボタン押下
                             WF_ButtonLAST_Click()
+                        Case "WF_TORI"                  'リスト変更
+                            WF_ListChange(WF_ButtonClick.Value)
                     End Select
 
                     '○ 一覧再表示処理
@@ -159,23 +161,6 @@ Public Class LNT0001ZissekiManage
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
-            ' メニューからの画面遷移
-            ' 画面間の情報クリア
-            work.Initialize()
-
-            ' 初期変数設定処理
-            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
-        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
-               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I OrElse
-            Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
-            ' 実行画面からの遷移
-            WF_TaishoYm.Value = work.WF_SEL_YM.Text
-        Else
-            ' 再度メニューからの遷移
-            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
-        End If
-
         ' ドロップダウンリスト（荷主）作成
         Dim toriList As New ListBox
         GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
@@ -200,6 +185,24 @@ Public Class LNT0001ZissekiManage
                 WF_TORI.Items.Add(New ListItem(toriList.Items(i).Text, toriList.Items(i).Value))
             End If
         Next
+
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.SUBMENU Then
+            ' メニューからの画面遷移
+            ' 画面間の情報クリア
+            work.Initialize()
+
+            ' 初期変数設定処理
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
+        ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
+               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I OrElse
+               Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
+            ' 実行画面からの遷移
+            WF_TaishoYm.Value = work.WF_SEL_TAISHOYM.Text
+            WF_TORI.SelectedIndex = work.WF_SEL_TORIINDEX.Text
+        Else
+            ' 再度メニューからの遷移
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
+        End If
 
     End Sub
 
@@ -250,7 +253,7 @@ Public Class LNT0001ZissekiManage
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
 
-        work.WF_SEL_YM.Text = WF_TaishoYm.Value
+        work.WF_SEL_TAISHOYM.Text = WF_TaishoYm.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
         TBLview.Dispose()
@@ -666,6 +669,19 @@ Public Class LNT0001ZissekiManage
     End Sub
 
     ''' <summary>
+    ''' リスト変更処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListChange(ByVal chkFieldName As String)
+
+        Select Case chkFieldName
+            '〇荷主リスト変更
+            Case "WF_TORI"
+                work.WF_SEL_TORIINDEX.Text = Me.WF_TORI.SelectedIndex
+        End Select
+
+    End Sub
+    ''' <summary>
     ''' 絞り込みボタン押下
     ''' </summary>
     Private Sub WF_ButtonExtract_Click()
@@ -686,6 +702,8 @@ Public Class LNT0001ZissekiManage
     ''' 実績取込画面遷移
     ''' </summary>
     Private Sub WF_ButtonZisseki_Click()
+        work.WF_SEL_TAISHOYM.Text = WF_TaishoYm.Value
+
         '○ 画面レイアウト設定
         If String.IsNullOrEmpty(Master.VIEWID) Then
             Master.VIEWID = rightviewD.GetViewId(Master.USERCAMP)
@@ -794,6 +812,8 @@ Public Class LNT0001ZissekiManage
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonInvoice_Click()
+
+        work.WF_SEL_TAISHOYM.Text = WF_TaishoYm.Value
 
         Dim WW_URL As String = ""
         work.GetURL(LNT0001WRKINC.MAPIDI, WW_URL)

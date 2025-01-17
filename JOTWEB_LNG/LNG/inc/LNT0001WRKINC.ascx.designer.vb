@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class LNT0001WRKINC
-    
+
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class LNT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_YM コントロール。
     '''</summary>
@@ -30,7 +30,16 @@ Partial Public Class LNT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_YM As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_TAISHOYM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TAISHOYM As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_TORICODE コントロール。
     '''</summary>
@@ -39,7 +48,16 @@ Partial Public Class LNT0001WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TORICODE As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_TORIINDEX コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TORIINDEX As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_INPTBL コントロール。
     '''</summary>
