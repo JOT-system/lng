@@ -1,5 +1,7 @@
 ﻿// 画面読み込み時処理
 window.onload = function () {
+    document.getElementById('WF_ButtonLogOut').style.display = 'inline';
+
     //変更不可判断キー
     const DisabledKeySystem = document.getElementById('DisabledKeySystem').value;
 

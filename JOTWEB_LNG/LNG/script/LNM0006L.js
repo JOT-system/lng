@@ -17,6 +17,8 @@ function InitDisplay() {
 
 // 画面読み込み時処理
 window.onload = function () {
+    document.getElementById('WF_ButtonLogOut').style.display = 'inline';
+
     //表示判断キー
     const VisibleKeyOrgCode = document.getElementById('VisibleKeyOrgCode').value;
 
