@@ -58,6 +58,111 @@ Public Class GS0007FIXVALUElst
     ''' <remarks></remarks>
     Public Property VALUE5() As ListBox
     ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE6() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE7() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE8() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE9() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE10() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE11() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE12() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE13() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE14() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE15() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE16() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE17() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE18() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE19() As ListBox
+    ''' <summary>
+    ''' 結果(ListBOX)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property VALUE20() As ListBox
+    ''' <summary>
     ''' 固定値1LISTBOX
     ''' </summary>
     ''' <value></value>
@@ -92,6 +197,111 @@ Public Class GS0007FIXVALUElst
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property LISTBOX5() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX6() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX7() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX8() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX9() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX10() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX11() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX12() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX13() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX14() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX15() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX16() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX17() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX18() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX19() As ListBox
+    ''' <summary>
+    ''' 固定値1LISTBOX
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property LISTBOX20() As ListBox
 
     ''' <summary>
     ''' SQL検索条件に含めるテキスト(このまま加える為、SQLインジェクションに注意)
@@ -122,6 +332,21 @@ Public Class GS0007FIXVALUElst
         VALUE3 = New ListBox
         VALUE4 = New ListBox
         VALUE5 = New ListBox
+        VALUE6 = New ListBox
+        VALUE7 = New ListBox
+        VALUE8 = New ListBox
+        VALUE9 = New ListBox
+        VALUE10 = New ListBox
+        VALUE11 = New ListBox
+        VALUE12 = New ListBox
+        VALUE13 = New ListBox
+        VALUE14 = New ListBox
+        VALUE15 = New ListBox
+        VALUE16 = New ListBox
+        VALUE17 = New ListBox
+        VALUE18 = New ListBox
+        VALUE19 = New ListBox
+        VALUE20 = New ListBox
 
         Try
             If IsNothing(LISTBOX1) Then
@@ -154,6 +379,96 @@ Public Class GS0007FIXVALUElst
                 LISTBOX5.Items.Clear()
             End If
 
+            If IsNothing(LISTBOX6) Then
+                LISTBOX6 = New ListBox
+            Else
+                LISTBOX6.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX7) Then
+                LISTBOX7 = New ListBox
+            Else
+                LISTBOX7.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX8) Then
+                LISTBOX8 = New ListBox
+            Else
+                LISTBOX8.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX9) Then
+                LISTBOX9 = New ListBox
+            Else
+                LISTBOX9.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX10) Then
+                LISTBOX10 = New ListBox
+            Else
+                LISTBOX10.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX11) Then
+                LISTBOX11 = New ListBox
+            Else
+                LISTBOX11.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX12) Then
+                LISTBOX12 = New ListBox
+            Else
+                LISTBOX12.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX13) Then
+                LISTBOX13 = New ListBox
+            Else
+                LISTBOX13.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX14) Then
+                LISTBOX14 = New ListBox
+            Else
+                LISTBOX14.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX15) Then
+                LISTBOX15 = New ListBox
+            Else
+                LISTBOX15.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX16) Then
+                LISTBOX16 = New ListBox
+            Else
+                LISTBOX16.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX17) Then
+                LISTBOX17 = New ListBox
+            Else
+                LISTBOX17.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX18) Then
+                LISTBOX18 = New ListBox
+            Else
+                LISTBOX18.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX19) Then
+                LISTBOX19 = New ListBox
+            Else
+                LISTBOX19.Items.Clear()
+            End If
+
+            If IsNothing(LISTBOX20) Then
+                LISTBOX20 = New ListBox
+            Else
+                LISTBOX20.Items.Clear()
+            End If
+
         Catch ex As Exception
         End Try
 
@@ -179,11 +494,26 @@ Public Class GS0007FIXVALUElst
                 SQLStr =
                       " SELECT DISTINCT                  " _
                     & "      rtrim(CLASS)  as KEYCODE , " _
-                    & "      rtrim(NAMES)  as VALUE1  , " _
-                    & "      rtrim(NAMES)  as VALUE2  , " _
-                    & "      rtrim(NAMES)  as VALUE3  , " _
-                    & "      rtrim(NAMES)  as VALUE4  , " _
-                    & "      rtrim(NAMES)  as VALUE5    " _
+                    & "      rtrim(VALUE1)  as VALUE1  , " _
+                    & "      rtrim(VALUE2)  as VALUE2  , " _
+                    & "      rtrim(VALUE3)  as VALUE3  , " _
+                    & "      rtrim(VALUE4)  as VALUE4  , " _
+                    & "      rtrim(VALUE5)  as VALUE5  , " _
+                    & "      rtrim(VALUE6)  as VALUE6  , " _
+                    & "      rtrim(VALUE7)  as VALUE7  , " _
+                    & "      rtrim(VALUE8)  as VALUE8  , " _
+                    & "      rtrim(VALUE9)  as VALUE9  , " _
+                    & "      rtrim(VALUE10)  as VALUE10  , " _
+                    & "      rtrim(VALUE11)  as VALUE11  , " _
+                    & "      rtrim(VALUE12)  as VALUE12  , " _
+                    & "      rtrim(VALUE13)  as VALUE13  , " _
+                    & "      rtrim(VALUE14)  as VALUE14  , " _
+                    & "      rtrim(VALUE15)  as VALUE15  , " _
+                    & "      rtrim(VALUE16)  as VALUE16  , " _
+                    & "      rtrim(VALUE17)  as VALUE17  , " _
+                    & "      rtrim(VALUE18)  as VALUE18  , " _
+                    & "      rtrim(VALUE19)  as VALUE19  , " _
+                    & "      rtrim(VALUE20)  as VALUE20    " _
                     & " FROM  LNG.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and DELFLG   <> @P5 "
@@ -215,7 +545,22 @@ Public Class GS0007FIXVALUElst
                     & "      rtrim(VALUE2)  as VALUE2  , " _
                     & "      rtrim(VALUE3)  as VALUE3  , " _
                     & "      rtrim(VALUE4)  as VALUE4  , " _
-                    & "      rtrim(VALUE5)  as VALUE5    " _
+                    & "      rtrim(VALUE5)  as VALUE5  , " _
+                    & "      rtrim(VALUE6)  as VALUE6  , " _
+                    & "      rtrim(VALUE7)  as VALUE7  , " _
+                    & "      rtrim(VALUE8)  as VALUE8  , " _
+                    & "      rtrim(VALUE9)  as VALUE9  , " _
+                    & "      rtrim(VALUE10)  as VALUE10  , " _
+                    & "      rtrim(VALUE11)  as VALUE11  , " _
+                    & "      rtrim(VALUE12)  as VALUE12  , " _
+                    & "      rtrim(VALUE13)  as VALUE13  , " _
+                    & "      rtrim(VALUE14)  as VALUE14  , " _
+                    & "      rtrim(VALUE15)  as VALUE15  , " _
+                    & "      rtrim(VALUE16)  as VALUE16  , " _
+                    & "      rtrim(VALUE17)  as VALUE17  , " _
+                    & "      rtrim(VALUE18)  as VALUE18  , " _
+                    & "      rtrim(VALUE19)  as VALUE19  , " _
+                    & "      rtrim(VALUE20)  as VALUE20    " _
                     & " FROM  LNG.VIW0001_FIXVALUE             " _
                     & " Where CAMPCODE  = @P1 " _
                     & "   and CLASS     = @P2 " _
@@ -255,12 +600,12 @@ Public Class GS0007FIXVALUElst
                     .Add("@P5", MySqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
                 End With
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                    Dim val(5) As String
+                    Dim val(20) As String
                     Dim keyCode As String = ""
                     While SQLdr.Read
                         keyCode = Convert.ToString(SQLdr("KEYCODE"))
                         If keyCode <> "" Then
-                            For i As Integer = 1 To 5
+                            For i As Integer = 1 To 20
                                 val(i) = Convert.ToString(SQLdr(String.Format("VALUE{0}", i)))
                             Next
                             VALUE1.Items.Add(New ListItem(val(1), keyCode))
@@ -268,12 +613,42 @@ Public Class GS0007FIXVALUElst
                             VALUE3.Items.Add(New ListItem(val(3), keyCode))
                             VALUE4.Items.Add(New ListItem(val(4), keyCode))
                             VALUE5.Items.Add(New ListItem(val(5), keyCode))
+                            VALUE6.Items.Add(New ListItem(val(6), keyCode))
+                            VALUE7.Items.Add(New ListItem(val(7), keyCode))
+                            VALUE8.Items.Add(New ListItem(val(8), keyCode))
+                            VALUE9.Items.Add(New ListItem(val(9), keyCode))
+                            VALUE10.Items.Add(New ListItem(val(10), keyCode))
+                            VALUE11.Items.Add(New ListItem(val(11), keyCode))
+                            VALUE12.Items.Add(New ListItem(val(12), keyCode))
+                            VALUE13.Items.Add(New ListItem(val(13), keyCode))
+                            VALUE14.Items.Add(New ListItem(val(14), keyCode))
+                            VALUE15.Items.Add(New ListItem(val(15), keyCode))
+                            VALUE16.Items.Add(New ListItem(val(16), keyCode))
+                            VALUE17.Items.Add(New ListItem(val(17), keyCode))
+                            VALUE18.Items.Add(New ListItem(val(18), keyCode))
+                            VALUE19.Items.Add(New ListItem(val(19), keyCode))
+                            VALUE20.Items.Add(New ListItem(val(20), keyCode))
 
                             LISTBOX1.Items.Add(New ListItem(val(1), keyCode))
                             LISTBOX2.Items.Add(New ListItem(val(2), keyCode))
                             LISTBOX3.Items.Add(New ListItem(val(3), keyCode))
                             LISTBOX4.Items.Add(New ListItem(val(4), keyCode))
                             LISTBOX5.Items.Add(New ListItem(val(5), keyCode))
+                            LISTBOX6.Items.Add(New ListItem(val(6), keyCode))
+                            LISTBOX7.Items.Add(New ListItem(val(7), keyCode))
+                            LISTBOX8.Items.Add(New ListItem(val(8), keyCode))
+                            LISTBOX9.Items.Add(New ListItem(val(9), keyCode))
+                            LISTBOX10.Items.Add(New ListItem(val(10), keyCode))
+                            LISTBOX11.Items.Add(New ListItem(val(11), keyCode))
+                            LISTBOX12.Items.Add(New ListItem(val(12), keyCode))
+                            LISTBOX13.Items.Add(New ListItem(val(13), keyCode))
+                            LISTBOX14.Items.Add(New ListItem(val(14), keyCode))
+                            LISTBOX15.Items.Add(New ListItem(val(15), keyCode))
+                            LISTBOX16.Items.Add(New ListItem(val(16), keyCode))
+                            LISTBOX17.Items.Add(New ListItem(val(17), keyCode))
+                            LISTBOX18.Items.Add(New ListItem(val(18), keyCode))
+                            LISTBOX19.Items.Add(New ListItem(val(19), keyCode))
+                            LISTBOX20.Items.Add(New ListItem(val(20), keyCode))
                         End If
                     End While
                 End Using 'SQLdr
@@ -310,14 +685,14 @@ Public Class GS0007FIXVALUElst
                         .Add("@P5", MySqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
                     End With
                     Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                        Dim val(5) As String
+                        Dim val(20) As String
                         Dim keyCode As String = ""
 
                         While SQLdr.Read
                             keyCode = Convert.ToString(SQLdr("KEYCODE"))
                             If keyCode <> "" Then
 
-                                For i As Integer = 1 To 5
+                                For i As Integer = 1 To 20
                                     val(i) = Convert.ToString(SQLdr(String.Format("VALUE{0}", i)))
                                 Next
                                 VALUE1.Items.Add(New ListItem(val(1), keyCode))
@@ -325,12 +700,42 @@ Public Class GS0007FIXVALUElst
                                 VALUE3.Items.Add(New ListItem(val(3), keyCode))
                                 VALUE4.Items.Add(New ListItem(val(4), keyCode))
                                 VALUE5.Items.Add(New ListItem(val(5), keyCode))
+                                VALUE6.Items.Add(New ListItem(val(6), keyCode))
+                                VALUE7.Items.Add(New ListItem(val(7), keyCode))
+                                VALUE8.Items.Add(New ListItem(val(8), keyCode))
+                                VALUE9.Items.Add(New ListItem(val(9), keyCode))
+                                VALUE10.Items.Add(New ListItem(val(10), keyCode))
+                                VALUE11.Items.Add(New ListItem(val(11), keyCode))
+                                VALUE12.Items.Add(New ListItem(val(12), keyCode))
+                                VALUE13.Items.Add(New ListItem(val(13), keyCode))
+                                VALUE14.Items.Add(New ListItem(val(14), keyCode))
+                                VALUE15.Items.Add(New ListItem(val(15), keyCode))
+                                VALUE16.Items.Add(New ListItem(val(16), keyCode))
+                                VALUE17.Items.Add(New ListItem(val(17), keyCode))
+                                VALUE18.Items.Add(New ListItem(val(18), keyCode))
+                                VALUE19.Items.Add(New ListItem(val(19), keyCode))
+                                VALUE20.Items.Add(New ListItem(val(20), keyCode))
 
                                 LISTBOX1.Items.Add(New ListItem(val(1), keyCode))
                                 LISTBOX2.Items.Add(New ListItem(val(2), keyCode))
                                 LISTBOX3.Items.Add(New ListItem(val(3), keyCode))
                                 LISTBOX4.Items.Add(New ListItem(val(4), keyCode))
                                 LISTBOX5.Items.Add(New ListItem(val(5), keyCode))
+                                LISTBOX6.Items.Add(New ListItem(val(6), keyCode))
+                                LISTBOX7.Items.Add(New ListItem(val(7), keyCode))
+                                LISTBOX8.Items.Add(New ListItem(val(8), keyCode))
+                                LISTBOX9.Items.Add(New ListItem(val(9), keyCode))
+                                LISTBOX10.Items.Add(New ListItem(val(10), keyCode))
+                                LISTBOX11.Items.Add(New ListItem(val(11), keyCode))
+                                LISTBOX12.Items.Add(New ListItem(val(12), keyCode))
+                                LISTBOX13.Items.Add(New ListItem(val(13), keyCode))
+                                LISTBOX14.Items.Add(New ListItem(val(14), keyCode))
+                                LISTBOX15.Items.Add(New ListItem(val(15), keyCode))
+                                LISTBOX16.Items.Add(New ListItem(val(16), keyCode))
+                                LISTBOX17.Items.Add(New ListItem(val(17), keyCode))
+                                LISTBOX18.Items.Add(New ListItem(val(18), keyCode))
+                                LISTBOX19.Items.Add(New ListItem(val(19), keyCode))
+                                LISTBOX20.Items.Add(New ListItem(val(20), keyCode))
                             End If
                         End While
                     End Using
@@ -366,7 +771,7 @@ Public Class GS0007FIXVALUElst
         'セッション制御宣言
         Dim sm As New CS0050SESSION
         '初期値設定
-        ERR = C_MESSAGE_NO.DLL_IF_ERROR
+        ERR = C_MESSAGE_NO.NORMAL
         Dim sqlStat As New StringBuilder
         'SQL文字の生成
         If String.IsNullOrEmpty(CLAS) Then
@@ -392,7 +797,8 @@ Public Class GS0007FIXVALUElst
             sqlStat.AppendLine("       rtrim(coalesce(KEYCODE,''))  AS KEYCODE")
             For Each fieldName In {"VALUE1", "VALUE2", "VALUE3", "VALUE4", "VALUE5",
                                        "VALUE6", "VALUE7", "VALUE8", "VALUE9", "VALUE10",
-                                       "VALUE11", "VALUE12", "VALUE13", "VALUE14", "VALUE15"}
+                                       "VALUE11", "VALUE12", "VALUE13", "VALUE14", "VALUE15",
+                                       "VALUE16", "VALUE17", "VALUE18", "VALUE19", "VALUE20"}
                 sqlStat.AppendFormat("      ,rtrim(coalesce({0},''))   AS {0}", fieldName).AppendLine()
             Next fieldName
             sqlStat.AppendLine("      ,rtrim(coalesce(NAMES,''))  AS NAMES")
