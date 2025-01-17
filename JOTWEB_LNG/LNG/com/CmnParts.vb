@@ -266,6 +266,7 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectKOTEIHIMaster(ByVal SQLcon As MySqlConnection,
                                    ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtKOTEIHIMas As DataTable,
+                                   Optional ByVal I_CLASS As String = Nothing,
                                    Optional ByVal I_RIKUBAN As String = Nothing)
         If IsNothing(O_dtKOTEIHIMas) Then
             O_dtKOTEIHIMas = New DataTable
@@ -295,9 +296,18 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0007.BIKOU1 "
         SQLStr &= "   ,LNM0007.BIKOU2 "
         SQLStr &= "   ,LNM0007.BIKOU3 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= "   ,LNM0005.VALUE08 AS KOTEIHI_CELLNUM "
+        End If
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0007_KOTEIHI LNM0007 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
+            SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0007.RIKUBAN "
+        End If
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -306,11 +316,15 @@ Public Class CmnParts
         SQLStr &= String.Format(" AND LNM0007.ORGCODE = '{0}' ", I_ORGCODE)
         SQLStr &= String.Format(" AND LNM0007.STYMD <= '{0}' ", I_TAISHOYM)
         SQLStr &= String.Format(" AND LNM0007.ENDYMD >= '{0}' ", I_TAISHOYM)
+        '★陸事番号が指定されている場合
         If Not IsNothing(I_RIKUBAN) Then
             SQLStr &= String.Format(" AND LNM0007.RIKUBAN = '{0}' ", I_RIKUBAN)
         End If
 
         '-- ORDER BY
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " ORDER BY CAST(LNM0005.VALUE08 AS SIGNED) "
+        End If
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -374,6 +388,7 @@ Public Class CmnParts
         End If
 
         '-- ORDER BY
+        SQLStr &= " ORDER BY CAST(LNM0010.RECOID AS SIGNED) "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)

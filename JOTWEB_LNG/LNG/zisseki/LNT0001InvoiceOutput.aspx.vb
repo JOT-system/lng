@@ -20,7 +20,9 @@ Public Class LNT0001InvoiceOutput
     Private LNT0001tbl As DataTable                                  '実績（アボカド）データ格納用テーブル
     Private LNT0001Sumtbl As DataTable                               '実績（アボカド）サマリーデータ格納用テーブル
     Private LNT0001Tanktbl As DataTable                              '実績（アボカド）単価データ格納用テーブル
-
+    Private LNT0001Koteihi As DataTable                              '-- 固定費マスタ
+    Private LNT0001HachinoheSprate As DataTable                      '-- 八戸特別料金マスタ
+    Private LNT0001EneosComfee As DataTable                          '-- ENEOS業務委託料マスタ
     ''' <summary>
     ''' 定数
     ''' </summary>
@@ -759,7 +761,10 @@ Public Class LNT0001InvoiceOutput
             '〇(帳票)項目チェック処理(ENEOS)
             WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
 
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi,
+                                                                             printHachinoheSprateDataClass:=LNT0001HachinoheSprate,
+                                                                             printEneosComfeeDataClass:=LNT0001EneosComfee,
+                                                                             taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
@@ -777,7 +782,12 @@ Public Class LNT0001InvoiceOutput
             '〇(帳票)項目チェック処理(DAIGAS)
             WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
 
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORI.SelectedValue, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, taishoYm:=Me.WF_TaishoYm.Value, calcNumber:=1000)
+            Dim dtDummy As New DataTable
+            dtDummy.Columns.Add("RECOID", Type.GetType("System.Int32"))
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORI.SelectedValue, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi,
+                                                                             printHachinoheSprateDataClass:=dtDummy,
+                                                                             printEneosComfeeDataClass:=dtDummy,
+                                                                             taishoYm:=Me.WF_TaishoYm.Value, calcNumber:=1000)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
@@ -984,6 +994,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTankClass, dtDaigasTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTodokeClass, dtDaigasTodoke)
             CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
+            CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=daigasTankClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1129,6 +1140,9 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTodokeClass, dtEneosTodoke)
             CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=eneosTankClass)
+            CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001HachinoheSprate)
+            CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001EneosComfee)
         End Using
 
         '〇(帳票)使用項目の設定

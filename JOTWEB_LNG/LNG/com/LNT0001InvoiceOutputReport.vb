@@ -8,6 +8,8 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp02 As Integer = 0
     Private WW_SheetNoTmp03 As Integer = 0
     Private WW_SheetNoTmp04 As Integer = 0
+    Private WW_SheetNoTmp05 As Integer = 0
+    Private WW_SheetNoTmp06 As Integer = 0
     Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
     ''' <summary>
@@ -18,6 +20,9 @@ Public Class LNT0001InvoiceOutputReport
     Private UrlRoot As String = ""
     Private PrintData As DataTable
     Private PrintTankData As DataTable
+    Private PrintKoteihiData As DataTable
+    Private PrintHachinoheSprateData As DataTable
+    Private PrintEneosComfeeData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -32,8 +37,14 @@ Public Class LNT0001InvoiceOutputReport
     ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
     ''' <param name="outputFileName">(出力用)Excelファイル名（フルパスではない)</param>
     ''' <param name="printDataClass">帳票データ</param>
+    ''' <param name="printKoteihiDataClass">固定費マスタ</param>
+    ''' <param name="printHachinoheSprateDataClass">八戸特別料金マスタ</param>
+    ''' <param name="printEneosComfeeDataClass">ENEOS業務委託料マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
-    Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable, printTankDataClass As DataTable,
+    Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
+                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable,
+                   Optional ByVal printHachinoheSprateDataClass As DataTable = Nothing,
+                   Optional ByVal printEneosComfeeDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -41,6 +52,9 @@ Public Class LNT0001InvoiceOutputReport
             Dim CS0050SESSION As New CS0050SESSION
             Me.PrintData = printDataClass
             Me.PrintTankData = printTankDataClass
+            Me.PrintKoteihiData = printKoteihiDataClass
+            Me.PrintHachinoheSprateData = printHachinoheSprateDataClass
+            Me.PrintEneosComfeeData = printEneosComfeeDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -92,14 +106,25 @@ Public Class LNT0001InvoiceOutputReport
                         OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" _
                         OrElse WW_Workbook.Worksheets(i).Name = "東洋ウレタン" _
                         OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" Then
+                        '〇共通(シート[(共有用)届先])
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
+                        '〇共通(シート[固定費])
                         WW_SheetNoTmp02 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "届先毎" _
                         OrElse WW_Workbook.Worksheets(i).Name = "水島（届先別）" Then
+                        '〇ENEOS(シート[届先別])
                         WW_SheetNoTmp03 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
+                        '〇共通(シート[ﾏｽﾀ])
                         WW_SheetNoTmp04 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "八戸業務委託料" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "水島輸送分請求書" Then
+                        '〇ENEOS(シート[業務委託料])
+                        WW_SheetNoTmp05 = i
+                    ElseIf WW_Workbook.Worksheets(i).Name = "請求書明細" Then
+                        '〇DAIGAS(シート[請求書明細])
+                        WW_SheetNoTmp06 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "TMP" + (j + 1).ToString("00") Then
                         WW_ArrSheetNo(j) = i
                         j += 1
@@ -215,6 +240,7 @@ Public Class LNT0001InvoiceOutputReport
     Private Sub EditDetailArea()
         Try
             Dim cellStay As String = ""
+            Dim condition As String = ""
 
             'For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO, TODOKEDATE")
             For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO, SHUKADATE")
@@ -248,9 +274,20 @@ Public Class LNT0001InvoiceOutputReport
                 '★ 表示
                 WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())).Hidden = False
                 '★ トラクタ
-                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("E" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TRACTORNUMBER").ToString()
+                If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
+                    OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("E" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TRACTORNUMBER").ToString()
+                End If
                 '★ トレーラ
                 WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("F" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TANKNUMBER").ToString()
+
+                '〇シート「請求書明細」
+                If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" Then
+                    Dim cellNum As Integer = 46
+                    cellNum += Integer.Parse(PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoTmp05).Range(String.Format("{0}:{0}", cellNum.ToString())).Hidden = False
+                End If
 
                 '表示用セル保管
                 cellStay = PrintDatarow("DISPLAYCELL_START").ToString()
@@ -288,6 +325,28 @@ Public Class LNT0001InvoiceOutputReport
 
                 '表示用セル保管
                 cellStay = PrintDatarow("TODOKECELL_REP").ToString()
+            Next
+
+            '〇陸事番号(固定費)設定
+            For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
+                '〇シート「固定費」
+                '★ 月額固定費
+                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+            Next
+            '〇陸事番号(固定費(八戸人員/八戸出荷))設定
+            For Each PrintHachinoheSprateDatarow As DataRow In PrintHachinoheSprateData.Rows
+                '〇シート「固定費」
+                If PrintHachinoheSprateDatarow("RECONAME").ToString() = "追加人員固定費" Then
+                    '★ 追加人員固定費
+                    If PrintHachinoheSprateDatarow("RECOID").ToString() = "1" Then
+                        WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G39").Value = Integer.Parse(PrintHachinoheSprateDatarow("KINGAKU").ToString())
+                    ElseIf PrintHachinoheSprateDatarow("RECOID").ToString() = "2" Then
+                        WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G40").Value = Integer.Parse(PrintHachinoheSprateDatarow("KINGAKU").ToString())
+                    End If
+                ElseIf PrintHachinoheSprateDatarow("RECONAME").ToString() = "八戸ターミナル負担分" Then
+                    '★ 八戸ターミナル負担分
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G41").Value = Integer.Parse(PrintHachinoheSprateDatarow("KINGAKU").ToString())
+                End If
             Next
 
             '〇届先(単価)設定
@@ -354,6 +413,19 @@ Public Class LNT0001InvoiceOutputReport
                         End If
                     End If
                 End If
+            Next
+
+            '〇ENEOS業務委託料
+            condition = ""
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
+                If Me.TaishoMM = "12" Then
+                    condition = "RECOID='2'"
+                Else
+                    condition = "RECOID='1'"
+                End If
+            End If
+            For Each PrintEneosComfeeDatarow As DataRow In PrintEneosComfeeData.Select(condition)
+                WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Integer.Parse(PrintEneosComfeeDatarow("KINGAKU").ToString())
             Next
 
             '★計算エンジンの有効化
