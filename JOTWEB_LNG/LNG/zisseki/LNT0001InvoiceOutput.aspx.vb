@@ -442,6 +442,7 @@ Public Class LNT0001InvoiceOutput
             & "     ,coalesce(LT1.LOADTIMES, '')                          AS LOADTIMES			" _
             & "     ,coalesce(LT1.TODOKEDATE, '')                         AS TODOKEDATE			" _
             & "     ,ROW_NUMBER() OVER(PARTITION BY coalesce(LT1.SYAGATA, ''),coalesce(LT1.SHUKADATE_MG, '') ORDER BY coalesce(LT1.SYAGATA, ''),coalesce(LT1.SHUKADATE, ''),coalesce(LT1.TODOKEDATE, '') ) TODOKEDATE_ROWNUM " _
+            & "     ,ROW_NUMBER() OVER(PARTITION BY coalesce(LT1.TODOKECODE, ''),coalesce(LT1.TODOKEDATE, '') ORDER BY coalesce(LT1.TODOKECODE, ''),coalesce(LT1.TODOKEDATE, ''),coalesce(LT1.SHITEITIMES, '') ) TODOKEDATE_ORDER " _
             & "     ,coalesce(LT1.SHITEITIME, '')                         AS SHITEITIME			" _
             & "     ,coalesce(LT1.SHITEITIMEIN, '')                       AS SHITEITIMEIN			" _
             & "     ,coalesce(LT1.SHITEITIMES, '')                        AS SHITEITIMES			" _
@@ -1239,6 +1240,14 @@ Public Class LNT0001InvoiceOutput
                 LNT0001tblrow("SHEETSORTNO_REP") = dtEneosTodokerow("KEYCODE03")
                 LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01")
                 LNT0001tblrow("SHEETNAME_REP") = dtEneosTodokerow("VALUE06")
+
+                '〇八戸営業所(東部瓦斯)独自仕様
+                If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005487 Then
+                    '★[３台目]に納入
+                    If LNT0001tblrow("TODOKEDATE_ORDER").ToString() = "3" Then
+                        LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01") + LNT0001tblrow("TODOKEDATE_ORDER").ToString()
+                    End If
+                End If
 
                 '〇届先が追加された場合
                 If dtEneosTodokerow("VALUE02").ToString() = "1" Then

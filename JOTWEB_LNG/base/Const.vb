@@ -356,6 +356,10 @@ Public Module BaseDllConst
     ''' 昭和産業㈱
     ''' </summary>
     Public Const CONST_TODOKECODE_005866 As String = "005866"
+    ''' <summary>
+    ''' 東部瓦斯
+    ''' </summary>
+    Public Const CONST_TODOKECODE_005487 As String = "005487"
 #End Region
 
 #Region "業務ID"
