@@ -473,7 +473,8 @@ Public Class LNS0001UserDetail
                     If LNS0001Chk.Rows.Count <> 0 Then
                         Dim LastLNS0001row As DataRow = LNS0001Chk.Rows(0)
                         ' 期間重複が同じデータで無い場合のみ次回情報を表示
-                        If WF_StYMD.Value <> CDate(LastLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
+                        'If WF_StYMD.Value <> CDate(LastLNS0001row("STYMD")).ToString("yyyy-MM-dd") Then
+                        If WF_StYMD.Value <> CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd") Then
                             flg = 1
                             DisabledKey_OverlapPeriodsInput_Start.Value = ""
                             pnlTxtAdjustLastStYMD.Text = CDate(LastLNS0001row("STYMD")).ToString("yyyy/MM/dd")

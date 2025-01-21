@@ -192,7 +192,7 @@ Partial Public Class LNT0001ZissekiManage
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -200,8 +200,8 @@ Partial Public Class LNT0001ZissekiManage
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Public WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
