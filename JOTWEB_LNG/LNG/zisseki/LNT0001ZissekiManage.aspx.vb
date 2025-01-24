@@ -193,6 +193,7 @@ Public Class LNT0001ZissekiManage
 
             ' 初期変数設定処理
             WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
+            work.WF_SEL_TORIINDEX.Text = WF_TORI.SelectedIndex
         ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001D OrElse
                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001I OrElse
                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
