@@ -807,16 +807,27 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
-        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 Then
-            '〇(帳票)項目チェック処理(DAIGAS)
-            WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 _
+            OrElse selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+            Dim iCalcNumber As Integer = 1000
+            Dim selectOrgCodeSub As String = Me.WF_TORI.SelectedValue
+            '★姫路を選択した場合(ENEOSとフォーマットが同一のため)
+            If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+                '〇(帳票)項目チェック処理(ENEOS)
+                WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+                iCalcNumber = 1
+                selectOrgCodeSub = selectOrgCode
+            Else
+                '〇(帳票)項目チェック処理(DAIGAS)
+                WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+            End If
 
             Dim dtDummy As New DataTable
             dtDummy.Columns.Add("RECOID", Type.GetType("System.Int32"))
-            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, Me.WF_TORI.SelectedValue, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi,
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCodeSub, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi,
                                                                              printHachinoheSprateDataClass:=dtDummy,
                                                                              printEneosComfeeDataClass:=dtDummy,
-                                                                             taishoYm:=Me.WF_TaishoYm.Value, calcNumber:=1000)
+                                                                             taishoYm:=Me.WF_TaishoYm.Value, calcNumber:=iCalcNumber)
             Dim url As String
             Try
                 url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
@@ -1159,6 +1170,14 @@ Public Class LNT0001InvoiceOutput
                 eneosTodokeClass = "MIZUSHIMA_TODOKE_MAS"
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0005700000
                 arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_023301
+
+            '"DAIGAS_姫路　輸送費請求書"
+            Case BaseDllConst.CONST_ORDERORGCODE_022801
+                eneosTankClass = "DAIGAS_HIMEGI_TANK"
+                eneosTodokeClass = "HIMEGI_TODOKE_MAS"
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0051200000
+                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_022801
+                arrToriCode(2) = Nothing
 
             Case Else
                 Exit Sub

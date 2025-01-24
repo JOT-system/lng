@@ -96,7 +96,8 @@ Public Class LNT0001InvoiceOutputReport
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 _
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" _
-                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" Then
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 Dim j As Integer = 0
                 For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
                     If WW_Workbook.Worksheets(i).Name = "入力表" _
@@ -105,7 +106,8 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" _
                         OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" _
                         OrElse WW_Workbook.Worksheets(i).Name = "東洋ウレタン" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" Then
+                        OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "日本板硝子" Then
                         '〇共通(シート[(共有用)届先])
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
@@ -188,7 +190,8 @@ Public Class LNT0001InvoiceOutputReport
             '◯ 年月
             Select Case Me.OutputOrgCode
                 Case BaseDllConst.CONST_ORDERORGCODE_020202,
-                     BaseDllConst.CONST_ORDERORGCODE_023301
+                     BaseDllConst.CONST_ORDERORGCODE_023301,
+                     BaseDllConst.CONST_ORDERORGCODE_022801
                     WW_Workbook.Worksheets(WW_SheetNo).Range("B1").Value = Integer.Parse(Me.TaishoYYYY)
                     WW_Workbook.Worksheets(WW_SheetNo).Range("B2").Value = Integer.Parse(Me.TaishoMM)
                     dayCellsSub = {"91", "94", "97"}
