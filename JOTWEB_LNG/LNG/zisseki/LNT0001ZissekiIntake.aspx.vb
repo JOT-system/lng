@@ -2120,6 +2120,19 @@ Public Class LNT0001ZissekiIntake
                 & "       , RECEIVEYMD  = @RECEIVEYMD                                     "
 
             Try
+                'グルーピング（受注部署、取引先）
+                Dim queryG = From row In iTbl.AsEnumerable()
+                             Group row By ORDERORG = row.Field(Of String)("受注受付部署コード"),
+                                          ORDERORGNAME = row.Field(Of String)("受注受付部署名"),
+                                          TORICODE = row.Field(Of String)("届先取引先コード"),
+                                          TORINAME = row.Field(Of String)("届先取引先名称") Into Group
+                             Select New With {
+                            .ORDERORG = ORDERORG,
+                            .ORDERORGNAME = ORDERORGNAME,
+                            .TORICODE = TORICODE,
+                            .TORINAME = TORINAME
+                        }
+
                 Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                     ' DB更新用パラメータ(ユーザーパスワードマスタ)
                     Dim TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Decimal, 6)             '対象年月
@@ -2141,34 +2154,36 @@ Public Class LNT0001ZissekiIntake
                     Dim UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)              '更新プログラムＩＤ
                     Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)           '集信日時
 
-                    ' DB更新
-                    TAISHOYM.Value = WF_TaishoYm.Value.Replace("/", "")                      '対象年月
-                    TORICODE.Value = SaveTori                                               '取引先コード
-                    TORINAME.Value = SaveToriName                                           '取引先名
-                    SHIPORG.Value = SaveOrg                                                 '営業所コード
-                    SHIPORGNAME.Value = SaveOrgName                                         '営業所名
-                    USERID.Value = Master.USERID                                            'ユーザーID
-                    CS0051UserInfo.USERID = Master.USERID
-                    CS0051UserInfo.getInfo()
-                    If isNormal(CS0051UserInfo.ERR) Then
-                        USERNAME.Value = CS0051UserInfo.STAFFNAMES                          'ユーザー名
-                    Else
-                        USERNAME.Value = ""                                                 'ユーザー名
-                    End If
-                    INTAKEDATE.Value = WW_DateNow                                           '最終事績取込日
-                    DELFLG.Value = C_DELETE_FLG.ALIVE                                       '削除フラグ
-                    INITYMD.Value = WW_DateNow                                              '登録年月日
-                    INITUSER.Value = Master.USERID                                          '登録ユーザーＩＤ
-                    INITTERMID.Value = Master.USERTERMID                                    '登録端末
-                    INITPGID.Value = Me.GetType().BaseType.Name                             '登録プログラムＩＤ
-                    UPDYMD.Value = WW_DateNow                                               '更新年月日
-                    UPDUSER.Value = Master.USERID                                           '更新ユーザーＩＤ
-                    UPDTERMID.Value = Master.USERTERMID                                     '更新端末
-                    UPDPGID.Value = Me.GetType().BaseType.Name                              '更新プログラムＩＤ
-                    RECEIVEYMD.Value = C_DEFAULT_YMD                                        '集信日時
+                    For Each result In queryG
+                        ' DB更新
+                        TAISHOYM.Value = WF_TaishoYm.Value.Replace("/", "")                     '対象年月
+                        TORICODE.Value = result.TORICODE                                        '取引先コード
+                        TORINAME.Value = result.TORINAME                                        '取引先名
+                        SHIPORG.Value = result.ORDERORG                                         '営業所コード
+                        SHIPORGNAME.Value = result.ORDERORGNAME                                 '営業所名
+                        USERID.Value = Master.USERID                                            'ユーザーID
+                        CS0051UserInfo.USERID = Master.USERID
+                        CS0051UserInfo.getInfo()
+                        If isNormal(CS0051UserInfo.ERR) Then
+                            USERNAME.Value = CS0051UserInfo.STAFFNAMES                          'ユーザー名
+                        Else
+                            USERNAME.Value = ""                                                 'ユーザー名
+                        End If
+                        INTAKEDATE.Value = WW_DateNow                                           '最終事績取込日
+                        DELFLG.Value = C_DELETE_FLG.ALIVE                                       '削除フラグ
+                        INITYMD.Value = WW_DateNow                                              '登録年月日
+                        INITUSER.Value = Master.USERID                                          '登録ユーザーＩＤ
+                        INITTERMID.Value = Master.USERTERMID                                    '登録端末
+                        INITPGID.Value = Me.GetType().BaseType.Name                             '登録プログラムＩＤ
+                        UPDYMD.Value = WW_DateNow                                               '更新年月日
+                        UPDUSER.Value = Master.USERID                                           '更新ユーザーＩＤ
+                        UPDTERMID.Value = Master.USERTERMID                                     '更新端末
+                        UPDPGID.Value = Me.GetType().BaseType.Name                              '更新プログラムＩＤ
+                        RECEIVEYMD.Value = C_DEFAULT_YMD                                        '集信日時
 
-                    SQLcmd.CommandTimeout = 300
-                    SQLcmd.ExecuteNonQuery()
+                        SQLcmd.CommandTimeout = 300
+                        SQLcmd.ExecuteNonQuery()
+                    Next
 
                 End Using
             Catch ex As Exception
