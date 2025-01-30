@@ -314,6 +314,10 @@ Public Module BaseDllConst
     ''' ＤＧＥ
     ''' </summary>
     Public Const CONST_TORICODE_0051200000 As String = "0051200000"
+    ''' <summary>
+    ''' エスケイ産業
+    ''' </summary>
+    Public Const CONST_TORICODE_0045200000 As String = "0045200000"
 #End Region
 
 #Region "受注受付部署"
@@ -364,6 +368,10 @@ Public Module BaseDllConst
     ''' 東部瓦斯
     ''' </summary>
     Public Const CONST_TODOKECODE_005487 As String = "005487"
+    ''' <summary>
+    ''' リコー福井事業所
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004559 As String = "004559"
 #End Region
 
 #Region "業務ID"

@@ -97,6 +97,7 @@ Public Class LNT0001InvoiceOutputReport
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 _
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" _
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "03" _
                 OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 Dim j As Integer = 0
                 For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
@@ -107,7 +108,8 @@ Public Class LNT0001InvoiceOutputReport
                         OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" _
                         OrElse WW_Workbook.Worksheets(i).Name = "東洋ウレタン" _
                         OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "日本板硝子" Then
+                        OrElse WW_Workbook.Worksheets(i).Name = "日本板硝子" _
+                        OrElse WW_Workbook.Worksheets(i).Name = "リコー" Then
                         '〇共通(シート[(共有用)届先])
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
@@ -196,7 +198,8 @@ Public Class LNT0001InvoiceOutputReport
                     WW_Workbook.Worksheets(WW_SheetNo).Range("B2").Value = Integer.Parse(Me.TaishoMM)
                     dayCellsSub = {"91", "94", "97"}
                 Case BaseDllConst.CONST_ORDERORGCODE_022702 + "01",
-                     BaseDllConst.CONST_ORDERORGCODE_022702 + "02"
+                     BaseDllConst.CONST_ORDERORGCODE_022702 + "02",
+                     BaseDllConst.CONST_ORDERORGCODE_022702 + "03"
                     WW_Workbook.Worksheets(WW_SheetNo).Range("C4").Value = Integer.Parse(Me.TaishoYYYY)
                     WW_Workbook.Worksheets(WW_SheetNo).Range("E4").Value = Integer.Parse(Me.TaishoMM)
                     dayCellsSub = {"36", "37", "38"}

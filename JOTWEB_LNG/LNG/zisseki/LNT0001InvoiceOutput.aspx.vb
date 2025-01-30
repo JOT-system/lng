@@ -207,16 +207,20 @@ Public Class LNT0001InvoiceOutput
 
         '取引先、部署（部署は、カンマ区切りで複数あり）
         WF_TORIORG.Items.Clear()
+        WF_TORIORG2.Items.Clear()
         WF_TORIORG.Items.Add(New ListItem("選択してください", ""))
+        WF_TORIORG2.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
             Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
             Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
             If exists Then
                 WF_TORIORG.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE5"), wOrg))
+                WF_TORIORG2.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE5"), LNS0006tbl.Rows(i)("KEYCODE")))
             End If
 
         Next
         WF_TORIORG.SelectedIndex = 0
+        WF_TORIORG2.SelectedIndex = 0
     End Sub
 
     Protected Function EditOrgCsv(ByVal iRow As DataRow) As String
@@ -611,6 +615,9 @@ Public Class LNT0001InvoiceOutput
         ElseIf Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022702 + "02" Then
             '★[Daigas新宮]選択時
             SQLStr &= String.Format(" AND LT1.TODOKECODE = '{0}' ", BaseDllConst.CONST_TODOKECODE_001640)
+        ElseIf Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022702 + "03" Then
+            '★[エスケイ産業]選択時
+            SQLStr &= String.Format(" AND LT1.TODOKECODE = '{0}' ", BaseDllConst.CONST_TODOKECODE_004559)
         End If
 
         SQLStr &= String.Format(" AND LT1.DELFLG = '{0}' ", BaseDllConst.C_DELETE_FLG.ALIVE)
@@ -636,7 +643,7 @@ Public Class LNT0001InvoiceOutput
                 End If
                 Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
                 PARA4.Value = lastMonth
-                PARA5.Value = WF_TORIORG.SelectedItem.Text
+                PARA5.Value = WF_TORIORG2.SelectedItem.Text
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -995,6 +1002,7 @@ Public Class LNT0001InvoiceOutput
                 Me.WF_TORIEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
+                Me.WF_TORIORG2.SelectedIndex = Me.WF_TORI.SelectedIndex
         End Select
 
     End Sub
@@ -1021,6 +1029,12 @@ Public Class LNT0001InvoiceOutput
                 If Me.WF_TORI.SelectedValue = "02270202" Then
                     daigasTodokeClass = "NIIMIYA_TODOKE_MAS"
                     arrToriCode(2) = BaseDllConst.CONST_TODOKECODE_001640
+                ElseIf Me.WF_TORI.SelectedValue = "02270203" Then
+                    '"エスケイ産業　輸送費請求書"を指定した場合
+                    daigasTankClass = "DAIGAS_ESUKEI_TANK"
+                    daigasTodokeClass = "ESUKEI_TODOKE_MAS"
+                    arrToriCode(0) = BaseDllConst.CONST_TORICODE_0045200000
+                    arrToriCode(2) = BaseDllConst.CONST_TODOKECODE_004559
                 Else
                     arrToriCode(2) = Nothing
                 End If
