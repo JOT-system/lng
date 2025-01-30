@@ -207,20 +207,16 @@ Public Class LNT0001InvoiceOutput
 
         '取引先、部署（部署は、カンマ区切りで複数あり）
         WF_TORIORG.Items.Clear()
-        WF_TORIORG2.Items.Clear()
         WF_TORIORG.Items.Add(New ListItem("選択してください", ""))
-        WF_TORIORG2.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To LNS0006tbl.Rows.Count - 1
             Dim wOrg As String = EditOrgCsv(LNS0006tbl.Rows(i))
             Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
             If exists Then
                 WF_TORIORG.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE5"), wOrg))
-                WF_TORIORG2.Items.Add(New ListItem(LNS0006tbl.Rows(i)("VALUE5"), LNS0006tbl.Rows(i)("KEYCODE")))
             End If
 
         Next
         WF_TORIORG.SelectedIndex = 0
-        WF_TORIORG2.SelectedIndex = 0
     End Sub
 
     Protected Function EditOrgCsv(ByVal iRow As DataRow) As String
@@ -633,7 +629,8 @@ Public Class LNT0001InvoiceOutput
                 Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
                 Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
                 Dim PARA5 As MySqlParameter = SQLcmd.Parameters.Add("@P5", MySqlDbType.VarChar)  '取引先コード
-                PARA1.Value = WF_TORIORG.SelectedValue
+                'PARA1.Value = WF_TORIORG.SelectedValue
+                PARA1.Value = WF_TORIORG.Items(WF_TORI.SelectedIndex).Value
                 If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                     PARA2.Value = WF_TaishoYm.Value & "/01"
                     PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
@@ -643,7 +640,8 @@ Public Class LNT0001InvoiceOutput
                 End If
                 Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
                 PARA4.Value = lastMonth
-                PARA5.Value = WF_TORIORG2.SelectedItem.Text
+                'PARA5.Value = WF_TORIORG.SelectedItem.Text
+                PARA5.Value = WF_TORIORG.Items(WF_TORI.SelectedIndex).Text
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -1002,7 +1000,6 @@ Public Class LNT0001InvoiceOutput
                 Me.WF_TORIEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
-                Me.WF_TORIORG2.SelectedIndex = Me.WF_TORI.SelectedIndex
         End Select
 
     End Sub
