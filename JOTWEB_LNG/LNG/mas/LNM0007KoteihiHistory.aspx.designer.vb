@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNM0006TankaList
+Partial Public Class LNM0007KoteihiHistory
     
     '''<summary>
     '''leftmenu コントロール。
@@ -23,6 +23,33 @@ Partial Public Class LNM0006TankaList
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
+    '''WF_ButtonKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ButtonTNGKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonTNGKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ButtonSKKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonSKKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
     '''ListCount コントロール。
     '''</summary>
     '''<remarks>
@@ -32,40 +59,31 @@ Partial Public Class LNM0006TankaList
     Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_StYMD コントロール。
+    '''WF_DDL_MODIFYYM コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_StYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_DDL_MODIFYYM As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_TODOKE コントロール。
+    '''WF_DDL_MODIFYDD コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TODOKE As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents WF_DDL_MODIFYDD As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_UPLOAD_LABEL コントロール。
+    '''WF_DDL_MODIFYUSER コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_UPLOAD_LABEL As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_UPLOAD_BTN コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
+    Protected WithEvents WF_DDL_MODIFYUSER As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''pnlListArea コントロール。
@@ -86,15 +104,6 @@ Partial Public Class LNM0006TankaList
     Protected WithEvents rightview As Global.JOTWEB_LNG.GRIS0004RightBox
     
     '''<summary>
-    '''rightview2 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents rightview2 As Global.JOTWEB_LNG.GRIS0003SRightBox
-    
-    '''<summary>
     '''leftview コントロール。
     '''</summary>
     '''<remarks>
@@ -110,16 +119,7 @@ Partial Public Class LNM0006TankaList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNM0006WRKINC
-    
-    '''<summary>
-    '''VisibleKeyOrgCode コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents VisibleKeyOrgCode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents work As Global.JOTWEB_LNG.LNM0007WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。

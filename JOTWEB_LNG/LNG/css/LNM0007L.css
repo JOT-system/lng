@@ -63,10 +63,32 @@ p {
     width: 190px !important;
 }
 
-#ListCount{
-    margin-right:10px;
+#ListCount {
+    margin-top:7px;
+    margin-right: 20px;
+    margin-left: 15px;
 }
 
-.leftSide {
+
+/*--------------------------------------------------------------
+# タブエリア
+--------------------------------------------------------------*/
+.tabBox {
     display: flex;
+    background-color: #AEAAAA;
+    width: 100%;
 }
+
+.btn-tab {
+    font-size: 1.7rem;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom:-1px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid #333;
+}
+
+/*#WF_ButtonSKKOTEIHI, #WF_ButtonTNGKOTEIHI {
+    margin-left: -3.5px;
+}*/

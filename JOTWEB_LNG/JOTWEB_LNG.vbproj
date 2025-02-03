@@ -241,6 +241,9 @@
     <Content Include="LNG\css\LNM0006H.css" />
     <Content Include="LNG\css\LNM0006L.css" />
     <Content Include="LNG\css\LNM0006S.css" />
+    <Content Include="LNG\css\LNM0007D.css" />
+    <Content Include="LNG\css\LNM0007H.css" />
+    <Content Include="LNG\css\LNM0007L.css" />
     <Content Include="LNG\css\LNS0001D.css" />
     <Content Include="LNG\css\LNS0001H.css" />
     <Content Include="LNG\css\LNS0001L.css" />
@@ -299,6 +302,7 @@
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0007WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
@@ -307,6 +311,9 @@
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaList.aspx" />
     <Content Include="LNG\mas\LNM0006TankaSearch.aspx" />
+    <Content Include="LNG\mas\LNM0007KoteihiDetail.aspx" />
+    <Content Include="LNG\mas\LNM0007KoteihiHistory.aspx" />
+    <Content Include="LNG\mas\LNM0007KoteihiList.aspx" />
     <Content Include="LNG\mas\LNS0001UserDetail.aspx" />
     <Content Include="LNG\mas\LNS0001UserHistory.aspx" />
     <Content Include="LNG\mas\LNS0001UserList.aspx" />
@@ -315,6 +322,9 @@
     <Content Include="LNG\script\LNM0006H.js" />
     <Content Include="LNG\script\LNM0006L.js" />
     <Content Include="LNG\script\LNM0006S.js" />
+    <Content Include="LNG\script\LNM0007D.js" />
+    <Content Include="LNG\script\LNM0007H.js" />
+    <Content Include="LNG\script\LNM0007L.js" />
     <Content Include="LNG\script\LNS0001D.js" />
     <Content Include="LNG\script\LNS0001H.js" />
     <Content Include="LNG\script\LNS0001L.js" />
@@ -525,6 +535,13 @@
       <DependentUpon>LNM0006WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0007WRKINC.ascx.vb">
+      <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\inc\LNM0023WRKINC.ascx.designer.vb">
       <DependentUpon>LNM0023WRKINC.ascx</DependentUpon>
     </Compile>
@@ -582,6 +599,27 @@
     </Compile>
     <Compile Include="LNG\mas\LNM0006TankaSearch.aspx.vb">
       <DependentUpon>LNM0006TankaSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiDetail.aspx.designer.vb">
+      <DependentUpon>LNM0007KoteihiDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiDetail.aspx.vb">
+      <DependentUpon>LNM0007KoteihiDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiHistory.aspx.designer.vb">
+      <DependentUpon>LNM0007KoteihiHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiHistory.aspx.vb">
+      <DependentUpon>LNM0007KoteihiHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiList.aspx.designer.vb">
+      <DependentUpon>LNM0007KoteihiList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0007KoteihiList.aspx.vb">
+      <DependentUpon>LNM0007KoteihiList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNS0001UserDetail.aspx.designer.vb">

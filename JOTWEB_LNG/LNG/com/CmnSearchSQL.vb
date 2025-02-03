@@ -340,6 +340,89 @@ Public Class CmnSearchSQL
     End Function
 
     ''' <summary>
+    ''' 固定費取引先検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetKoteihiToriTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("TORICODE", "取引先コード", "100"),
+                New DispFieldItem("TORINAME", "取引先名称", "150")
+            }
+        Return colTitle
+    End Function
+    ''' <summary>
+    ''' 固定費加算先部門検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetKoteihiKasanOrgTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("KASANORGCODE", "加算先部門コード", "150"),
+                New DispFieldItem("KASANORGNAME", "加算先部門名称", "150")
+            }
+        Return colTitle
+    End Function
+
+    ''' <summary>
+    ''' 固定費取引先取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetKoteihiToriSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 取引先取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     TORICODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(TORICODE) AS TORICODE")
+        SQLBldr.AppendLine("    , RTRIM(TORINAME) AS TORINAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0002_KOTEIHI")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     TORICODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 固定費加算先部門取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetKoteihiKasanOrgSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 加算先部門取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     KASANORGCODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(KASANORGCODE) AS KASANORGCODE")
+        SQLBldr.AppendLine("    , RTRIM(KASANORGNAME) AS KASANORGNAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0002_KOTEIHI")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     KASANORGCODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
     ''' 品目検索タイトル取得
     ''' </summary>
     ''' <returns></returns>

@@ -11,7 +11,7 @@ Option Strict On
 Option Explicit On
 
 
-Partial Public Class LNM0006TankaList
+Partial Public Class LNM0007KoteihiList
     
     '''<summary>
     '''leftmenu コントロール。
@@ -21,33 +21,6 @@ Partial Public Class LNM0006TankaList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
-    
-    '''<summary>
-    '''ListCount コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_StYMD コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_StYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_TODOKE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKE As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''WF_UPLOAD_LABEL コントロール。
@@ -66,6 +39,60 @@ Partial Public Class LNM0006TankaList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
+    
+    '''<summary>
+    '''WF_ButtonKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ButtonTNGKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonTNGKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''WF_ButtonSKKOTEIHI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonSKKOTEIHI As Global.System.Web.UI.WebControls.Button
+    
+    '''<summary>
+    '''ListCount コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TaishoYm コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TaishoYm As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''pnlListArea コントロール。
@@ -110,7 +137,7 @@ Partial Public Class LNM0006TankaList
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNM0006WRKINC
+    Protected WithEvents work As Global.JOTWEB_LNG.LNM0007WRKINC
     
     '''<summary>
     '''VisibleKeyOrgCode コントロール。
@@ -120,6 +147,15 @@ Partial Public Class LNM0006TankaList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents VisibleKeyOrgCode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''VisibleKeyTohokuOrgCode コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents VisibleKeyTohokuOrgCode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_GridDBclick コントロール。

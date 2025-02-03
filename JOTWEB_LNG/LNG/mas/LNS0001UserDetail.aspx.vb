@@ -270,13 +270,13 @@ Public Class LNS0001UserDetail
         'TxtApproValid.Text = work.WF_SEL_APPROVALID.Text
         'CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
         '削除
-        TxtDelFlg.Text = work.WF_SEL_DELFLG.Text
-        CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
+        ddlDELFLG.SelectedValue = work.WF_SEL_DELFLG.Text
+        'CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
         'Disabled制御項目
         DisabledKeyItem.Value = work.WF_SEL_USERID.Text
 
         ' 削除フラグ・誤り回数・会社コード・組織コードを入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
+        'Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtMissCNT.Attributes("onkeyPress") = "CheckNum()"
         'Me.TxtOrg.Attributes("onkeyPress") = "CheckNum()"
 
@@ -290,7 +290,7 @@ Public Class LNS0001UserDetail
             DisabledKeyItemUserId.Value = work.WF_SEL_USERID.Text
             '追加時は入力可能
             If work.WF_SEL_USERID.Text <> "" Then
-                TxtDelFlg.Enabled = False
+                ddlDELFLG.Enabled = False
                 TxtStaffNameS.Enabled = False
                 TxtStaffNameL.Enabled = False
                 TxtMissCNT.Enabled = False
@@ -1471,7 +1471,7 @@ Public Class LNS0001UserDetail
         '論理削除の場合は入力チェックを省略、削除フラグのみ更新
         If Not DisabledKeyItem.Value = "" And
             work.WF_SEL_DELFLG.Text = C_DELETE_FLG.ALIVE And
-            TxtDelFlg.Text = C_DELETE_FLG.DELETE Then
+            ddlDELFLG.SelectedValue = C_DELETE_FLG.DELETE Then
 
             ' マスタ更新(削除フラグのみ)
             UpdateMasterDelflgOnly()
@@ -1673,7 +1673,7 @@ Public Class LNS0001UserDetail
         O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(TxtDelFlg.Text)      '削除フラグ
+        'Master.EraseCharToIgnore(ddlDELFLG.SelectedValue)      '削除フラグ
         Master.EraseCharToIgnore(TxtUserId.Text)      'ユーザーID
         Master.EraseCharToIgnore(TxtStaffNameS.Text)  '社員名（短）
         Master.EraseCharToIgnore(TxtStaffNameL.Text)  '社員名（長）
@@ -1695,7 +1695,7 @@ Public Class LNS0001UserDetail
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(TxtSelLineCNT.Text) AndAlso
-            String.IsNullOrEmpty(TxtDelFlg.Text) Then
+            String.IsNullOrEmpty(ddlDELFLG.SelectedValue) Then
             Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"                'SUBクラス名
@@ -1728,7 +1728,7 @@ Public Class LNS0001UserDetail
         LNS0001INProw("SELECT") = 1
         LNS0001INProw("HIDDEN") = 0
 
-        LNS0001INProw("DELFLG") = TxtDelFlg.Text           '削除フラグ
+        LNS0001INProw("DELFLG") = ddlDELFLG.SelectedValue           '削除フラグ
         LNS0001INProw("USERID") = TxtUserId.Text           'ユーザーID
         LNS0001INProw("STAFFNAMES") = TxtStaffNameS.Text   '社員名（短）
         LNS0001INProw("STAFFNAMEL") = TxtStaffNameL.Text   '社員名（長）
@@ -1887,8 +1887,8 @@ Public Class LNS0001UserDetail
         'TxtRprtProfId.Text = ""               'エクセル出力制御ロール
         'TxtVariant.Text = ""                  '画面初期値ロール
         'TxtApproValid.Text = ""               '承認権限ロール
-        TxtDelFlg.Text = ""                   '削除フラグ
-        LblDelFlgName.Text = ""              '削除フラグ名称
+        'ddlDELFLG.SelectedValue = ""                   '削除フラグ
+        'LblDelFlgName.Text = ""              '削除フラグ名称
 
     End Sub
 
@@ -1974,27 +1974,27 @@ Public Class LNS0001UserDetail
             Case "TxtPassword"    'パスワード
                 TxtPassword.Attributes("Value") = work.WF_SEL_PASSWORD.Text
                 TxtPassword.Focus()
-            'Case "TxtOrg"         '組織コード
-            '    CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_RtnSW)
-            '    TxtOrg.Focus()
-            'Case "TxtMenuRole"    'メニュー表示制御ロール
-            '    CODENAME_get("MENU", TxtMenuRole.Text, LblMenuRoleName.Text, WW_Dummy)
-            '    TxtMenuRole.Focus()
-            'Case "TxtMapRole"     '画面参照更新制御ロール
-            '    CODENAME_get("MAP", TxtMapRole.Text, LblMapRoleName.Text, WW_Dummy)
-            '    TxtMapRole.Focus()
-            'Case "TxtViewProfId"  '画面表示項目制御ロール
-            '    CODENAME_get("VIEW", TxtViewProfId.Text, LblViewProfIdName.Text, WW_Dummy)
-            '    TxtViewProfId.Focus()
-            'Case "TxtRprtProfId"  'エクセル出力制御ロール
-            '    CODENAME_get("XML", TxtRprtProfId.Text, LblRprtProfIdName.Text, WW_Dummy)
-            '    TxtRprtProfId.Focus()
-            'Case "TxtApproValid"  '承認権限ロール
-            '    CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
-            '    TxtApproValid.Focus()
-            Case "TxtDelFlg"      '削除フラグ
-                CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
-                TxtDelFlg.Focus()
+                'Case "TxtOrg"         '組織コード
+                '    CODENAME_get("ORG", ddlSelectORG.SelectedValue, LblOrgName.Text, WW_RtnSW)
+                '    TxtOrg.Focus()
+                'Case "TxtMenuRole"    'メニュー表示制御ロール
+                '    CODENAME_get("MENU", TxtMenuRole.Text, LblMenuRoleName.Text, WW_Dummy)
+                '    TxtMenuRole.Focus()
+                'Case "TxtMapRole"     '画面参照更新制御ロール
+                '    CODENAME_get("MAP", TxtMapRole.Text, LblMapRoleName.Text, WW_Dummy)
+                '    TxtMapRole.Focus()
+                'Case "TxtViewProfId"  '画面表示項目制御ロール
+                '    CODENAME_get("VIEW", TxtViewProfId.Text, LblViewProfIdName.Text, WW_Dummy)
+                '    TxtViewProfId.Focus()
+                'Case "TxtRprtProfId"  'エクセル出力制御ロール
+                '    CODENAME_get("XML", TxtRprtProfId.Text, LblRprtProfIdName.Text, WW_Dummy)
+                '    TxtRprtProfId.Focus()
+                'Case "TxtApproValid"  '承認権限ロール
+                '    CODENAME_get("APPROVAL", TxtApproValid.Text, LblApproValidName.Text, WW_Dummy)
+                '    TxtApproValid.Focus()
+                'Case "TxtDelFlg"      '削除フラグ
+                '    CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
+                '    TxtDelFlg.Focus()
 
         End Select
 
@@ -2162,10 +2162,10 @@ Public Class LNS0001UserDetail
                     LblCampCodeName.Text = WW_SelectText
                     createListBox()
                     TxtCampCode.Focus()
-                Case "TxtDelFlg"      '削除フラグ
-                    TxtDelFlg.Text = WW_SelectValue
-                    LblDelFlgName.Text = WW_SelectText
-                    TxtDelFlg.Focus()
+                'Case "TxtDelFlg"      '削除フラグ
+                '    ddlDELFLG.SelectedValue = WW_SelectValue
+                '    LblDelFlgName.Text = WW_SelectText
+                '    TxtDelFlg.Focus()
                 Case "TxtPassEndYMD"  'パスワード有効期限
                     Try
                         Date.TryParse(leftview.WF_Calendar.Text, WW_Date)
@@ -2243,8 +2243,8 @@ Public Class LNS0001UserDetail
         '○ フォーカスセット
         If String.IsNullOrEmpty(WF_FIELD_REP.Value) Then
             Select Case WF_FIELD.Value
-                Case "TxtDelFlg"            '削除フラグ
-                    TxtDelFlg.Focus()
+                'Case "TxtDelFlg"            '削除フラグ
+                '    TxtDelFlg.Focus()
                 Case "TxtCampCode"          '会社コード
                     TxtCampCode.Focus()
                 Case "TxtPassEndYMD"        'パスワード有効期限

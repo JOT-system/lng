@@ -69,10 +69,10 @@
                                 <span class="ef magnifier">
                                     <!-- 削除フラグ -->
                                     <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <a ondblclick="Field_DBclick('TxtDelFlg', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>)" onchange="TextBox_change('TxtDelFlg');">
-                                        <asp:TextBox ID="TxtDelFlg" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
-                                    </a>
-                                    <asp:Label ID="LblDelFlgName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <asp:DropDownList ID="ddlDELFLG" runat="server" CssClass="ddlSelectControl">
+                                        <asp:ListItem Text="有効" Value="0"></asp:ListItem>
+                                        <asp:ListItem Text="削除" Value="1"></asp:ListItem>
+                                    </asp:DropDownList>
                                     <a  style="display:none;">
                                     <!-- 会社コード -->
                                     <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -102,7 +102,7 @@
                                 <span class="ef magnifier">
                                     <!-- 部門コード -->
                                     <asp:Label ID="WF_ORGCODE_L" runat="server" Text="部門コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl"/>
+                                    <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" onchange="ButtonClick('WF_ORGChange');"/>
                                 </span>
                             </p>
                             <p id="TANKA_LINE_5">
@@ -170,7 +170,7 @@
                                     <!-- 単価 -->
                                     <asp:Label ID="WF_TANKA_L" runat="server" Text="単価" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtTANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="5"></asp:TextBox>
-                                    <asp:Label ID="WF_TANKA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <asp:Label ID="WF_TANKA_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <!-- 枝番 -->
                                     <a  style="display:none;">
                                     <asp:Label ID="WF_BRANCHCODE_L" runat="server" Text="枝番" CssClass="WF_TEXT_LEFT"></asp:Label>
