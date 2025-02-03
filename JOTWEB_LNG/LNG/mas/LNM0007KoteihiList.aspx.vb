@@ -391,7 +391,8 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KASANORGNAME), '')                                AS KASANORGNAME              ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.TAISHOYM, '%Y/%m'), '')                     AS TAISHOYM               ")
+        'SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.TAISHOYM, '%Y/%m'), '')                     AS TAISHOYM               ")
+        SQLStr.AppendLine("   , COALESCE(CONCAT(LEFT(VIW0002.TAISHOYM ,4),'/',RIGHT(VIW0002.TAISHOYM,2)) , '')    AS TAISHOYM               ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYABAN), '')                                      AS SYABAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.RIKUBAN), '')                                     AS RIKUBAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYAGATA), '')                                     AS SYAGATA              ")
@@ -431,6 +432,8 @@ Public Class LNM0007KoteihiList
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim dt As DateTime
+        Dim Itype As Integer
+
         '削除フラグ
         'If Not work.WF_SEL_DELFLG_S.Text = "1" Then
         SQLStr.AppendLine(" AND  VIW0002.DELFLG = '0'                                                      ")
@@ -441,16 +444,20 @@ Public Class LNM0007KoteihiList
         End If
 
         '対象年月
-        If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
+        Select Case work.WF_SEL_CONTROLTABLE.Text
+            Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
                     SQLStr.AppendLine(" AND  @STYMD BETWEEN VIW0002.STYMD AND VIW0002.ENDYMD  ")
-                Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                    SQLStr.AppendLine(" AND  COALESCE(DATE_FORMAT(VIW0002.TAISHOYM, '%Y%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y%m'), '')  ")
-                Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                    SQLStr.AppendLine(" AND  COALESCE(DATE_FORMAT(VIW0002.TAISHOYM, '%Y%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y%m'), '')  ")
-            End Select
-        End If
+                End If
+            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
+                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                    SQLStr.AppendLine(" AND  COALESCE(VIW0002.TAISHOYM, '0') = COALESCE(@TAISHOYM, '0')  ")
+                End If
+            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
+                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                    SQLStr.AppendLine(" AND  COALESCE(VIW0002.TAISHOYM, '0') = COALESCE(@TAISHOYM, '0')  ")
+                End If
+        End Select
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     VIW0002.TORICODE                                                           ")
@@ -484,19 +491,23 @@ Public Class LNM0007KoteihiList
                 End If
 
                 '対象年月
-                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                    Select Case work.WF_SEL_CONTROLTABLE.Text
-                        Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                Select Case work.WF_SEL_CONTROLTABLE.Text
+                    Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                        If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
                             Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
                             P_STYMD.Value = dt
-                        Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                            Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)
-                            P_TAISHOYM.Value = dt
-                        Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                            Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)
-                            P_TAISHOYM.Value = dt
-                    End Select
-                End If
+                        End If
+                    Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
+                        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                            Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)
+                            P_TAISHOYM.Value = Itype
+                        End If
+                    Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
+                        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                            Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)
+                            P_TAISHOYM.Value = Itype
+                        End If
+                End Select
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -2341,7 +2352,7 @@ Public Class LNM0007KoteihiList
                         O_RTN = "ERR"
                     End If
                     '対象年月
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.TAISHOYM))
+                    WW_TEXT = Replace(Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.TAISHOYM)), "/", ""), "／", "")
                     WW_DATATYPE = DataTypeHT("TAISHOYM")
                     LNM0007Exceltblrow("TAISHOYM") = LNM0007WRKINC.DataConvert("対象年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                     If WW_RESULT = False Then
@@ -2470,7 +2481,7 @@ Public Class LNM0007KoteihiList
                         O_RTN = "ERR"
                     End If
                     '対象年月
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TAISHOYM))
+                    WW_TEXT = Replace(Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TAISHOYM)), "/", ""), "／", "")
                     WW_DATATYPE = DataTypeHT("TAISHOYM")
                     LNM0007Exceltblrow("TAISHOYM") = LNM0007WRKINC.DataConvert("対象年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                     If WW_RESULT = False Then
@@ -2658,7 +2669,7 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABARA, '')             = @SYABARA ")
                 SQLStr.AppendLine("    AND  COALESCE(GETSUGAKU, '0')             = @GETSUGAKU ")
@@ -2675,7 +2686,7 @@ Public Class LNM0007KoteihiList
                         Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                         Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                         Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
                         Dim P_GETSUGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GETSUGAKU", MySqlDbType.Decimal)     '月額運賃
@@ -2743,7 +2754,7 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
                 SQLStr.AppendLine("    AND  COALESCE(KOTEIHIM, '0')             = @KOTEIHIM ")
                 SQLStr.AppendLine("    AND  COALESCE(KOTEIHID, '0')             = @KOTEIHID ")
@@ -2759,7 +2770,7 @@ Public Class LNM0007KoteihiList
                         Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                         Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                         Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal)     '月額固定費
                         Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal)     '日額固定費
@@ -2902,7 +2913,7 @@ Public Class LNM0007KoteihiList
                 '一意キーが未入力の場合処理を終了する
                 If WW_ROW("TORICODE") = "" OrElse
                     WW_ROW("ORGCODE") = "" OrElse
-                    WW_ROW("TAISHOYM") = Date.MinValue OrElse
+                    WW_ROW("TAISHOYM") = "0" OrElse
                     WW_ROW("SYABAN") = "" Then
                     Exit Function
                 End If
@@ -2916,14 +2927,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
@@ -2969,7 +2980,7 @@ Public Class LNM0007KoteihiList
                 '一意キーが未入力の場合処理を終了する
                 If WW_ROW("TORICODE") = "" OrElse
                     WW_ROW("ORGCODE") = "" OrElse
-                    WW_ROW("TAISHOYM") = Date.MinValue OrElse
+                    WW_ROW("TAISHOYM") = "0" OrElse
                     WW_ROW("SYABAN") = "" Then
                     Exit Function
                 End If
@@ -2983,14 +2994,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
@@ -3113,14 +3124,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.Append(" WHERE                                       ")
                 SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.Append("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                         Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
@@ -3166,14 +3177,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.Append(" WHERE                                       ")
                 SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.Append("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                         Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
@@ -3448,7 +3459,7 @@ Public Class LNM0007KoteihiList
                         Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                         Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                         Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
                         Dim P_GETSUGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GETSUGAKU", MySqlDbType.Decimal)     '月額運賃
@@ -3582,7 +3593,7 @@ Public Class LNM0007KoteihiList
                         Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                         Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                         Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal)     '月額固定費
                         Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal)     '日額固定費
@@ -4196,14 +4207,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
@@ -4256,14 +4267,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
@@ -4328,7 +4339,7 @@ Public Class LNM0007KoteihiList
 #Region "固定費マスタ"
                 '○ ＤＢ更新
                 Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNM0016_KOTEIHIHIST ")
+                SQLStr.AppendLine(" INSERT INTO LNG.LNT0006_KOTEIHIHIST ")
                 SQLStr.AppendLine("  (  ")
                 SQLStr.AppendLine("      TORICODE  ")
                 SQLStr.AppendLine("     ,TORINAME  ")
@@ -4442,10 +4453,10 @@ Public Class LNM0007KoteihiList
 
                     End Using
                 Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0016_KOTEIHIHIST INSERT")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_KOTEIHIHIST INSERT")
 
                     CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0016_KOTEIHIHIST INSERT"
+                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0006_KOTEIHIHIST INSERT"
                     CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                     CS0011LOGWrite.TEXT = ex.ToString()
                     CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -4460,7 +4471,7 @@ Public Class LNM0007KoteihiList
 #Region "SK固定費マスタ"
                 '○ ＤＢ更新
                 Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNM0017_SKKOTEIHIHIST ")
+                SQLStr.AppendLine(" INSERT INTO LNG.LNT0007_SKKOTEIHIHIST ")
                 SQLStr.AppendLine("  (  ")
                 SQLStr.AppendLine("      TORICODE  ")
                 SQLStr.AppendLine("     ,TORINAME  ")
@@ -4513,14 +4524,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
                 SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("   AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
@@ -4566,10 +4577,10 @@ Public Class LNM0007KoteihiList
 
                     End Using
                 Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0017_SKKOTEIHIHIST INSERT")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0007_SKKOTEIHIHIST INSERT")
 
                     CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0017_SKKOTEIHIHIST INSERT"
+                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0007_SKKOTEIHIHIST INSERT"
                     CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                     CS0011LOGWrite.TEXT = ex.ToString()
                     CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -4584,7 +4595,7 @@ Public Class LNM0007KoteihiList
 #Region "TNG固定費マスタ"
                 '○ ＤＢ更新
                 Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNM0018_TNGKOTEIHIHIST ")
+                SQLStr.AppendLine(" INSERT INTO LNG.LNT0008_TNGKOTEIHIHIST ")
                 SQLStr.AppendLine("  (  ")
                 SQLStr.AppendLine("      TORICODE  ")
                 SQLStr.AppendLine("     ,TORINAME  ")
@@ -4637,14 +4648,14 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
                 SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '') = COALESCE(DATE_FORMAT(@TAISHOYM, '%Y/%m'), '') ")
+                SQLStr.AppendLine("   AND  COALESCE(TAISHOYM, '0') = @TAISHOYM ")
                 SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)    '対象年月
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
@@ -4690,10 +4701,10 @@ Public Class LNM0007KoteihiList
 
                     End Using
                 Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0018_TNGKOTEIHIHIST INSERT")
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0008_TNGKOTEIHIHIST INSERT")
 
                     CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0018_TNGKOTEIHIHIST INSERT"
+                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0008_TNGKOTEIHIHIST INSERT"
                     CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
                     CS0011LOGWrite.TEXT = ex.ToString()
                     CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR

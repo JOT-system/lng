@@ -21,9 +21,9 @@ Public Class LNM0007WRKINC
     Public Const TBLKOTEIHI As String = "LNM0007_KOTEIHI"
     Public Const TBLSKKOTEIHI As String = "LNM0008_SKKOTEIHI"
     Public Const TBLTNGKOTEIHI As String = "LNM0009_TNGKOTEIHI"
-    Public Const TBLKOTEIHIHIST As String = "LNM0016_KOTEIHIHIST"
-    Public Const TBLSKKOTEIHIHIST As String = "LNM0017_SKKOTEIHIHIST"
-    Public Const TBLTNGKOTEIHIHIST As String = "LNM0018_TNGKOTEIHIHIST"
+    Public Const TBLKOTEIHIHIST As String = "LNT0006_KOTEIHIHIST"
+    Public Const TBLSKKOTEIHIHIST As String = "LNT0007_SKKOTEIHIHIST"
+    Public Const TBLTNGKOTEIHIHIST As String = "LNT0008_TNGKOTEIHIHIST"
 
     'ボタン名
     Public Const BTNNAMETOHOKU As String = "東北電力固定費"
@@ -798,19 +798,19 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine(" WHERE                                       ")
         SQLStr.AppendLine("       TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND DATE_FORMAT(TAISHOYM, '%Y/%m') = DATE_FORMAT(@TAISHOYM, '%Y/%m')")
+        SQLStr.AppendLine("   AND TAISHOYM = @TAISHOYM                  ")
         SQLStr.AppendLine("   AND SYABAN  = @SYABAN                     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6) '対象年月
                 Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20) '車番
 
                 P_TORICODE.Value = I_TORICODE '取引先コード
                 P_ORGCODE.Value = I_ORGCODE '部門コード
-                P_TAISHOYM.Value = CDate(I_TAISHOYM) '対象年月
+                P_TAISHOYM.Value = Replace(I_TAISHOYM, "/", "") '対象年月
                 P_SYABAN.Value = I_SYABAN '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -879,19 +879,19 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine(" WHERE                                       ")
         SQLStr.AppendLine("       TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND DATE_FORMAT(TAISHOYM, '%Y/%m') = DATE_FORMAT(@TAISHOYM, '%Y/%m')")
+        SQLStr.AppendLine("   AND TAISHOYM = @TAISHOYM                  ")
         SQLStr.AppendLine("   AND SYABAN  = @SYABAN                     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Date)     '対象年月
+                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6) '対象年月
                 Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20) '車番
 
                 P_TORICODE.Value = I_TORICODE '取引先コード
                 P_ORGCODE.Value = I_ORGCODE '部門コード
-                P_TAISHOYM.Value = CDate(I_TAISHOYM) '対象年月
+                P_TAISHOYM.Value = Replace(I_TAISHOYM, "/", "") '対象年月
                 P_SYABAN.Value = I_SYABAN '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
