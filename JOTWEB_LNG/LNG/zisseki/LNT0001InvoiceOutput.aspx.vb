@@ -846,6 +846,15 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
+        ''石油資源開発
+        'If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_021502 Then
+        '    '〇(帳票)項目チェック処理(石油資源開発)
+        '    WW_ReportChecSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+
+
+
+        'End If
+
         'エスジーリキッドサービス（西部ガス）
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_024001 Then
             '〇(帳票)項目チェック処理(西部ガス)
@@ -1005,6 +1014,105 @@ Public Class LNT0001InvoiceOutput
     End Sub
 
     ''' <summary>
+    ''' (帳票)項目チェック処理(石油資源開発)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ReportChecSekiyuSigen(ByVal reportName As String, ByVal reportCode As String)
+        Dim dtSekiyuSigenTank As New DataTable
+        Dim dtSekiyuSigenTodoke As New DataTable
+        Dim sekiyuSigenTankClass As String = ""
+        Dim sekiyuSigenTodokeClass As String = ""
+        Dim arrToriCode As String() = {"", "", ""}
+
+        Select Case reportCode
+            '"石油資源開発　輸送費請求書"
+            Case BaseDllConst.CONST_ORDERORGCODE_021502
+                sekiyuSigenTankClass = "SEKIYUSIGEN_TANK"
+                sekiyuSigenTodokeClass = "SEKIYUSIG_TODOKE_MAS"
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
+                arrToriCode(1) = Nothing
+                arrToriCode(2) = Nothing
+
+            Case Else
+                Exit Sub
+        End Select
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
+            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
+            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenTodokeClass)
+
+        End Using
+
+        '〇(帳票)使用項目の設定
+        LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
+        LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
+        LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
+        'LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
+        LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
+        LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
+        LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
+        LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
+        LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
+        'LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
+        'LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
+        'LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
+        LNT0001tbl.Columns.Add("ORDERORGCODE_REP", Type.GetType("System.String"))       '// EXCELシート(受注受付部署コード)設定用
+        LNT0001tbl.Columns.Add("GYOMUTANKNUM_REP", Type.GetType("System.String"))       '// EXCELシート(業務車番)設定用
+        'LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
+        'LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
+        'LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
+
+        '〇陸事番号マスタ設定
+        For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTank.Rows
+            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                '★届日より日を取得(セル(行数)の設定のため)
+                Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
+                Dim lastMonth As Boolean = False
+                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                    lastMonth = True
+                End If
+                Dim iLine As Integer = Integer.Parse(setDay) - 1
+                iLine = (iLine * Integer.Parse(dtSekiyuSigenTankrow("VALUE06"))) + Integer.Parse(dtSekiyuSigenTankrow("VALUE05"))
+                ''★トリップより位置を取得
+                'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+                'iTrip += iLine
+                LNT0001tblrow("ROWSORTNO") = dtSekiyuSigenTankrow("VALUE01")
+                LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
+                LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
+                'LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
+                LNT0001tblrow("SETLINE") = iLine
+                LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE04")
+                LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE05")
+                '★表示セルフラグ(1:表示)
+                If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
+                    LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
+                    LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
+                    'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
+                Else
+                    LNT0001tblrow("DISPLAYCELL_START") = ""
+                    LNT0001tblrow("DISPLAYCELL_END") = ""
+                    'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+                End If
+
+                '★備考設定用(出荷日と届日が不一致の場合)
+                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                    If lastMonth = True Then
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                    Else
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                    End If
+                End If
+            Next
+        Next
+
+    End Sub
+
+    ''' <summary>
     ''' (帳票)項目チェック処理(DAIGAS)
     ''' </summary>
     ''' <remarks></remarks>
@@ -1111,6 +1219,7 @@ Public Class LNT0001InvoiceOutput
                 End If
                 LNT0001tblrow("SETLINE") = iLine
 
+                '★表示セルフラグ(1:表示)
                 If dtDaigasTankrow("VALUE07").ToString() = "1" Then
                     LNT0001tblrow("DISPLAYCELL_START") = dtDaigasTankrow("VALUE02").ToString()
                     LNT0001tblrow("DISPLAYCELL_END") = dtDaigasTankrow("VALUE04").ToString()
@@ -1242,6 +1351,7 @@ Public Class LNT0001InvoiceOutput
                 LNT0001tblrow("SETCELL02") = dtEneosTankrow("VALUE03") + iTrip.ToString()
                 LNT0001tblrow("SETCELL03") = dtEneosTankrow("VALUE04") + iTrip.ToString()
                 LNT0001tblrow("SETLINE") = iTrip.ToString()
+                '★表示セルフラグ(1:表示)
                 If dtEneosTankrow("VALUE07").ToString() = "1" Then
                     LNT0001tblrow("DISPLAYCELL_START") = dtEneosTankrow("VALUE02").ToString()
                     LNT0001tblrow("DISPLAYCELL_END") = dtEneosTankrow("VALUE04").ToString()

@@ -318,6 +318,10 @@ Public Module BaseDllConst
     ''' エスケイ産業
     ''' </summary>
     Public Const CONST_TORICODE_0045200000 As String = "0045200000"
+    ''' <summary>
+    ''' 石油資源開発
+    ''' </summary>
+    Public Const CONST_TORICODE_0132800000 As String = "0132800000"
 #End Region
 
 #Region "受注受付部署"
@@ -341,6 +345,22 @@ Public Module BaseDllConst
     ''' EX_姫路営業所
     ''' </summary>
     Public Const CONST_ORDERORGCODE_022801 As String = "022801"
+    ''' <summary>
+    ''' EX_新潟支店車庫
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_021502 As String = "021502"
+    ''' <summary>
+    ''' EX_庄内営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_020601 As String = "020601"
+    ''' <summary>
+    ''' EX_東北支店車庫
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_020402 As String = "020402"
+    ''' <summary>
+    ''' EX_茨城営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_020804 As String = "020804"
 #End Region
 
 #Region "届先"
