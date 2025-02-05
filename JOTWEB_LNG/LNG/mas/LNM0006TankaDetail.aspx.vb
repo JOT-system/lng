@@ -79,6 +79,19 @@ Public Class LNM0006TankaDetail
                             RowSelected_mspKASANORGCodeSingle()
                         Case "mspTodokeCodeSingleRowSelected"  '[共通]届先コード選択ポップアップで行選択
                             RowSelected_mspTodokeCodeSingle()
+                        Case "WF_ORGChange"    '部門コードチェンジ
+                            If Not ddlSelectORG.SelectedValue = "" Then
+                                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                                    SQLcon.Open()  ' DataBase接続
+                                    GetTori(SQLcon, ddlSelectORG.SelectedValue)
+                                    GetKasanOrg(SQLcon, ddlSelectORG.SelectedValue)
+                                End Using
+                            Else
+                                TxtTORICODE.Text = ""
+                                TxtTORINAME.Text = ""
+                                TxtKASANORGCODE.Text = ""
+                                TxtKASANORGNAME.Text = ""
+                            End If
                     End Select
                 End If
             Else
@@ -226,8 +239,8 @@ Public Class LNM0006TankaDetail
         '選択行
         TxtSelLineCNT.Text = work.WF_SEL_LINECNT.Text
         '削除
-        TxtDelFlg.Text = work.WF_SEL_DELFLG.Text
-        CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
+        ddlDELFLG.SelectedValue = work.WF_SEL_DELFLG.Text
+        'CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
         '画面ＩＤ
         TxtMapId.Text = "M00001"
         '会社コード
@@ -321,7 +334,7 @@ Public Class LNM0006TankaDetail
         End If
 
         ' 削除フラグ・取引先コード・加算先部門コード・届先コード・単価を入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
+        'Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtTORICODE.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtKASANORGCODE.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtTODOKECODE.Attributes("onkeyPress") = "CheckNum()"
@@ -380,6 +393,100 @@ Public Class LNM0006TankaDetail
     End Function
 
     ''' <summary>
+    ''' 取引先取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub GetTori(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT DISTINCT ")
+        SQLStr.AppendLine("       TORICODE")
+        SQLStr.AppendLine("      ,TORINAME")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0006_TANKA")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
+        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                P_ORGCODE.Value = WW_ORGCODE '部門コード
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                End Using
+
+                '１件場合は取引先入力欄に入れる
+                If WW_Tbl.Rows.Count = 1 Then
+                    TxtTORICODE.Text = WW_Tbl.Rows(0)("TORICODE")
+                    TxtTORINAME.Text = WW_Tbl.Rows(0)("TORINAME")
+                Else
+                    TxtTORICODE.Text = ""
+                    TxtTORINAME.Text = ""
+                End If
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 加算先部門取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub GetKasanOrg(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT DISTINCT ")
+        SQLStr.AppendLine("       KASANORGCODE")
+        SQLStr.AppendLine("      ,KASANORGNAME")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0006_TANKA")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
+        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                P_ORGCODE.Value = WW_ORGCODE '部門コード
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                End Using
+
+                '１件の場合は加算先部門入力欄に入れる
+                If WW_Tbl.Rows.Count = 1 Then
+                    TxtKASANORGCODE.Text = WW_Tbl.Rows(0)("KASANORGCODE")
+                    TxtKASANORGNAME.Text = WW_Tbl.Rows(0)("KASANORGNAME")
+                Else
+                    TxtKASANORGCODE.Text = ""
+                    TxtKASANORGNAME.Text = ""
+                End If
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' 取引先、加算先、届け先取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
@@ -429,8 +536,6 @@ Public Class LNM0006TankaDetail
         Catch ex As Exception
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' 単価マスタ登録更新
@@ -1033,7 +1138,7 @@ Public Class LNM0006TankaDetail
         '論理削除の場合は入力チェックを省略、削除フラグのみ更新
         If Not DisabledKeyItem.Value = "" And
             work.WF_SEL_DELFLG.Text = C_DELETE_FLG.ALIVE And
-            TxtDelFlg.Text = C_DELETE_FLG.DELETE Then
+            ddlDELFLG.SelectedValue = C_DELETE_FLG.DELETE Then
 
             ' マスタ更新(削除フラグのみ)
             UpdateMasterDelflgOnly()
@@ -1114,7 +1219,7 @@ Public Class LNM0006TankaDetail
         O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(TxtDelFlg.Text)      '削除フラグ
+        Master.EraseCharToIgnore(ddlDELFLG.SelectedValue)      '削除フラグ
         Master.EraseCharToIgnore(TxtTORICODE.Text)  '取引先コード
         Master.EraseCharToIgnore(TxtTORINAME.Text)  '取引先名称
         Master.EraseCharToIgnore(ddlSelectORG.SelectedValue)  '部門コード
@@ -1136,7 +1241,7 @@ Public Class LNM0006TankaDetail
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(TxtSelLineCNT.Text) AndAlso
-            String.IsNullOrEmpty(TxtDelFlg.Text) Then
+            String.IsNullOrEmpty(ddlDELFLG.SelectedValue) Then
             Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"                'SUBクラス名
@@ -1169,7 +1274,7 @@ Public Class LNM0006TankaDetail
         LNM0006INProw("SELECT") = 1
         LNM0006INProw("HIDDEN") = 0
 
-        LNM0006INProw("DELFLG") = TxtDelFlg.Text             '削除フラグ
+        LNM0006INProw("DELFLG") = ddlDELFLG.SelectedValue             '削除フラグ
         LNM0006INProw("TORICODE") = TxtTORICODE.Text         '取引先コード
         LNM0006INProw("TORINAME") = TxtTORINAME.Text         '取引先名称
         LNM0006INProw("ORGCODE") = ddlSelectORG.SelectedValue           '部門コード
@@ -1221,8 +1326,6 @@ Public Class LNM0006TankaDetail
                 ' KEY項目以外の項目の差異をチェック
                 If LNM0006row("DELFLG") = LNM0006INProw("DELFLG") AndAlso
                     LNM0006row("TORINAME") = LNM0006INProw("TORINAME") AndAlso
-                    LNM0006row("ORGNAME") = LNM0006INProw("ORGNAME") AndAlso
-                    LNM0006row("KASANORGNAME") = LNM0006INProw("KASANORGNAME") AndAlso
                     LNM0006row("TODOKENAME") = LNM0006INProw("TODOKENAME") AndAlso
                     LNM0006row("ENDYMD") = LNM0006INProw("ENDYMD") AndAlso
                     LNM0006row("TANKA") = LNM0006INProw("TANKA") AndAlso
@@ -1319,7 +1422,7 @@ Public Class LNM0006TankaDetail
 
         TxtSelLineCNT.Text = ""              'LINECNT
         TxtMapId.Text = "M00001"             '画面ＩＤ
-        TxtDelFlg.Text = ""                  '削除フラグ
+        ddlDELFLG.SelectedValue = ""                  '削除フラグ
         TxtTORICODE.Text = ""                '取引先コード
         TxtTORINAME.Text = ""                '取引先名称
         'ddlSelectORG.SelectedValue = ""                 '部門コード
@@ -1401,9 +1504,9 @@ Public Class LNM0006TankaDetail
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "TxtDelFlg"      '削除フラグ
-                CODENAME_get("DELFLG", TxtDelFlg.Text, LblDelFlgName.Text, WW_Dummy)
-                TxtDelFlg.Focus()
+            'Case "TxtDelFlg"      '削除フラグ
+            '    CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
+            '    TxtDelFlg.Focus()
             Case "TxtTORICODE"
                 CODENAME_get("TORICODE", TxtTORICODE.Text, TxtTORINAME.Text, WW_RtnSW)  '取引先コード
                 TxtTORICODE.Focus()
@@ -1590,10 +1693,10 @@ Public Class LNM0006TankaDetail
         '○ 選択内容を画面項目へセット
         If String.IsNullOrEmpty(WF_FIELD_REP.Value) Then
             Select Case WF_FIELD.Value
-                Case "TxtDelFlg"      '削除フラグ
-                    TxtDelFlg.Text = WW_SelectValue
-                    LblDelFlgName.Text = WW_SelectText
-                    TxtDelFlg.Focus()
+                'Case "TxtDelFlg"      '削除フラグ
+                '    ddlDELFLG.SelectedValue = WW_SelectValue
+                '    LblDelFlgName.Text = WW_SelectText
+                '    TxtDelFlg.Focus()
             End Select
         End If
 
@@ -1614,8 +1717,8 @@ Public Class LNM0006TankaDetail
         '○ フォーカスセット
         If String.IsNullOrEmpty(WF_FIELD_REP.Value) Then
             Select Case WF_FIELD.Value
-                Case "TxtDelFlg"            '削除フラグ
-                    TxtDelFlg.Focus()
+                'Case "TxtDelFlg"            '削除フラグ
+                '    TxtDelFlg.Focus()
             End Select
         End If
 
@@ -2077,8 +2180,6 @@ Public Class LNM0006TankaDetail
                     ' KEY項目以外の項目の差異をチェック
                     If LNM0006row("DELFLG") = LNM0006INProw("DELFLG") AndAlso
                         LNM0006row("TORINAME") = LNM0006INProw("TORINAME") AndAlso
-                        LNM0006row("ORGNAME") = LNM0006INProw("ORGNAME") AndAlso
-                        LNM0006row("KASANORGNAME") = LNM0006INProw("KASANORGNAME") AndAlso
                         LNM0006row("TODOKENAME") = LNM0006INProw("TODOKENAME") AndAlso
                         LNM0006row("STYMD") = LNM0006INProw("STYMD") AndAlso
                         LNM0006row("ENDYMD") = LNM0006INProw("ENDYMD") AndAlso
@@ -2122,8 +2223,6 @@ Public Class LNM0006TankaDetail
                 Dim WW_DBDataCheck As String = ""
                 Dim WW_BeforeMAXSTYMD As String = ""
                 Dim WW_STYMD_SAVE As String = ""
-                Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
-                Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
 
                 '枝番が新規、有効開始日が変更されたときの対応
                 If LNM0006INPtbl.Rows(0)("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
@@ -2169,44 +2268,10 @@ Public Class LNM0006TankaDetail
                             LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
                             '有効終了日に最大値を入れる
                             LNM0006INPtbl.Rows(0)("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
-
-                        '更新前有効開始日 >　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が小さい場合)
-                        Case WW_BeforeMAXSTYMD > CDate(LNM0006INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
-                            'DBに登録されている該当する有効範囲の有効開始日を取得する
-                            work.GetPastSTENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_PASTSTYMD, WW_PASTENDYMD)
-                            '取得できた場合
-                            If Not WW_PASTSTYMD = "" Then
-                                'DBに登録されている該当する有効範囲の有効開始日の有効終了日を登録しようとしている有効開始日-1にする
-                                '変更後の有効開始日退避
-                                WW_STYMD_SAVE = LNM0006INPtbl.Rows(0)("STYMD")
-                                '変更後テーブルに取得した有効開始日格納
-                                LNM0006INPtbl.Rows(0)("STYMD") = WW_PASTSTYMD
-                                '変更後テーブルに更新用の有効終了日格納
-                                LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                '履歴テーブルに変更前データを登録
-                                InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.BEFDATA, WW_DATE)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '変更前の有効終了日更新
-                                UpdateENDYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
-                                If Not isNormal(WW_DBDataCheck) Then
-                                    Exit Sub
-                                End If
-                                '履歴テーブルに変更後データを登録
-                                InsertHist(SQLcon, LNM0006WRKINC.MODIFYKBN.AFTDATA, WW_DATE)
-                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                    Exit Sub
-                                End If
-                                '退避した有効開始日を元に戻す
-                                LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
-                                '有効終了日を取得した過去の有効終了日に設定する
-                                LNM0006INPtbl.Rows(0)("ENDYMD") = WW_PASTENDYMD
-                            Else
-                                '取得できなかった場合(過去のデータが1件もなかった場合)
-                                '有効終了日を変更前の開始日-1にする
-                                LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_BeforeMAXSTYMD).AddDays(-1).ToString("yyyy/MM/dd")
-                            End If
+                        Case Else
+                            '有効終了日に有効開始日の月の末日を入れる
+                            Dim WW_NEXT_YM As String = DateTime.Parse(LNM0006INPtbl.Rows(0)("STYMD")).AddMonths(1).ToString("yyyy/MM")
+                            LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                     End Select
                 End If
 

@@ -193,17 +193,17 @@ Public Module PrevDispMap
         Public Const LNM0006H As String = "ASP.LNG_MAS_LNM0006TANKAHISTORY_ASPX"
 
         ''' <summary>
-        ''' コード変換特例１マスタメンテナンス（検索）
+        ''' 固定費マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const LNM0007S As String = "ASP.LNG_MAS_LNM0007RECT1MSEARCH_ASPX"
+        Public Const LNM0007L As String = "ASP.LNG_MAS_LNM0007KOTEIHILIST_ASPX"
         ''' <summary>
-        ''' コード変換特例１マスタメンテナンス（一覧）
+        ''' 固定費マスタメンテナンス（詳細）
         ''' </summary>
-        Public Const LNM0007L As String = "ASP.LNG_MAS_LNM0007RECT1MLIST_ASPX"
+        Public Const LNM0007D As String = "ASP.LNG_MAS_LNM0007KOTEIHIDETAIL_ASPX"
         ''' <summary>
-        ''' コード変換特例１マスタメンテナンス（詳細）
+        ''' 固定費スタメンテナンス（履歴）
         ''' </summary>
-        Public Const LNM0007D As String = "ASP.LNG_MAS_LNM0007RECT1MDETAIL_ASPX"
+        Public Const LNM0007H As String = "ASP.LNG_MAS_LNM0007TANKAHISTORY_ASPX"
 
         ''' <summary>
         ''' コード変換特例２マスタメンテナンス（検索）

@@ -174,6 +174,7 @@ p {
     /*width: 90% !important;*/
 }
 #detailkeybox {
+    width: 80% !important;
     height: 73% !important;
     overflow-x: hidden;
     overflow-y: auto !important;
@@ -186,7 +187,7 @@ p {
     width: 30em !important;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] {
+#detailkeybox p[id^=KOTEIHI_LINE_] {
     min-width: 500px;
     display: flex;
     box-sizing: border-box;
@@ -196,65 +197,65 @@ p {
 /* 単票入力欄の列定義         */
 /* ************************** */
 /* 1項目(名称 文言 列幅) */
-#detailkeybox p[id^=TANKA_LINE_] > span {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span {
     display: inline-block;
     margin-bottom: 8px;
 }
 
-#detailkeybox p[id^=TANKA_LINE_]:last-of-type > span {
+#detailkeybox p[id^=KOTEIHI_LINE_]:last-of-type > span {
     margin-bottom: 0;
 }
 
 /* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(1) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(1) {
     display: inline-block;
     width: 10em;
     font-weight: bold;
 }
 /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(2) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(2) {
     display: inline-block;
     width: 11em;
 }
 /* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(3) {
+    #detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(3) {
         display: inline-block;
         width: 5.5em;
     }
-    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(4) {
+    #detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(4) {
         display: inline-block;
         width: 10em;
         font-weight: bold;
     }
 /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(5) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(5) {
     display: inline-block;
     width: 11em;
 }
 /* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(6) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(6) {
     display: inline-block;
     width: 15.5em;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(1) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(1) {
     display: inline-block;
     width: 10em;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(2) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(2) {
     display: inline-block;
     width: 11.5em;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(3) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(3) {
     display: inline-block;
     width: 5.5em;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(4) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(4) {
     display: inline-block;
     width: 10em;
     font-weight: bold;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(5) {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(5) {
     display: inline-block;
     width: 11em;
 }
@@ -264,7 +265,7 @@ p {
     text-align: right !important;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] > span > b {
+#detailkeybox p[id^=KOTEIHI_LINE_] > span > b {
     display: inline-block;
     width: 190px !important;
 }
@@ -280,6 +281,10 @@ p {
     padding: 2px;
 }
 
-#WF_TANKA_TEXT{
-    font-weight:bold;
+#TxtSYABARA, #TxtKOTEIHI, #TxtGETSUGAKU, #TxtGENGAKU, #TxtKOTEIHIM, #TxtKOTEIHID, #TxtKAISU, #TxtKINGAKU {
+    text-align: right !important;
+}
+
+#WF_GETSUGAKU_TEXT, #WF_GENGAKU_TEXT, #WF_KOTEIHI_TEXT, #WF_KOTEIHIM_TEXT, #WF_KOTEIHID_TEXT, #WF_KINGAKU_TEXT {
+    font-weight: bold;
 }

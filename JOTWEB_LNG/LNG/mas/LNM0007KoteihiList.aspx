@@ -1,4 +1,4 @@
-﻿<%@ Page Title="LNM0006L" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master" CodeBehind="LNM0006TankaList.aspx.vb" Inherits="JOTWEB_LNG.LNM0006TankaList" %>
+﻿<%@ Page Title="LNM0007L" Language="vb" AutoEventWireup="false" MasterPageFile="~/LNG/LNGMasterPage.Master" CodeBehind="LNM0007KoteihiList.aspx.vb" Inherits="JOTWEB_LNG.LNM0007KoteihiList" %>
 <%@ MasterType VirtualPath="~/LNG/LNGMasterPage.Master" %>
 
 <%@ Import Namespace="JOTWEB_LNG.GRIS0005LeftBox" %>
@@ -7,23 +7,25 @@
 <%@ Register Src="~/inc/GRIS0003SRightBox.ascx" TagName="rightview2" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0006LeftMenu.ascx" TagName="leftmenu" TagPrefix="MSINC" %>
-<%@ Register Src="~/LNG/inc/LNM0006WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/LNM0007WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 
-<asp:Content ID="LNM0006LH" ContentPlaceHolderID="head" runat="server">
+<asp:Content ID="LNM0007LH" ContentPlaceHolderID="head" runat="server">
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link href='<%=ResolveUrl("~/LNG/css/LNM0006L.css")%>' rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNM0006L.js")%>'></script>
+    <link href='<%=ResolveUrl("~/LNG/css/LNM0007L.css")%>' rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
+    <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNM0007L.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
  
-<asp:Content ID="LNM0006L" ContentPlaceHolderID="contents1" runat="server">
+<asp:Content ID="LNM0007L" ContentPlaceHolderID="contents1" runat="server">
     <div class="d-inline-flex align-items-center flex-column w-100">
         <!-- draggable="true"を指定するとTEXTBoxのマウス操作に影響 -->
         <!-- 全体レイアウト　headerbox -->
@@ -34,34 +36,14 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active" id="PAGE_SEARCH"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006S');">単価マスタ（検索）</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">単価マスタ（一覧）</li>
+                        <li class="breadcrumb-item active" aria-current="page">固定費マスタ</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">単価マスタ一覧</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title">固定費マスタ</h2>
                         <div class="Operation">
                             <div class="actionButtonBox">
-                                <div class="leftSide">
-                                    <!-- 一覧件数 -->
-                                    <div class="d-flex align-items-center gap-2 me-3">
-                                        <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2 me-3">
-                                    <strong class="flex-shrink-0">対象日</strong>
-                                        <b class="calendararea">
-                                            <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                                <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
-                                                <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
-                                                    <span class="material-symbols-outlined">calendar_month</span>
-                                                </span>
-                                            </b>
-                                        </b>
-                                    </div>
-                                    <b class="d-flex align-items-center gap-2">
-                                        <strong class="flex-shrink-0">届先</strong>
-                                        <asp:DropDownList ID="WF_TODOKE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TODOKEChange');" />
-                                    </b>  
+                                <div class="leftSide">           
                                 </div>
                                 <div class="rightSide">
                                     <input type="button" id="WF_ButtonINSERT"   class="btn-sticky btn-action" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
@@ -79,7 +61,32 @@
                             </div> <!-- End class=actionButtonBox -->
                         </div> <!-- End class="Operation" -->
 
+                        <div class="tabBox">
+                            <asp:button ID="WF_ButtonKOTEIHI" CssClass="btn-tab" text="固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonKOTEIHI');" />
+                            <asp:button ID="WF_ButtonTNGKOTEIHI" CssClass="btn-tab" text="TNG固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonTNGKOTEIHI');" />
+                            <asp:button ID="WF_ButtonSKKOTEIHI" CssClass="btn-tab" text="SK固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonSKKOTEIHI');" />
+
+                            <!-- 一覧件数 -->
+                            <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                            <!-- 対象年月 -->
+                        <div class="d-flex align-items-center gap-2 me-3">
+                            <strong class="flex-shrink-0">対象年月</strong>
+                            <b class="calendararea">
+                                <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                    <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
+                                    <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
+                                        <span class="material-symbols-outlined">calendar_month</span>
+                                    </span>
+                                </b>
+                            </b>
+                        </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <strong class="flex-shrink-0">荷主</strong>
+                                <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORIChange');" />
+                            </div>   
+                        </div>
                         <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
+
                 </div>
             </div>
         </div>
@@ -99,7 +106,7 @@
     <div style="display:none;">
         <!-- 表示制御項目 -->
         <input id="VisibleKeyOrgCode" runat="server" value="" type="text" />
-
+        <input id="VisibleKeyTohokuOrgCode" runat="server" value="" type="text" />
         <!-- GridView DBクリック-->
         <asp:TextBox ID="WF_GridDBclick" Text="" runat="server"></asp:TextBox>
         <!-- GridView表示位置フィールド -->

@@ -77,22 +77,13 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDelFlg コントロール。
+    '''ddlDELFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDelFlg As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''LblDelFlgName コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents LblDelFlgName As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents ddlDELFLG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''WF_CAMPCODE_L コントロール。

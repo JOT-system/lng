@@ -61,10 +61,10 @@
                             <!-- 削除フラグ -->
                             <span class="ef magnifier">
                                 <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                <a ondblclick="Field_DBclick('TxtDelFlg', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>)" onchange="TextBox_change('TxtDelFlg');">
-                                    <asp:TextBox ID="TxtDelFlg" runat="server" CssClass="WF_TEXTBOX_CSS boxIcon" MaxLength="1"></asp:TextBox>
-                                </a>
-                                <asp:Label ID="LblDelFlgName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                <asp:DropDownList ID="ddlDELFLG" runat="server" CssClass="ddlSelectControl">
+                                    <asp:ListItem Text="有効" Value="0"></asp:ListItem>
+                                    <asp:ListItem Text="削除" Value="1"></asp:ListItem>
+                                </asp:DropDownList>
                             </span>
 
                             <!-- 画面ＩＤ -->
