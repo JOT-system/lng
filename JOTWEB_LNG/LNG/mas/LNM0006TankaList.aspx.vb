@@ -487,7 +487,8 @@ Public Class LNM0006TankaList
         work.WF_SEL_TODOKECODE.Text = ""                                         '届先コード
         work.WF_SEL_TODOKENAME.Text = ""                                         '届先名称
         work.WF_SEL_STYMD.Text = ""                                              '有効開始日
-        work.WF_SEL_ENDYMD.Text = LNM0006WRKINC.MAX_ENDYMD                       '有効終了日
+        'work.WF_SEL_ENDYMD.Text = LNM0006WRKINC.MAX_ENDYMD                       '有効終了日
+        work.WF_SEL_ENDYMD.Text = ""                                             '有効終了日
         work.WF_SEL_BRANCHCODE.Text = ""                                         '枝番
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_TANKA.Text)    '単価
         work.WF_SEL_SYAGATA.Text = ""                                            '車型
@@ -895,7 +896,7 @@ Public Class LNM0006TankaList
                 WF_PrintURL.Value = UrlRoot & FileName
                 ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
             Case LNM0006WRKINC.FILETYPE.PDF
-                FileName = "ユーザマスタ.pdf"
+                FileName = "単価マスタ.pdf"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -954,7 +955,7 @@ Public Class LNM0006TankaList
 
         '入力不要列網掛け
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '枝番
-        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
+        'sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
 
         '1,2行の網掛けは消す
@@ -1044,6 +1045,15 @@ Public Class LNM0006TankaList
                 End With
             End If
 
+            '有効終了日
+            WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
+            '選択比較項目-発荷主コード
+            sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Comment.Shape
+                .Width = 150
+                .Height = 30
+            End With
+
         End Using
 
     End Sub
@@ -1095,19 +1105,17 @@ Public Class LNM0006TankaList
         Dim WW_STRANGE As IRange
         Dim WW_ENDRANGE As IRange
 
-        'シートの保護を解除
-        sheet.Unprotect()
-        sheet.Cells.Locked = False
+        'シートの保護をかけるとリボンも操作できなくなるため
+        'データの入力規則で対応(該当セルの入力可能文字数を0にする)
 
         '枝番
         WW_STRANGE = sheet.Cells(WW_STROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
         WW_ENDRANGE = sheet.Cells(WW_ENDROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
-        sheet.Range(WW_STRANGE.Address & ":" & WW_ENDRANGE.Address).Locked = True
+        With sheet.Range(WW_STRANGE.Address & ":" & WW_ENDRANGE.Address).Validation
+            .Add(type:=ValidationType.TextLength, validationOperator:=ValidationOperator.LessEqual, formula1:=0)
+        End With
 
-        'シートを保護する
-        sheet.Protect()
     End Sub
-
 
     ''' <summary>
     ''' 明細設定
@@ -1260,8 +1268,7 @@ Public Class LNM0006TankaList
             Dim WW_DBDataCheck As String = ""
             Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
-            Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
+            Dim WW_ENDYMD_SAVE As String = ""
 
             For Each Row As DataRow In LNM0006Exceltbl.Rows
 
@@ -1296,6 +1303,7 @@ Public Class LNM0006TankaList
                         Continue For
                     End If
 
+
                     '有効開始日、有効終了日更新
                     If Not Row("TORICODE") = "" And
                        Not Row("ORGCODE") = "" And
@@ -1303,11 +1311,13 @@ Public Class LNM0006TankaList
                        Not Row("TODOKECODE") = "" And
                        Not Row("STYMD") = Date.MinValue Then
 
+                        WF_AUTOENDYMD.Value = ""
+
                         '枝番が新規、有効開始日が変更されたときの対応
                         If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
                             '枝番を生成
                             Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
-                            Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                            WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                             If Not isNormal(WW_DBDataCheck) Then
                                 Exit Sub
                             End If
@@ -1320,16 +1330,17 @@ Public Class LNM0006TankaList
 
                             Select Case True
                                 Case WW_BeforeMAXSTYMD = "" '無いと思うが1件も対象の枝番データが無い場合
-                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
-                                    '何もしない
-
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                 Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                     'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
 
                                     '変更後の有効開始日退避
                                     WW_STYMD_SAVE = Row("STYMD")
+                                    '変更後の有効終了日退避
+                                    WW_ENDYMD_SAVE = Row("ENDYMD")
                                     '変更後テーブルに変更前の有効開始日格納
                                     Row("STYMD") = WW_BeforeMAXSTYMD
                                     '変更後テーブルに更新用の有効終了日格納
@@ -1351,14 +1362,14 @@ Public Class LNM0006TankaList
                                     End If
                                     '退避した有効開始日を元に戻す
                                     Row("STYMD") = WW_STYMD_SAVE
+                                    '退避した有効終了日を元に戻す
+                                    Row("ENDYMD") = WW_ENDYMD_SAVE
                                     '有効終了日に最大値を入れる
-                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
-
-                                    '更新前有効開始日 >　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が小さい場合)
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case Else
                                     '有効終了日に有効開始日の月の末日を入れる
                                     Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                    Row("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                                    WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                             End Select
                         End If
                     End If
@@ -1505,8 +1516,7 @@ Public Class LNM0006TankaList
             Dim WW_DBDataCheck As String = ""
             Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
-            Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
+            Dim WW_ENDYMD_SAVE As String = ""
 
             For Each Row As DataRow In LNM0006Exceltbl.Rows
 
@@ -1550,11 +1560,13 @@ Public Class LNM0006TankaList
                        Not Row("TODOKECODE") = "" And
                        Not Row("STYMD") = Date.MinValue Then
 
+                        WF_AUTOENDYMD.Value = ""
+
                         '枝番が新規、有効開始日が変更されたときの対応
                         If Row("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
                             '枝番を生成
                             Row("BRANCHCODE") = LNM0006WRKINC.GenerateBranchCode(SQLcon, Row, WW_DBDataCheck)
-                            Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                            WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                             If Not isNormal(WW_DBDataCheck) Then
                                 Exit Sub
                             End If
@@ -1567,15 +1579,17 @@ Public Class LNM0006TankaList
 
                             Select Case True
                                 Case WW_BeforeMAXSTYMD = "" '無いと思うが1件も対象の枝番データが無い場合
-                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
-                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                 Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                     'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
 
                                     '変更後の有効開始日退避
                                     WW_STYMD_SAVE = Row("STYMD")
+                                    '変更後の有効終了日退避
+                                    WW_ENDYMD_SAVE = Row("ENDYMD")
                                     '変更後テーブルに変更前の有効開始日格納
                                     Row("STYMD") = WW_BeforeMAXSTYMD
                                     '変更後テーブルに更新用の有効終了日格納
@@ -1597,12 +1611,14 @@ Public Class LNM0006TankaList
                                     End If
                                     '退避した有効開始日を元に戻す
                                     Row("STYMD") = WW_STYMD_SAVE
+                                    '退避した有効終了日を元に戻す
+                                    Row("ENDYMD") = WW_ENDYMD_SAVE
                                     '有効終了日に最大値を入れる
-                                    Row("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case Else
                                     '有効終了日に有効開始日の月の末日を入れる
                                     Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                    Row("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                                    WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                             End Select
                         End If
                     End If
@@ -1615,7 +1631,6 @@ Public Class LNM0006TankaList
                     If Not isNormal(WW_ErrSW) Then
                         Exit Sub
                     End If
-
 
                     '変更がある場合履歴テーブルに変更前データを登録
                     If WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.BEFDATA Then
@@ -1848,14 +1863,14 @@ Public Class LNM0006TankaList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            ''有効終了日
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD))
-            'WW_DATATYPE = DataTypeHT("ENDYMD")
-            'LNM0006Exceltblrow("ENDYMD") = LNM0006WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
+            '有効終了日
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD))
+            WW_DATATYPE = DataTypeHT("ENDYMD")
+            LNM0006Exceltblrow("ENDYMD") = LNM0006WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
             '枝番
             WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE))
             WW_DATATYPE = DataTypeHT("BRANCHCODE")
@@ -1965,6 +1980,11 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
         SQLStr.AppendLine("    AND  COALESCE(TODOKENAME, '')             = @TODOKENAME ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+
+        If Not WW_ROW("ENDYMD") = Date.MinValue Then
+            SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        End If
+
         SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
         SQLStr.AppendLine("    AND  COALESCE(TANKA, '0')             = @TANKA ")
         SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
@@ -1987,7 +2007,6 @@ Public Class LNM0006TankaList
                 Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
                 Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
                 Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal)         '単価
                 Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
@@ -2020,6 +2039,12 @@ Public Class LNM0006TankaList
                 P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
 
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
+
+                '有効終了日
+                If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                    Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
+                    P_ENDYMD.Value = WW_ROW("ENDYMD")
+                End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -2334,7 +2359,14 @@ Public Class LNM0006TankaList
                 P_TODOKECODE.Value = WW_ROW("TODOKECODE")       '届先コード
                 P_TODOKENAME.Value = WW_ROW("TODOKENAME")       '届先名称
                 P_STYMD.Value = WW_ROW("STYMD")                 '有効開始日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")               '有効終了日
+
+                '有効終了日
+                If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                    P_ENDYMD.Value = WW_ROW("ENDYMD")
+                Else
+                    P_ENDYMD.Value = WF_AUTOENDYMD.Value
+                End If
+
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")       '枝番
                 P_TANKA.Value = WW_ROW("TANKA")                 '単価
                 P_SYAGATA.Value = WW_ROW("SYAGATA")             '車型

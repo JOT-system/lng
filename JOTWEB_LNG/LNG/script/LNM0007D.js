@@ -54,26 +54,52 @@ window.onload = function () {
     //変更不可判断キーに値が入っていない場合
     if (DisabledKeyItem == "") {
         //名称を変更する
-        document.getElementById('PAGE_NAME1').innerText = "固定費マスタ（追加）";
-        document.getElementById('PAGE_NAME2').innerText = "固定費マスタ追加";
         document.getElementById('WF_ButtonUPDATE').value = "追加";
+        switch (VisibleKeyControlTable) {
+            case "LNM0007L": //固定費マスタ
+                document.getElementById('PAGE_NAME1').innerText = "固定費マスタ（追加）";
+                document.getElementById('PAGE_NAME2').innerText = "固定費マスタ追加";
+                break;
+            case "LNM0007LSK": //SK固定費マスタ
+                document.getElementById('PAGE_NAME1').innerText = "SK固定費マスタ（追加）";
+                document.getElementById('PAGE_NAME2').innerText = "SK固定費マスタ追加";
+                break;
+            case "LNM0007LTNG": //TNG固定費マスタ
+                document.getElementById('PAGE_NAME1').innerText = "TNG固定費マスタ（追加）";
+                document.getElementById('PAGE_NAME2').innerText = "TNG固定費マスタ追加";
+                break;
+        }
+    } else {
+        switch (VisibleKeyControlTable) {
+            case "LNM0007LSK": //SK固定費マスタ
+                document.getElementById('PAGE_NAME1').innerText = "SK固定費マスタ（詳細）";
+                document.getElementById('PAGE_NAME2').innerText = "SK固定費マスタ詳細";
+                break;
+            case "LNM0007LTNG": //TNG固定費マスタ
+                document.getElementById('PAGE_NAME1').innerText = "TNG固定費マスタ（詳細）";
+                document.getElementById('PAGE_NAME2').innerText = "TNG固定費マスタ詳細";
+                break;
+        }
     }
 
     //変更不可判断キーに値が入っている場合、一意項目を入力不可にする
     if (DisabledKeyItem != "") { 
         //取引先コード
         document.getElementById('TxtTORICODE').readOnly = true;
-        document.getElementById('TxtTORICODEcommonIcon').style.display = "none";
+        //document.getElementById('TxtTORICODEcommonIcon').style.display = "none";
         //取引先名称
         document.getElementById('TxtTORINAME').readOnly = true;
         //加算先部門コード
         document.getElementById('TxtKASANORGCODE').readOnly = true;
-        document.getElementById('TxtKASANORGCODEcommonIcon').style.display = "none";
+        // document.getElementById('TxtKASANORGCODEcommonIcon').style.display = "none";
+    
         //加算先部門名称
         document.getElementById('TxtKASANORGNAME').readOnly = true;
         //有効開始日
-        TxtStYMD.readOnly = true;
+        document.getElementById('WF_StYMD').readOnly = true;
         document.getElementById('WF_StYMD_CALENDAR').style.display = "none";
+        //有効終了日注釈
+        document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';
     };
 
 };

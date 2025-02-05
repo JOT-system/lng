@@ -115,7 +115,7 @@ Public Class LNM0007KoteihiList
                                 Case "WF_ButtonTNGKOTEIHI"
                                     work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDLTNG
                             End Select
-                            WF_TaishoYm.Value = ""
+                            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
                             DowpDownInitialize()
                             GridViewInitialize()
                             SetTabColor()
@@ -252,6 +252,10 @@ Public Class LNM0007KoteihiList
             VisibleKeyTohokuOrgCode.Value = Master.ROLE_ORG
             WF_ButtonKOTEIHI.Text = LNM0007WRKINC.BTNNAMETOHOKU
         End If
+
+        '対象年月
+        WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
+
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -551,14 +555,21 @@ Public Class LNM0007KoteihiList
         work.WF_SEL_LINECNT.Text = ""                                             '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)    '削除
 
-        work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue                         '取引先コード
-        work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString                 '取引先名称
+        If WF_TORI.SelectedValue = "" Then
+            work.WF_SEL_TORICODE.Text = ""                  '取引先コード
+            work.WF_SEL_TORINAME.Text = ""                 '取引先名称
+        Else
+            work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue                         '取引先コード
+            work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString                 '取引先名称
+        End If
+
         work.WF_SEL_ORGCODE.Text = ""                                             '部門コード
         work.WF_SEL_ORGNAME.Text = ""                                             '部門名称
         work.WF_SEL_KASANORGCODE.Text = ""                                        '加算先部門コード
         work.WF_SEL_KASANORGNAME.Text = ""                                        '加算先部門名称
         work.WF_SEL_STYMD.Text = ""                                               '有効開始日
-        work.WF_SEL_ENDYMD.Text = LNM0007WRKINC.MAX_ENDYMD                        '有効終了日
+        'work.WF_SEL_ENDYMD.Text = LNM0007WRKINC.MAX_ENDYMD                       '有効終了日
+        work.WF_SEL_ENDYMD.Text = ""                                              '有効終了日
         work.WF_SEL_TAISHOYM.Text = ""                                            '対象年月
         work.WF_SEL_SYABAN.Text = ""                                              '車番
         work.WF_SEL_RIKUBAN.Text = ""                                             '陸事番号
@@ -1075,7 +1086,7 @@ Public Class LNM0007KoteihiList
                 sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
 
                 '入力不要列網掛け
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
+                'sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
                 sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
                 '入力必須列網掛け
@@ -1217,6 +1228,16 @@ Public Class LNM0007KoteihiList
                             .Height = CONST_HEIGHT_PER_ROW * WW_CNT
                         End With
                     End If
+
+                    '有効終了日
+                    WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
+                    '選択比較項目-発荷主コード
+                    sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).AddComment(WW_TEXT)
+                    With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Comment.Shape
+                        .Width = 150
+                        .Height = 30
+                    End With
+
                 Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
                     '削除フラグ
                     COMMENT_get(SQLcon, "DELFLG", WW_TEXT, WW_CNT)
@@ -1512,8 +1533,7 @@ Public Class LNM0007KoteihiList
             Dim WW_DBDataCheck As String = ""
             Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
-            Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
+            Dim WW_ENDYMD_SAVE As String = ""
 
             For Each Row As DataRow In LNM0007Exceltbl.Rows
 
@@ -1565,17 +1585,22 @@ Public Class LNM0007KoteihiList
                                     Exit Sub
                                 End If
 
+                                WF_AUTOENDYMD.Value = ""
+
                                 Select Case True
-                                    Case WW_BeforeMAXSTYMD = "" '無い場合
-                                        Row("ENDYMD") = LNM0007WRKINC.MAX_ENDYMD
-                                    Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
-                                        Row("ENDYMD") = LNM0007WRKINC.MAX_ENDYMD
+                                    'DBに登録されている有効開始日が無かった場合
+                                    Case WW_BeforeMAXSTYMD = ""
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
+                                        '同一の場合
+                                    Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd")
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
                                 '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                     Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                         'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
-
                                         '変更後の有効開始日退避
                                         WW_STYMD_SAVE = Row("STYMD")
+                                        '変更後の有効終了日退避
+                                        WW_ENDYMD_SAVE = Row("ENDYMD")
                                         '変更後テーブルに変更前の有効開始日格納
                                         Row("STYMD") = WW_BeforeMAXSTYMD
                                         '変更後テーブルに更新用の有効終了日格納
@@ -1597,12 +1622,14 @@ Public Class LNM0007KoteihiList
                                         End If
                                         '退避した有効開始日を元に戻す
                                         Row("STYMD") = WW_STYMD_SAVE
+                                        '退避した有効終了日を元に戻す
+                                        Row("ENDYMD") = WW_ENDYMD_SAVE
                                         '有効終了日に最大値を入れる
-                                        Row("ENDYMD") = LNM0007WRKINC.MAX_ENDYMD
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
                                     Case Else
                                         '有効終了日に有効開始日の月の末日を入れる
                                         Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                        Row("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                                        WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                                 End Select
                             End If
 #End Region
@@ -1756,8 +1783,7 @@ Public Class LNM0007KoteihiList
             Dim WW_DBDataCheck As String = ""
             Dim WW_BeforeMAXSTYMD As String = ""
             Dim WW_STYMD_SAVE As String = ""
-            Dim WW_PASTSTYMD As String = "" '過去有効開始日格納
-            Dim WW_PASTENDYMD As String = "" '過去有効終了日格納
+            Dim WW_ENDYMD_SAVE As String = ""
 
             For Each Row As DataRow In LNM0007Exceltbl.Rows
 
@@ -1810,19 +1836,22 @@ Public Class LNM0007KoteihiList
                                     Exit Sub
                                 End If
 
+                                WF_AUTOENDYMD.Value = ""
+
                                 Select Case True
                                     'DBに登録されている有効開始日が無かった場合
                                     Case WW_BeforeMAXSTYMD = ""
-                                        Row("ENDYMD") = LNM0007WRKINC.MAX_ENDYMD
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
                                         '同一の場合
                                     Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                    '何もしない
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
                                 '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                     Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                         'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
-
                                         '変更後の有効開始日退避
                                         WW_STYMD_SAVE = Row("STYMD")
+                                        '変更後の有効終了日退避
+                                        WW_ENDYMD_SAVE = Row("ENDYMD")
                                         '変更後テーブルに変更前の有効開始日格納
                                         Row("STYMD") = WW_BeforeMAXSTYMD
                                         '変更後テーブルに更新用の有効終了日格納
@@ -1844,12 +1873,14 @@ Public Class LNM0007KoteihiList
                                         End If
                                         '退避した有効開始日を元に戻す
                                         Row("STYMD") = WW_STYMD_SAVE
+                                        '退避した有効終了日を元に戻す
+                                        Row("ENDYMD") = WW_ENDYMD_SAVE
                                         '有効終了日に最大値を入れる
-                                        Row("ENDYMD") = LNM0007WRKINC.MAX_ENDYMD
+                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
                                     Case Else
                                         '有効終了日に有効開始日の月の末日を入れる
                                         Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                        Row("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                                        WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                                 End Select
                             End If
 #End Region
@@ -2198,14 +2229,14 @@ Public Class LNM0007KoteihiList
                         WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                         O_RTN = "ERR"
                     End If
-                    ''有効終了日
-                    'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD))
-                    'WW_DATATYPE = DataTypeHT("ENDYMD")
-                    'LNM0007Exceltblrow("ENDYMD") = LNM0007WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    'If WW_RESULT = False Then
-                    '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                    '    O_RTN = "ERR"
-                    'End If
+                    '有効終了日
+                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD))
+                    WW_DATATYPE = DataTypeHT("ENDYMD")
+                        LNM0007Exceltblrow("ENDYMD") = LNM0007WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                    If WW_RESULT = False Then
+                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                        O_RTN = "ERR"
+                    End If
                     '車番
                     WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN))
                     WW_DATATYPE = DataTypeHT("SYABAN")
@@ -2577,6 +2608,11 @@ Public Class LNM0007KoteihiList
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
                 SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
                 SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+
+                If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                    SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+                End If
+
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
                 SQLStr.AppendLine("    AND  COALESCE(RIKUBAN, '')             = @RIKUBAN ")
                 SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
@@ -2626,6 +2662,12 @@ Public Class LNM0007KoteihiList
                         P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
 
                         P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
+
+                        '有効終了日
+                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                            Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
+                            P_ENDYMD.Value = WW_ROW("ENDYMD")
+                        End If
 
                         Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                             Dim WW_Tbl = New DataTable
@@ -3343,7 +3385,14 @@ Public Class LNM0007KoteihiList
                         P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
                         P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
                         P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_ENDYMD.Value = WW_ROW("ENDYMD")           '有効終了日
+
+                        '有効終了日
+                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                            P_ENDYMD.Value = WW_ROW("ENDYMD")
+                        Else
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
+                        End If
+
                         P_SYABAN.Value = WW_ROW("SYABAN")           '車番
                         P_RIKUBAN.Value = WW_ROW("RIKUBAN")           '陸事番号
                         P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
@@ -3764,15 +3813,17 @@ Public Class LNM0007KoteihiList
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
-                ''有効終了日(バリデーションチェック)
-                'Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                'If Not isNormal(WW_CS0024FCheckerr) Then
-                '    WW_CheckMES1 = "・有効終了日エラーです。"
-                '    WW_CheckMES2 = WW_CS0024FCheckReport
-                '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                '    WW_LineErr = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
+                '有効終了日(バリデーションチェック)
+                If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                    Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+                    If Not isNormal(WW_CS0024FCheckerr) Then
+                        WW_CheckMES1 = "・有効終了日エラーです。"
+                        WW_CheckMES2 = WW_CS0024FCheckReport
+                        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                        WW_LineErr = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
+                End If
                 '車番(バリデーションチェック)
                 Master.CheckField(Master.USERCAMP, "SYABAN", WW_ROW("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
                 If Not isNormal(WW_CS0024FCheckerr) Then
@@ -3854,6 +3905,20 @@ Public Class LNM0007KoteihiList
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
+                '有効終了日(バリデーションチェック)
+                If Not WW_ROW("ENDYMD") = Date.MinValue Then
+                    ' 日付大小チェック
+                    If Not WW_ROW("STYMD") = Date.MinValue Then
+                        If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
+                            WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
+                            WW_CheckMES2 = "日付大小入力エラー"
+                            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                            WW_LineErr = "ERR"
+                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        End If
+                    End If
+                End If
+
 #End Region
             Case LNM0007WRKINC.MAPIDLSK
 #Region "SK固定費マスタ"

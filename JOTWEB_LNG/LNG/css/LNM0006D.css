@@ -269,8 +269,12 @@ p {
     width: 190px !important;
 }
 
+#TANKA_LINE_ENDYMD_ANNOTATION {
+    padding-left: 400px;
+}
+
 #WF_ENDYMD_L {
-    margin-left: -13px;
+    margin-left: -16px;
 }
 
 .ddlSelectControl {

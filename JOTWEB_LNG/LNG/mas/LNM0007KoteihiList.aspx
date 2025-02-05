@@ -133,6 +133,8 @@
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+        <!-- 自動作成した有効終了日 -->
+        <input id="WF_AUTOENDYMD" runat="server" value="" type="text" />
     </div>
  
 </asp:Content>

@@ -281,10 +281,12 @@ Public Class LNM0007WRKINC
                     Next
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
-                    'If WW_Tbl.Rows.Count > 1 Then
-                    '    Dim listBlankItm As New ListItem("選択してください", "")
-                    '    retList.Items.Add(listBlankItm)
-                    'End If
+                    If WW_Tbl.Rows.Count > 1 Then
+                        If AdminCheck(I_ORGCODE) Then
+                            Dim listBlankItm As New ListItem("全て表示", "")
+                            retList.Items.Add(listBlankItm)
+                        End If
+                    End If
                     For Each WW_ROW As DataRow In WW_Tbl.Rows
                         Dim listItm As New ListItem(WW_ROW("TORINAME"), WW_ROW("TORICODE"))
                         retList.Items.Add(listItm)

@@ -319,6 +319,7 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("    ,TODOKECODE                                                         ")
         SQLStr.AppendLine("    ,STYMD                                                              ")
         SQLStr.AppendLine("    ,BRANCHCODE                                                         ")
+        SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)

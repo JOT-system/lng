@@ -88,7 +88,10 @@
                                 <!-- 取引先コード -->
                                 <span>
                                     <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
+<%--                                    <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>--%>
+                                    <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORICODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORICODE');">
+                                        <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                    </a>
                                 </span>
                             </p>
                             <p id="KOTEIHI_LINE_TORINAME">
@@ -136,10 +139,13 @@
                                     </b>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_ENDYMD" style="display:none;">
+                            <p id="KOTEIHI_LINE_ENDYMD_ANNOTATION">
+                               <asp:Label ID="Label32" runat="server" Text="※有効終了日が未入力の場合は「2099/12/31」が設定されます。" CssClass="WF_TEXT_LEFT" style="color:red"></asp:Label>
+                            </p>
+                            <p id="KOTEIHI_LINE_ENDYMD">
                                 <!-- 有効終了日 -->
                                 <span>
-                                    <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <b class="calendararea">
                                         <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
                                             <input type="text" id="WF_EndYMD" runat="server" class="WF_TEXTBOX_CSS" data-input>
@@ -338,6 +344,8 @@
         <input id="WF_BeforeMAPID" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+        <!-- 自動作成した有効終了日 -->
+        <input id="WF_AUTOENDYMD" runat="server" value="" type="text" />
 
     </div>
  
