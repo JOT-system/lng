@@ -174,7 +174,7 @@ p {
     /*width: 90% !important;*/
 }
 #detailkeybox {
-    width: 80% !important;
+    /*width: 80% !important;*/
     height: 73% !important;
     overflow-x: hidden;
     overflow-y: auto !important;
@@ -283,4 +283,13 @@ p {
 
 #WF_GETSUGAKU_TEXT, #WF_GENGAKU_TEXT, #WF_KOTEIHI_TEXT, #WF_KOTEIHIM_TEXT, #WF_KOTEIHID_TEXT, #WF_KINGAKU_TEXT {
     font-weight: bold;
+}
+
+#KOTEIHI_LINE_ENDYMD_ANNOTATION {
+    padding-left: 400px;
+}
+
+
+#WF_ENDYMD_L {
+    margin-left: -16px;
 }

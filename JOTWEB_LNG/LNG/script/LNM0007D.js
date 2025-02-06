@@ -15,38 +15,28 @@ window.onload = function () {
     switch (VisibleKeyControlTable) {
         case "LNM0007L": //固定費マスタ
             document.getElementById('KOTEIHI_LINE_TAISHOYM').style.display = "none";　//対象年月
-            document.getElementById('KOTEIHI_LINE_GETSUGAKU').style.display = "none";　//月額運賃
-            document.getElementById('KOTEIHI_LINE_GENGAKU').style.display = "none";　//減額対象額
-            document.getElementById('KOTEIHI_LINE_KOTEIHIM').style.display = "none";　//月額固定費
-            document.getElementById('KOTEIHI_LINE_KOTEIHID').style.display = "none";　//日額固定費
-            document.getElementById('KOTEIHI_LINE_KAISU').style.display = "none";　//使用回数
-            document.getElementById('KOTEIHI_LINE_KINGAKU').style.display = "none";　//金額
+            document.getElementById('KOTEIHI_LINE_GETSUGAKU_GENGAKU').style.display = "none";　//月額運賃、減額対象額
+            document.getElementById('KOTEIHI_LINE_KOTEIHIM_KOTEIHID').style.display = "none";　//月額固定費、日額固定費
+            document.getElementById('KOTEIHI_LINE_KAISU_KINGAKU').style.display = "none";　//使用回数、金額
             document.getElementById('KOTEIHI_LINE_BIKOU').style.display = "none";　//備考
             break;
         case "LNM0007LSK": //SK固定費マスタ
-            document.getElementById('KOTEIHI_LINE_STYMD').style.display = "none";　//有効開始日
-            document.getElementById('KOTEIHI_LINE_ENDYMD').style.display = "none";　//有効終了日
-            document.getElementById('KOTEIHI_LINE_RIKUBAN').style.display = "none";　//陸事番号
-            document.getElementById('KOTEIHI_LINE_SYAGATA').style.display = "none";　//車型
-            document.getElementById('KOTEIHI_LINE_KOTEIHIM').style.display = "none";　//月額固定費
-            document.getElementById('KOTEIHI_LINE_KOTEIHID').style.display = "none";　//日額固定費
-            document.getElementById('KOTEIHI_LINE_KAISU').style.display = "none";　//使用回数
-            document.getElementById('KOTEIHI_LINE_KINGAKU').style.display = "none";　//金額
-            document.getElementById('KOTEIHI_LINE_BIKOU1').style.display = "none";　//備考1
-            document.getElementById('KOTEIHI_LINE_BIKOU2').style.display = "none";　//備考2
+            document.getElementById('KOTEIHI_LINE_STYMD_ENDYMD').style.display = "none";　//有効開始日、有効終了日
+            document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';   //有効終了日注釈
+            document.getElementById('KOTEIHI_LINE_RIKUBAN_SYAGATA').style.display = "none";　//陸事番号、車型
+            document.getElementById('KOTEIHI_LINE_KOTEIHIM_KOTEIHID').style.display = "none";　//月額固定費、日額固定費
+            document.getElementById('KOTEIHI_LINE_KAISU_KINGAKU').style.display = "none";　//使用回数、金額
+            document.getElementById('KOTEIHI_LINE_BIKOU1_BIKOU2').style.display = "none";　//備考1、備考2
             document.getElementById('KOTEIHI_LINE_BIKOU3').style.display = "none";　//備考3
             break;
         case "LNM0007LTNG": //TNG固定費マスタ
-            document.getElementById('KOTEIHI_LINE_STYMD').style.display = "none";　//有効開始日
-            document.getElementById('KOTEIHI_LINE_ENDYMD').style.display = "none";　//有効終了日
-            document.getElementById('KOTEIHI_LINE_RIKUBAN').style.display = "none";　//陸事番号
-            document.getElementById('KOTEIHI_LINE_SYAGATA').style.display = "none";　//車型
+            document.getElementById('KOTEIHI_LINE_STYMD_ENDYMD').style.display = "none";　//有効開始日、有効終了日
+            document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';   //有効終了日注釈
+            document.getElementById('KOTEIHI_LINE_RIKUBAN_SYAGATA').style.display = "none";　//陸事番号、車型
             document.getElementById('KOTEIHI_LINE_SYABARA').style.display = "none";　//車腹
-            document.getElementById('KOTEIHI_LINE_GETSUGAKU').style.display = "none";　//月額運賃
-            document.getElementById('KOTEIHI_LINE_GENGAKU').style.display = "none";　//減額対象額
+            document.getElementById('KOTEIHI_LINE_GETSUGAKU_GENGAKU').style.display = "none";　//月額運賃、減額対象額
             document.getElementById('KOTEIHI_LINE_KOTEIHI').style.display = "none";　//固定費
-            document.getElementById('KOTEIHI_LINE_BIKOU1').style.display = "none";　//備考1
-            document.getElementById('KOTEIHI_LINE_BIKOU2').style.display = "none";　//備考2
+            document.getElementById('KOTEIHI_LINE_BIKOU1_BIKOU2').style.display = "none";　//備考1、備考2
             document.getElementById('KOTEIHI_LINE_BIKOU3').style.display = "none";　//備考3
             break;
     }
@@ -96,10 +86,8 @@ window.onload = function () {
         //加算先部門名称
         document.getElementById('TxtKASANORGNAME').readOnly = true;
         //有効開始日
-        document.getElementById('WF_StYMD').readOnly = true;
-        document.getElementById('WF_StYMD_CALENDAR').style.display = "none";
-        //有効終了日注釈
-        document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';
+        //document.getElementById('WF_StYMD').readOnly = true;
+        //document.getElementById('WF_StYMD_CALENDAR').style.display = "none";
     };
 
 };

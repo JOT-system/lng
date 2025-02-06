@@ -81,53 +81,52 @@
                                     <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                     </a>
                                 </span>
-
-
                             </p>
                             <p id="KOTEIHI_LINE_TORICODE">
-                                <!-- 取引先コード -->
-                                <span>
+                                <span class="ef magnifier">
+                                    <!-- 取引先コード -->
                                     <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-<%--                                    <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>--%>
+                                    <%--<asp:TextBox ID="TxtTORICODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>--%>
                                     <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORICODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORICODE');">
                                         <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                                     </a>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_TORINAME">
-                                <!-- 取引先名称 -->
-                                <span>
+                                    <asp:Label ID="WF_TORICODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <!-- 取引先名称 -->
                                     <asp:Label ID="WF_TORINAME_L" runat="server" Text="取引先名称" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtTORINAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
+                                    <asp:TextBox ID="TxtTORINAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                                    <asp:Label ID="WF_TORINAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
-                                <p id="KOTEIHI_LINE_ORGCODE">
-                                <!-- 部門コード -->
+
+                            <p id="KOTEIHI_LINE_ORGCODE">
                                 <span>
+                                    <!-- 部門コード -->
                                     <asp:Label ID="WF_ORGCODE_L" runat="server" Text="部門コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" onchange="ButtonClick('WF_ORGChange');"/>
                                 </span>
                             </p>
                             <p id="KOTEIHI_LINE_KASANORGCODE">
-                                <!-- 加算先部門コード -->
-                                <span>
+                                <span class="ef magnifier">
+                                    <!-- 加算先部門コード -->
                                     <asp:Label ID="WF_KASANORGCODE_L" runat="server" Text="加算先部門コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <a class="ef" id="WF_KASANORG" ondblclick="Field_DBclick('TxtKASANORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtKASANORGCODE');">
                                         <asp:TextBox ID="TxtKASANORGCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
                                     </a>
                                     <asp:Label ID="WF_KASANORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_KASANORGNAME">
-                                <!-- 加算先部門名称 -->
-                                <span>
+                                    <!-- 加算先部門名称 -->
                                     <asp:Label ID="WF_KASANORGNAME_L" runat="server" Text="加算先部門名称" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKASANORGNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                                </span>
+                                    <asp:Label ID="WF_KASANORGNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                               </span>
                             </p>
-                            <p id="KOTEIHI_LINE_STYMD">
-                                <!-- 有効開始日 -->
+
+                            <p id="KOTEIHI_LINE_ENDYMD_ANNOTATION">
+                               <asp:Label ID="Label32" runat="server" Text="※有効終了日が未入力の場合は「2099/12/31」が設定されます。" CssClass="WF_TEXT_LEFT" style="color:red"></asp:Label>
+                            </p>
+
+                            <p id="KOTEIHI_LINE_STYMD_ENDYMD">
                                 <span>
+                                    <!-- 有効開始日 -->
                                     <asp:Label ID="WF_STYMD_L" runat="server" Text="有効開始日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <b class="calendararea">
                                         <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
@@ -137,14 +136,8 @@
                                             </span>
                                         </b>
                                     </b>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_ENDYMD_ANNOTATION">
-                               <asp:Label ID="Label32" runat="server" Text="※有効終了日が未入力の場合は「2099/12/31」が設定されます。" CssClass="WF_TEXT_LEFT" style="color:red"></asp:Label>
-                            </p>
-                            <p id="KOTEIHI_LINE_ENDYMD">
-                                <!-- 有効終了日 -->
-                                <span>
+                                    <asp:Label ID="WF_STYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <!-- 有効終了日 -->
                                     <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <b class="calendararea">
                                         <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
@@ -154,11 +147,13 @@
                                             </span>
                                         </b>
                                     </b>
+                                    <asp:Label ID="WF_ENDYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
+
                             <p id="KOTEIHI_LINE_TAISHOYM">
-                                <!-- 対象年月 -->
                                 <span>
+                                    <!-- 対象年月 -->
                                     <asp:Label ID="WF_TAISHOYM_L" runat="server" Text="対象年月" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <b class="calendararea">
                                         <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
@@ -171,24 +166,22 @@
                                 </span>
                             </p>
                             <p id="KOTEIHI_LINE_SYABAN">
-                                <!-- 車番 -->
                                 <span>
+                                    <!-- 車番 -->
                                     <asp:Label ID="WF_SYABAN_L" runat="server" Text="車番" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <asp:TextBox ID="TxtSYABAN" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_RIKUBAN">
-                                <!-- 陸事番号 -->
+                            <p id="KOTEIHI_LINE_RIKUBAN_SYAGATA">
                                 <span>
+                                    <!-- 陸事番号 -->
                                     <asp:Label ID="WF_RIKUBAN_L" runat="server" Text="陸事番号" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtRIKUBAN" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_SYAGATA">
-                                <!-- 車型 -->
-                                <span>
+                                    <asp:Label ID="WF_RIKUBAN_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <!-- 車型 -->
                                     <asp:Label ID="WF_SYAGATA_L" runat="server" Text="車型" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:DropDownList ID="ddlSelectSYAGATA" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl"/>
+                                    <asp:Label ID="WF_SYAGATA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
                             <p id="KOTEIHI_LINE_SYABARA">
@@ -198,17 +191,13 @@
                                     <asp:TextBox ID="TxtSYABARA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_GETSUGAKU">
-                                <!-- 月額運賃 -->
+                            <p id="KOTEIHI_LINE_GETSUGAKU_GENGAKU">
                                 <span>
+                                    <!-- 月額運賃 -->
                                     <asp:Label ID="WF_GETSUGAKU_L" runat="server" Text="月額運賃" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtGETSUGAKU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                                     <asp:Label ID="WF_GETSUGAKU_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_GENGAKU">
-                                <!-- 減額対象額 -->
-                                <span>
+                                    <!-- 減額対象額 -->
                                     <asp:Label ID="WF_GENGAKU_L" runat="server" Text="減額対象額" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtGENGAKU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                                     <asp:Label ID="WF_GENGAKU_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -222,32 +211,25 @@
                                     <asp:Label ID="WF_KOTEIHI_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_KOTEIHIM">
-                                <!-- 月額固定費 -->
+                            <p id="KOTEIHI_LINE_KOTEIHIM_KOTEIHID">
                                 <span>
+                                    <!-- 月額固定費 -->
                                     <asp:Label ID="WF_KOTEIHIM_L" runat="server" Text="月額固定費" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKOTEIHIM" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                                     <asp:Label ID="WF_KOTEIHIM_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_KOTEIHID">
-                                <!-- 日額固定費 -->
-                                <span>
+                                    <!-- 日額固定費 -->
                                     <asp:Label ID="WF_KOTEIHID_L" runat="server" Text="日額固定費" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKOTEIHID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                                     <asp:Label ID="WF_KOTEIHID_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_KAISU">
-                                <!-- 使用回数 -->
+                            <p id="KOTEIHI_LINE_KAISU_KINGAKU">
                                 <span>
+                                    <!-- 使用回数 -->
                                     <asp:Label ID="WF_KAISU_L" runat="server" Text="使用回数" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKAISU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_KINGAKU">
-                                <!-- 金額 -->
-                                <span>
+                                    <asp:Label ID="WF_KAISU_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <!-- 金額 -->
                                     <asp:Label ID="WF_KINGAKU_L" runat="server" Text="金額" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKINGAKU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
                                     <asp:Label ID="WF_KINGAKU_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -260,18 +242,16 @@
                                     <asp:TextBox ID="TxtBIKOU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="100"></asp:TextBox>
                                 </span>
                             </p>
-                            <p id="KOTEIHI_LINE_BIKOU1">
-                                <!-- 備考1 -->
+                            <p id="KOTEIHI_LINE_BIKOU1_BIKOU2">
                                 <span>
+                                    <!-- 備考1 -->
                                     <asp:Label ID="WF_BIKOU1_L" runat="server" Text="備考1" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU1" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
-                                </span>
-                            </p>
-                            <p id="KOTEIHI_LINE_BIKOU2">
-                                <!-- 備考2 -->
-                                <span>
+                                    <asp:Label ID="WF_BIKOU1_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                    <!-- 備考2 -->
                                     <asp:Label ID="WF_BIKOU2_L" runat="server" Text="備考2" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU2" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
+                                    <asp:Label ID="WF_BIKOU2_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
                             <p id="KOTEIHI_LINE_BIKOU3">

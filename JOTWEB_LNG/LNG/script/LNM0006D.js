@@ -60,7 +60,7 @@ window.onload = function () {
         document.getElementById('TxtSYAGOU').readOnly = true;
 
         //有効終了日注釈
-        document.getElementById('TANKA_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';
+        //document.getElementById('TANKA_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';
 
     };
 
