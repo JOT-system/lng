@@ -43,21 +43,25 @@ window.onload = function () {
     if (DisabledKeyItem != "") { 
         //取引先コード
         document.getElementById('TxtTORICODE').readOnly = true;
-        document.getElementById('TxtTORICODEcommonIcon').style.display = "none";
+        //document.getElementById('TxtTORICODEcommonIcon').style.display = "none";
         //取引先名称
         document.getElementById('TxtTORINAME').readOnly = true;
         //加算先部門コード
         document.getElementById('TxtKASANORGCODE').readOnly = true;
-        document.getElementById('TxtKASANORGCODEcommonIcon').style.display = "none";
+        //document.getElementById('TxtKASANORGCODEcommonIcon').style.display = "none";
         //加算先部門名称
         document.getElementById('TxtKASANORGNAME').readOnly = true;
         //届先コード
         document.getElementById('TxtTODOKECODE').readOnly = true;
-        document.getElementById('TxtTODOKECODEcommonIcon').style.display = "none";
+        //document.getElementById('TxtTODOKECODEcommonIcon').style.display = "none";
         //届先名称
         document.getElementById('TxtTODOKENAME').readOnly = true;
         //車号
         document.getElementById('TxtSYAGOU').readOnly = true;
+
+        //有効終了日注釈
+        //document.getElementById('TANKA_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';
+
     };
 
 };

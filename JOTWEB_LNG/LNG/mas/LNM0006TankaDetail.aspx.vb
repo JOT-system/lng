@@ -729,7 +729,14 @@ Public Class LNM0006TankaDetail
                 P_TODOKECODE.Value = LNM0006row("TODOKECODE")       '届先コード
                 P_TODOKENAME.Value = LNM0006row("TODOKENAME")       '届先名称
                 P_STYMD.Value = LNM0006row("STYMD")                 '有効開始日
-                P_ENDYMD.Value = LNM0006row("ENDYMD")               '有効終了日
+
+                '有効終了日(画面入力済みの場合画面入力を優先)
+                If Not WF_EndYMD.Value = "" Then
+                    P_ENDYMD.Value = LNM0006row("ENDYMD")
+                Else
+                    P_ENDYMD.Value = WF_AUTOENDYMD.Value
+                End If
+
                 P_BRANCHCODE.Value = LNM0006row("BRANCHCODE")       '枝番
                 P_TANKA.Value = LNM0006row("TANKA")                 '単価
                 P_SYAGATA.Value = LNM0006row("SYAGATA")             '車型
@@ -1983,17 +1990,22 @@ Public Class LNM0006TankaDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            ' 有効終了日(バリデーションチェック)
-            Master.CheckField(Master.USERCAMP, "ENDYMD", LNM0006INProw("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            If isNormal(WW_CS0024FCheckerr) Then
-                LNM0006INProw("ENDYMD") = CDate(LNM0006INProw("ENDYMD")).ToString("yyyy/MM/dd")
-            Else
-                WW_CheckMES1 = "・有効終了日エラーです。"
-                WW_CheckMES2 = WW_CS0024FCheckReport
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+
+            '画面で入力済みの場合のみ
+            If Not WF_EndYMD.Value = "" Then
+                ' 有効終了日(バリデーションチェック)
+                Master.CheckField(Master.USERCAMP, "ENDYMD", LNM0006INProw("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+                If isNormal(WW_CS0024FCheckerr) Then
+                    LNM0006INProw("ENDYMD") = CDate(LNM0006INProw("ENDYMD")).ToString("yyyy/MM/dd")
+                Else
+                    WW_CheckMES1 = "・有効終了日エラーです。"
+                    WW_CheckMES2 = WW_CS0024FCheckReport
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
             End If
+
             ' 単価(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "TANKA", LNM0006INProw("TANKA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2058,15 +2070,18 @@ Public Class LNM0006TankaDetail
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
 
-            ' 日付大小チェック
-            If Not String.IsNullOrEmpty(LNM0006INProw("STYMD")) AndAlso
-                    Not String.IsNullOrEmpty(LNM0006INProw("ENDYMD")) Then
-                If CDate(LNM0006INProw("STYMD")) > CDate(LNM0006INProw("ENDYMD")) Then
-                    WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-                    WW_CheckMES2 = "日付大小入力エラー"
-                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            '画面で入力済みの場合のみ
+            If Not WF_EndYMD.Value = "" Then
+                ' 日付大小チェック
+                If Not String.IsNullOrEmpty(LNM0006INProw("STYMD")) AndAlso
+                        Not String.IsNullOrEmpty(LNM0006INProw("ENDYMD")) Then
+                    If CDate(LNM0006INProw("STYMD")) > CDate(LNM0006INProw("ENDYMD")) Then
+                        WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
+                        WW_CheckMES2 = "日付大小入力エラー"
+                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                        WW_LineErr = "ERR"
+                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    End If
                 End If
             End If
 
@@ -2223,6 +2238,9 @@ Public Class LNM0006TankaDetail
                 Dim WW_DBDataCheck As String = ""
                 Dim WW_BeforeMAXSTYMD As String = ""
                 Dim WW_STYMD_SAVE As String = ""
+                Dim WW_ENDYMD_SAVE As String = ""
+
+                WF_AUTOENDYMD.Value = ""
 
                 '枝番が新規、有効開始日が変更されたときの対応
                 If LNM0006INPtbl.Rows(0)("BRANCHCODE").ToString = "" Then '枝番なし(新規の場合)
@@ -2231,6 +2249,7 @@ Public Class LNM0006TankaDetail
                     If Not isNormal(WW_DBDataCheck) Then
                         Exit Sub
                     End If
+                    WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                 Else
                     '更新前の最大有効開始日取得
                     WW_BeforeMAXSTYMD = LNM0006WRKINC.GetSTYMD(SQLcon, LNM0006INPtbl.Rows(0), WW_DBDataCheck)
@@ -2239,12 +2258,21 @@ Public Class LNM0006TankaDetail
                     End If
 
                     Select Case True
+                        'DBに登録されている有効開始日が無かった場合
+                        Case WW_BeforeMAXSTYMD = ""
+                            WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
+                            '同一の場合
+                        Case WW_BeforeMAXSTYMD = CDate(LNM0006INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
+                            WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                         '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                         Case WW_BeforeMAXSTYMD < CDate(LNM0006INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
                             'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
 
                             '変更後の有効開始日退避
                             WW_STYMD_SAVE = LNM0006INPtbl.Rows(0)("STYMD")
+                            '変更後の有効終了日退避
+                            WW_ENDYMD_SAVE = LNM0006INPtbl.Rows(0)("ENDYMD")
+
                             '変更後テーブルに変更前の有効開始日格納
                             LNM0006INPtbl.Rows(0)("STYMD") = WW_BeforeMAXSTYMD
                             '変更後テーブルに更新用の有効終了日格納
@@ -2266,12 +2294,14 @@ Public Class LNM0006TankaDetail
                             End If
                             '退避した有効開始日を元に戻す
                             LNM0006INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
+                            '退避した有効終了日を元に戻す
+                            LNM0006INPtbl.Rows(0)("ENDYMD") = WW_ENDYMD_SAVE
                             '有効終了日に最大値を入れる
-                            LNM0006INPtbl.Rows(0)("ENDYMD") = LNM0006WRKINC.MAX_ENDYMD
+                            WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                         Case Else
                             '有効終了日に有効開始日の月の末日を入れる
                             Dim WW_NEXT_YM As String = DateTime.Parse(LNM0006INPtbl.Rows(0)("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                            LNM0006INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                            WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                     End Select
                 End If
 

@@ -381,9 +381,9 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("    ,TORICODE                                                           ")
         SQLStr.AppendLine("    ,ORGCODE                                                            ")
         SQLStr.AppendLine("    ,STYMD                                                              ")
-        SQLStr.AppendLine("    ,ENDYMD                                                             ")
         SQLStr.AppendLine("    ,TAISHOYM                                                           ")
         SQLStr.AppendLine("    ,SYABAN                                                             ")
+        SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)

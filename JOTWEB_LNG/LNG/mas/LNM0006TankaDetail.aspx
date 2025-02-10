@@ -137,6 +137,9 @@
                                 </span>
                             </p>
 
+                            <p id="TANKA_LINE_ENDYMD_ANNOTATION">
+                                <asp:Label ID="Label32" runat="server" Text="※有効終了日が未入力の場合は「2099/12/31」が設定されます。" CssClass="WF_TEXT_LEFT" style="color:red"></asp:Label>
+                            </p>
                             <p id="TANKA_LINE_7">
                                 <span class="ef">
                                     <!-- 有効開始日 -->
@@ -151,18 +154,16 @@
                                     </b>
                                     <asp:Label ID="WF_STYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                     <!-- 有効終了日 -->
-                                    <a  style="display:none;">
-                                        <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                        <b class="calendararea">
-                                            <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                                <input type="text" id="WF_EndYMD" runat="server" class="WF_TEXTBOX_CSS" data-input>
-                                                <span id="WF_ENDYMD_CALENDAR" class="input-group-text" data-toggle>
-                                                    <span class="material-symbols-outlined">calendar_month</span>
-                                                </span>
-                                            </b>
+                                    <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <b class="calendararea">
+                                        <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                            <input type="text" id="WF_EndYMD" runat="server" class="WF_TEXTBOX_CSS" data-input>
+                                            <span id="WF_ENDYMD_CALENDAR" class="input-group-text" data-toggle>
+                                                <span class="material-symbols-outlined">calendar_month</span>
+                                            </span>
                                         </b>
-                                        <asp:Label ID="WF_ENDYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    </a>
+                                    </b>
+                                    <asp:Label ID="WF_ENDYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
                             <p id="TANKA_LINE_8">
@@ -288,7 +289,8 @@
         <input id="WF_BeforeMAPID" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
-
+        <!-- 自動作成した有効終了日 -->
+        <input id="WF_AUTOENDYMD" runat="server" value="" type="text" />
     </div>
  
 </asp:Content>

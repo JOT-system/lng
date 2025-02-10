@@ -275,6 +275,15 @@ Partial Public Class LNM0007KoteihiList
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_AUTOENDYMD コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AUTOENDYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>

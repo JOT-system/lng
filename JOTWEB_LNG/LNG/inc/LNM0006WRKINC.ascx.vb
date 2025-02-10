@@ -166,7 +166,7 @@ Public Class LNM0006WRKINC
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
                     If WW_Tbl.Rows.Count > 1 Then
-                        Dim listBlankItm As New ListItem(" ", "")
+                        Dim listBlankItm As New ListItem("全て表示", "")
                         retList.Items.Add(listBlankItm)
                     End If
                     For Each WW_ROW As DataRow In WW_Tbl.Rows
