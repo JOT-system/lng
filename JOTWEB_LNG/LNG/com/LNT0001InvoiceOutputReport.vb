@@ -10,6 +10,7 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp04 As Integer = 0
     Private WW_SheetNoTmp05 As Integer = 0
     Private WW_SheetNoTmp06 As Integer = 0
+    Private WW_SheetNoTobuGas As Integer = 0
     Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
     ''' <summary>
@@ -131,6 +132,9 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf WW_Workbook.Worksheets(i).Name = "請求書明細" Then
                         '〇DAIGAS(シート[請求書明細])
                         WW_SheetNoTmp06 = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "東部瓦斯") Then
+                        '〇ENEOS(シート[東部瓦斯])
+                        WW_SheetNoTobuGas = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "TMP" + (j + 1).ToString("00") Then
                         WW_ArrSheetNo(j) = i
                         j += 1
@@ -276,6 +280,13 @@ Public Class LNT0001InvoiceOutputReport
                 If PrintDatarow("SETCELL03").ToString() = "" Then Continue For
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = PrintDatarow("REMARK_REP").ToString()
             Next
+
+            '★八戸営業所の場合([東部瓦斯]独自対応)
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
+                '届日メインで設定
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER<>'3'", "C", "D")
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER='3'", "E", "F")
+            End If
 
             '★計算エンジンの無効化
             WW_Workbook.EnableCalculation = False
@@ -460,4 +471,29 @@ Public Class LNT0001InvoiceOutputReport
         Finally
         End Try
     End Sub
+
+    Private Sub EditDetailAreaTobugas(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String)
+        Dim zissekiNum As Double = 0    '【数量 （t）】設定用
+        Dim zissekiCnt As Integer = 0   '【台数】設定用
+        Dim cellStart As Integer = 12   '[設定行]
+        Dim todokeDate As String = ""   '[届日]保管用
+        Dim condition As String = String.Format("TODOKECODE='{0}' {1} ", todokeCode, todokeOrder)
+        For Each PrintDatarow As DataRow In PrintData.Select(condition, "TODOKEDATE, TODOKEDATE_ORDER")
+            Dim lineNum As Integer = Integer.Parse(Date.Parse(PrintDatarow("TODOKEDATE").ToString()).ToString("dd")) - 1
+            lineNum += cellStart
+            If todokeDate = "" OrElse todokeDate <> PrintDatarow("TODOKEDATE").ToString() Then
+                zissekiNum = Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                zissekiCnt = 1
+            Else
+                zissekiNum += Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                zissekiCnt += 1
+            End If
+
+            WW_Workbook.Worksheets(WW_SheetNoTobuGas).Range(cellNum + lineNum.ToString()).Value = zissekiNum
+            WW_Workbook.Worksheets(WW_SheetNoTobuGas).Range(cellCnt + lineNum.ToString()).Value = zissekiCnt
+
+            todokeDate = PrintDatarow("TODOKEDATE").ToString()
+        Next
+    End Sub
+
 End Class

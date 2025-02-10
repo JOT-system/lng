@@ -1384,13 +1384,13 @@ Public Class LNT0001InvoiceOutput
                 LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01")
                 LNT0001tblrow("SHEETNAME_REP") = dtEneosTodokerow("VALUE06")
 
-                '〇八戸営業所(東部瓦斯)独自仕様
-                If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005487 Then
-                    '★[３台目]に納入
-                    If LNT0001tblrow("TODOKEDATE_ORDER").ToString() = "3" Then
-                        LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01") + LNT0001tblrow("TODOKEDATE_ORDER").ToString()
-                    End If
-                End If
+                ''〇八戸営業所(東部瓦斯)独自仕様
+                'If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005487 Then
+                '    '★[３台目]に納入
+                '    If LNT0001tblrow("TODOKEDATE_ORDER").ToString() = "3" Then
+                '        LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01") + LNT0001tblrow("TODOKEDATE_ORDER").ToString()
+                '    End If
+                'End If
 
                 '〇届先が追加された場合
                 If dtEneosTodokerow("VALUE02").ToString() = "1" Then
