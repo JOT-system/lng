@@ -23,6 +23,7 @@ Public Class LNT0001InvoiceOutputReport
     Private PrintKoteihiData As DataTable
     Private PrintHachinoheSprateData As DataTable
     Private PrintEneosComfeeData As DataTable
+    Private PrintCalendarData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -42,7 +43,7 @@ Public Class LNT0001InvoiceOutputReport
     ''' <param name="printEneosComfeeDataClass">ENEOS業務委託料マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
-                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable,
+                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                    Optional ByVal printHachinoheSprateDataClass As DataTable = Nothing,
                    Optional ByVal printEneosComfeeDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
@@ -53,6 +54,7 @@ Public Class LNT0001InvoiceOutputReport
             Me.PrintData = printDataClass
             Me.PrintTankData = printTankDataClass
             Me.PrintKoteihiData = printKoteihiDataClass
+            Me.PrintCalendarData = printCalendarDataClass
             Me.PrintHachinoheSprateData = printHachinoheSprateDataClass
             Me.PrintEneosComfeeData = printEneosComfeeDataClass
             Me.TaishoYm = taishoYm
@@ -104,12 +106,12 @@ Public Class LNT0001InvoiceOutputReport
                     If WW_Workbook.Worksheets(i).Name = "入力表" _
                         OrElse WW_Workbook.Worksheets(i).Name = "実績入力表" Then
                         WW_SheetNo = i
-                    ElseIf WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "加藤製油" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "東洋ウレタン" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "新宮ガス" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "日本板硝子" _
-                        OrElse WW_Workbook.Worksheets(i).Name = "リコー" Then
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "東北電力　TMEJ内サテライト") _
+                        OrElse (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 AndAlso WW_Workbook.Worksheets(i).Name = "加藤製油") _
+                        OrElse (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 AndAlso WW_Workbook.Worksheets(i).Name = "日本板硝子") _
+                        OrElse (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" AndAlso WW_Workbook.Worksheets(i).Name = "東洋ウレタン") _
+                        OrElse (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" AndAlso WW_Workbook.Worksheets(i).Name = "新宮ガス") _
+                        OrElse (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "03" AndAlso WW_Workbook.Worksheets(i).Name = "リコー") Then
                         '〇共通(シート[(共有用)届先])
                         WW_SheetNoTmp01 = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "固定費" Then
@@ -160,6 +162,8 @@ Public Class LNT0001InvoiceOutputReport
             '◯明細の設定
             EditDetailArea()
             '***** TODO処理 ここまで *****
+            '★ [ﾏｽﾀ]シート非表示
+            WW_Workbook.Worksheets(WW_SheetNoTmp04).Visible = Visibility.Hidden
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -234,6 +238,20 @@ Public Class LNT0001InvoiceOutputReport
             Dim lastDate As String = Me.TaishoYYYY + "/" + Me.TaishoMM + "/01"
             lastDate = Date.Parse(lastDate).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
             WW_Workbook.Worksheets(WW_SheetNoTmp01).Range("I1").Value = Date.Parse(lastDate)
+
+            '〇カレンダー設定
+            Dim iCalendarLine As Integer = 12
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "03" Then
+                iCalendarLine = 13
+            End If
+            For Each PrintCalendarDatarow As DataRow In PrintCalendarData.Rows
+                If PrintCalendarDatarow("WORKINGDAY").ToString() <> "0" Then
+                    WW_Workbook.Worksheets(WW_SheetNoTmp01).Range("J" + iCalendarLine.ToString("00")).Value = "1"
+                Else
+                    WW_Workbook.Worksheets(WW_SheetNoTmp01).Range("J" + iCalendarLine.ToString("00")).Value = "0"
+                End If
+                iCalendarLine += 1
+            Next
 
         Catch ex As Exception
             Throw

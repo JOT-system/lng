@@ -471,4 +471,63 @@ Public Class CmnParts
 
     End Sub
 
+    ''' <summary>
+    ''' カレンダーマスタTBL検索
+    ''' </summary>
+    Public Sub SelectCALENDARMaster(ByVal SQLcon As MySqlConnection,
+                                    ByVal I_TORICODE As String, ByVal I_TAISHOYM As String, ByRef O_dtCALENDARMas As DataTable,
+                                    Optional ByVal I_ORGCODE As String = Nothing)
+        If IsNothing(O_dtCALENDARMas) Then
+            O_dtCALENDARMas = New DataTable
+        End If
+        If O_dtCALENDARMas.Columns.Count <> 0 Then
+            O_dtCALENDARMas.Columns.Clear()
+        End If
+        O_dtCALENDARMas.Clear()
+
+        '★月末日取得
+        Dim lastDay As String = ""
+        lastDay = Date.Parse(I_TAISHOYM).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0016.TORICODE "
+        SQLStr &= "   ,LNM0016.YMD "
+        SQLStr &= "   ,LNM0016.WEEKDAY "
+        SQLStr &= "   ,LNM0016.WORKINGDAY "
+        SQLStr &= "   ,LNM0016.WORKINGDAYNAME "
+        SQLStr &= "   ,LNM0016.PUBLICHOLIDAYNAME "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0016_CALENDAR LNM0016 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0016.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0016.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0016.YMD BETWEEN '{0}' AND '{1}' ", I_TAISHOYM, lastDay)
+        'If Not IsNothing(I_ORGCODE) Then
+        '    SQLStr &= String.Format(" AND LNM0016.ORGCODE = '{0}' ", I_ORGCODE)
+        'End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtCALENDARMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtCALENDARMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
 End Class
