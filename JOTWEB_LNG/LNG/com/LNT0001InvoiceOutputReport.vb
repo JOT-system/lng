@@ -11,6 +11,7 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp05 As Integer = 0
     Private WW_SheetNoTmp06 As Integer = 0
     Private WW_SheetNoTobuGas As Integer = 0
+    Private WW_SheetNoMitsuiES As Integer = 0
     Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
     ''' <summary>
@@ -135,6 +136,9 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "東部瓦斯") Then
                         '〇ENEOS(シート[東部瓦斯])
                         WW_SheetNoTobuGas = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 AndAlso WW_Workbook.Worksheets(i).Name = "三井Ｅ＆Ｓ") Then
+                        '〇ENEOS(シート[三井Ｅ＆Ｓ])
+                        WW_SheetNoMitsuiES = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "TMP" + (j + 1).ToString("00") Then
                         WW_ArrSheetNo(j) = i
                         j += 1
@@ -286,6 +290,13 @@ Public Class LNT0001InvoiceOutputReport
                 '届日メインで設定
                 EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER<>'3'", "C", "D")
                 EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER='3'", "E", "F")
+
+            ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                '★水島営業所の場合([三井Ｅ＆Ｓ]独自対応)
+                '※仮で「受注数量」が8.000を基準とし実施
+                EditDetailAreaMitsuiES(BaseDllConst.CONST_TODOKECODE_004002, " AND ZYUTYU_STR IN ('8.000','10.000')", "C", "D", True)
+                EditDetailAreaMitsuiES(BaseDllConst.CONST_TODOKECODE_004002, " AND ZYUTYU_STR NOT IN ('8.000','10.000')", "E", "F", False)
+
             End If
 
             '★計算エンジンの無効化
@@ -396,10 +407,22 @@ Public Class LNT0001InvoiceOutputReport
                     '★トレーラ
                     '〇水島営業所(三井Ｅ＆Ｓ, コカ・コーラ)独自仕様
                     If PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 _
-                        AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004002 _
-                                 OrElse PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509) _
+                        AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004002) _
                         AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
                         WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+
+                    ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 _
+                        AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509) Then
+                        Select Case PrintDatarow("TODOKEBRANCHCODE").ToString()
+                            Case "02"
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Case "03"
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Case "04"
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Case "05"
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("G{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        End Select
 
                         '〇西日本支店車庫(泉北)独自仕様
                     ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
@@ -472,6 +495,9 @@ Public Class LNT0001InvoiceOutputReport
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 帳票の明細設定([東部瓦斯]独自対応)
+    ''' </summary>
     Private Sub EditDetailAreaTobugas(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String)
         Dim zissekiNum As Double = 0    '【数量 （t）】設定用
         Dim zissekiCnt As Integer = 0   '【台数】設定用
@@ -493,6 +519,41 @@ Public Class LNT0001InvoiceOutputReport
             WW_Workbook.Worksheets(WW_SheetNoTobuGas).Range(cellCnt + lineNum.ToString()).Value = zissekiCnt
 
             todokeDate = PrintDatarow("TODOKEDATE").ToString()
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定([三井Ｅ＆Ｓ]独自対応)
+    ''' </summary>
+    Private Sub EditDetailAreaMitsuiES(ByVal todokeCode As String, ByVal tonNum As String, ByVal cellNum As String, ByVal cellCnt As String,
+                                       Optional ByVal okFlg As Boolean = False)
+        Dim zissekiNum As Double = 0                    '【数量 （t）】設定用
+        Dim zissekiCnt As Integer = 0                   '【台数】設定用
+        Dim cellStart As Integer = 12                   '[設定行]
+        Dim syukaDate As String = ""                    '[出荷日]保管用
+        Dim condition As String = String.Format("TODOKECODE='{0}'", todokeCode)
+        Dim dtDummy As DataTable = PrintData.Copy
+        dtDummy.Columns.Add("ZYUTYU_STR", Type.GetType("System.String"))
+        For Each dtDummyrow As DataRow In dtDummy.Select(condition)
+            dtDummyrow("ZYUTYU_STR") = dtDummyrow("ZYUTYU").ToString()
+        Next
+        condition &= tonNum
+
+        For Each PrintDatarow As DataRow In dtDummy.Select(condition, "SHUKADATE")
+            Dim lineNum As Integer = Integer.Parse(Date.Parse(PrintDatarow("SHUKADATE").ToString()).ToString("dd")) - 1
+            lineNum += cellStart
+            If syukaDate = "" OrElse syukaDate <> PrintDatarow("SHUKADATE").ToString() Then
+                zissekiNum = Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                zissekiCnt = 1
+            Else
+                zissekiNum += Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                zissekiCnt += 1
+            End If
+
+            WW_Workbook.Worksheets(WW_SheetNoMitsuiES).Range(cellNum + lineNum.ToString()).Value = zissekiNum
+            WW_Workbook.Worksheets(WW_SheetNoMitsuiES).Range(cellCnt + lineNum.ToString()).Value = zissekiCnt
+
+            syukaDate = PrintDatarow("SHUKADATE").ToString()
         Next
     End Sub
 
