@@ -557,6 +557,9 @@ Public Class CS0054KintoneApi
         Public Property 分類番号_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property ひらなが_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property 一連指定番号_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property オーダー開始日 As NormalStruct
+        Public Property 表示用オーダー終了日 As NormalStruct
+        Public Property オーダー終了日 As NormalStruct
         Public Property 更新者 As ValNestStruct
         Public Property 作成者 As ValNestStruct
         Public Property 更新日時 As NormalStruct

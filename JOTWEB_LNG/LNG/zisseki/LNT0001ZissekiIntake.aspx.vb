@@ -1147,6 +1147,9 @@ Public Class LNT0001ZissekiIntake
                 & "     , CALENDERMEMO25						    " _
                 & "     , CALENDERMEMO26						    " _
                 & "     , CALENDERMEMO27						    " _
+                & "     , ORDSTDATE						            " _
+                & "     , ORDENDATE						            " _
+                & "     , OPENENDATE						        " _
                 & "     , UPDATEUSER						        " _
                 & "     , CREATEUSER						        " _
                 & "     , UPDATEYMD						            " _
@@ -1350,6 +1353,9 @@ Public Class LNT0001ZissekiIntake
                 & "     , @CALENDERMEMO25						    " _
                 & "     , @CALENDERMEMO26						    " _
                 & "     , @CALENDERMEMO27						    " _
+                & "     , @ORDSTDATE						        " _
+                & "     , @ORDENDATE						        " _
+                & "     , @OPENENDATE						        " _
                 & "     , @UPDATEUSER						        " _
                 & "     , @CREATEUSER						        " _
                 & "     , @UPDATEYMD						        " _
@@ -1553,6 +1559,9 @@ Public Class LNT0001ZissekiIntake
                 & "     , CALENDERMEMO25 = @CALENDERMEMO25			" _
                 & "     , CALENDERMEMO26 = @CALENDERMEMO26			" _
                 & "     , CALENDERMEMO27 = @CALENDERMEMO27			" _
+                & "     , ORDSTDATE = @ORDSTDATE					" _
+                & "     , ORDENDATE = @ORDENDATE					" _
+                & "     , OPENENDATE = @OPENENDATE					" _
                 & "     , UPDATEUSER = @UPDATEUSER					" _
                 & "     , CREATEUSER = @CREATEUSER					" _
                 & "     , UPDATEYMD = @UPDATEYMD					" _
@@ -1755,6 +1764,9 @@ Public Class LNT0001ZissekiIntake
                     Dim CALENDERMEMO25 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO25", MySqlDbType.VarChar)    '分類番号_トラクタ_カレンダー画面メモ
                     Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらなが_トラクタ_カレンダー画面メモ
                     Dim CALENDERMEMO27 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO27", MySqlDbType.VarChar)    '一連指定番号_トラクタ_カレンダー画面メモ
+                    Dim ORDSTDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDSTDATE", MySqlDbType.Date)   'オーダー開始日
+                    Dim ORDENDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDENDATE", MySqlDbType.Date)   'オーダー終了日
+                    Dim OPENENDATE As MySqlParameter = SQLcmd.Parameters.Add("@OPENENDATE", MySqlDbType.Date)   '表示用オーダー終了日
                     Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
                     Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
                     Dim UPDATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEYMD", MySqlDbType.DateTime) '更新日時
@@ -2026,6 +2038,21 @@ Public Class LNT0001ZissekiIntake
                         CALENDERMEMO25.Value = updRow("分類番号_トラクタ_カレンダー画面メモ")    '分類番号_トラクタ_カレンダー画面メモ
                         CALENDERMEMO26.Value = updRow("ひらなが_トラクタ_カレンダー画面メモ")    'ひらなが_トラクタ_カレンダー画面メモ
                         CALENDERMEMO27.Value = updRow("一連指定番号_トラクタ_カレンダー画面メモ")  '一連指定番号_トラクタ_カレンダー画面メモ
+                        If String.IsNullOrEmpty(updRow("オーダー開始日")) Then
+                            ORDSTDATE.Value = DBNull.Value 'オーダー開始日
+                        Else
+                            ORDSTDATE.Value = updRow("オーダー開始日") 'オーダー開始日
+                        End If
+                        If String.IsNullOrEmpty(updRow("オーダー終了日")) Then
+                            ORDENDATE.Value = DBNull.Value 'オーダー終了日
+                        Else
+                            ORDENDATE.Value = updRow("オーダー終了日") 'オーダー終了日
+                        End If
+                        If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
+                            OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
+                        Else
+                            OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
+                        End If
                         UPDATEUSER.Value = updRow("更新者")    '更新者
                         CREATEUSER.Value = updRow("作成者")    '作成者
                         If String.IsNullOrEmpty(updRow("更新日時")) Then

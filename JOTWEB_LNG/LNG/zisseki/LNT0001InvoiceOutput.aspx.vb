@@ -891,6 +891,42 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
+        '東北天然ガス
+        If Me.WF_TORI.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020402 & "01" Then
+
+            Dim LNT0001InvoiceOutputTNG As New LNT0001InvoiceOutputTNG(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, Master.USERID, Master.USERTERMID, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputTNG.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
+
+        End If
+
+        '東北電力
+        If Me.WF_TORI.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020402 & "02" Then
+
+            Dim LNT0001InvoiceOutputTOHOKU As New LNT0001InvoiceOutputTOHOKU(Master.MAPID, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, Master.USERID, Master.USERTERMID, taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputTOHOKU.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
+
+        End If
+
         '○ 帳票出力
         CS0030REPORT.CAMPCODE = Master.USERCAMP                 '会社コード
         CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
