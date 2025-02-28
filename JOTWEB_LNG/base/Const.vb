@@ -389,6 +389,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TODOKECODE_005487 As String = "005487"
     ''' <summary>
+    ''' ナガセケムテックス
+    ''' </summary>
+    Public Const CONST_TODOKECODE_006880 As String = "006880"
+    ''' <summary>
     ''' リコー福井事業所
     ''' </summary>
     Public Const CONST_TODOKECODE_004559 As String = "004559"

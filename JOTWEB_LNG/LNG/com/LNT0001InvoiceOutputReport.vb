@@ -451,6 +451,16 @@ Public Class LNT0001InvoiceOutputReport
                         Else
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If
+
+                        '〇姫路営業所独自仕様
+                    ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+                        '☆(ナガセケムテックス)独自仕様
+                        If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_006880 _
+                            AndAlso PrintDatarow("BIKOU1").ToString() = "2運行目" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        Else
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        End If
                     Else
                         WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                     End If
@@ -468,6 +478,13 @@ Public Class LNT0001InvoiceOutputReport
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
 
+                        End If
+
+                        '〇姫路営業所独自仕様
+                    ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+                        '★日祝配送
+                        If PrintDatarow("SYUBETSU").ToString() = "日祝配送" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If
                     End If
                 End If
