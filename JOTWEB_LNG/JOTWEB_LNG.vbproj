@@ -508,6 +508,8 @@
     <Compile Include="LNG\com\LNT0001InvoiceOutputSAIBU.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputReport.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputSEKIYUSIGEN.vb" />
+    <Compile Include="LNG\com\LNT0001InvoiceOutputTNG.vb" />
+    <Compile Include="LNG\com\LNT0001InvoiceOutputTOHOKU.vb" />
     <Compile Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx.designer.vb">
       <DependentUpon>GRC0001TILESELECTORWRKINC.ascx</DependentUpon>
     </Compile>
