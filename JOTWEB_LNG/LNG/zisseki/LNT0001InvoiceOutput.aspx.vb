@@ -23,6 +23,7 @@ Public Class LNT0001InvoiceOutput
     Private LNT0001Koteihi As DataTable                              '-- 固定費マスタ
     Private LNT0001HachinoheSprate As DataTable                      '-- 八戸特別料金マスタ
     Private LNT0001EneosComfee As DataTable                          '-- ENEOS業務委託料マスタ
+    Private LNT0001SKKoteichi As DataTable                           '-- 石油資源開発(固定値(業務車番))マスタ
     Private LNT0001Calendar As DataTable                             '-- カレンダーマスタ
     Private LNS0006tbl As DataTable                                  '固定値マスタ格納用テーブル
     ''' <summary>
@@ -847,14 +848,30 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
-        ''石油資源開発
-        'If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_021502 Then
-        '    '〇(帳票)項目チェック処理(石油資源開発)
-        '    WW_ReportChecSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+        '石油資源開発
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_021502 Then
+            '〇(帳票)項目チェック処理(石油資源開発)
+            Dim dcNigata As New Dictionary(Of String, String)
+            Dim dcSyonai As New Dictionary(Of String, String)
+            Dim dcTouhoku As New Dictionary(Of String, String)
+            Dim dcIbaraki As New Dictionary(Of String, String)
+            WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki)
 
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGEN(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
+                                                                                  LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
+                                                                                  taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
 
-
-        'End If
+            Exit Sub
+        End If
 
         'エスジーリキッドサービス（西部ガス）
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_024001 Then
@@ -1018,18 +1035,31 @@ Public Class LNT0001InvoiceOutput
     ''' (帳票)項目チェック処理(石油資源開発)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_ReportChecSekiyuSigen(ByVal reportName As String, ByVal reportCode As String)
+    Protected Sub WW_ReportCheckSekiyuSigen(ByVal reportName As String, ByVal reportCode As String,
+                                           ByRef dcNigataList As Dictionary(Of String, String), ByRef dcSyonaiList As Dictionary(Of String, String),
+                                           ByRef dcTouhokuList As Dictionary(Of String, String), ByRef dcIbarakiList As Dictionary(Of String, String))
         Dim dtSekiyuSigenTank As New DataTable
+        Dim dtSekiyuSigenTankSub As New DataTable
         Dim dtSekiyuSigenTodoke As New DataTable
         Dim sekiyuSigenTankClass As String = ""
+        Dim sekiyuSigenTankSubClass As String = ""
         Dim sekiyuSigenTodokeClass As String = ""
+        Dim sekiyuSigenSGKoteihiClass As String = ""
         Dim arrToriCode As String() = {"", "", ""}
+        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
+        Dim arrFuzumi002022_302 As String() = {"T", "U"}    '--（ＳＫ）本田金属　喜多方サテライト(302号車(11.4t車)不積)
+        Dim arrFuzumi002019_333 As String() = {"T", "U"}    '--（ＳＫ）テーブルマーク　塩沢      (333号車(14.0t車)不積)
+        Dim arrFuzumi002019_334 As String() = {"Z", "AA"}   '--（ＳＫ）テーブルマーク　塩沢      (334号車(15.7t車)不積)
+
+        Dim arrOPFCycle_002025_326 As String() = {"Z", "AA"}    ' （ＳＫ）若松ガス　玉川(326号車(若松1.5回転))
 
         Select Case reportCode
             '"石油資源開発　輸送費請求書"
             Case BaseDllConst.CONST_ORDERORGCODE_021502
                 sekiyuSigenTankClass = "SEKIYUSIGEN_TANK"
+                sekiyuSigenTankSubClass = "SEKIYUSIGEN_TANK_OTR"
                 sekiyuSigenTodokeClass = "SEKIYUSIG_TODOKE_MAS"
+                sekiyuSigenSGKoteihiClass = "SEKIYUSIGEN_KOTEIHI"
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
                 arrToriCode(1) = Nothing
                 arrToriCode(2) = Nothing
@@ -1041,10 +1071,12 @@ Public Class LNT0001InvoiceOutput
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
-            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
-            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenTodokeClass)
-
+            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
+            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1058,56 +1090,255 @@ Public Class LNT0001InvoiceOutput
         LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
         LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
         'LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-        'LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
+        LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
+        LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
         LNT0001tbl.Columns.Add("ORDERORGCODE_REP", Type.GetType("System.String"))       '// EXCELシート(受注受付部署コード)設定用
         LNT0001tbl.Columns.Add("GYOMUTANKNUM_REP", Type.GetType("System.String"))       '// EXCELシート(業務車番)設定用
-        'LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-        'LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
+        LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
+        LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
+        LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
+        LNT0001tbl.Columns.Add("GROUPNO_REP", Type.GetType("System.String"))            '// EXCELシート(届先GRP)設定用
+        LNT0001tbl.Columns.Add("ZISSEKI_FUZUMI", Type.GetType("System.Decimal"))        '// EXCELシート①(車腹 - 不積(しきい値))設定用
+        LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
+        LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
 
         '〇陸事番号マスタ設定
         For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTank.Rows
             Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                '★届日より日を取得(セル(行数)の設定のため)
-                Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
-                Dim lastMonth As Boolean = False
-                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-                    lastMonth = True
-                End If
-                Dim iLine As Integer = Integer.Parse(setDay) - 1
-                iLine = (iLine * Integer.Parse(dtSekiyuSigenTankrow("VALUE06"))) + Integer.Parse(dtSekiyuSigenTankrow("VALUE05"))
-                ''★トリップより位置を取得
-                'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-                'iTrip += iLine
-                LNT0001tblrow("ROWSORTNO") = dtSekiyuSigenTankrow("VALUE01")
-                LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
-                LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
-                'LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
-                LNT0001tblrow("SETLINE") = iLine
-                LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE04")
-                LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE05")
-                '★表示セルフラグ(1:表示)
-                If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
-                    LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
-                    LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
-                    'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
-                Else
-                    LNT0001tblrow("DISPLAYCELL_START") = ""
-                    LNT0001tblrow("DISPLAYCELL_END") = ""
-                    'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
-                End If
+            If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
+                condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
+            End If
+            '★届先(個別設定)は除く
+            condition &= String.Format(" AND TODOKECODE NOT IN ('{0}', '{1}')",
+                                       BaseDllConst.CONST_TODOKECODE_004012,
+                                       BaseDllConst.CONST_TODOKECODE_005890)
+            '届先(明細)セル値設定
+            WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
+#Region "コメント"
+            'For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            '    '★届日より日を取得(セル(行数)の設定のため)
+            '    Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+            '    Dim lastMonth As Boolean = False
+            '    If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+            '        setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+            '        lastMonth = True
+            '    End If
+            '    Dim iLine As Integer = Integer.Parse(setDay) - 1
+            '    iLine = (iLine * Integer.Parse(dtSekiyuSigenTankrow("VALUE06"))) + Integer.Parse(dtSekiyuSigenTankrow("VALUE05"))
+            '    ''★トリップより位置を取得
+            '    'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+            '    'iTrip += iLine
+            '    LNT0001tblrow("ROWSORTNO") = dtSekiyuSigenTankrow("VALUE01")
+            '    LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
+            '    LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
+            '    'LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
+            '    LNT0001tblrow("SETLINE") = iLine
+            '    LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE04")
+            '    LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE05")
+            '    '★表示セルフラグ(1:表示)
+            '    If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
+            '        LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
+            '        LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
+            '        'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
+            '    Else
+            '        LNT0001tblrow("DISPLAYCELL_START") = ""
+            '        LNT0001tblrow("DISPLAYCELL_END") = ""
+            '        'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+            '    End If
 
-                '★備考設定用(出荷日と届日が不一致の場合)
-                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-                    If lastMonth = True Then
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-                    Else
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
-                    End If
+            '    '★備考設定用(出荷日と届日が不一致の場合)
+            '    If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+            '        If lastMonth = True Then
+            '            LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+            '        Else
+            '            LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+            '        End If
+            '    End If
+            'Next
+#End Region
+        Next
+        '〇陸事番号マスタ設定(※個別設定用)
+        For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTankSub.Rows
+            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
+            If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
+                condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
+            End If
+            '★届先(個別設定)のみ
+            condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}')",
+                                       BaseDllConst.CONST_TODOKECODE_004012,
+                                       BaseDllConst.CONST_TODOKECODE_005890)
+            '届先(明細)セル値設定
+            WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
+        Next
+
+        '〇石油資源開発(不積判定の設定) ----------------------------------------------------------
+        '■若松ｶﾞｽ(喜多方) 
+        '  --302号車(11.4t車)不積
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, "302")
+        '■ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
+        '  --333号車(14.0t車)不積 
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, "333")
+        '  --334号車(15.7t車)不積
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, "334")
+        ' ---------------------------------------------------------------------------------------/
+
+        '〇石油資源開発(1.5回転の設定) -----------------------------------------------------------
+        '■若松ｶﾞｽ(玉川)
+        '  --326号車(若松1.5回転)
+        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "積込", "積置", "326", arrOPFCycle_002025_326, judgeDate:="SHUKADATE")
+        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326)
+        ' ---------------------------------------------------------------------------------------/
+
+        '〇(石油資源開発)届先出荷場所車庫マスタ設定
+        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Rows
+            Dim condition As String = String.Format("TODOKECODE='{0}'", SekiyuSigenTodokerow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                LNT0001tblrow("SHEETSORTNO_REP") = SekiyuSigenTodokerow("KEYCODE03")
+                LNT0001tblrow("TODOKENAME_REP") = SekiyuSigenTodokerow("VALUE01")
+                LNT0001tblrow("SHEETNAME_REP") = SekiyuSigenTodokerow("VALUE06")
+                'LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
+
+                '〇届先が追加された場合
+                If SekiyuSigenTodokerow("VALUE02").ToString() = "1" Then
+                    LNT0001tblrow("TODOKECELL_REP") = SekiyuSigenTodokerow("VALUE03")
+                    LNT0001tblrow("MASTERCELL_REP") = SekiyuSigenTodokerow("VALUE04")
+                    LNT0001tblrow("SHEETDISPLAY_REP") = SekiyuSigenTodokerow("VALUE05")
+                Else
+                    LNT0001tblrow("TODOKECELL_REP") = ""
+                    LNT0001tblrow("MASTERCELL_REP") = ""
+                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
                 End If
+            Next
+        Next
+
+        '〇各部署ごとの情報取得
+        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Rows
+            Dim condition As String = String.Format("TODOKECODE='{0}' AND SHUKABASHO='{1}'", SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE06"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
+            Next
+        Next
+        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Select("", "KEYCODE08, KEYCODE01")
+            Select Case SekiyuSigenTodokerow("KEYCODE08").ToString()
+                Case "1"
+                    Try
+                        dcNigataList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
+                    Catch ex As Exception
+                    End Try
+                Case "2"
+                    dcSyonaiList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
+                Case "3"
+                    dcTouhokuList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
+                Case "4"
+                    dcIbarakiList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
+            End Select
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 石油資源開発(届先(明細)セル値設定)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_SekiyuSigenRikugiMas(ByVal dtSekiyuSigenTankrow As DataRow, ByVal condition As String, ByVal fuzumiLimit As Decimal, ByRef LNT0001tbl As DataTable)
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            '★届日より日を取得(セル(行数)の設定のため)
+            Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+            Dim lastMonth As Boolean = False
+            If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                lastMonth = True
+            End If
+            Dim iLine As Integer = Integer.Parse(setDay) - 1
+            iLine = (iLine * Integer.Parse(dtSekiyuSigenTankrow("VALUE06"))) + Integer.Parse(dtSekiyuSigenTankrow("VALUE05"))
+            ''★トリップより位置を取得
+            'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+            'iTrip += iLine
+            LNT0001tblrow("ROWSORTNO") = dtSekiyuSigenTankrow("VALUE01")
+            LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
+            LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
+            'LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
+            LNT0001tblrow("SETLINE") = iLine
+            LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE05")
+            LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE04")
+
+            '# 不積の判断
+            Dim todokeCode As String = LNT0001tblrow("TODOKECODE").ToString()
+            Dim decFuzumi As Decimal = Decimal.Parse(LNT0001tblrow("SYABARA").ToString()) - fuzumiLimit
+            Dim decZisseki As Decimal = Decimal.Parse(LNT0001tblrow("ZISSEKI").ToString())
+            LNT0001tblrow("ZISSEKI_FUZUMI") = decFuzumi
+            LNT0001tblrow("FUZUMI_REFVALUE") = decFuzumi - decZisseki
+            If Decimal.Parse(LNT0001tblrow("FUZUMI_REFVALUE").ToString()) >= 0 Then
+                LNT0001tblrow("ZISSEKI_FUZUMIFLG") = "TRUE"
+            Else
+                LNT0001tblrow("ZISSEKI_FUZUMIFLG") = "FALSE"
+            End If
+
+            '★表示セルフラグ(1:表示)
+            If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
+                LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
+                LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
+                'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
+            Else
+                LNT0001tblrow("DISPLAYCELL_START") = ""
+                LNT0001tblrow("DISPLAYCELL_END") = ""
+                'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+            End If
+
+            '★備考設定用(出荷日と届日が不一致の場合)
+            If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                If lastMonth = True Then
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                Else
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                End If
+            End If
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' 石油資源開発(不積判定の設定)
+    ''' </summary>
+    Protected Sub WW_SetSekiyuSigenFuzumi(ByVal todokeCode As String, cellSet As String(),
+                                          Optional ByVal gyomuNo As String = Nothing)
+        Dim condition As String = ""
+        condition &= String.Format("TODOKECODE='{0}' ", todokeCode)
+        condition &= "AND ZISSEKI_FUZUMIFLG='TRUE' "
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            If Not IsNothing(gyomuNo) AndAlso LNT0001tblrow("GYOMUTANKNUM_REP").ToString() <> gyomuNo Then
+                Continue For
+            End If
+            LNT0001tblrow("SETCELL01") = cellSet(0) + LNT0001tblrow("SETLINE").ToString()
+            LNT0001tblrow("SETCELL02") = cellSet(1) + LNT0001tblrow("SETLINE").ToString()
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 石油資源開発(1.5回転の設定)
+    ''' </summary>
+    ''' <param name="todokeCode">届先コード</param>
+    ''' <param name="loadUnloType">積込荷卸区分</param>
+    ''' <param name="stackingType">積置区分</param>
+    Protected Sub WW_SetSekiyuSigenOnePointFiveCycle(ByVal todokeCode As String, ByVal loadUnloType As String, ByVal stackingType As String, ByVal gyomuNo As String, cellSet As String(),
+                                                      Optional ByVal judgeDate As String = "TODOKEDATE")
+        Dim condition As String = ""
+        condition &= String.Format("TODOKECODE='{0}' ", todokeCode)             '-- 届先
+        condition &= String.Format("AND LOADUNLOTYPE='{0}' ", loadUnloType)     '-- 積込荷卸区分
+        condition &= String.Format("AND STACKINGTYPE='{0}' ", stackingType)     '-- 積置区分
+        condition &= String.Format("AND GYOMUTANKNUM_REP='{0}' ", gyomuNo)      '-- 業務車番
+
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            Dim conditionSub As String = ""
+            conditionSub &= String.Format("TODOKECODE='{0}' ", LNT0001tblrow("TODOKECODE").ToString())
+            conditionSub &= String.Format("AND SHUKADATE='{0}' ", LNT0001tblrow(judgeDate).ToString())
+            conditionSub &= String.Format("AND TODOKEDATE='{0}' ", LNT0001tblrow(judgeDate).ToString())
+            conditionSub &= String.Format("AND STAFFCODE='{0}' ", LNT0001tblrow("STAFFCODE").ToString())
+            conditionSub &= String.Format("AND GYOMUTANKNUM_REP='{0}' ", LNT0001tblrow("GYOMUTANKNUM_REP").ToString())
+
+            For Each LNT0001tblSubrow As DataRow In LNT0001tbl.Select(conditionSub)
+                LNT0001tblrow("SETCELL01") = cellSet(0) + LNT0001tblrow("SETLINE").ToString()
+                LNT0001tblrow("SETCELL02") = cellSet(1) + LNT0001tblrow("SETLINE").ToString()
             Next
         Next
 

@@ -4,11 +4,19 @@ Imports GrapeCity.Documents.Excel
 Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private WW_Workbook As New Workbook  '共通
     Private WW_SheetNo As Integer = 0
-    Private WW_SheetNo03 As Integer() = {0, 0, 0}                           '// 既存シート用(東北)
+    Private WW_SheetNoSKKoteihi As Integer = 0
+    Private WW_SheetNoUnchin As Integer = 0
+    Private WW_SheetNoCalendar As Integer = 0
+    Private WW_SheetNoMaster As Integer = 0
+    Private WW_SheetNo01Dic As New Dictionary(Of String, Integer)           '// 既存シート用(新潟)
+    Private WW_SheetNo02Dic As New Dictionary(Of String, Integer)           '// 既存シート用(庄内)
+    Private WW_SheetNo03Dic As New Dictionary(Of String, Integer)           '// 既存シート用(東北)
+    Private WW_SheetNo04Dic As New Dictionary(Of String, Integer)           '// 既存シート用(茨城)
     Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(新潟・庄内)
     Private WW_ArrSheetNo02 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(秋田)
     Private WW_ArrSheetNo03 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(東北)
     Private WW_ArrSheetNo04 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(茨城)
+    Private WW_ArrSheetNoKoteichi As Integer() = {0, 0, 0, 0, 0}            '// 単価シート用
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -19,6 +27,8 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private PrintData As DataTable
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
+    Private PrintCalendarData As DataTable
+    Private PrintSKKoteichiData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -37,7 +47,8 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     ''' <param name="printKoteihiDataClass">固定費マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
-                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable,
+                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable, printSKKoteichiDataClass As DataTable,
+                   dicNigataList As Dictionary(Of String, String), dicSyonaiList As Dictionary(Of String, String), dicTouhokuList As Dictionary(Of String, String), dicIbarakiList As Dictionary(Of String, String),
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -46,12 +57,18 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
             Me.PrintData = printDataClass
             Me.PrintTankData = printTankDataClass
             Me.PrintKoteihiData = printKoteihiDataClass
+            Me.PrintCalendarData = printCalendarDataClass
+            Me.PrintSKKoteichiData = printSKKoteichiDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
             Me.OutputOrgCode = orgCode
             Me.OutputFileName = outputFileName
             Me.calcZissekiNumber = calcNumber
+            'ReDim WW_SheetNo01(dicNigataList.Count - 1)
+            'ReDim WW_SheetNo02(dicSyonaiList.Count - 1)
+            'ReDim WW_SheetNo03(dicTouhokuList.Count - 1)
+            'ReDim WW_SheetNo04(dicIbarakiList.Count - 1)
 
             Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                               "PRINTFORMAT",
@@ -85,32 +102,332 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
             'ファイルopen
             WW_Workbook.Open(Me.ExcelTemplatePath)
 
-            Dim j As Integer() = {0, 0, 0, 0}
+            'Dim iNum As Integer = 0
+            '〇[新潟]シート設定
+            For Each dic In dicNigataList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = strValue Then
+                        WW_SheetNo01Dic.Add(indexKey, i)
+                        Exit For
+                    End If
+                Next
+            Next
+            '〇[庄内]シート設定
+            For Each dic In dicSyonaiList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = strValue Then
+                        WW_SheetNo02Dic.Add(indexKey, i)
+                        Exit For
+                    End If
+                Next
+            Next
+            '〇[東北]シート設定
+            For Each dic In dicTouhokuList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = strValue Then
+                        WW_SheetNo03Dic.Add(indexKey, i)
+                        'WW_SheetNo03(iNum) = i
+                        'iNum += 1
+                        Exit For
+                    End If
+                Next
+            Next
+            '〇[茨城]シート設定
+            For Each dic In dicIbarakiList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = strValue Then
+                        WW_SheetNo04Dic.Add(indexKey, i)
+                        Exit For
+                    End If
+                Next
+            Next
+            Dim j As Integer() = {0, 0, 0, 0, 0}
             For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
                 If WW_Workbook.Worksheets(i).Name = "入力表" Then
-                ElseIf WW_Workbook.Worksheets(i).Name = "寺岡製作所（相馬出荷・東北）" Then
-                    WW_SheetNo03(0) = i
-                ElseIf WW_Workbook.Worksheets(i).Name = "鶴岡ガス（相馬出荷・東北）" Then
-                    WW_SheetNo03(1) = i
-                ElseIf WW_Workbook.Worksheets(i).Name = "若松ガス（相馬出荷・東北）" Then
-                    WW_SheetNo03(2) = i
+                    'ElseIf WW_Workbook.Worksheets(i).Name = "寺岡製作所（相馬出荷・東北）" Then
+                    '    WW_SheetNo03(0) = i
+                    'ElseIf WW_Workbook.Worksheets(i).Name = "鶴岡ガス（相馬出荷・東北）" Then
+                    '    WW_SheetNo03(1) = i
+                    'ElseIf WW_Workbook.Worksheets(i).Name = "若松ガス（相馬出荷・東北）" Then
+                    '    WW_SheetNo03(2) = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "固定運賃" Then
+                    '〇共通(シート[固定運賃])
+                    WW_SheetNoSKKoteihi = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "従量運賃" Then
+                    '〇共通(シート[従量運賃])
+                    WW_SheetNoUnchin = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "若松ｶﾞｽ(玉川)" Then
+                    '〇SK(シート[届先別])
+                    WW_SheetNoCalendar = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
+                    '〇共通(シート[ﾏｽﾀ])
+                    WW_SheetNoMaster = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "TMP6" + (j(0) + 1).ToString("00") Then
                     WW_ArrSheetNo01(j(0)) = i
                     j(0) += 1
                 ElseIf WW_Workbook.Worksheets(i).Name = "TMP7" + (j(1) + 1).ToString("00") Then
-                    WW_ArrSheetNo01(j(1)) = i
+                    WW_ArrSheetNo02(j(1)) = i
                     j(1) += 1
                 ElseIf WW_Workbook.Worksheets(i).Name = "TMP8" + (j(2) + 1).ToString("00") Then
-                    WW_ArrSheetNo01(j(2)) = i
+                    WW_ArrSheetNo03(j(2)) = i
                     j(2) += 1
                 ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(3) + 1).ToString("00") Then
-                    WW_ArrSheetNo01(j(3)) = i
+                    WW_ArrSheetNo04(j(3)) = i
                     j(3) += 1
+                ElseIf WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟①" _
+                    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟②" _
+                    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)秋田" _
+                    OrElse WW_Workbook.Worksheets(i).Name = "固定値(東北)" _
+                    OrElse WW_Workbook.Worksheets(i).Name = "固定値(茨城)" Then
+                    WW_ArrSheetNoKoteichi(j(4)) = i
+                    j(4) += 1
                 End If
             Next
 
         Catch ex As Exception
             Throw
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' テンプレートを元に帳票を作成しダウンロードURLを生成する
+    ''' </summary>
+    ''' <returns>ダウンロード先URL</returns>
+    ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
+    Public Function CreateExcelPrintData() As String
+        Dim tmpFileName As String = Date.Parse(TaishoYm + "/" + "01").ToString("yyyy年MM月_") & Me.OutputFileName & ".xlsx"
+        Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
+        Dim retByte() As Byte
+
+        Try
+            '***** TODO処理 ここから *****
+            '◯ヘッダーの設定
+            EditHeaderArea()
+            '◯明細の設定
+            EditDetailArea()
+            '◯(固定費・単価)の設定
+            EditKoteihiTankaArea()
+            '***** TODO処理 ここまで *****
+            '★ [ﾏｽﾀ]シート非表示
+            WW_Workbook.Worksheets(WW_SheetNoMaster).Visible = Visibility.Hidden
+            '★ [固定値]シート非表示
+            For Each i In WW_ArrSheetNoKoteichi
+                WW_Workbook.Worksheets(i).Visible = Visibility.Hidden
+            Next
+
+            '保存処理実行
+            Dim saveExcelLock As New Object
+            SyncLock saveExcelLock '複数Excel起動で同時セーブすると落ちるので抑止
+                WW_Workbook.Save(tmpFilePath, SaveFileFormat.Xlsx)
+            End SyncLock
+
+            'ストリーム生成
+            Using fs As New IO.FileStream(tmpFilePath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                Dim binaryLength = Convert.ToInt32(fs.Length)
+                ReDim retByte(binaryLength)
+                fs.Read(retByte, 0, binaryLength)
+                fs.Flush()
+            End Using
+            Return UrlRoot & tmpFileName
+
+        Catch ex As Exception
+            Throw '呼出し元にThrow
+        Finally
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 帳票のヘッダー設定
+    ''' </summary>
+    Private Sub EditHeaderArea()
+        Dim dayCellsSub As String() = {"", "", ""}
+        Try
+            '◯ 年月
+            WW_Workbook.Worksheets(WW_SheetNoCalendar).Range("AD1").Value = Integer.Parse(Me.TaishoYYYY)
+            WW_Workbook.Worksheets(WW_SheetNoCalendar).Range("AD2").Value = Integer.Parse(Me.TaishoMM)
+
+            '〇カレンダー設定
+            Dim iCalendarLine As Integer = 5
+            For Each PrintCalendarDatarow As DataRow In PrintCalendarData.Rows
+                If PrintCalendarDatarow("WORKINGDAY").ToString() <> "0" Then
+                    WW_Workbook.Worksheets(WW_SheetNoCalendar).Range("AE" + iCalendarLine.ToString("00")).Value = "1"
+                Else
+                    WW_Workbook.Worksheets(WW_SheetNoCalendar).Range("AE" + iCalendarLine.ToString("00")).Value = "0"
+                End If
+                iCalendarLine += 1
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定
+    ''' </summary>
+    Private Sub EditDetailArea()
+        Try
+            Dim condition As String = "SETCELL01<>'' AND GROUPNO_REP='{0}'"
+            '〇[新潟]シート設定
+            For Each dicSheetNo01 In WW_SheetNo01Dic
+                condition = String.Format(condition, "1")
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE")
+                    If PrintDatarow("TODOKECODE").ToString() <> dicSheetNo01.Key Then
+                        Continue For
+                    End If
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+                    '◯ 実績数量
+                    WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                Next
+            Next
+            '〇[庄内]シート設定
+            condition = "SETCELL01<>'' AND GROUPNO_REP='{0}'"
+            For Each dicSheetNo02 In WW_SheetNo02Dic
+                condition = String.Format(condition, "2")
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE")
+                    If PrintDatarow("TODOKECODE").ToString() <> dicSheetNo02.Key Then
+                        Continue For
+                    End If
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(dicSheetNo02.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+                    '◯ 実績数量
+                    WW_Workbook.Worksheets(dicSheetNo02.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                Next
+            Next
+            '〇[東北]シート設定
+            condition = "SETCELL01<>'' AND GROUPNO_REP='{0}'"
+            For Each dicSheetNo03 In WW_SheetNo03Dic
+                condition = String.Format(condition, "3")
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE")
+                    If PrintDatarow("TODOKECODE").ToString() <> dicSheetNo03.Key Then
+                        Continue For
+                    End If
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(dicSheetNo03.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+                    '◯ 実績数量
+                    WW_Workbook.Worksheets(dicSheetNo03.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                Next
+            Next
+            '〇[茨城]シート設定
+            condition = "SETCELL01<>'' AND GROUPNO_REP='{0}'"
+            For Each dicSheetNo04 In WW_SheetNo04Dic
+                condition = String.Format(condition, "4")
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE")
+                    If PrintDatarow("TODOKECODE").ToString() <> dicSheetNo04.Key Then
+                        Continue For
+                    End If
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(dicSheetNo04.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+                    '◯ 実績数量
+                    WW_Workbook.Worksheets(dicSheetNo04.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                Next
+            Next
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票のSK固定費設定
+    ''' </summary>
+    Private Sub EditKoteihiTankaArea()
+        Try
+            '★計算エンジンの無効化
+            WW_Workbook.EnableCalculation = False
+
+            '〇業務番号(固定費)設定(※陸事番号)
+            For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
+                '〇シート「固定運賃」
+                '★ 月額固定費
+                WW_Workbook.Worksheets(WW_SheetNoSKKoteihi).Range("E" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("GETSUGAKU").ToString())
+                '★ 減額固定費
+                WW_Workbook.Worksheets(WW_SheetNoSKKoteihi).Range("G" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("GENGAKU").ToString())
+
+                '※陸事番号(固定費)(追加)用設定
+                If PrintKoteihiDatarow("KOTEIHI_DISPLAY").ToString() = "1" Then
+                    '★ 車番
+                    WW_Workbook.Worksheets(WW_SheetNoSKKoteihi).Range("D" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("SYABAN").ToString())
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoSKKoteihi).Range(String.Format("{0}:{0}", PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString())).Hidden = False
+                End If
+            Next
+
+            '〇届名称(追加)用設定
+            For Each PrintDatarow As DataRow In PrintData.Select("TODOKECELL_REP<>''")
+                '〇シート「従量運賃」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintDatarow("TODOKECELL_REP").ToString())).Hidden = False
+
+                '〇シート「マスタ」
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("{0}:{0}", PrintDatarow("MASTERCELL_REP").ToString())).Hidden = False
+                '★ 設定(配送先)
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("A{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("TODOKENAME_REP").ToString()
+                '★ 設定(向け先)
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("F{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
+
+                Try
+                    Dim iDisp As Integer = Integer.Parse(PrintDatarow("SHEETDISPLAY_REP").ToString())
+                    If PrintDatarow("GROUPNO_REP").ToString() = "1" Then
+                        '★ シート表示
+                        WW_Workbook.Worksheets(WW_ArrSheetNo01(iDisp)).Visible = Visibility.Visible
+                        '★ シート名変更
+                        WW_Workbook.Worksheets(WW_ArrSheetNo01(iDisp)).Name = PrintDatarow("TODOKENAME_REP").ToString()
+
+                    ElseIf PrintDatarow("GROUPNO_REP").ToString() = "2" Then
+                        '★ シート表示
+                        WW_Workbook.Worksheets(WW_ArrSheetNo02(iDisp)).Visible = Visibility.Visible
+                        '★ シート名変更
+                        WW_Workbook.Worksheets(WW_ArrSheetNo02(iDisp)).Name = PrintDatarow("TODOKENAME_REP").ToString()
+
+                    ElseIf PrintDatarow("GROUPNO_REP").ToString() = "3" Then
+                        '★ シート表示
+                        WW_Workbook.Worksheets(WW_ArrSheetNo03(iDisp)).Visible = Visibility.Visible
+                        '★ シート名変更
+                        WW_Workbook.Worksheets(WW_ArrSheetNo03(iDisp)).Name = PrintDatarow("TODOKENAME_REP").ToString()
+
+                    ElseIf PrintDatarow("GROUPNO_REP").ToString() = "4" Then
+                        '★ シート表示
+                        WW_Workbook.Worksheets(WW_ArrSheetNo04(iDisp)).Visible = Visibility.Visible
+                        '★ シート名変更
+                        WW_Workbook.Worksheets(WW_ArrSheetNo04(iDisp)).Name = PrintDatarow("TODOKENAME_REP").ToString()
+
+                    End If
+                Catch ex As Exception
+                End Try
+
+            Next
+
+            '〇届先(単価)設定
+            For Each PrintDatarow As DataRow In PrintSKKoteichiData.Rows
+                If PrintDatarow("TANKA").ToString() = "" Then Continue For
+                Dim iTanka As Integer = Integer.Parse(PrintDatarow("TANKA").ToString())
+                Dim iSheetNum As Integer = Integer.Parse(PrintDatarow("GRPNO").ToString()) - 1
+                Dim setCell As String = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + PrintDatarow("SET_CELL").ToString()
+                WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = iTanka
+
+                If PrintDatarow("MEISAI_HYOJIFLG").ToString() = "1" Then
+                    setCell = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + "3"
+                    WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = PrintDatarow("KOTEICHI_GYOMU").ToString()
+                End If
+            Next
+
+            '★計算エンジンの有効化
+            WW_Workbook.EnableCalculation = True
+
+        Catch ex As Exception
+
         End Try
     End Sub
 

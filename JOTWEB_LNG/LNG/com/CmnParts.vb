@@ -221,6 +221,7 @@ Public Class CmnParts
         SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
         SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
         SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
+        SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0006_TANKA LNM0006 "
@@ -233,7 +234,9 @@ Public Class CmnParts
         SQLStr &= " WHERE "
         SQLStr &= String.Format("     LNM0006.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
         SQLStr &= String.Format(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
-        SQLStr &= String.Format(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+        If Not IsNothing(I_ORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+        End If
         SQLStr &= String.Format(" AND LNM0006.STYMD <= '{0}' ", I_TAISHOYM)
         SQLStr &= String.Format(" AND LNM0006.ENDYMD >= '{0}' ", I_TAISHOYM)
         If Not IsNothing(I_TODOKECODE) Then
@@ -341,6 +344,282 @@ Public Class CmnParts
         Catch ex As Exception
             Throw '呼び出し元の例外にスロー
         End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' SK固定運賃マスタTBL検索
+    ''' </summary>
+    Public Sub SelectSKKOTEIHIMaster(ByVal SQLcon As MySqlConnection,
+                                     ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSKKOTEIHIMas As DataTable,
+                                     Optional ByVal I_CLASS As String = Nothing,
+                                     Optional ByVal I_SYABAN As String = Nothing)
+        If IsNothing(O_dtSKKOTEIHIMas) Then
+            O_dtSKKOTEIHIMas = New DataTable
+        End If
+        If O_dtSKKOTEIHIMas.Columns.Count <> 0 Then
+            O_dtSKKOTEIHIMas.Columns.Clear()
+        End If
+        O_dtSKKOTEIHIMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0008.TORICODE "
+        SQLStr &= "   ,LNM0008.TORINAME "
+        SQLStr &= "   ,LNM0008.ORGCODE "
+        SQLStr &= "   ,LNM0008.ORGNAME "
+        SQLStr &= "   ,LNM0008.KASANORGCODE "
+        SQLStr &= "   ,LNM0008.KASANORGNAME "
+        'SQLStr &= "   ,LNM0008.TAISHOYM "
+        SQLStr &= "   ,LNM0008.STYMD "
+        SQLStr &= "   ,LNM0008.ENDYMD "
+        SQLStr &= "   ,LNM0008.SYABAN "
+        SQLStr &= "   ,LNM0008.SYABARA "
+        SQLStr &= "   ,LNM0008.GETSUGAKU "
+        SQLStr &= "   ,LNM0008.GENGAKU "
+        SQLStr &= "   ,LNM0008.KOTEIHI "
+        SQLStr &= "   ,LNM0008.BIKOU "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= "   ,LNM0005.VALUE01 AS KOTEIHI_DISPLAY "
+            SQLStr &= "   ,LNM0005.VALUE02 AS KOTEIHI_CELLNUM "
+        End If
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0008_SKKOTEIHI LNM0008 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
+            SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE04 = LNM0008.SYABAN "
+        End If
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0008.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0008.TORICODE = '{0}' ", I_TORICODE)
+        'SQLStr &= String.Format(" AND LNM0008.TAISHOYM <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0008.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0008.ENDYMD >= '{0}' ", I_TAISHOYM)
+        '★部門コードが指定されている場合
+        If Not IsNothing(I_ORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0008.ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+        '★車番が指定されている場合
+        If Not IsNothing(I_SYABAN) Then
+            SQLStr &= String.Format(" AND LNM0008.SYABAN = '{0}' ", I_SYABAN)
+        End If
+
+        '-- ORDER BY
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE05 AS SIGNED),CAST(LNM0005.KEYCODE06 AS SIGNED) "
+        End If
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSKKOTEIHIMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSKKOTEIHIMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' SK固定値マスタTBL検索
+    ''' </summary>
+    Public Sub SelectSKKOTEICHIMaster(ByVal SQLcon As MySqlConnection, ByVal I_dtTANKAMas As DataTable, ByRef O_dtSKKOTEICHIMas As DataTable,
+                                      Optional ByRef O_dtSKKOTEICHIOtherMas As DataTable = Nothing)
+        If IsNothing(O_dtSKKOTEICHIMas) Then
+            O_dtSKKOTEICHIMas = New DataTable
+        End If
+        If O_dtSKKOTEICHIMas.Columns.Count <> 0 Then
+            O_dtSKKOTEICHIMas.Columns.Clear()
+        End If
+        O_dtSKKOTEICHIMas.Clear()
+
+        Dim SQLStr As String = ""
+        Dim arrAkitaSyaban As String() = {"宿泊有", "宿泊無"}
+        Dim arrAkitaSyaban01 As String() = {String.Format("334号車({0})", arrAkitaSyaban(0)), String.Format("329号車({0})", arrAkitaSyaban(0))}
+        Dim arrAkitaSyaban02 As String() = {String.Format("334号車({0})", arrAkitaSyaban(1)), String.Format("329号車({0})", arrAkitaSyaban(1))}
+
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0005.CLASS "
+        SQLStr &= "  , CASE "
+        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '4' THEN '5' "
+        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '3' THEN '4' "
+        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '2' THEN '3' "
+        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '1' AND LNM0005.VALUE05='45' THEN '2' "
+        SQLStr &= "    ELSE '1' "
+        SQLStr &= "    END AS GRPNO "
+        SQLStr &= "  , LNM0005_TODOKE.KEYCODE01 AS TODOKENO "
+        SQLStr &= "  , LNM0005_TODOKE.VALUE01   AS TODOKENAME "
+        SQLStr &= "  , LNM0005.VALUE05          AS MEISAI_GYO "
+        SQLStr &= "  , LNM0005.VALUE07          AS MEISAI_HYOJIFLG "
+        SQLStr &= "  , LNM0005.KEYCODE03        AS KOTEICHI_GYOMU "
+        SQLStr &= "  , LNM0005.KEYCODE04        AS KOTEICHI_GYOMUNO "
+        SQLStr &= "  , CASE "
+        SQLStr &= String.Format("    WHEN LNM0005.KEYCODE03='{0}' OR LNM0005.KEYCODE03='{1}' THEN '01' ", arrAkitaSyaban01(0), arrAkitaSyaban01(1))
+        SQLStr &= String.Format("    WHEN LNM0005.KEYCODE03='{0}' OR LNM0005.KEYCODE03='{1}' THEN '02' ", arrAkitaSyaban02(0), arrAkitaSyaban02(1))
+        SQLStr &= "    ELSE '' "
+        SQLStr &= "    END AS KOTEICHI_GYOMUNOSUB "
+        SQLStr &= "  , LNM0005.VALUE18          AS KOTEICHI_YOKOCELL "
+        SQLStr &= "  , (4 + CAST(LNM0005_TODOKE.KEYCODE03 AS SIGNED)) - 1 AS SET_CELL "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+
+        '-- LEFT JOIN
+        SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005_TODOKE ON "
+        SQLStr &= String.Format("     LNM0005_TODOKE.CLASS = '{0}' ", "SEKIYUSIG_TODOKE_MAS")
+        SQLStr &= " AND LNM0005_TODOKE.KEYCODE08 = LNM0005.VALUE19 "
+        SQLStr &= String.Format(" AND LNM0005_TODOKE.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        '-- WHERE
+        'SQLStr &= String.Format(" WHERE LNM0005.CLASS = '{0}' ", "SEKIYUSIGEN_TANK")
+        SQLStr &= " WHERE LNM0005.CLASS = @CLASS "
+        SQLStr &= String.Format(" AND LNM0005.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+#Region "コメント"
+        ''★１控え用
+        'Dim SQLStrWork As String = SQLStr
+        'SQLStrWork &= " AND LNM0005.KEYCODE07 = LNM0005_TODOKE.KEYCODE01 "
+        'SQLStrWork &= " AND LNM0005.KEYCODE05 = LNM0005_TODOKE.KEYCODE06 "
+
+        ''★２（★１で取得する内容を省く条件）
+        'SQLStr &= String.Format(" AND LNM0005_TODOKE.KEYCODE01 NOT IN ('{0}', '{1}') ", BaseDllConst.CONST_TODOKECODE_004012, BaseDllConst.CONST_TODOKECODE_005890)
+#End Region
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY "
+        SQLStr &= "   LNM0005.VALUE19 "
+        SQLStr &= " , CAST(LNM0005.VALUE05 AS SIGNED) "
+        SQLStr &= " , LNM0005_TODOKE.VALUE02 "
+        SQLStr &= " , LNM0005_TODOKE.VALUE03 "
+        SQLStr &= " , LNM0005.VALUE18 "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Dim P_CLASS As MySqlParameter = SQLcmd.Parameters.Add("@CLASS", MySqlDbType.VarChar)                              '
+                P_CLASS.Value = "SEKIYUSIGEN_TANK"
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSKKOTEICHIMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSKKOTEICHIMas.Load(SQLdr)
+                End Using
+            End Using
+#Region "コメント"
+            'If IsNothing(O_dtSKKOTEICHIOtherMas) Then
+            '    O_dtSKKOTEICHIOtherMas = New DataTable
+            'End If
+            'If O_dtSKKOTEICHIOtherMas.Columns.Count <> 0 Then
+            '    O_dtSKKOTEICHIOtherMas.Columns.Clear()
+            'End If
+            'O_dtSKKOTEICHIOtherMas.Clear()
+            'Using SQLcmd As New MySqlCommand(SQLStrWork, SQLcon)
+            '    Dim P_CLASS As MySqlParameter = SQLcmd.Parameters.Add("@CLASS", MySqlDbType.VarChar)                              '
+            '    P_CLASS.Value = "SEKIYUSIGEN_TANK_OTR"
+
+            '    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+            '        '○ フィールド名とフィールドの型を取得
+            '        For index As Integer = 0 To SQLdr.FieldCount - 1
+            '            O_dtSKKOTEICHIOtherMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+            '        Next
+
+            '        '○ テーブル検索結果をテーブル格納
+            '        'O_dtSKKOTEICHIOtherMas.Load(SQLdr)
+            '        O_dtSKKOTEICHIMas.Load(SQLdr)
+            '    End Using
+            'End Using
+#End Region
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+        '★項目[単価]作成
+        O_dtSKKOTEICHIMas.Columns.Add("TANKA", Type.GetType("System.Decimal"))
+        '-- 〇茨城
+        Dim conditionSub As String = "GRPNO='4'"
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO='5' "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
+
+        '-- 〇東北
+        conditionSub = "GRPNO='3'"
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO='4' "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
+
+        '-- 〇秋田
+        conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO='3' "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
+        '-- ★秋田(宿泊有)
+        conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub &= String.Format("AND BIKOU1='{0}' ", arrAkitaSyaban(0))
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO='3' "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= "AND KOTEICHI_GYOMUNOSUB ='01' "
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
+        '-- ★秋田(宿泊無)
+        conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub &= String.Format("AND BIKOU1='{0}' ", arrAkitaSyaban(1))
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO='3' "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= "AND KOTEICHI_GYOMUNOSUB ='02' "
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
+
+        '-- 〇新潟
+        conditionSub = String.Format("GRPNO ='1' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_021502)
+        For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
+            Dim condition As String = "GRPNO IN ('1','2') "
+            condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
+            condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+            Next
+        Next
 
     End Sub
 

@@ -392,6 +392,26 @@ Public Module BaseDllConst
     ''' リコー福井事業所
     ''' </summary>
     Public Const CONST_TODOKECODE_004559 As String = "004559"
+    ''' <summary>
+    ''' （ＳＫ）北陸ガス　栃尾
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004012 As String = "004012"
+    ''' <summary>
+    ''' 寺岡製作所（SK）
+    ''' </summary>
+    Public Const CONST_TODOKECODE_005890 As String = "005890"
+    ''' <summary>
+    ''' （ＳＫ）テーブルマーク　塩沢
+    ''' </summary>
+    Public Const CONST_TODOKECODE_002019 As String = "002019"
+    ''' <summary>
+    ''' （ＳＫ）若松ガス　玉川
+    ''' </summary>
+    Public Const CONST_TODOKECODE_002025 As String = "002025"
+    ''' <summary>
+    ''' （ＳＫ）本田金属　喜多方サテライト
+    ''' </summary>
+    Public Const CONST_TODOKECODE_002022 As String = "002022"
 #End Region
 
 #Region "業務ID"
