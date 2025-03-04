@@ -1,0 +1,101 @@
+﻿/*アップロードボタン*/
+#WF_UPLOAD_LABEL {
+    display: block;
+}
+
+input#WF_UPLOAD_BTN {
+    display: none;
+}
+
+#WF_UPLOAD_LABEL:hover {
+    cursor: pointer;
+}
+
+#WF_UPLOAD_LABEL:has(input:disabled) {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+    #WF_UPLOAD_LABEL:has(input:disabled):hover {
+        border-color: #cfcfcf;
+        cursor: default;
+    }
+/*--------------------------------------------------------------
+# 調整（k.miyake)
+--------------------------------------------------------------*/
+#divContensbox {
+    overflow: hidden;
+}
+
+#pnlListArea {
+    margin: 0 0px;
+}
+
+:root, [data-bs-theme=light] {
+    --bs-body-font-size: 1.5rem;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+}
+th {
+    text-align: center;
+}
+/*--------------------------------------------------------------
+# サイズ基準
+# 1rem = 16px
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Bootstrap Customize
+--------------------------------------------------------------*/
+.form-select {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
+
+.calendararea {
+    display: inline-block;
+    width: 190px !important;
+}
+
+#ListCount {
+    margin-top:7px;
+    margin-right: 20px;
+    margin-left: 15px;
+}
+
+
+/*--------------------------------------------------------------
+# タブエリア
+--------------------------------------------------------------*/
+.tabBox {
+    display: flex;
+    background-color: #AEAAAA;
+    width: 100%;
+}
+
+.tabButtonFlexboxBox{
+    display:flex;
+    width:100px;
+}
+
+.btn-tab {
+    /*height:20px;*/
+    font-size: 1.7rem;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: -1px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid #333;
+}
+
+
+/*#WF_ButtonSKKOTEIHI, #WF_ButtonTNGKOTEIHI {
+    margin-left: -3.5px;
+}*/

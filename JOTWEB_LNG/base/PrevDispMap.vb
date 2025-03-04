@@ -229,6 +229,24 @@ Public Module PrevDispMap
         ''' ＪＲ賃率マスタメンテナンス（詳細）
         ''' </summary>
         Public Const LNM0009D As String = "ASP.LNG_MAS_LNM0009RETINMDETAIL_ASPX"
+
+        ''' <summary>
+        ''' 特別料金マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const LNM0010L As String = "ASP.LNG_MAS_LNM0010SPRATELIST_ASPX"
+        ''' <summary>
+        ''' 特別料金マスタメンテナンス（詳細）
+        ''' </summary>
+        Public Const LNM0010D As String = "ASP.LNG_MAS_LNM0010SPRATEDETAIL_ASPX"
+        ''' <summary>
+        ''' 特別料金マスタメンテナンス（北海道ガス詳細）
+        ''' </summary>
+        Public Const LNM0010DKG As String = "ASP.LNG_MAS_LNM0010SPRATEDETAILKG_ASPX"
+        ''' <summary>
+        ''' 特別料金スタメンテナンス（履歴）
+        ''' </summary>
+        Public Const LNM0010H As String = "ASP.LNG_MAS_LNM0010SPRATEHISTORY_ASPX"
+
         ''' <summary>
         ''' キロ程マスタメンテナンス（検索）
         ''' </summary>

@@ -423,6 +423,179 @@ Public Class CmnSearchSQL
     End Function
 
     ''' <summary>
+    ''' 特別料金取引先検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateToriTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("TORICODE", "取引先コード", "100"),
+                New DispFieldItem("TORINAME", "取引先名称", "150")
+            }
+        Return colTitle
+    End Function
+    ''' <summary>
+    ''' 特別料金加算先部門検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateKasanOrgTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("KASANORGCODE", "加算先部門コード", "150"),
+                New DispFieldItem("KASANORGNAME", "加算先部門名称", "150")
+            }
+        Return colTitle
+    End Function
+
+    ''' <summary>
+    ''' 特別料金届先検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateTodokeTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("TODOKECODE", "届先コード", "100"),
+                New DispFieldItem("TODOKENAME", "届先名称", "300")
+            }
+        Return colTitle
+    End Function
+
+    ''' <summary>
+    ''' 特別料金項目名検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateItemTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("ITEMID", "大項目", "100"),
+                New DispFieldItem("ITEMNAME", "項目名", "500")
+            }
+        Return colTitle
+    End Function
+
+    ''' <summary>
+    ''' 特別料金取引先取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateToriSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 取引先取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     TORICODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(TORICODE) AS TORICODE")
+        SQLBldr.AppendLine("    , RTRIM(TORINAME) AS TORINAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     TORICODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金加算先部門取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateKasanOrgSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 加算先部門取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     KASANORGCODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(KASANORGCODE) AS KASANORGCODE")
+        SQLBldr.AppendLine("    , RTRIM(KASANORGNAME) AS KASANORGNAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     KASANORGCODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金届先取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateTodokeSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 届先取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     TODOKECODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS TODOKECODE")
+        SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS TODOKENAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TODOKECODE <> ''")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     TODOKECODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金項目名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+        'Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, ByVal prmTaishoYm As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(ITEMID, '00')")
+        SQLBldr.AppendLine("  + ITEMNAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(ITEMID) AS ITEMID")
+        SQLBldr.AppendLine("    , RTRIM(ITEMNAME) AS ITEMNAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        'SQLBldr.AppendLine("  AND TAISHOYM = '" & prmTaishoYm & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     ITEMID")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
     ''' 品目検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
