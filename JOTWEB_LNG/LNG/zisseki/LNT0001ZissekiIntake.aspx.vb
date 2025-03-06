@@ -783,7 +783,7 @@ Public Class LNT0001ZissekiIntake
 
                     If LNT0001tbl.Rows.Count > 0 Then
                         '実績テーブル、実績履歴テーブル更新（アボカドデータ保存）
-                        ZissekiUpdate(ApiInfo(i).Org, LNT0001tbl, WW_ErrSW)
+                        ZissekiUpdate(ApiInfo(i).Org, WF_TORIhdn.Value, LNT0001tbl, WW_ErrSW)
                         If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
                             Exit Sub
                         End If
@@ -876,7 +876,7 @@ Public Class LNT0001ZissekiIntake
     ''' <summary>
     ''' 実績テーブル更新
     ''' </summary>
-    Private Sub ZissekiUpdate(ByVal iOrg As String, ByVal iTbl As DataTable, ByRef oResult As String)
+    Private Sub ZissekiUpdate(ByVal iOrg As String, ByVal iTori As String, ByVal iTbl As DataTable, ByRef oResult As String)
 
         oResult = C_MESSAGE_NO.NORMAL
 
@@ -886,6 +886,7 @@ Public Class LNT0001ZissekiIntake
         Dim SaveOrgName As String = Nothing
         Dim SaveRecordNo As String = Nothing
         Dim WW_DateNow As DateTime = Date.Now
+        Dim repTori As String = "('" & iTori.Replace(",", "','") & "')"
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
 
@@ -906,6 +907,7 @@ Public Class LNT0001ZissekiIntake
                 & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
                 & " WHERE                                                           " _
                 & "     ORDERORGCODE = @ORDERORGCODE                                " _
+                & " AND TORICODE in " & repTori _
                 & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
                 & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -913,6 +915,7 @@ Public Class LNT0001ZissekiIntake
                 Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                     ' DB更新用パラメータ(ユーザーパスワードマスタ)
                     Dim ORDERORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGCODE", MySqlDbType.VarChar)        '営業所コード
+                    Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                '取引先コード
                     Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                 '削除フラグ
                     Dim YMDFROM As MySqlParameter = SQLcmd.Parameters.Add("@YMDFROM", MySqlDbType.DateTime)                 '年月日FROM
                     Dim YMDTO As MySqlParameter = SQLcmd.Parameters.Add("@YMDTO", MySqlDbType.DateTime)                     '年月日TO
@@ -926,6 +929,7 @@ Public Class LNT0001ZissekiIntake
 
                     ' DB更新
                     ORDERORGCODE.Value = iOrg                                               '営業所コード
+                    TORICODE.Value = iTori                                                  '取引先コード
                     DELFLG.Value = C_DELETE_FLG.DELETE                                      '削除フラグ（削除）
                     If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                         YMDFROM.Value = WF_TaishoYm.Value & "/01"
