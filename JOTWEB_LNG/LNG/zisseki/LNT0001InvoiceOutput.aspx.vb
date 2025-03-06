@@ -848,7 +848,7 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
-        '石油資源開発
+        '石油資源開発(本州分)新潟・庄内・東北・茨城
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_021502 Then
             '〇(帳票)項目チェック処理(石油資源開発)
             Dim dcNigata As New Dictionary(Of String, String)
@@ -871,6 +871,11 @@ Public Class LNT0001InvoiceOutput
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
 
             Exit Sub
+        End If
+
+        '石油資源開発(北海道)石狩
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+
         End If
 
         'エスジーリキッドサービス（西部ガス）
