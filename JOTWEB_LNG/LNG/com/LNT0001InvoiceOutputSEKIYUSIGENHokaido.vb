@@ -12,6 +12,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private WW_SheetNo01Dic As New Dictionary(Of String, Integer)           '// 既存シート用(石狩)
     Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(石狩)
     Private WW_ArrSheetNoKoteichi As Integer() = {0, 0, 0, 0, 0}            '// 単価シート用
+    Private WW_DicIshikariList As Dictionary(Of String, String)
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -44,6 +45,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintSKKoteichiData = printSKKoteichiDataClass
+            Me.WW_DicIshikariList = dicIshikariList
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -116,7 +118,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(0) + 1).ToString("00") Then
                     WW_ArrSheetNo01(j(0)) = i
                     j(0) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟①" _
+                    'ElseIf WW_Workbook.Worksheets(i).Name = "①KG石狩～釧路(40ft) " _
                     '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟②" _
                     '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)秋田" _
                     '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(東北)" _
@@ -187,9 +189,62 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     End Sub
 
     ''' <summary>
-    ''' 帳票の明細設定
+    ''' 帳票の明細設定(メイン)
     ''' </summary>
     Private Sub EditDetailArea()
+        Try
+            'Dim condition As String = "SETCELL01<>'' AND GROUPNO_REP='{0}' AND SETCELL03='{1}'"
+            Dim condition As String = "SETCELL01<>'' AND GROUPNO_REP='{0}' AND SHEETNAME_REP='{1}'"
+            Dim conditionSb As String = ""
+            Dim todokeCode As String = ""
+            Dim grpNo As String = ""
+            Dim sheetName As String = ""
+            '〇[①KG石狩～釧路(40ft)]  , [②ＫＧ石狩～釧路(ﾛｰﾘｰ)]
+            '　[③ＫＧ石狩～室蘭(40ft)], [④ＫＧ石狩～室蘭(ﾛｰﾘｰ)]
+            '　[⑤ＫＧ石狩～JSW(40ft)]
+            '　[⑥北電～室蘭バンカリング(ﾛｰﾘｰ)]
+            '　[⑦北電～ＳＫ勇払(40ft)], [⑧北電～ＳＫ勇払（ﾛｰﾘｰ)]
+            '★シート設定
+            For Each dicSheetNo01 In WW_SheetNo01Dic
+                '届名
+                todokeCode = dicSheetNo01.Key.Substring(0, 6)
+                'GRPNo
+                grpNo = dicSheetNo01.Key.Substring(6, 1)
+                'If todokeCode <> BaseDllConst.CONST_TODOKECODE_003561 Then Continue For
+
+                '★シート名取得
+                sheetName = WW_DicIshikariList(dicSheetNo01.Key)
+                '★条件設定
+                conditionSb = String.Format(condition, grpNo, sheetName)
+                '〇セル設定
+                EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01)
+
+                'conditionSb = String.Format(condition, "1", "コンテナ")
+                'EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01)
+
+                'conditionSb = String.Format(condition, "1", "ローリー")
+                'EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01)
+            Next
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(サブ)
+    ''' </summary>
+    Private Sub EditDetailAreaSub(ByVal condition As String, ByVal todokeCode As String, ByVal dicSheetNo01 As KeyValuePair(Of String, Integer))
+
+        For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE")
+            If PrintDatarow("TODOKECODE").ToString() <> todokeCode Then
+                Continue For
+            End If
+            '◯ 出荷日
+            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+            '◯ 実績数量
+            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+        Next
 
     End Sub
 

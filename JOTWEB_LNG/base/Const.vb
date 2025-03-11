@@ -420,6 +420,22 @@ Public Module BaseDllConst
     ''' （ＳＫ）本田金属　喜多方サテライト
     ''' </summary>
     Public Const CONST_TODOKECODE_002022 As String = "002022"
+    ''' <summary>
+    ''' 釧路ガス
+    ''' </summary>
+    Public Const CONST_TODOKECODE_003561 As String = "003561"
+    ''' <summary>
+    ''' (SK)室蘭ガス
+    ''' </summary>
+    Public Const CONST_TODOKECODE_003563 As String = "003563"
+    ''' <summary>
+    ''' ＳＫ勇払（工場）
+    ''' </summary>
+    Public Const CONST_TODOKECODE_005834 As String = "005834"
+    ''' <summary>
+    ''' 室蘭港バンカリング
+    ''' </summary>
+    Public Const CONST_TODOKECODE_006915 As String = "006915"
 #End Region
 
 #Region "業務ID"
