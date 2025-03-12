@@ -25,8 +25,18 @@ Public Class LNM0007WRKINC
     Public Const TBLSKKOTEIHIHIST As String = "LNT0007_SKKOTEIHIHIST"
     Public Const TBLTNGKOTEIHIHIST As String = "LNT0008_TNGKOTEIHIHIST"
 
-    'ボタン名
-    Public Const BTNNAMETOHOKU As String = "東北電力固定費"
+    'リスト名(東北電力固定費)
+    Public Const LISTNAMETOHOKU As String = "東北電力固定費"
+
+    ''' <summary>
+    ''' テーブル一覧
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum TableList
+        固定費
+        TNG固定費
+        SK固定費
+    End Enum
 
     ''' <summary>
     ''' ファイルタイプ
@@ -74,7 +84,8 @@ Public Class LNM0007WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TAISHOYM   '対象年月
+        STYMD   '有効開始日
+        ENDYMD   '有効終了日
         SYABAN   '車番
         SYABARA   '車腹
         GETSUGAKU   '月額運賃
@@ -95,7 +106,8 @@ Public Class LNM0007WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TAISHOYM   '対象年月
+        STYMD   '有効開始日
+        ENDYMD   '有効終了日
         SYABAN   '車番
         KOTEIHIM   '月額固定費
         KOTEIHID   '日額固定費
@@ -149,7 +161,8 @@ Public Class LNM0007WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TAISHOYM   '対象年月
+        STYMD   '有効開始日
+        ENDYMD   '有効終了日
         SYABAN   '車番
         SYABARA   '車腹
         GETSUGAKU   '月額運賃
@@ -174,7 +187,8 @@ Public Class LNM0007WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TAISHOYM   '対象年月
+        STYMD   '有効開始日
+        ENDYMD   '有効終了日
         SYABAN   '車番
         KOTEIHIM   '月額固定費
         KOTEIHID   '日額固定費
@@ -598,7 +612,8 @@ Public Class LNM0007WRKINC
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="WW_ROW"></param>
-    Public Shared Function GetSTYMD(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+    Public Shared Function GetSTYMD(ByVal SQLcon As MySqlConnection, ByVal WW_CONTROLTABLE As String,
+                                    ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
 
         GetSTYMD = ""
 
@@ -610,7 +625,14 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine(" SELECT ")
         SQLStr.AppendLine("       DATE_FORMAT(MAX(STYMD), '%Y/%m/%d') AS STYMD ")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0007_KOTEIHI")
+        Select Case WW_CONTROLTABLE
+            Case MAPIDL '固定費マスタ
+                SQLStr.Append("     LNG.LNM0007_KOTEIHI             ")
+            Case MAPIDLSK 'SK固定費マスタ
+                SQLStr.Append("     LNG.LNM0008_SKKOTEIHI           ")
+            Case MAPIDLTNG 'TNG固定費マスタ
+                SQLStr.Append("     LNG.LNM0009_TNGKOTEIHI          ")
+        End Select
         SQLStr.AppendLine(" WHERE")
         SQLStr.AppendLine("       TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
@@ -649,7 +671,7 @@ Public Class LNM0007WRKINC
             End Using
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007 SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -782,11 +804,11 @@ Public Class LNM0007WRKINC
     ''' <param name="I_TIMESTAMP">タイムスタンプ</param>
     ''' <param name="I_TORICODE">取引先コード</param>
     ''' <param name="I_ORGCODE">部門コード</param>
-    ''' <param name="I_TAISHOYM">対象年月</param>
+    ''' <param name="I_STYMD">有効開始日</param>
     ''' <param name="I_SYABAN">車番</param>
     Public Sub HaitaCheckSK(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String, ByVal I_TIMESTAMP As String,
                           ByVal I_TORICODE As String, ByVal I_ORGCODE As String,
-                          ByVal I_TAISHOYM As String, ByVal I_SYABAN As String)
+                          ByVal I_STYMD As String, ByVal I_SYABAN As String)
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -800,19 +822,19 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine(" WHERE                                       ")
         SQLStr.AppendLine("       TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND TAISHOYM = @TAISHOYM                  ")
+        SQLStr.AppendLine("   AND DATE_FORMAT(STYMD, '%Y/%m/%d') = DATE_FORMAT(@STYMD, '%Y/%m/%d')")
         SQLStr.AppendLine("   AND SYABAN  = @SYABAN                     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6) '対象年月
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20) '車番
 
                 P_TORICODE.Value = I_TORICODE '取引先コード
                 P_ORGCODE.Value = I_ORGCODE '部門コード
-                P_TAISHOYM.Value = Replace(I_TAISHOYM, "/", "") '対象年月
+                P_STYMD.Value = CDate(I_STYMD) '有効開始日
                 P_SYABAN.Value = I_SYABAN '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -863,11 +885,11 @@ Public Class LNM0007WRKINC
     ''' <param name="I_TIMESTAMP">タイムスタンプ</param>
     ''' <param name="I_TORICODE">取引先コード</param>
     ''' <param name="I_ORGCODE">部門コード</param>
-    ''' <param name="I_TAISHOYM">対象年月</param>
+    ''' <param name="I_STYMD">有効開始日</param>
     ''' <param name="I_SYABAN">車番</param>
     Public Sub HaitaCheckTNG(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String, ByVal I_TIMESTAMP As String,
                           ByVal I_TORICODE As String, ByVal I_ORGCODE As String,
-                          ByVal I_TAISHOYM As String, ByVal I_SYABAN As String)
+                          ByVal I_STYMD As String, ByVal I_SYABAN As String)
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -881,19 +903,19 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine(" WHERE                                       ")
         SQLStr.AppendLine("       TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND TAISHOYM = @TAISHOYM                  ")
+        SQLStr.AppendLine("   AND DATE_FORMAT(STYMD, '%Y/%m/%d') = DATE_FORMAT(@STYMD, '%Y/%m/%d')")
         SQLStr.AppendLine("   AND SYABAN  = @SYABAN                     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6) '対象年月
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20) '車番
 
                 P_TORICODE.Value = I_TORICODE '取引先コード
                 P_ORGCODE.Value = I_ORGCODE '部門コード
-                P_TAISHOYM.Value = Replace(I_TAISHOYM, "/", "") '対象年月
+                P_STYMD.Value = CDate(I_STYMD) '有効開始日
                 P_SYABAN.Value = I_SYABAN '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()

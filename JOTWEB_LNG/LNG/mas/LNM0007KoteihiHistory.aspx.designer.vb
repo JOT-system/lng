@@ -23,31 +23,13 @@ Partial Public Class LNM0007KoteihiHistory
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
-    '''WF_ButtonKOTEIHI コントロール。
+    '''WF_TARGETTABLE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonKOTEIHI As Global.System.Web.UI.WebControls.Button
-    
-    '''<summary>
-    '''WF_ButtonTNGKOTEIHI コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonTNGKOTEIHI As Global.System.Web.UI.WebControls.Button
-    
-    '''<summary>
-    '''WF_ButtonSKKOTEIHI コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ButtonSKKOTEIHI As Global.System.Web.UI.WebControls.Button
+    Protected WithEvents WF_TARGETTABLE As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''ListCount コントロール。

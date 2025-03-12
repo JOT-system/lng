@@ -60,8 +60,10 @@ Public Class LNM0006TankaSearch
                         WF_ButtonCan_Click()
                     Case "WF_ListboxDBclick"            '左ボックスダブルクリック
                         WF_ButtonSel_Click()
-                    Case "mspToriOrgCodeSingleRowSelected"  '[共通]取引先部門コード選択ポップアップで行選択
-                        RowSelected_mspToriOrgCodeSingle()
+                    Case "mspToriNameSingleRowSelected"  '[共通]取引先部門コード選択ポップアップで行選択
+                        RowSelected_mspToriNameSingle()
+                        ' ドロップダウンリスト再生成
+                        createListBox()
                 End Select
             End If
         Else
@@ -88,11 +90,12 @@ Public Class LNM0006TankaSearch
         WF_RightboxOpen.Value = ""
         leftview.ActiveListBox()
 
-        '○ ドロップダウンリスト生成
-        createListBox()
-
         '○ 画面の値設定
         WW_MAPValueSet()
+
+        '○ ドロップダウンリスト生成
+        createListBox()
+        ddlSelectORG.SelectedValue = work.WF_SEL_ORGCODE_S.Text     '部門コード
 
     End Sub
 
@@ -111,9 +114,15 @@ Public Class LNM0006TankaSearch
             'Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
             Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList("02", "ORGCODEDROP")
 
+            '選択した取引先名称の部門コード一覧を取得
+            Dim WW_targetOrgHt As New Hashtable
+            WW_targetOrgHt = GetToriNameOrg()
+
             If retOfficeList.Items.Count > 0 Then
                 For index As Integer = 0 To retOfficeList.Items.Count - 1
-                    ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
+                    If WW_targetOrgHt.ContainsKey(retOfficeList.Items(index).Value) = True Then
+                        ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
+                    End If
                 Next
             End If
 
@@ -161,8 +170,7 @@ Public Class LNM0006TankaSearch
             End If
 
             WF_StYMDCode.Value = work.WF_SEL_STYMD_S.Text    '有効開始日
-            TxtTORICode.Text = work.WF_SEL_TORICODE_S.Text   '取引先コード
-            ddlSelectORG.SelectedValue = work.WF_SEL_ORGCODE_S.Text     '部門コード
+            TxtTORIName.Text = work.WF_SEL_TORINAME_S.Text   '取引先名称
 
             ' 論理削除フラグ
             If work.WF_SEL_DELFLG_S.Text = "1" Then
@@ -171,7 +179,7 @@ Public Class LNM0006TankaSearch
                 ChkDelDataFlg.Checked = False
             End If
             '○ 名称設定処理
-            CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_Dummy)  '取引先コード
+            'CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_Dummy)  '取引先コード
         Else
             ' サブメニューからの画面遷移
             ' メニューからの画面遷移
@@ -191,7 +199,7 @@ Public Class LNM0006TankaSearch
         TxtCampCode.Text = Master.USERCAMP
 
         ' 取引先コードを入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtTORICode.Attributes("onkeyPress") = "CheckNum()"
+        'Me.TxtTORICode.Attributes("onkeyPress") = "CheckNum()"
 
         ' 有効年月日(開始)を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
         Me.WF_StYMDCode.Attributes("onkeyPress") = "CheckCalendar()"
@@ -228,7 +236,7 @@ Public Class LNM0006TankaSearch
 
         '○ 入力文字置き換え(使用禁止文字排除)
         Master.EraseCharToIgnore(WF_StYMDCode.Value)             '有効開始日
-        Master.EraseCharToIgnore(TxtTORICode.Text)               '取引先コード
+        'Master.EraseCharToIgnore(TxtTORIName.Text)               '取引先名称
 
         '○ チェック処理
         WW_Check(WW_ErrSW)
@@ -238,7 +246,7 @@ Public Class LNM0006TankaSearch
 
         '○ 条件選択画面の入力値退避
         work.WF_SEL_STYMD_S.Text = WF_StYMDCode.Value.ToString     '有効開始日
-        work.WF_SEL_TORICODE_S.Text = TxtTORICode.Text             '取引先コード
+        work.WF_SEL_TORINAME_S.Text = TxtTORIName.Text             '取引先名称
         work.WF_SEL_ORGCODE_S.Text = ddlSelectORG.SelectedValue               '部門コード
 
         ' 論理削除フラグ
@@ -291,25 +299,25 @@ Public Class LNM0006TankaSearch
             Exit Sub
         End If
 
-        '取引先コード
-        Master.CheckField(Master.USERCAMP, "TORICODE", TxtTORICode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If isNormal(WW_CS0024FCheckerr) Then
-            If Not String.IsNullOrEmpty(TxtTORICode.Text) Then
-                ' 名称存在チェック
-                CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)
-                If Not isNormal(WW_RtnSW) Then
-                    Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード : " & TxtTORICode.Text, needsPopUp:=True)
-                    TxtTORICode.Focus()
-                    O_RTN = "ERR"
-                    Exit Sub
-                End If
-            End If
-        Else
-            Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード", needsPopUp:=True)
-            TxtTORICode.Focus()
-            O_RTN = "ERR"
-            Exit Sub
-        End If
+        ''取引先コード
+        'Master.CheckField(Master.USERCAMP, "TORICODE", TxtTORICode.Text, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If isNormal(WW_CS0024FCheckerr) Then
+        '    If Not String.IsNullOrEmpty(TxtTORICode.Text) Then
+        '        ' 名称存在チェック
+        '        CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)
+        '        If Not isNormal(WW_RtnSW) Then
+        '            Master.Output(C_MESSAGE_NO.NO_DATA_EXISTS_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード : " & TxtTORICode.Text, needsPopUp:=True)
+        '            TxtTORICode.Focus()
+        '            O_RTN = "ERR"
+        '            Exit Sub
+        '        End If
+        '    End If
+        'Else
+        '    Master.Output(C_MESSAGE_NO.FORMAT_ERROR, C_MESSAGE_TYPE.ERR, "取引先コード", needsPopUp:=True)
+        '    TxtTORICode.Focus()
+        '    O_RTN = "ERR"
+        '    Exit Sub
+        'End If
 
         '○ 正常メッセージ
         Master.Output(C_MESSAGE_NO.NORMAL, C_MESSAGE_TYPE.NOR)
@@ -345,10 +353,10 @@ Public Class LNM0006TankaSearch
             With leftview
                 ' フィールドによってパラメータを変える
                 Select Case WF_FIELD.Value
-                    Case "TxtTORICode"       '取引先コード
+                    Case "TxtTORIName"       '取引先コード
                         leftview.Visible = False
                         '検索画面
-                        DisplayView_mspToriOrgCodeSingle()
+                        DisplayView_mspToriNameSingle()
                         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
                         WF_LeftboxOpen.Value = ""
                         Exit Sub
@@ -373,9 +381,12 @@ Public Class LNM0006TankaSearch
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "TxtTORICode"
-                CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)  '取引先コード
-                TxtTORICode.Focus()
+            Case "TxtTORIName"
+                'CODENAME_get("TORICODE", TxtTORICode.Text, LblTORIName.Text, WW_RtnSW)  '取引先コード
+                '部門コード初期化
+                ' ドロップダウンリスト再生成
+                createListBox()
+                TxtTORIName.Focus()
         End Select
 
         '○ メッセージ表示
@@ -465,38 +476,86 @@ Public Class LNM0006TankaSearch
     End Sub
 
     ''' <summary>
-    ''' 取引先部門コード検索時処理
+    ''' 取引先名称検索時処理
     ''' </summary>
-    Protected Sub DisplayView_mspToriOrgCodeSingle()
+    Protected Sub DisplayView_mspToriNameSingle()
 
-        Me.mspToriOrgCodeSingle.InitPopUp()
-        Me.mspToriOrgCodeSingle.SelectionMode = ListSelectionMode.Single
-        Me.mspToriOrgCodeSingle.SQL = CmnSearchSQL.GetTankaToriOrgSQL(ddlSelectORG.SelectedValue)
+        Me.mspToriNameSingle.InitPopUp()
+        Me.mspToriNameSingle.SelectionMode = ListSelectionMode.Single
+        Me.mspToriNameSingle.SQL = CmnSearchSQL.GetTankaToriNameSQL()
 
-        Me.mspToriOrgCodeSingle.KeyFieldName = "KEYCODE"
-        Me.mspToriOrgCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaToriOrgTitle)
+        Me.mspToriNameSingle.KeyFieldName = "KEYCODE"
+        Me.mspToriNameSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaToriNameTitle)
 
-        Me.mspToriOrgCodeSingle.ShowPopUpList()
+        Me.mspToriNameSingle.ShowPopUpList()
 
     End Sub
 
     ''' <summary>
+    ''' 荷主名から部門コード取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetToriNameOrg() As Hashtable
+        Dim retHash As New Hashtable
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       ORGCODE AS ORGCODE                                                                            ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNM0006_TANKA                                                                                   ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("      DELFLG = '0'                                                                                   ")
+        If Not TxtTORIName.Text = "" Then
+            SQLStr.AppendLine(" AND  TORINAME LIKE '%" & TxtTORIName.Text & "%'                                                                    ")
+        End If
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retHash
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        If Not retHash.ContainsKey(WW_ROW("ORGCODE")) Then
+                            retHash.Add(WW_ROW("ORGCODE"), WW_ROW("ORGCODE"))
+                        End If
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+        Return retHash
+    End Function
+
+
+    ''' <summary>
     ''' 取引先部門コード選択ポップアップで行選択
     ''' </summary>
-    Protected Sub RowSelected_mspToriOrgCodeSingle()
+    Protected Sub RowSelected_mspToriNameSingle()
 
-        Dim selData = Me.mspToriOrgCodeSingle.SelectedSingleItem
+        Dim selData = Me.mspToriNameSingle.SelectedSingleItem
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
 
-            Case TxtTORICode.ID
-                Me.TxtTORICode.Text = selData("TORICODE").ToString '取引先コード
-                Me.LblTORIName.Text = selData("TORINAME").ToString '取引先名
+            Case TxtTORIName.ID
+                Me.TxtTORIName.Text = selData("TORINAME").ToString '取引先名
         End Select
 
         'ポップアップの非表示
-        Me.mspToriOrgCodeSingle.HidePopUp()
+        Me.mspToriNameSingle.HidePopUp()
 
     End Sub
 

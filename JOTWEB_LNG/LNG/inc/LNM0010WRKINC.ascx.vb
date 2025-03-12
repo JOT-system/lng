@@ -896,6 +896,116 @@ Public Class LNM0010WRKINC
         End Try
     End Function
 
+    ''' <summary>
+    ''' 有効開始日取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="WW_ROW"></param>
+    Public Shared Function GetSTYMD(ByVal SQLcon As MySqlConnection, ByVal WW_CONTROLTABLE As String,
+                                    ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+
+        GetSTYMD = ""
+
+        Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+        O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT ")
+        SQLStr.AppendLine("       DATE_FORMAT(MAX(STYMD), '%Y/%m/%d') AS STYMD ")
+        SQLStr.AppendLine(" FROM")
+        Select Case WW_CONTROLTABLE
+            Case MAPIDLHA '八戸特別料金マスタ
+                SQLStr.Append("     LNG.LNM0010_HACHINOHESPRATE             ")
+            Case MAPIDLEN 'ENEOS業務委託料マスタ
+                SQLStr.Append("     LNG.LNM0011_ENEOSCOMFEE           ")
+            Case MAPIDLTO '東北電力車両別追加料金マスタ
+                SQLStr.Append("     LNG.LNM0012_TOHOKUSPRATE          ")
+            Case MAPIDLSKSP 'SK特別料金マスタ
+                SQLStr.Append("     LNG.LNM0014_SKSPRATE          ")
+        End Select
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("       DELFLG  = '0'             ")
+        Select Case WW_CONTROLTABLE
+            Case MAPIDLHA '八戸特別料金マスタ
+                SQLStr.AppendLine("   AND RECOID  = @RECOID             ")
+                SQLStr.AppendLine("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
+            Case MAPIDLEN 'ENEOS業務委託料マスタ
+                SQLStr.AppendLine("   AND RECOID  = @RECOID             ")
+                SQLStr.AppendLine("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
+            Case MAPIDLTO '東北電力車両別追加料金マスタ
+                SQLStr.AppendLine("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
+                SQLStr.AppendLine("   AND SYABAN  = @SYABAN             ")
+            Case MAPIDLSKSP 'SK特別料金マスタ
+                SQLStr.AppendLine("   AND RECOID  = @RECOID             ")
+                SQLStr.AppendLine("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
+        End Select
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Select Case WW_CONTROLTABLE
+                    Case MAPIDLHA '八戸特別料金マスタ
+                        Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                        P_RECOID.Value = WW_ROW("RECOID")           'レコードID
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                    Case MAPIDLEN 'ENEOS業務委託料マスタ
+                        Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                        P_RECOID.Value = WW_ROW("RECOID")           'レコードID
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                    Case MAPIDLTO '東北電力車両別追加料金マスタ
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20) '車番
+
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                        P_SYABAN.Value = WW_ROW("SYABAN") '車番
+                    Case MAPIDLSKSP 'SK特別料金マスタ
+                        Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+
+                        P_RECOID.Value = WW_ROW("RECOID")           'レコードID
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                End Select
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    If WW_Tbl.Rows.Count >= 1 Then
+                        GetSTYMD = WW_Tbl.Rows(0)("STYMD").ToString
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007 SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            Exit Function
+        End Try
+    End Function
 
     ''' <summary>
     ''' 会社コード取得のパラメータ設定

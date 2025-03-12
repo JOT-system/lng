@@ -150,21 +150,6 @@
                                     <asp:Label ID="WF_ENDYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
-
-                            <p id="KOTEIHI_LINE_TAISHOYM">
-                                <span>
-                                    <!-- 対象年月 -->
-                                    <asp:Label ID="WF_TAISHOYM_L" runat="server" Text="対象年月" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <b class="calendararea">
-                                        <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                            <input type="text" id="WF_TAISHOYM" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
-                                            <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
-                                                <span class="material-symbols-outlined">calendar_month</span>
-                                            </span>
-                                        </b>
-                                    </b>
-                                </span>
-                            </p>
                             <p id="KOTEIHI_LINE_SYABAN">
                                 <span>
                                     <!-- 車番 -->

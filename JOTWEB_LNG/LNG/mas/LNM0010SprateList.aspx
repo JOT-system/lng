@@ -82,7 +82,7 @@
                                     </b>
                                 </b>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
+                            <div style="display:none;">
                                 <strong class="flex-shrink-0">荷主</strong>
                                 <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORIChange');" />
                             </div>   

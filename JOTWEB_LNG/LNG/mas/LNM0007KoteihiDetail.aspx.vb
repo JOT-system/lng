@@ -255,8 +255,6 @@ Public Class LNM0007KoteihiDetail
         WF_StYMD.Value = work.WF_SEL_STYMD.Text
         '有効終了日
         WF_EndYMD.Value = work.WF_SEL_ENDYMD.Text
-        '対象年月
-        WF_TAISHOYM.Value = work.WF_SEL_TAISHOYM.Text
         '車番
         TxtSYABAN.Text = work.WF_SEL_SYABAN.Text
         '陸事番号
@@ -354,7 +352,6 @@ Public Class LNM0007KoteihiDetail
         ' 有効開始日・有効終了日・対象年月を入力するテキストボックスは数値(0～9)＋記号(/)のみ可能とする。
         Me.WF_StYMD.Attributes("onkeyPress") = "CheckCalendar()"
         Me.WF_EndYMD.Attributes("onkeyPress") = "CheckCalendar()"
-        'Me.WF_TAISHOYM.Attributes("onkeyPress") = "CheckCalendar()"
 
         ' 入力するテキストボックスは数値(0～9)＋記号(.)のみ可能とする。
         Me.TxtSYABARA.Attributes("onkeyPress") = "CheckDeci()"             '車腹
@@ -595,7 +592,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , BIKOU2                       ")
                 SQLStr.AppendLine("       , BIKOU3                       ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLStr.AppendLine("       , TAISHOYM                     ")
+                SQLStr.AppendLine("       , STYMD                        ")
+                SQLStr.AppendLine("       , ENDYMD                       ")
                 SQLStr.AppendLine("       , SYABAN                       ")
                 SQLStr.AppendLine("       , SYABARA                      ")
                 SQLStr.AppendLine("       , GETSUGAKU                    ")
@@ -603,7 +601,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , KOTEIHI                      ")
                 SQLStr.AppendLine("       , BIKOU                        ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLStr.AppendLine("       , TAISHOYM                     ")
+                SQLStr.AppendLine("       , STYMD                        ")
+                SQLStr.AppendLine("       , ENDYMD                       ")
                 SQLStr.AppendLine("       , SYABAN                       ")
                 SQLStr.AppendLine("       , KOTEIHIM                     ")
                 SQLStr.AppendLine("       , KOTEIHID                     ")
@@ -644,7 +643,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , @BIKOU2                      ")
                 SQLStr.AppendLine("       , @BIKOU3                      ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLStr.AppendLine("       , @TAISHOYM                    ")
+                SQLStr.AppendLine("       , @STYMD                       ")
+                SQLStr.AppendLine("       , @ENDYMD                      ")
                 SQLStr.AppendLine("       , @SYABAN                      ")
                 SQLStr.AppendLine("       , @SYABARA                     ")
                 SQLStr.AppendLine("       , @GETSUGAKU                   ")
@@ -652,7 +652,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , @KOTEIHI                     ")
                 SQLStr.AppendLine("       , @BIKOU                       ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLStr.AppendLine("       , @TAISHOYM                    ")
+                SQLStr.AppendLine("       , @STYMD                       ")
+                SQLStr.AppendLine("       , @ENDYMD                      ")
                 SQLStr.AppendLine("       , @SYABAN                      ")
                 SQLStr.AppendLine("       , @KOTEIHIM                    ")
                 SQLStr.AppendLine("       , @KOTEIHID                    ")
@@ -692,7 +693,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , BIKOU2     = @BIKOU2            ")
                 SQLStr.AppendLine("       , BIKOU3     = @BIKOU3            ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLStr.AppendLine("       , TAISHOYM     = @TAISHOYM        ")
+                SQLStr.AppendLine("       , STYMD     = @STYMD              ")
+                SQLStr.AppendLine("       , ENDYMD     = @ENDYMD            ")
                 SQLStr.AppendLine("       , SYABAN     = @SYABAN            ")
                 SQLStr.AppendLine("       , SYABARA     = @SYABARA          ")
                 SQLStr.AppendLine("       , GETSUGAKU     = @GETSUGAKU      ")
@@ -700,7 +702,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("       , KOTEIHI     = @KOTEIHI          ")
                 SQLStr.AppendLine("       , BIKOU     = @BIKOU              ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLStr.AppendLine("       , TAISHOYM     = @TAISHOYM        ")
+                SQLStr.AppendLine("       , STYMD     = @STYMD              ")
+                SQLStr.AppendLine("       , ENDYMD     = @ENDYMD            ")
                 SQLStr.AppendLine("       , SYABAN     = @SYABAN            ")
                 SQLStr.AppendLine("       , KOTEIHIM     = @KOTEIHIM        ")
                 SQLStr.AppendLine("       , KOTEIHID     = @KOTEIHID        ")
@@ -734,7 +737,8 @@ Public Class LNM0007KoteihiDetail
                 SQLJnl.AppendLine("   , BIKOU2                              ")
                 SQLJnl.AppendLine("   , BIKOU3                              ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLJnl.AppendLine("   , TAISHOYM                              ")
+                SQLJnl.AppendLine("   , STYMD                              ")
+                SQLJnl.AppendLine("   , ENDYMD                              ")
                 SQLJnl.AppendLine("   , SYABAN                              ")
                 SQLJnl.AppendLine("   , SYABARA                              ")
                 SQLJnl.AppendLine("   , GETSUGAKU                              ")
@@ -742,7 +746,8 @@ Public Class LNM0007KoteihiDetail
                 SQLJnl.AppendLine("   , KOTEIHI                              ")
                 SQLJnl.AppendLine("   , BIKOU                              ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLJnl.AppendLine("   , TAISHOYM                              ")
+                SQLJnl.AppendLine("   , STYMD                              ")
+                SQLJnl.AppendLine("   , ENDYMD                              ")
                 SQLJnl.AppendLine("   , SYABAN                              ")
                 SQLJnl.AppendLine("   , KOTEIHIM                              ")
                 SQLJnl.AppendLine("   , KOTEIHID                              ")
@@ -779,10 +784,10 @@ Public Class LNM0007KoteihiDetail
                 SQLJnl.AppendLine("   AND STYMD  = @STYMD              ")
                 SQLJnl.AppendLine("   AND SYABAN  = @SYABAN            ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLJnl.AppendLine("   AND TAISHOYM  = @TAISHOYM        ")
+                SQLJnl.AppendLine("   AND STYMD  = @STYMD              ")
                 SQLJnl.AppendLine("   AND SYABAN  = @SYABAN            ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLJnl.AppendLine("   AND TAISHOYM  = @TAISHOYM        ")
+                SQLJnl.AppendLine("   AND STYMD  = @STYMD              ")
                 SQLJnl.AppendLine("   AND SYABAN  = @SYABAN            ")
         End Select
 
@@ -878,7 +883,8 @@ Public Class LNM0007KoteihiDetail
                         JP_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                     Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
                         Dim P_GETSUGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GETSUGAKU", MySqlDbType.Decimal)     '月額運賃
@@ -886,10 +892,18 @@ Public Class LNM0007KoteihiDetail
                         Dim P_KOTEIHI As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHI", MySqlDbType.Decimal)     '固定費
                         Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
 
-                        Dim JP_TAISHOYM As MySqlParameter = SQLcmdJnl.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim JP_STYMD As MySqlParameter = SQLcmdJnl.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim JP_SYABAN As MySqlParameter = SQLcmdJnl.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
+
+                        '有効終了日(画面入力済みの場合画面入力を優先)
+                        If Not WF_EndYMD.Value = "" Then
+                            P_ENDYMD.Value = LNM0007row("ENDYMD")
+                        Else
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
+                        End If
+
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
                         P_SYABARA.Value = LNM0007row("SYABARA")           '車腹
                         P_GETSUGAKU.Value = LNM0007row("GETSUGAKU")           '月額運賃
@@ -897,11 +911,12 @@ Public Class LNM0007KoteihiDetail
                         P_KOTEIHI.Value = LNM0007row("KOTEIHI")           '固定費
                         P_BIKOU.Value = LNM0007row("BIKOU")           '備考
 
-                        JP_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        JP_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         JP_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                     Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
                         Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal)     '月額固定費
                         Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal)     '日額固定費
@@ -909,10 +924,18 @@ Public Class LNM0007KoteihiDetail
                         Dim P_KINGAKU As MySqlParameter = SQLcmd.Parameters.Add("@KINGAKU", MySqlDbType.Decimal)     '金額
                         Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
 
-                        Dim JP_TAISHOYM As MySqlParameter = SQLcmdJnl.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim JP_STYMD As MySqlParameter = SQLcmdJnl.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim JP_SYABAN As MySqlParameter = SQLcmdJnl.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
+
+                        '有効終了日(画面入力済みの場合画面入力を優先)
+                        If Not WF_EndYMD.Value = "" Then
+                            P_ENDYMD.Value = LNM0007row("ENDYMD")
+                        Else
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
+                        End If
+
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
                         P_KOTEIHIM.Value = LNM0007row("KOTEIHIM")           '月額固定費
                         P_KOTEIHID.Value = LNM0007row("KOTEIHID")           '日額固定費
@@ -920,7 +943,7 @@ Public Class LNM0007KoteihiDetail
                         P_KINGAKU.Value = LNM0007row("KINGAKU")           '金額
                         P_BIKOU.Value = LNM0007row("BIKOU")           '備考
 
-                        JP_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        JP_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         JP_SYABAN.Value = LNM0007row("SYABAN")           '車番
                 End Select
 
@@ -1059,21 +1082,21 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '')             = @TAISHOYM ")
+                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim LNM0007row As DataRow = LNM0007INPtbl.Rows(0)
 
                         P_TORICODE.Value = LNM0007row("TORICODE")           '取引先コード
                         P_ORGCODE.Value = LNM0007row("ORGCODE")           '部門コード
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                         Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1119,21 +1142,21 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
                 SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(TAISHOYM, '')             = @TAISHOYM ")
+                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
                 SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)    '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim LNM0007row As DataRow = LNM0007INPtbl.Rows(0)
 
                         P_TORICODE.Value = LNM0007row("TORICODE")           '取引先コード
                         P_ORGCODE.Value = LNM0007row("ORGCODE")           '部門コード
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")           '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                         Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1329,7 +1352,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("     ,ORGNAME  ")
                 SQLStr.AppendLine("     ,KASANORGCODE  ")
                 SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,TAISHOYM  ")
+                SQLStr.AppendLine("     ,STYMD  ")
+                SQLStr.AppendLine("     ,ENDYMD  ")
                 SQLStr.AppendLine("     ,SYABAN  ")
                 SQLStr.AppendLine("     ,SYABARA  ")
                 SQLStr.AppendLine("     ,GETSUGAKU  ")
@@ -1353,7 +1377,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("     ,ORGNAME  ")
                 SQLStr.AppendLine("     ,KASANORGCODE  ")
                 SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,TAISHOYM  ")
+                SQLStr.AppendLine("     ,STYMD  ")
+                SQLStr.AppendLine("     ,ENDYMD  ")
                 SQLStr.AppendLine("     ,SYABAN  ")
                 SQLStr.AppendLine("     ,SYABARA  ")
                 SQLStr.AppendLine("     ,GETSUGAKU  ")
@@ -1374,14 +1399,14 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
                 SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND TAISHOYM  = @TAISHOYM                  ")
+                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
                 SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
@@ -1399,7 +1424,7 @@ Public Class LNM0007KoteihiDetail
                         ' DB更新
                         P_TORICODE.Value = LNM0007row("TORICODE") '取引先コード
                         P_ORGCODE.Value = LNM0007row("ORGCODE") '部門コード
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")    '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                         '操作区分
@@ -1455,7 +1480,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("     ,ORGNAME  ")
                 SQLStr.AppendLine("     ,KASANORGCODE  ")
                 SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,TAISHOYM  ")
+                SQLStr.AppendLine("     ,STYMD  ")
+                SQLStr.AppendLine("     ,ENDYMD  ")
                 SQLStr.AppendLine("     ,SYABAN  ")
                 SQLStr.AppendLine("     ,KOTEIHIM  ")
                 SQLStr.AppendLine("     ,KOTEIHID  ")
@@ -1479,7 +1505,8 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("     ,ORGNAME  ")
                 SQLStr.AppendLine("     ,KASANORGCODE  ")
                 SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,TAISHOYM  ")
+                SQLStr.AppendLine("     ,STYMD  ")
+                SQLStr.AppendLine("     ,ENDYMD  ")
                 SQLStr.AppendLine("     ,SYABAN  ")
                 SQLStr.AppendLine("     ,KOTEIHIM  ")
                 SQLStr.AppendLine("     ,KOTEIHID  ")
@@ -1500,14 +1527,14 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.AppendLine("    WHERE")
                 SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
                 SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND TAISHOYM  = @TAISHOYM                  ")
+                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
                 SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
 
                 Try
                     Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                         Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                         Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
                         Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
@@ -1525,7 +1552,7 @@ Public Class LNM0007KoteihiDetail
                         ' DB更新
                         P_TORICODE.Value = LNM0007row("TORICODE") '取引先コード
                         P_ORGCODE.Value = LNM0007row("ORGCODE") '部門コード
-                        P_TAISHOYM.Value = LNM0007row("TAISHOYM")       '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
 
                         '操作区分
@@ -1578,8 +1605,8 @@ Public Class LNM0007KoteihiDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="WW_ROW"></param>
-    Public Sub UpdateENDYMD(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow,
-                            ByRef O_MESSAGENO As String, ByVal WW_NOW As String)
+    Public Sub UpdateENDYMD(ByVal SQLcon As MySqlConnection, ByVal WW_CONTROLTABLE As String,
+                            ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String, ByVal WW_NOW As String)
 
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -1588,7 +1615,14 @@ Public Class LNM0007KoteihiDetail
         '○ 対象データ更新
         Dim SQLStr As New StringBuilder
         SQLStr.Append(" UPDATE                                      ")
-        SQLStr.Append("     LNG.LNM0007_KOTEIHI                     ")
+        Select Case WW_CONTROLTABLE
+            Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                SQLStr.Append("     LNG.LNM0007_KOTEIHI             ")
+            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
+                SQLStr.Append("     LNG.LNM0008_SKKOTEIHI           ")
+            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
+                SQLStr.Append("     LNG.LNM0009_TNGKOTEIHI          ")
+        End Select
         SQLStr.Append(" SET                                         ")
         SQLStr.Append("     ENDYMD               = @ENDYMD          ")
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
@@ -1743,7 +1777,6 @@ Public Class LNM0007KoteihiDetail
         Master.EraseCharToIgnore(TxtKASANORGNAME.Text)  '加算先部門名称
         Master.EraseCharToIgnore(WF_StYMD.Value)  '有効開始日
         Master.EraseCharToIgnore(WF_EndYMD.Value)  '有効終了日
-        Master.EraseCharToIgnore(WF_TAISHOYM.Value)  '対象年月
         Master.EraseCharToIgnore(TxtSYABAN.Text)  '車番
         Master.EraseCharToIgnore(TxtRIKUBAN.Text)  '陸事番号
         Master.EraseCharToIgnore(TxtSYABARA.Text)  '車腹
@@ -1812,14 +1845,6 @@ Public Class LNM0007KoteihiDetail
         LNM0007INProw("KASANORGNAME") = TxtKASANORGNAME.Text            '加算先部門名称
         LNM0007INProw("STYMD") = WF_StYMD.Value              '有効開始日
         LNM0007INProw("ENDYMD") = WF_EndYMD.Value            '有効終了日
-
-        '対象年月
-        If Not WF_TAISHOYM.Value = "" Then
-            LNM0007INProw("TAISHOYM") = Replace(WF_TAISHOYM.Value, "/", "")
-        Else
-            LNM0007INProw("TAISHOYM") = WF_TAISHOYM.Value
-        End If
-
         LNM0007INProw("SYABAN") = TxtSYABAN.Text            '車番
         LNM0007INProw("RIKUBAN") = TxtRIKUBAN.Text            '陸事番号
         LNM0007INProw("SYAGATA") = ddlSelectSYAGATA.SelectedValue           '車型
@@ -1891,7 +1916,7 @@ Public Class LNM0007KoteihiDetail
                     If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                         LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso
                         LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso
-                        Replace(LNM0007row("TAISHOYM").ToString, "/", "") = Replace(LNM0007INProw("TAISHOYM").ToString, "/", "") AndAlso
+                        LNM0007row("STYMD") = LNM0007INProw("STYMD") AndAlso
                         LNM0007row("SYABAN") = LNM0007INProw("SYABAN") Then
                         ' KEY項目以外の項目の差異をチェック
                         If LNM0007row("DELFLG") = LNM0007INProw("DELFLG") AndAlso
@@ -1916,7 +1941,7 @@ Public Class LNM0007KoteihiDetail
                     If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                         LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso
                         LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso
-                        Replace(LNM0007row("TAISHOYM").ToString, "/", "") = Replace(LNM0007INProw("TAISHOYM").ToString, "/", "") AndAlso
+                        LNM0007row("STYMD") = LNM0007INProw("STYMD") AndAlso
                         LNM0007row("SYABAN") = LNM0007INProw("SYABAN") Then
                         ' KEY項目以外の項目の差異をチェック
                         If LNM0007row("DELFLG") = LNM0007INProw("DELFLG") AndAlso
@@ -2015,7 +2040,6 @@ Public Class LNM0007KoteihiDetail
         TxtKASANORGNAME.Text = ""                    '加算先部門名称
         WF_StYMD.Value = ""                  '有効開始日
         WF_EndYMD.Value = ""                 '有効終了日
-        WF_TAISHOYM.Value = ""                    '対象年月
         TxtSYABAN.Text = ""                    '車番
         TxtRIKUBAN.Text = ""                    '陸事番号
         TxtSYABARA.Text = ""                    '車腹
@@ -2116,7 +2140,6 @@ Public Class LNM0007KoteihiDetail
         LNM0007INPtbl.Columns.Add("TORICODE")
         LNM0007INPtbl.Columns.Add("ORGCODE")
         LNM0007INPtbl.Columns.Add("STYMD")
-        LNM0007INPtbl.Columns.Add("TAISHOYM")
         LNM0007INPtbl.Columns.Add("SYABAN")
         LNM0007INPtbl.Columns.Add("DELFLG")
 
@@ -2133,7 +2156,6 @@ Public Class LNM0007KoteihiDetail
         row("TORICODE") = TxtTORICODE.Text
         row("ORGCODE") = ddlSelectORG.SelectedValue
         row("STYMD") = WF_StYMD.Value
-        row("TAISHOYM") = WF_TAISHOYM.Value
         row("SYABAN") = TxtSYABAN.Text
         row("DELFLG") = C_DELETE_FLG.DELETE
         LNM0007INPtbl.Rows.Add(row)
@@ -2184,7 +2206,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007INProw("TABLEID") = LNM0007row("TABLEID") AndAlso
                             LNM0007INProw("TORICODE") = LNM0007row("TORICODE") AndAlso
                             LNM0007INProw("ORGCODE") = LNM0007row("ORGCODE") AndAlso
-                            LNM0007INProw("TAISHOYM") = LNM0007row("TAISHOYM") AndAlso
+                            LNM0007INProw("STYMD") = LNM0007row("STYMD") AndAlso
                             LNM0007INProw("SYABAN") = LNM0007row("SYABAN") Then
                             ' 画面入力テーブル項目設定              
                             LNM0007row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2197,7 +2219,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007INProw("TABLEID") = LNM0007row("TABLEID") AndAlso
                             LNM0007INProw("TORICODE") = LNM0007row("TORICODE") AndAlso
                             LNM0007INProw("ORGCODE") = LNM0007row("ORGCODE") AndAlso
-                            LNM0007INProw("TAISHOYM") = LNM0007row("TAISHOYM") AndAlso
+                            LNM0007INProw("STYMD") = LNM0007row("STYMD") AndAlso
                             LNM0007INProw("SYABAN") = LNM0007row("SYABAN") Then
                             ' 画面入力テーブル項目設定              
                             LNM0007row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2249,10 +2271,10 @@ Public Class LNM0007KoteihiDetail
                 SQLStr.Append("   AND STYMD  = @STYMD               ")
                 SQLStr.Append("   AND SYABAN  = @SYABAN             ")
             Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLStr.Append("   AND TAISHOYM  = @TAISHOYM               ")
+                SQLStr.Append("   AND STYMD  = @STYMD               ")
                 SQLStr.Append("   AND SYABAN  = @SYABAN             ")
             Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLStr.Append("   AND TAISHOYM  = @TAISHOYM               ")
+                SQLStr.Append("   AND STYMD  = @STYMD               ")
                 SQLStr.Append("   AND SYABAN  = @SYABAN             ")
         End Select
 
@@ -2285,18 +2307,14 @@ Public Class LNM0007KoteihiDetail
                         P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
                     Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)    '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        P_TAISHOYM.Value = Replace(LNM0007row("TAISHOYM").ToString, "/", "")           '対象年月
-
-
-
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
                     Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                        Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)     '対象年月
+                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        P_TAISHOYM.Value = Replace(LNM0007row("TAISHOYM").ToString, "/", "")           '対象年月
+                        P_STYMD.Value = LNM0007row("STYMD")           '有効開始日
                         P_SYABAN.Value = LNM0007row("SYABAN")           '車番
                 End Select
 
@@ -2594,7 +2612,7 @@ Public Class LNM0007KoteihiDetail
             End If
 
             Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG '固定費マスタ SK固定費マスタ TNG固定費マスタ
                     ' 有効開始日(バリデーションチェック)
                     Master.CheckField(Master.USERCAMP, "STYMD", LNM0007INProw("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
                     If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2618,19 +2636,6 @@ Public Class LNM0007KoteihiDetail
                     O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             End If
-
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG 'SK固定費マスタ 'TNG固定費マスタ
-                    ' 対象年月(バリデーションチェック)
-                    Master.CheckField(Master.USERCAMP, "TAISHOYM", LNM0007INProw("TAISHOYM"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                    If Not isNormal(WW_CS0024FCheckerr) Then
-                        WW_CheckMES1 = "・対象年月エラーです。"
-                        WW_CheckMES2 = WW_CS0024FCheckReport
-                        WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                        WW_LineErr = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-            End Select
 
             ' 車番(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "SYABAN", LNM0007INProw("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
@@ -2778,7 +2783,7 @@ Public Class LNM0007KoteihiDetail
             End If
 
             Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
+                Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG '固定費マスタ SK固定費マスタ TNG固定費マスタ
                     '画面で入力済みの場合のみ
                     If Not WF_EndYMD.Value = "" Then
                         ' 日付大小チェック
@@ -2810,11 +2815,11 @@ Public Class LNM0007KoteihiDetail
                         Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
                             work.HaitaCheckSK(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
                             work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                            work.WF_SEL_TAISHOYM.Text, work.WF_SEL_SYABAN.Text)
+                            work.WF_SEL_STYMD.Text, work.WF_SEL_SYABAN.Text)
                         Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
                             work.HaitaCheckTNG(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
                             work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                            work.WF_SEL_TAISHOYM.Text, work.WF_SEL_SYABAN.Text)
+                            work.WF_SEL_STYMD.Text, work.WF_SEL_SYABAN.Text)
                     End Select
 
                 End Using
@@ -2829,18 +2834,18 @@ Public Class LNM0007KoteihiDetail
                                            "([" & LNM0007INProw("STYMD") & "]" &
                                            " [" & LNM0007INProw("SYABAN") & "])"
                         Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                            WW_CheckMES1 = "・排他エラー（取引先コード & 部門コード & 対象年月 & 車番）"
+                            WW_CheckMES1 = "・排他エラー（取引先コード & 部門コード & 有効開始日 & 車番）"
                             WW_CheckMES2 = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR &
                                            "([" & LNM0007INProw("TORICODE") & "]" &
                                            "([" & LNM0007INProw("ORGCODE") & "]" &
-                                           "([" & LNM0007INProw("TAISHOYM") & "]" &
+                                           "([" & LNM0007INProw("STYMD") & "]" &
                                            " [" & LNM0007INProw("SYABAN") & "])"
                         Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                            WW_CheckMES1 = "・排他エラー（取引先コード & 部門コード & 対象年月 & 車番）"
+                            WW_CheckMES1 = "・排他エラー（取引先コード & 部門コード & 有効開始日 & 車番）"
                             WW_CheckMES2 = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR &
                                            "([" & LNM0007INProw("TORICODE") & "]" &
                                            "([" & LNM0007INProw("ORGCODE") & "]" &
-                                           "([" & LNM0007INProw("TAISHOYM") & "]" &
+                                           "([" & LNM0007INProw("STYMD") & "]" &
                                            " [" & LNM0007INProw("SYABAN") & "])"
                     End Select
 
@@ -2963,7 +2968,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                             LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso
                             LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso
-                            LNM0007row("TAISHOYM") = LNM0007INProw("TAISHOYM") AndAlso
+                            LNM0007row("STYMD") = LNM0007INProw("STYMD") AndAlso
                             LNM0007row("SYABAN") = LNM0007INProw("SYABAN") Then
                             ' KEY項目以外の項目の差異をチェック
                             If LNM0007row("DELFLG") = LNM0007INProw("DELFLG") AndAlso
@@ -2991,7 +2996,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                             LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso
                             LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso
-                            LNM0007row("TAISHOYM") = LNM0007INProw("TAISHOYM") AndAlso
+                            LNM0007row("STYMD") = LNM0007INProw("STYMD") AndAlso
                             LNM0007row("SYABAN") = LNM0007INProw("SYABAN") Then
                             ' KEY項目以外の項目の差異をチェック
                             If LNM0007row("DELFLG") = LNM0007INProw("DELFLG") AndAlso
@@ -3039,14 +3044,15 @@ Public Class LNM0007KoteihiDetail
                 Dim WW_ENDYMD_SAVE As String = ""
 
                 '更新前の最大有効開始日取得
-                WW_BeforeMAXSTYMD = LNM0007WRKINC.GetSTYMD(SQLcon, LNM0007INPtbl.Rows(0), WW_DBDataCheck)
+                WW_BeforeMAXSTYMD = LNM0007WRKINC.GetSTYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
+                                                           LNM0007INPtbl.Rows(0), WW_DBDataCheck)
                 If Not isNormal(WW_DBDataCheck) Then
                     Exit Sub
                 End If
 
                 Select Case work.WF_SEL_CONTROLTABLE.Text
-                    Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
+                    Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG
+#Region "固定費マスタ、SK固定費マスタ、TNG固定費マスタ"
                         WF_AUTOENDYMD.Value = ""
 
                         Select Case True
@@ -3074,7 +3080,8 @@ Public Class LNM0007KoteihiDetail
                                     Exit Sub
                                 End If
                                 '変更前の有効終了日更新
-                                UpdateENDYMD(SQLcon, LNM0007INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
+                                UpdateENDYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
+                                             LNM0007INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
                                 If Not isNormal(WW_DBDataCheck) Then
                                     Exit Sub
                                 End If
@@ -3094,14 +3101,6 @@ Public Class LNM0007KoteihiDetail
                                 Dim WW_NEXT_YM As String = DateTime.Parse(LNM0007INPtbl.Rows(0)("STYMD")).AddMonths(1).ToString("yyyy/MM")
                                 WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
                         End Select
-#End Region
-                    Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-
-#End Region
-                    Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-
 #End Region
                 End Select
 
@@ -3169,7 +3168,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                             LNM0007INProw("TORICODE") = LNM0007row("TORICODE") AndAlso
                             LNM0007INProw("ORGCODE") = LNM0007row("ORGCODE") AndAlso
-                            LNM0007INProw("TAISHOYM") = LNM0007row("TAISHOYM") AndAlso
+                            LNM0007INProw("STYMD") = LNM0007row("STYMD") AndAlso
                             LNM0007INProw("SYABAN") = LNM0007row("SYABAN") Then
                             ' 画面入力テーブル項目設定
                             LNM0007INProw("LINECNT") = LNM0007row("LINECNT")
@@ -3188,7 +3187,7 @@ Public Class LNM0007KoteihiDetail
                         If LNM0007row("TABLEID") = LNM0007INProw("TABLEID") AndAlso
                             LNM0007INProw("TORICODE") = LNM0007row("TORICODE") AndAlso
                             LNM0007INProw("ORGCODE") = LNM0007row("ORGCODE") AndAlso
-                            LNM0007INProw("TAISHOYM") = LNM0007row("TAISHOYM") AndAlso
+                            LNM0007INProw("STYMD") = LNM0007row("STYMD") AndAlso
                             LNM0007INProw("SYABAN") = LNM0007row("SYABAN") Then
                             ' 画面入力テーブル項目設定
                             LNM0007INProw("LINECNT") = LNM0007row("LINECNT")

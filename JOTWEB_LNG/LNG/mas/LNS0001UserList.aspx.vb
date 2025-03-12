@@ -97,19 +97,15 @@ Public Class LNS0001UserList
                             WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()  ' DataBase接続
-                                MAPDataGet(SQLcon)
-                                Master.SaveTable(LNS0001tbl)
-                                '〇 一覧の件数を取得
-                                Me.ListCount.Text = "件数：" + LNS0001tbl.Rows.Count.ToString()
-                            End Using
+                            GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
                     End Select
 
                     '○ 一覧再表示処理
-                    DisplayGrid()
+                    If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" Then
+                        DisplayGrid()
+                    End If
 
                 End If
             Else

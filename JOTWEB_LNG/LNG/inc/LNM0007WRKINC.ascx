@@ -18,7 +18,6 @@
     <asp:TextBox ID="WF_SEL_KASANORGNAME" runat="server"></asp:TextBox>        <!-- 加算先部門名称 -->
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>               <!-- 有効開始日 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>              <!-- 有効終了日 -->
-    <asp:TextBox ID="WF_SEL_TAISHOYM" runat="server"></asp:TextBox>            <!-- 対象年月 -->
     <asp:TextBox ID="WF_SEL_SYABAN" runat="server"></asp:TextBox>              <!-- 車番 -->
     <asp:TextBox ID="WF_SEL_RIKUBAN" runat="server"></asp:TextBox>             <!-- 陸事番号 -->
     <asp:TextBox ID="WF_SEL_SYAGATA" runat="server"></asp:TextBox>             <!-- 車型 -->

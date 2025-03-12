@@ -97,24 +97,21 @@ Public Class LNM0007KoteihiHistory
                                 '〇 一覧の件数を取得
                                 Me.ListCount.Text = "件数：" + LNM0007tbl.Rows.Count.ToString()
                             End Using
-                        Case "WF_ButtonKOTEIHI", "WF_ButtonSKKOTEIHI", "WF_ButtonTNGKOTEIHI"
-                            Select Case WF_ButtonClick.Value
-                                Case "WF_ButtonKOTEIHI"
+                        Case "WF_TARGETTABLEChange" '表示対象テーブル変更時
+                            Select Case WF_TARGETTABLE.SelectedValue
+                                Case LNM0007WRKINC.TableList.固定費, LNM0007WRKINC.LISTNAMETOHOKU
                                     work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDH
-                                Case "WF_ButtonSKKOTEIHI"
+                                Case LNM0007WRKINC.TableList.SK固定費
                                     work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDHSK
-                                Case "WF_ButtonTNGKOTEIHI"
+                                Case LNM0007WRKINC.TableList.TNG固定費
                                     work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDHTNG
                             End Select
                             DowpDownInitialize()
                             GridViewInitialize()
-                            SetTabColor()
                     End Select
 
                     '○ 一覧再表示処理
-                    If Not WF_ButtonClick.Value = "WF_ButtonKOTEIHI" And
-                        Not WF_ButtonClick.Value = "WF_ButtonSKKOTEIHI" And
-                        Not WF_ButtonClick.Value = "WF_ButtonTNGKOTEIHI" Then
+                    If Not WF_ButtonClick.Value = "WF_TARGETTABLEChange" Then
                         DisplayGrid()
                     End If
 
@@ -187,33 +184,13 @@ Public Class LNM0007KoteihiHistory
     Protected Sub WW_MAPValueSet()
 
         DowpDownInitialize()
+        DowpDownTARGETTABLEInitialize()
 
         work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDH
-        'タブ色設定
-        SetTabColor()
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
-    End Sub
-
-    ''' <summary>
-    ''' タブ色設定処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub SetTabColor()
-        WF_ButtonKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_INACTIVE)
-        WF_ButtonSKKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_INACTIVE)
-        WF_ButtonTNGKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_INACTIVE)
-
-        Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-            Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                WF_ButtonKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_ACTIVE)
-            Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                WF_ButtonSKKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_ACTIVE)
-            Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                WF_ButtonTNGKOTEIHI.BackColor = ColorTranslator.FromHtml(CONST_COLOR_TAB_ACTIVE)
-        End Select
     End Sub
 
     ''' <summary>
@@ -233,6 +210,17 @@ Public Class LNM0007KoteihiHistory
         End Using
     End Sub
 
+    ''' <summary>
+    ''' 表示対象ドロップダウンリスト初期設定処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DowpDownTARGETTABLEInitialize()
+        '表示テーブル
+        Me.WF_TARGETTABLE.Items.Clear()
+        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.固定費), LNM0007WRKINC.TableList.固定費))
+        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.SK固定費), LNM0007WRKINC.TableList.SK固定費))
+        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.TNG固定費), LNM0007WRKINC.TableList.TNG固定費))
+    End Sub
 
     ''' <summary>
     ''' GridViewデータ設定
@@ -324,8 +312,6 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGNAME), '')                                AS KASANORGNAME              ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
-        'SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(TAISHOYM, '%Y/%m'), '')                     AS TAISHOYM               ")
-        SQLStr.AppendLine("   , COALESCE(CONCAT(LEFT(TAISHOYM ,4),'/',RIGHT(TAISHOYM,2)) , '')    AS TAISHOYM               ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYABAN), '')                                      AS SYABAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(RIKUBAN), '')                                     AS RIKUBAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATA), '')                                     AS SYAGATA              ")
@@ -381,7 +367,6 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("    ,TORICODE                                                           ")
         SQLStr.AppendLine("    ,ORGCODE                                                            ")
         SQLStr.AppendLine("    ,STYMD                                                              ")
-        SQLStr.AppendLine("    ,TAISHOYM                                                           ")
         SQLStr.AppendLine("    ,SYABAN                                                             ")
         SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
@@ -1031,7 +1016,8 @@ Public Class LNM0007KoteihiHistory
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGNAME).Value = "部門名称"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGCODE).Value = "加算先部門コード"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TAISHOYM).Value = "対象年月"
+                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
+                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABAN).Value = "車番"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABARA).Value = "車腹"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GETSUGAKU).Value = "月額運賃"
@@ -1050,7 +1036,8 @@ Public Class LNM0007KoteihiHistory
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGNAME).Value = "部門名称"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGCODE).Value = "加算先部門コード"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TAISHOYM).Value = "対象年月"
+                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
+                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.SYABAN).Value = "車番"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHIM).Value = "月額固定費"
                 sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHID).Value = "日額固定費"
@@ -1105,7 +1092,8 @@ Public Class LNM0007KoteihiHistory
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGNAME).Value = Row("ORGNAME") '部門名称
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TAISHOYM).Value = Row("TAISHOYM") '対象年月
+                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.STYMD).Value = Row("STYMD") '有効開始日
+                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ENDYMD).Value = Row("ENDYMD") '有効終了日
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABAN).Value = Row("SYABAN") '車番
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABARA).Value = Row("SYABARA") '車腹
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GETSUGAKU).Value = Row("GETSUGAKU") '月額運賃
@@ -1124,7 +1112,8 @@ Public Class LNM0007KoteihiHistory
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGNAME).Value = Row("ORGNAME") '部門名称
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TAISHOYM).Value = Row("TAISHOYM") '対象年月
+                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.STYMD).Value = Row("STYMD") '有効開始日
+                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ENDYMD).Value = Row("ENDYMD") '有効終了日
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.SYABAN).Value = Row("SYABAN") '車番
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHIM).Value = Row("KOTEIHIM") '月額固定費
                     sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHID).Value = Row("KOTEIHID") '日額固定費
