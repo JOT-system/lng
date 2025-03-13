@@ -292,8 +292,10 @@ Public Class LNT0001InvoiceOutputReport
             '★八戸営業所の場合([東部瓦斯]独自対応)
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
                 '届日メインで設定
-                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER<>'3'", "C", "D", WW_SheetNoTobuGas)
-                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER='3'", "E", "F", WW_SheetNoTobuGas)
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER IN ('1','2')", "C", "D", WW_SheetNoTobuGas)
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER >= '3'", "E", "F", WW_SheetNoTobuGas)
+                'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER<>'3'", "C", "D", WW_SheetNoTobuGas)
+                'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER='3'", "E", "F", WW_SheetNoTobuGas)
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
                 '★水島営業所の場合([三井Ｅ＆Ｓ]独自対応)
@@ -302,6 +304,11 @@ Public Class LNT0001InvoiceOutputReport
                 EditDetailAreaMitsuiES(BaseDllConst.CONST_TODOKECODE_004002, " AND ZYUTYU_STR NOT IN ('8.000','10.000')", "E", "F", False)
 
                 '★水島営業所の場合([コカ・コーラボトラーズジャパン株式会社]独自対応)
+                '-- [t数]設定
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='13.200'", "G", "H", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='13.500'", "E", "F", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='14.000'", "I", "J", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='12.300'", "C", "D", WW_SheetNoCocacola)
                 '-- [不積対応分]設定
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND ZISSEKI_FUZUMIFLG='TRUE'", "K", "L", WW_SheetNoCocacola)
 
