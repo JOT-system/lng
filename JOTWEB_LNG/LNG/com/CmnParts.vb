@@ -751,6 +751,165 @@ Public Class CmnParts
     End Sub
 
     ''' <summary>
+    ''' SK特別料金マスタTBL検索
+    ''' </summary>
+    Public Sub SelectSKSpecialFEEMaster(ByVal SQLcon As MySqlConnection,
+                                        ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSKSPECIALFEEMas As DataTable,
+                                        Optional ByVal I_KASANORGCODE As String = Nothing,
+                                        Optional ByVal I_CLASS As String = Nothing)
+        If IsNothing(O_dtSKSPECIALFEEMas) Then
+            O_dtSKSPECIALFEEMas = New DataTable
+        End If
+        If O_dtSKSPECIALFEEMas.Columns.Count <> 0 Then
+            O_dtSKSPECIALFEEMas.Columns.Clear()
+        End If
+        O_dtSKSPECIALFEEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "      LNM0014.BIGCATEGORYCODE "
+        SQLStr &= "    , LNM0014.BIGCATEGORYNAME "
+        SQLStr &= "    , LNM0014.CATEGORYCODE "
+        SQLStr &= "    , LNM0014.CATEGORYNAME "
+        SQLStr &= "    , LNM0014.DETAILCODE "
+        SQLStr &= "    , LNM0014.DETAILNAME "
+        SQLStr &= "    , LNM0014.SORT "
+        SQLStr &= "    , LNM0014.TORICODE "
+        SQLStr &= "    , LNM0014.TORINAME "
+        SQLStr &= "    , LNM0014.ORGCODE "
+        SQLStr &= "    , LNM0014.ORGNAME "
+        SQLStr &= "    , LNM0014.KASANORGCODE "
+        SQLStr &= "    , LNM0014.KASANORGNAME "
+        SQLStr &= "    , LNM0014.TODOKECODE "
+        SQLStr &= "    , LNM0014.TODOKENAME "
+        SQLStr &= "    , LNM0014.STYMD "
+        SQLStr &= "    , LNM0014.ENDYMD "
+        SQLStr &= "    , LNM0014.TANKA "
+        SQLStr &= "    , LNM0014.KUBUN "
+        SQLStr &= "    , LNM0014.KUBUNNAME "
+        SQLStr &= "    , LNM0014.QUANTITY "
+        SQLStr &= "    , LNM0014.BIKOU1 "
+        SQLStr &= "    , LNM0014.BIKOU2 "
+        SQLStr &= "    , LNM0014.BIKOU3 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= "   ,LNM0005.VALUE01 AS KOTEIHI_DISPLAYFLG "
+            SQLStr &= "   ,LNM0005.VALUE02 AS KOTEIHI_CELLNUM "
+        End If
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0014_SKSPRATE LNM0014 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
+            SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0014.BIGCATEGORYCODE "
+            SQLStr &= " AND LNM0005.KEYCODE04 = LNM0014.CATEGORYCODE "
+            SQLStr &= " AND LNM0005.KEYCODE07 = LNM0014.SORT "
+        End If
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0014.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0014.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0014.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0014.STYMD <= '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0014.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_KASANORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0014.KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSKSPECIALFEEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSKSPECIALFEEMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' SK燃料サーチャージマスタTBL検索
+    ''' </summary>
+    Public Sub SelectSKFuelSurchargeMaster(ByVal SQLcon As MySqlConnection,
+                                           ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSKFUELSURCHARGEMas As DataTable,
+                                           Optional ByVal I_KASANORGCODE As String = Nothing)
+        If IsNothing(O_dtSKFUELSURCHARGEMas) Then
+            O_dtSKFUELSURCHARGEMas = New DataTable
+        End If
+        If O_dtSKFUELSURCHARGEMas.Columns.Count <> 0 Then
+            O_dtSKFUELSURCHARGEMas.Columns.Clear()
+        End If
+        O_dtSKFUELSURCHARGEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "      LNM0015.TORICODE "
+        SQLStr &= "    , LNM0015.TORINAME "
+        SQLStr &= "    , LNM0015.ORGCODE "
+        SQLStr &= "    , LNM0015.ORGNAME "
+        SQLStr &= "    , LNM0015.KASANORGCODE "
+        SQLStr &= "    , LNM0015.KASANORGNAME "
+        SQLStr &= "    , LNM0015.TODOKECODE "
+        SQLStr &= "    , LNM0015.TODOKENAME "
+        SQLStr &= "    , LNM0015.TAISHOYM "
+        SQLStr &= "    , LNM0015.KYORI "
+        SQLStr &= "    , LNM0015.KEIYU "
+        SQLStr &= "    , LNM0015.KIZYUN "
+        SQLStr &= "    , LNM0015.TANKASA "
+        SQLStr &= "    , LNM0015.KAISU "
+        SQLStr &= "    , LNM0015.USAGECHARGE "
+        SQLStr &= "    , LNM0015.SURCHARGE "
+        SQLStr &= "    , LNM0015.BIKOU1 "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0015_SKSURCHARGE LNM0015 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0015.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0015.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0015.ORGCODE = '{0}' ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0015.TAISHOYM <= '{0}' ", I_TAISHOYM)
+        'SQLStr &= String.Format(" AND LNM0015.STYMD <= '{0}' ", I_TAISHOYM)
+        'SQLStr &= String.Format(" AND LNM0015.ENDYMD >= '{0}' ", I_TAISHOYM)
+        If Not IsNothing(I_KASANORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0015.KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
+        '-- ORDER BY
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSKFUELSURCHARGEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSKFUELSURCHARGEMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' カレンダーマスタTBL検索
     ''' </summary>
     Public Sub SelectCALENDARMaster(ByVal SQLcon As MySqlConnection,

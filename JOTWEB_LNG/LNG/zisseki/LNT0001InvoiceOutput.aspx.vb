@@ -24,6 +24,8 @@ Public Class LNT0001InvoiceOutput
     Private LNT0001HachinoheSprate As DataTable                      '-- 八戸特別料金マスタ
     Private LNT0001EneosComfee As DataTable                          '-- ENEOS業務委託料マスタ
     Private LNT0001SKKoteichi As DataTable                           '-- 石油資源開発(固定値(業務車番))マスタ
+    Private LNT0001SKSprate As DataTable                             '-- SK特別料金マスタ
+    Private LNT0001SKSurcharge As DataTable                          '-- SK燃料サーチャージマスタ
     Private LNT0001Calendar As DataTable                             '-- カレンダーマスタ
     Private LNS0006tbl As DataTable                                  '固定値マスタ格納用テーブル
     ''' <summary>
@@ -880,7 +882,7 @@ Public Class LNT0001InvoiceOutput
             WW_ReportCheckSekiyuSigenHokaido(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcIshikari)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGENHokaido(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
-                                                                                         LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcIshikari,
+                                                                                         LNT0001tbl, LNT0001Tanktbl, LNT0001SKSprate, LNT0001SKSurcharge, LNT0001Calendar, dcIshikari,
                                                                                          taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
@@ -1098,7 +1100,7 @@ Public Class LNT0001InvoiceOutput
         Dim dtSekiyuSigenHKDTodoke As New DataTable
         Dim sekiyuSigenTankHKDClass As String = ""
         Dim sekiyuSigenTodokeHKDClass As String = ""
-        'Dim sekiyuSigenSGKoteihiClass As String = ""
+        Dim sekiyuSigenKoteihiHKDClass As String = ""
         Dim arrToriCode As String() = {"", "", ""}
         Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
 
@@ -1107,9 +1109,9 @@ Public Class LNT0001InvoiceOutput
             Case BaseDllConst.CONST_ORDERORGCODE_020104
                 sekiyuSigenTankHKDClass = "SEKIYUSIGEN_HKD_TANK"
                 sekiyuSigenTodokeHKDClass = "SEKIYUSIG_HKD_TODOKE"
-                'sekiyuSigenSGKoteihiClass = "SEKIYUSIGEN_KOTEIHI"
+                sekiyuSigenKoteihiHKDClass = "SEKIYU_HKD_KOTEIHI"
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
-                arrToriCode(1) = Nothing
+                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020104
                 arrToriCode(2) = Nothing
         End Select
 
@@ -1117,6 +1119,9 @@ Public Class LNT0001InvoiceOutput
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankHKDClass, dtSekiyuSigenHKDTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeHKDClass, dtSekiyuSigenHKDTodoke)
+            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
+            CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001SKSurcharge)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
         End Using
 
@@ -1413,11 +1418,17 @@ Public Class LNT0001InvoiceOutput
             LNT0001tblrow("SETLINE") = iLine
             LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE05")
             LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE04")
+            LNT0001tblrow("ROLLY_CONTAINER") = dtSekiyuSigenTankrow("KEYCODE03")
 
             '★表示セルフラグ(1:表示)
             If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
                 LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
-                LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
+                If dtSekiyuSigenTankrow("KEYCODE05") = BaseDllConst.CONST_TODOKECODE_006915 _
+                    OrElse dtSekiyuSigenTankrow("KEYCODE05") = BaseDllConst.CONST_TODOKECODE_005834 Then
+                    LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE09").ToString()
+                Else
+                    LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
+                End If
                 'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
             Else
                 LNT0001tblrow("DISPLAYCELL_START") = ""
@@ -2094,6 +2105,7 @@ Public Class LNT0001InvoiceOutput
         LNT0001tbl.Columns.Add("ZISSEKI_FUZUMI", Type.GetType("System.Decimal"))        '// EXCELシート①(車腹 - 不積(しきい値))設定用
         LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
         LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
+        LNT0001tbl.Columns.Add("ROLLY_CONTAINER", Type.GetType("System.String"))        '// EXCELシート(ローリー・コンテナ)設定用
     End Sub
 
 End Class
