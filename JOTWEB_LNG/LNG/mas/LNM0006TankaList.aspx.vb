@@ -377,10 +377,15 @@ Public Class LNM0006TankaList
         If Not work.WF_SEL_DELFLG_S.Text = "1" Then
             SQLStr.AppendLine(" AND  LNM0006.DELFLG = '0'                                                                       ")
         End If
-        '取引先コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.TORICODE = @TORICODE                                                               ")
+        ''取引先コード
+        'If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
+        '    SQLStr.AppendLine(" AND  LNM0006.TORICODE = @TORICODE                                                               ")
+        'End If
+        '取引先名称
+        If Not String.IsNullOrEmpty(work.WF_SEL_TORINAME_S.Text) Then
+            SQLStr.AppendLine(" AND  LNM0006.TORINAME LIKE '%" & work.WF_SEL_TORINAME_S.Text & "%'                                                               ")
         End If
+
         '部門コード
         If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE_S.Text) Then
             SQLStr.AppendLine(" AND  LNM0006.ORGCODE = @ORGCODE                                                                       ")
@@ -408,11 +413,12 @@ Public Class LNM0006TankaList
                 Dim P_ROLE As MySqlParameter = SQLcmd.Parameters.Add("@ROLE", MySqlDbType.VarChar, 20)
                 P_ROLE.Value = Master.ROLE_ORG
 
-                '取引先コード
-                If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
-                    Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
-                    P_TORICODE.Value = work.WF_SEL_TORICODE_S.Text
-                End If
+                ''取引先コード
+                'If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
+                '    Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
+                '    P_TORICODE.Value = work.WF_SEL_TORICODE_S.Text
+                'End If
+
                 '部門コード
                 If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE_S.Text) Then
                     Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)

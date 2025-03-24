@@ -1128,7 +1128,7 @@ Public Class LNM0010SprateDetail
                         If Not WF_EndYMD.Value = "" Then
                             P_ENDYMD.Value = LNM0010row("ENDYMD")
                         Else
-                            P_ENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
                         End If
                         P_KINGAKU.Value = LNM0010row("KINGAKU")           '金額
 
@@ -1196,7 +1196,7 @@ Public Class LNM0010SprateDetail
                         If Not WF_EndYMD.Value = "" Then
                             P_ENDYMD.Value = LNM0010row("ENDYMD")
                         Else
-                            P_ENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
                         End If
                         P_KINGAKU.Value = LNM0010row("KINGAKU")           '金額
 
@@ -1262,7 +1262,7 @@ Public Class LNM0010SprateDetail
                         If Not WF_EndYMD.Value = "" Then
                             P_ENDYMD.Value = LNM0010row("ENDYMD")
                         Else
-                            P_ENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
                         End If
 
                         P_SYABAN.Value = LNM0010row("SYABAN")           '車番
@@ -1342,7 +1342,7 @@ Public Class LNM0010SprateDetail
                         If Not WF_EndYMD.Value = "" Then
                             P_ENDYMD.Value = LNM0010row("ENDYMD")
                         Else
-                            P_ENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
                         End If
                         P_SYABARA.Value = LNM0010row("SYABARA")           '車腹
                         P_KOTEIHI.Value = LNM0010row("KOTEIHI")           '固定費
@@ -2462,8 +2462,9 @@ Public Class LNM0010SprateDetail
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="WW_ROW"></param>
-    Public Sub UpdateENDYMD(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow,
+    Public Sub UpdateENDYMD(ByVal SQLcon As MySqlConnection, ByVal WW_CONTROLTABLE As String, ByVal WW_ROW As DataRow,
                             ByRef O_MESSAGENO As String, ByVal WW_NOW As String)
+
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -2471,17 +2472,15 @@ Public Class LNM0010SprateDetail
         '○ 対象データ更新
         Dim SQLStr As New StringBuilder
         SQLStr.Append(" UPDATE                                      ")
-        Select Case work.WF_SEL_CONTROLTABLE.Text
+        Select Case WW_CONTROLTABLE
             Case LNM0010WRKINC.MAPIDLHA '八戸特別料金マスタ
-                SQLStr.Append("     LNG.LNM0010_HACHINOHESPRATE                     ")
+                SQLStr.Append("     LNG.LNM0010_HACHINOHESPRATE             ")
             Case LNM0010WRKINC.MAPIDLEN 'ENEOS業務委託料マスタ
-                SQLStr.Append("     LNG.LNM0011_ENEOSCOMFEE                     ")
+                SQLStr.Append("     LNG.LNM0011_ENEOSCOMFEE           ")
             Case LNM0010WRKINC.MAPIDLTO '東北電力車両別追加料金マスタ
-                SQLStr.Append("     LNG.LNM0012_TOHOKUSPRATE                     ")
-            'Case LNM0010WRKINC.MAPIDLKG '北海道ガス特別料金マスタ
+                SQLStr.Append("     LNG.LNM0012_TOHOKUSPRATE          ")
             Case LNM0010WRKINC.MAPIDLSKSP 'SK特別料金マスタ
-                SQLStr.Append("     LNG.LNM0014_SKSPRATE                     ")
-                'Case LNM0010WRKINC.MAPIDLSKSU 'SK燃料サーチャージマスタ
+                SQLStr.Append("     LNG.LNM0014_SKSPRATE          ")
         End Select
         SQLStr.Append(" SET                                         ")
         SQLStr.Append("     ENDYMD               = @ENDYMD          ")
@@ -2490,83 +2489,88 @@ Public Class LNM0010SprateDetail
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
-        Select Case work.WF_SEL_CONTROLTABLE.Text
+        Select Case WW_CONTROLTABLE
             Case LNM0010WRKINC.MAPIDLHA '八戸特別料金マスタ
-                SQLStr.AppendLine("         COALESCE(RECOID, '')             = @RECOID ")
-                SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
+                SQLStr.Append("       RECOID  = @RECOID             ")
+                SQLStr.Append("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
+                SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
             Case LNM0010WRKINC.MAPIDLEN 'ENEOS業務委託料マスタ
-                SQLStr.AppendLine("         COALESCE(RECOID, '')             = @RECOID ")
-                SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
+                SQLStr.Append("       RECOID  = @RECOID             ")
+                SQLStr.Append("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
+                SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
             Case LNM0010WRKINC.MAPIDLTO '東北電力車両別追加料金マスタ
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-             'Case LNM0010WRKINC.MAPIDLKG '北海道ガス特別料金マスタ
+                SQLStr.Append("       TORICODE  = @TORICODE                 ")
+                SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
+                SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+                SQLStr.Append("   AND SYABAN  = @SYABAN             ")
             Case LNM0010WRKINC.MAPIDLSKSP 'SK特別料金マスタ
-                SQLStr.AppendLine("         COALESCE(RECOID, '')             = @RECOID ")
-                SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y%m%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y%m%d'), '') ")
-                'Case LNM0010WRKINC.MAPIDLSKSU 'SK燃料サーチャージマスタ
+                SQLStr.Append("       RECOID  = @RECOID             ")
+                SQLStr.Append("   AND TORICODE  = @TORICODE                 ")
+                SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
+                SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
         End Select
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Select Case work.WF_SEL_CONTROLTABLE.Text
+
+                Select Case WW_CONTROLTABLE
                     Case LNM0010WRKINC.MAPIDLHA '八戸特別料金マスタ
                         Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                         Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
 
                         P_RECOID.Value = WW_ROW("RECOID")           'レコードID
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                        P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                        P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
                     Case LNM0010WRKINC.MAPIDLEN 'ENEOS業務委託料マスタ
                         Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                         Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
 
                         P_RECOID.Value = WW_ROW("RECOID")           'レコードID
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                        P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                        P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
                     Case LNM0010WRKINC.MAPIDLTO '東北電力車両別追加料金マスタ
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                         Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                         Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
 
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                        P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                        P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
                         P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                    'Case LNM0010WRKINC.MAPIDLKG '北海道ガス特別料金マスタ
-
                     Case LNM0010WRKINC.MAPIDLSKSP 'SK特別料金マスタ
                         Dim P_RECOID As MySqlParameter = SQLcmd.Parameters.Add("@RECOID", MySqlDbType.VarChar, 10)     'レコードID
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                         Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
 
                         P_RECOID.Value = WW_ROW("RECOID")           'レコードID
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        'Case LNM0010WRKINC.MAPIDLSKSU 'SK燃料サーチャージマスタ
+                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                        P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                        P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
                 End Select
 
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+
 
                 P_UPDYMD.Value = WW_NOW                '更新年月日
                 P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
@@ -2580,7 +2584,7 @@ Public Class LNM0010SprateDetail
             End Using
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0010_SPRATE UPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -4382,6 +4386,72 @@ Public Class LNM0010SprateDetail
                 Dim WW_MODIFYKBN As String = ""
                 Dim WW_DATE As Date = Date.Now
                 Dim WW_DBDataCheck As String = ""
+                Dim WW_BeforeMAXSTYMD As String = ""
+                Dim WW_STYMD_SAVE As String = ""
+                Dim WW_ENDYMD_SAVE As String = ""
+
+#Region "八戸特別料金マスタ、ENEOS業務委託料マスタ、東北電力車両別追加料金マスタ、SK特別料金マスタ"
+                Select Case work.WF_SEL_CONTROLTABLE.Text
+                    Case LNM0010WRKINC.MAPIDLHA, LNM0010WRKINC.MAPIDLEN, LNM0010WRKINC.MAPIDLTO,
+                         LNM0010WRKINC.MAPIDLSKSP
+
+                        '更新前の最大有効開始日取得
+                        WW_BeforeMAXSTYMD = LNM0010WRKINC.GetSTYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
+                                                                   LNM0010INPtbl.Rows(0), WW_DBDataCheck)
+                        If Not isNormal(WW_DBDataCheck) Then
+                            Exit Sub
+                        End If
+
+                        WF_AUTOENDYMD.Value = ""
+
+                        Select Case True
+                        'DBに登録されている有効開始日が無かった場合
+                            Case WW_BeforeMAXSTYMD = ""
+                                WF_AUTOENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            '同一の場合
+                            Case WW_BeforeMAXSTYMD = CDate(LNM0010INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
+                                WF_AUTOENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            Case WW_BeforeMAXSTYMD < CDate(LNM0010INPtbl.Rows(0)("STYMD")).ToString("yyyy/MM/dd")
+                                'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
+
+                                '変更後の有効開始日退避
+                                WW_STYMD_SAVE = LNM0010INPtbl.Rows(0)("STYMD")
+                                '変更後の有効終了日退避
+                                WW_ENDYMD_SAVE = LNM0010INPtbl.Rows(0)("ENDYMD")
+
+                                '変更後テーブルに変更前の有効開始日格納
+                                LNM0010INPtbl.Rows(0)("STYMD") = WW_BeforeMAXSTYMD
+                                '変更後テーブルに更新用の有効終了日格納
+                                LNM0010INPtbl.Rows(0)("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
+                                '履歴テーブルに変更前データを登録
+                                InsertHist(SQLcon, LNM0010WRKINC.MODIFYKBN.BEFDATA, WW_DATE)
+                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                    Exit Sub
+                                End If
+                                '変更前の有効終了日更新
+                                UpdateENDYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
+                                             LNM0010INPtbl.Rows(0), WW_DBDataCheck, WW_DATE)
+                                If Not isNormal(WW_DBDataCheck) Then
+                                    Exit Sub
+                                End If
+                                '履歴テーブルに変更後データを登録
+                                InsertHist(SQLcon, LNM0010WRKINC.MODIFYKBN.AFTDATA, WW_DATE)
+                                If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
+                                    Exit Sub
+                                End If
+                                '退避した有効開始日を元に戻す
+                                LNM0010INPtbl.Rows(0)("STYMD") = WW_STYMD_SAVE
+                                '退避した有効終了日を元に戻す
+                                LNM0010INPtbl.Rows(0)("ENDYMD") = WW_ENDYMD_SAVE
+                                '有効終了日に最大値を入れる
+                                WF_AUTOENDYMD.Value = LNM0010WRKINC.MAX_ENDYMD
+                            Case Else
+                                '有効終了日に有効開始日の月の末日を入れる
+                                Dim WW_NEXT_YM As String = DateTime.Parse(LNM0010INPtbl.Rows(0)("STYMD")).AddMonths(1).ToString("yyyy/MM")
+                                WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
+                        End Select
+                End Select
+#End Region
 
                 '変更チェック
                 MASTEREXISTS(SQLcon, WW_MODIFYKBN)

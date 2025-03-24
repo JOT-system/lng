@@ -14,15 +14,12 @@ window.onload = function () {
     //非表示項目
     switch (VisibleKeyControlTable) {
         case "LNM0007L": //固定費マスタ
-            document.getElementById('KOTEIHI_LINE_TAISHOYM').style.display = "none";　//対象年月
             document.getElementById('KOTEIHI_LINE_GETSUGAKU_GENGAKU').style.display = "none";　//月額運賃、減額対象額
             document.getElementById('KOTEIHI_LINE_KOTEIHIM_KOTEIHID').style.display = "none";　//月額固定費、日額固定費
             document.getElementById('KOTEIHI_LINE_KAISU_KINGAKU').style.display = "none";　//使用回数、金額
             document.getElementById('KOTEIHI_LINE_BIKOU').style.display = "none";　//備考
             break;
         case "LNM0007LSK": //SK固定費マスタ
-            document.getElementById('KOTEIHI_LINE_STYMD_ENDYMD').style.display = "none";　//有効開始日、有効終了日
-            document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';   //有効終了日注釈
             document.getElementById('KOTEIHI_LINE_RIKUBAN_SYAGATA').style.display = "none";　//陸事番号、車型
             document.getElementById('KOTEIHI_LINE_KOTEIHIM_KOTEIHID').style.display = "none";　//月額固定費、日額固定費
             document.getElementById('KOTEIHI_LINE_KAISU_KINGAKU').style.display = "none";　//使用回数、金額
@@ -30,8 +27,6 @@ window.onload = function () {
             document.getElementById('KOTEIHI_LINE_BIKOU3').style.display = "none";　//備考3
             break;
         case "LNM0007LTNG": //TNG固定費マスタ
-            document.getElementById('KOTEIHI_LINE_STYMD_ENDYMD').style.display = "none";　//有効開始日、有効終了日
-            document.getElementById('KOTEIHI_LINE_ENDYMD_ANNOTATION').style.cssText = 'display:none !important';   //有効終了日注釈
             document.getElementById('KOTEIHI_LINE_RIKUBAN_SYAGATA').style.display = "none";　//陸事番号、車型
             document.getElementById('KOTEIHI_LINE_SYABARA').style.display = "none";　//車腹
             document.getElementById('KOTEIHI_LINE_GETSUGAKU_GENGAKU').style.display = "none";　//月額運賃、減額対象額
@@ -118,14 +113,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     locale: 'ja',
                     clickOpens: false,
                     allowInput: true,
-                    plugins: [
-                        new monthSelectPlugin({
-                            shorthand: true, //defaults to false
-                            dateFormat: "Y/m",
-                            altFormat: "F Y", //defaults to "F Y"
-                            theme: "light" // defaults to "light"
-                        })
-                    ]
+                    monthSelectorType: 'static',
+                    //defaultDate: new Date() // 必要に応じてカスタマイズ
                 });
             });
             break;
@@ -138,14 +127,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     locale: 'ja',
                     clickOpens: false,
                     allowInput: true,
-                    plugins: [
-                        new monthSelectPlugin({
-                            shorthand: true, //defaults to false
-                            dateFormat: "Y/m",
-                            altFormat: "F Y", //defaults to "F Y"
-                            theme: "light" // defaults to "light"
-                        })
-                    ]
+                    monthSelectorType: 'static',
+                    //defaultDate: new Date() // 必要に応じてカスタマイズ
                 });
             });
             break;

@@ -162,6 +162,21 @@ Public Class CmnSearchSQL
     End Function
 
     ''' <summary>
+    ''' 単価取引先名称検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetTankaToriNameTitle() As IEnumerable(Of DispFieldItem)
+
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("TORINAME", "取引先名称", "150")
+            }
+
+        Return colTitle
+
+    End Function
+
+    ''' <summary>
     ''' 単価取引先部門先部門検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
@@ -214,6 +229,27 @@ Public Class CmnSearchSQL
                 New DispFieldItem("TODOKENAME", "届先名称", "300")
             }
         Return colTitle
+    End Function
+
+    ''' <summary>
+    ''' 単価取引先名称取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetTankaToriNameSQL() As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 取引先取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("     TORINAME AS KEYCODE")
+        SQLBldr.AppendLine("    ,RTRIM(TORINAME) AS TORINAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.LNM0006_TANKA")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+
+        Return SQLBldr.ToString
+
     End Function
 
     ''' <summary>

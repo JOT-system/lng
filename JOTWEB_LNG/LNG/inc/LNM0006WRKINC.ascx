@@ -9,7 +9,7 @@
     <!-- 検索用 -->
     <asp:TextBox ID="WF_SEL_DELFLG_S" runat="server"></asp:TextBox>                <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_STYMD_S" runat="server"></asp:TextBox>                 <!-- 有効開始日 -->
-    <asp:TextBox ID="WF_SEL_TORICODE_S" runat="server"></asp:TextBox>              <!-- 取引先コード -->
+    <asp:TextBox ID="WF_SEL_TORINAME_S" runat="server"></asp:TextBox>              <!-- 取引先コード -->
     <asp:TextBox ID="WF_SEL_ORGCODE_S" runat="server"></asp:TextBox>               <!-- 部門コード -->
 
     <!-- 登録・更新用 -->

@@ -74,15 +74,15 @@
                                 </div>
                             </div>
 
-                            <!-- 取引先コード -->
+                            <!-- 取引先名称 -->
                             <div class="inputItem">
-                                <a id="WF_TORI_LABEL" >取引先コード</a>
-                                <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORICode', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORICode');">
-                                    <asp:TextBox ID="TxtTORICode" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
+                                <a id="WF_TORI_LABEL" >取引先名称</a>
+                                <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORIName', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORIName');">
+                                    <asp:TextBox ID="TxtTORIName" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
                                 </a>
-                                <a id="WF_TORI_TEXT">
+<%--                                <a id="WF_TORI_TEXT">
                                     <asp:Label ID="LblTORIName" runat="server" CssClass="WF_TEXT"></asp:Label>
-                                </a>
+                                </a>--%>
                             </div>
 
                             <!-- 部門コード -->
@@ -123,7 +123,7 @@
 
     <!-- multiSelect レイアウト -->
     <!-- 取引先部門コード単一選択 -->
-    <MSINC:multiselect runat="server" id="mspToriOrgCodeSingle" />
+    <MSINC:multiselect runat="server" id="mspToriNameSingle" />
 
     <!-- イベント用 -->
     <div hidden="hidden">

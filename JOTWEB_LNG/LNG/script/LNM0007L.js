@@ -27,12 +27,12 @@ window.onload = function () {
     if (VisibleKeyOrgCode == "") {
         //変更履歴を非表示にする
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
-            //東北支店以外の場合
-        if (VisibleKeyTohokuOrgCode == "") {
-            //SK固定費タブ、TNG固定費タブを非表示にする
-            document.getElementById('WF_ButtonTNGKOTEIHI').style.display = "none";
-            document.getElementById('WF_ButtonSKKOTEIHI').style.display = "none";
-        }
+        //    //東北支店以外の場合
+        //if (VisibleKeyTohokuOrgCode == "") {
+        //    //SK固定費タブ、TNG固定費タブを非表示にする
+        //    document.getElementById('WF_ButtonTNGKOTEIHI').style.display = "none";
+        //    document.getElementById('WF_ButtonSKKOTEIHI').style.display = "none";
+        //}
     }
 }
 

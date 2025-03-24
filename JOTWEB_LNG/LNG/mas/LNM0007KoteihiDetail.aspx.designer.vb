@@ -302,24 +302,6 @@ Partial Public Class LNM0007KoteihiDetail
     Protected WithEvents WF_ENDYMD_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TAISHOYM_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TAISHOYM_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_TAISHOYM コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TAISHOYM As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
     '''WF_SYABAN_L コントロール。
     '''</summary>
     '''<remarks>

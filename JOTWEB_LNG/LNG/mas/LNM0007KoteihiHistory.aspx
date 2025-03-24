@@ -55,9 +55,10 @@
                         </div> <!-- End class=actionButtonBox -->
                     </div> <!-- End class="Operation" -->
                     <div class="tabBox">
-                        <asp:button ID="WF_ButtonKOTEIHI" CssClass="btn-tab" text="固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonKOTEIHI');" />
-                        <asp:button ID="WF_ButtonTNGKOTEIHI" CssClass="btn-tab" text="TNG固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonTNGKOTEIHI');" />
-                        <asp:button ID="WF_ButtonSKKOTEIHI" CssClass="btn-tab" text="SK固定費" runat="server" OnClientClick="ButtonClick('WF_ButtonSKKOTEIHI');" />
+                            <div class="d-flex align-items-center gap-2">
+                                <strong class="flex-shrink-0">対象</strong>
+                                <asp:DropDownList ID="WF_TARGETTABLE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TARGETTABLEChange');" />
+                            </div>  
 
                         <div class="d-flex align-items-center gap-2">
                             <!-- 一覧件数 -->
