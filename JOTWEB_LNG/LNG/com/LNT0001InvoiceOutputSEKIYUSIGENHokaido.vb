@@ -301,6 +301,12 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
             '◯ 実績数量
             WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+            '★ 納入指定時間
+            If PrintDatarow("ORDERORGCODE_REP").ToString() = BaseDllConst.CONST_TODOKECODE_006915 Then
+                '[室蘭港バンカリング]のみ
+                WW_Workbook.Worksheets(dicSheetNo01.Value).Range("AP" + PrintDatarow("SETLINE").ToString()).Value = PrintDatarow("SHITEITIME").ToString()
+                'WW_Workbook.Worksheets(dicSheetNo01.Value).Range("AP" + PrintDatarow("SETLINE").ToString()).Value = DateTime.Parse(PrintDatarow("SHITEITIME").ToString()).ToShortTimeString()
+            End If
         Next
 
         Dim conditionSb As String = condition
