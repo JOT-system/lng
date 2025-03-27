@@ -244,10 +244,9 @@
     <Content Include="LNG\css\LNM0007D.css" />
     <Content Include="LNG\css\LNM0007H.css" />
     <Content Include="LNG\css\LNM0007L.css" />
-    <Content Include="LNG\css\LNM0010D.css" />
-    <Content Include="LNG\css\LNM0010DKG.css" />
-    <Content Include="LNG\css\LNM0010H.css" />
-    <Content Include="LNG\css\LNM0010L.css" />
+    <Content Include="LNG\css\LNM0014D.css" />
+    <Content Include="LNG\css\LNM0014H.css" />
+    <Content Include="LNG\css\LNM0014L.css" />
     <Content Include="LNG\css\LNS0001D.css" />
     <Content Include="LNG\css\LNS0001H.css" />
     <Content Include="LNG\css\LNS0001L.css" />
@@ -307,7 +306,7 @@
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0007WRKINC.ascx" />
-    <Content Include="LNG\inc\LNM0010WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0014WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0023WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
@@ -319,10 +318,9 @@
     <Content Include="LNG\mas\LNM0007KoteihiDetail.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiHistory.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiList.aspx" />
-    <Content Include="LNG\mas\LNM0010SprateDetail.aspx" />
-    <Content Include="LNG\mas\LNM0010SprateDetailKG.aspx" />
-    <Content Include="LNG\mas\LNM0010SprateHistory.aspx" />
-    <Content Include="LNG\mas\LNM0010SprateList.aspx" />
+    <Content Include="LNG\mas\LNM0014SprateDetail.aspx" />
+    <Content Include="LNG\mas\LNM0014SprateHistory.aspx" />
+    <Content Include="LNG\mas\LNM0014SprateList.aspx" />
     <Content Include="LNG\mas\LNS0001UserDetail.aspx" />
     <Content Include="LNG\mas\LNS0001UserHistory.aspx" />
     <Content Include="LNG\mas\LNS0001UserList.aspx" />
@@ -334,10 +332,9 @@
     <Content Include="LNG\script\LNM0007D.js" />
     <Content Include="LNG\script\LNM0007H.js" />
     <Content Include="LNG\script\LNM0007L.js" />
-    <Content Include="LNG\script\LNM0010D.js" />
-    <Content Include="LNG\script\LNM0010DKG.js" />
-    <Content Include="LNG\script\LNM0010H.js" />
-    <Content Include="LNG\script\LNM0010L.js" />
+    <Content Include="LNG\script\LNM0014D.js" />
+    <Content Include="LNG\script\LNM0014H.js" />
+    <Content Include="LNG\script\LNM0014L.js" />
     <Content Include="LNG\script\LNS0001D.js" />
     <Content Include="LNG\script\LNS0001H.js" />
     <Content Include="LNG\script\LNS0001L.js" />
@@ -559,11 +556,11 @@
       <DependentUpon>LNM0007WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\inc\LNM0010WRKINC.ascx.designer.vb">
-      <DependentUpon>LNM0010WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\inc\LNM0010WRKINC.ascx.vb">
-      <DependentUpon>LNM0010WRKINC.ascx</DependentUpon>
+    <Compile Include="LNG\inc\LNM0014WRKINC.ascx.vb">
+      <DependentUpon>LNM0014WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\inc\LNM0023WRKINC.ascx.designer.vb">
@@ -646,32 +643,25 @@
       <DependentUpon>LNM0007KoteihiList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateDetail.aspx.designer.vb">
-      <DependentUpon>LNM0010SprateDetail.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateDetail.aspx.designer.vb">
+      <DependentUpon>LNM0014SprateDetail.aspx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateDetail.aspx.vb">
-      <DependentUpon>LNM0010SprateDetail.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateDetail.aspx.vb">
+      <DependentUpon>LNM0014SprateDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateDetailKG.aspx.designer.vb">
-      <DependentUpon>LNM0010SprateDetailKG.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateHistory.aspx.designer.vb">
+      <DependentUpon>LNM0014SprateHistory.aspx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateDetailKG.aspx.vb">
-      <DependentUpon>LNM0010SprateDetailKG.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateHistory.aspx.vb">
+      <DependentUpon>LNM0014SprateHistory.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateHistory.aspx.designer.vb">
-      <DependentUpon>LNM0010SprateHistory.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateList.aspx.designer.vb">
+      <DependentUpon>LNM0014SprateList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateHistory.aspx.vb">
-      <DependentUpon>LNM0010SprateHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateList.aspx.designer.vb">
-      <DependentUpon>LNM0010SprateList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0010SprateList.aspx.vb">
-      <DependentUpon>LNM0010SprateList.aspx</DependentUpon>
+    <Compile Include="LNG\mas\LNM0014SprateList.aspx.vb">
+      <DependentUpon>LNM0014SprateList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNS0001UserDetail.aspx.designer.vb">
