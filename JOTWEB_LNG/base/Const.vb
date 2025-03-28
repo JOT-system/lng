@@ -322,6 +322,14 @@ Public Module BaseDllConst
     ''' 石油資源開発
     ''' </summary>
     Public Const CONST_TORICODE_0132800000 As String = "0132800000"
+    ''' <summary>
+    ''' シーエナジー
+    ''' </summary>
+    Public Const CONST_TORICODE_0110600000 As String = "0110600000"
+    ''' <summary>
+    ''' 北陸エルネス
+    ''' </summary>
+    Public Const CONST_TORICODE_0238900000 As String = "0238900000"
 #End Region
 
 #Region "受注受付部署"
@@ -365,6 +373,22 @@ Public Module BaseDllConst
     ''' EX_石狩営業所
     ''' </summary>
     Public Const CONST_ORDERORGCODE_020104 As String = "020104"
+    ''' <summary>
+    ''' EX_中部支店車庫
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_022302 As String = "022302"
+    ''' <summary>
+    ''' EX_上越営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_021504 As String = "021504"
+    ''' <summary>
+    ''' EX_富山営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_021601 As String = "021601"
+    ''' <summary>
+    ''' EX_四日市営業所
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_022401 As String = "022401"
 #End Region
 
 #Region "届先"

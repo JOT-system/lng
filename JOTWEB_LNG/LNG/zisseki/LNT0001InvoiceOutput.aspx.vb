@@ -603,9 +603,15 @@ Public Class LNT0001InvoiceOutput
             & " WHERE                                                               " _
             & "     date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @P2                  " _
             & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @P3                  " _
-            & " AND LT1.TORICODE = @P5                                              " _
             & " AND LT1.ZISSEKI <> 0                                                "
 
+        '〇シーエナジー
+        If Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022302 + "01" Then
+            '★北陸エルネスも含める
+            SQLStr &= String.Format(" AND LT1.TORICODE IN (@P5, '{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
+        Else
+            SQLStr &= " AND LT1.TORICODE = @P5                                              "
+        End If
         SQLStr &= " AND LT1.ORDERORGCODE in (" & WF_TORIORG.SelectedValue & ")"
 
         '〇西日本支店車庫
@@ -897,6 +903,11 @@ Public Class LNT0001InvoiceOutput
             Exit Sub
         End If
 
+        'シーエナジー・エルネス
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022302 Then
+
+        End If
+
         'エスジーリキッドサービス（西部ガス）
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_024001 Then
             '〇(帳票)項目チェック処理(西部ガス)
@@ -1088,6 +1099,41 @@ Public Class LNT0001InvoiceOutput
                 Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
                 Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
         End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' (帳票)項目チェック処理(シーエナジー・エルネス)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_ReportCheckCenergyElNess(ByVal reportName As String, ByVal reportCode As String)
+        Dim dtCenergyElNessTank As New DataTable
+        Dim dtCenergyElNessTodoke As New DataTable
+        Dim cenergyElNessTankClass As String = ""
+        'Dim cenergyElNessTodokeClass As String = ""
+        'Dim cenergyElNessKoteihiClass As String = ""
+        Dim arrToriCode As String() = {"", "", ""}
+        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
+
+        Select Case reportCode
+            '"シーエナジー・エルネス　輸送費請求書"
+            Case BaseDllConst.CONST_ORDERORGCODE_020104
+                cenergyElNessTankClass = "CENERGY_TANK"
+                'cenergyElNessTodokeClass = ""
+                'cenergyElNessKoteihiClass = ""
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0110600000
+                arrToriCode(1) = Nothing
+                arrToriCode(2) = Nothing
+        End Select
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTankClass, dtCenergyElNessTank)
+            'CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTodokeClass, dtCenergyElNessTodoke)
+        End Using
+
+        '〇(帳票)使用項目の設定
+        WW_ReportMeisaiAdd(LNT0001tbl)
 
     End Sub
 
