@@ -344,14 +344,14 @@ Public Class LNS0001UserDetail
         SQLStr.AppendLine(" WHERE                  ")
         SQLStr.AppendLine("         USERID  = @USERID  ")
         SQLStr.AppendLine("     AND STYMD   = @STYMD  ")
-        SQLStr.AppendLine("     AND ENDYMD   = @ENDYMD  ")
+        'SQLStr.AppendLine("     AND ENDYMD   = @ENDYMD  ")
         SQLStr.AppendLine("     AND DELFLG <> @DELFLG  ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20) 'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.VarChar, 20) '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.VarChar, 20) '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.VarChar, 20) '終了年月日
                 Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)  '削除フラグ
 
                 P_USERID.Value = TxtUserId.Text       'ユーザーID
@@ -360,11 +360,11 @@ Public Class LNS0001UserDetail
                 Else
                     P_STYMD.Value = StYMD            '開始年月日
                 End If
-                If EnYMD = "" Then
-                    P_ENDYMD.Value = WF_EndYMD.Value    '終了年月日
-                Else
-                    P_ENDYMD.Value = EnYMD            '終了年月日
-                End If
+                'If EnYMD = "" Then
+                '    P_ENDYMD.Value = WF_EndYMD.Value    '終了年月日
+                'Else
+                '    P_ENDYMD.Value = EnYMD            '終了年月日
+                'End If
                 P_DELFLG.Value = C_DELETE_FLG.DELETE  '削除フラグ
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1273,19 +1273,19 @@ Public Class LNS0001UserDetail
         SQLStr.AppendLine("    WHERE")
         SQLStr.Append("         USERID = @USERID                    ")
         SQLStr.Append("     AND STYMD   = @STYMD                    ")
-        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+        'SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
 
                 Dim LNS0001row As DataRow = LNS0001INPtbl.Rows(0)
 
                 P_USERID.Value = LNS0001row("USERID")           'ユーザーID
                 P_STYMD.Value = LNS0001row("STYMD")           '開始年月日
-                P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
 
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1387,12 +1387,12 @@ Public Class LNS0001UserDetail
         SQLStr.AppendLine("    WHERE")
         SQLStr.Append("         USERID = @USERID                    ")
         SQLStr.Append("     AND STYMD   = @STYMD                    ")
-        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+        'SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
 
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
@@ -1409,7 +1409,7 @@ Public Class LNS0001UserDetail
                 ' DB更新
                 P_USERID.Value = LNS0001row("USERID")           'ユーザーID
                 P_STYMD.Value = LNS0001row("STYMD")           '開始年月日
-                P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = LNS0001row("ENDYMD")           '終了年月日
 
                 '操作区分
                 '変更区分が新規の場合
@@ -2094,7 +2094,7 @@ Public Class LNS0001UserDetail
         SQLStr.Append(" WHERE                                       ")
         SQLStr.Append("         USERID = @USERID                    ")
         SQLStr.Append("     AND STYMD   = @STYMD                    ")
-        SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
+        'SQLStr.Append("     AND ENDYMD   = @ENDYMD                  ")
 
 
         Try
@@ -2632,11 +2632,15 @@ Public Class LNS0001UserDetail
                 End Using
 
                 If Not isNormal(WW_DBDataCheck) Then
-                    WW_CheckMES1 = "・一意制約違反（ユーザーID & 開始年月日 & 終了年月日）"
+                    'WW_CheckMES1 = "・一意制約違反（ユーザーID & 開始年月日 & 終了年月日）"
+                    'WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
+                    '                   "([" & LNS0001INProw("USERID") & "]" &
+                    '                   "([" & LNS0001INProw("STYMD") & "]" &
+                    '                   " [" & LNS0001INProw("ENDYMD") & "])"
+                    WW_CheckMES1 = "・一意制約違反（ユーザーID & 開始年月日）"
                     WW_CheckMES2 = C_MESSAGE_NO.OVERLAP_DATA_ERROR &
                                        "([" & LNS0001INProw("USERID") & "]" &
-                                       "([" & LNS0001INProw("STYMD") & "]" &
-                                       " [" & LNS0001INProw("ENDYMD") & "])"
+                                       " [" & LNS0001INProw("STYMD") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_PRIMARYKEY_REPEAT_ERROR
