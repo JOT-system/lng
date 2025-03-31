@@ -1474,7 +1474,7 @@ Public Class LNM0014SprateDetail
 
         '燃料使用量
         If TxtDIESELCONSUMPTION.Text = "" Then
-            LNM0014INProw("") = "0"
+            LNM0014INProw("DIESELCONSUMPTION") = "0"
         Else
             LNM0014INProw("DIESELCONSUMPTION") = TxtDIESELCONSUMPTION.Text
         End If
