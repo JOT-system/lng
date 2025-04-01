@@ -8,6 +8,10 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     'Private WW_SheetNoUnchin As Integer = 0
     Private WW_SheetNoCalendar As Integer = 0
     Private WW_SheetNoMaster As Integer = 0
+    Private WW_DicCenergyList As New Dictionary(Of String, String)
+    Private WW_DicElNessList As New Dictionary(Of String, String)
+    Private WW_ArrSheetNoCenergy As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// シーエナジー(シート)用
+    Private WW_ArrSheetNoElNess As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}    '// エルネス　　(シート)用
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -38,6 +42,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
+                   dicCenergyList As Dictionary(Of String, String), dicElNessList As Dictionary(Of String, String),
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -54,6 +59,8 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             Me.OutputOrgCode = orgCode
             Me.OutputFileName = outputFileName
             Me.calcZissekiNumber = calcNumber
+            ReDim WW_ArrSheetNoCenergy(dicCenergyList.Count - 1)
+            ReDim WW_ArrSheetNoElNess(dicElNessList.Count - 1)
 
             Me.ExcelTemplatePath = System.IO.Path.Combine(CS0050SESSION.UPLOAD_PATH,
                                   "PRINTFORMAT",
@@ -86,6 +93,29 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
 
             'ファイルopen
             WW_Workbook.Open(Me.ExcelTemplatePath)
+
+            '〇シーエナジー(シート)用
+            For Each dic In dicCenergyList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = indexKey Then
+                        WW_DicCenergyList.Add(indexKey, i.ToString())
+                        Exit For
+                    End If
+                Next
+            Next
+            '〇エルネス(シート)用
+            For Each dic In dicElNessList
+                Dim indexKey = dic.Key
+                Dim strValue = dic.Value
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = indexKey Then
+                        WW_DicElNessList.Add(indexKey, i.ToString())
+                        Exit For
+                    End If
+                Next
+            Next
 
             Dim j As Integer() = {0, 0, 0, 0, 0}
             For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
@@ -187,14 +217,97 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     ''' 帳票のヘッダー設定
     ''' </summary>
     Private Sub EditHeaderArea()
+        Try
+            '◯ 年月
+            WW_Workbook.Worksheets(WW_SheetNoMaster).Range("A1").Value = Integer.Parse(Me.TaishoYYYY)
+            WW_Workbook.Worksheets(WW_SheetNoMaster).Range("A2").Value = Integer.Parse(Me.TaishoMM)
+            '〇 日(末日)
+            Dim lastDay As String = Me.TaishoYYYY + "/" + Me.TaishoMM + "/01"
+            lastDay = Date.Parse(lastDay).AddMonths(1).AddDays(-1).ToString("dd")
+            WW_Workbook.Worksheets(WW_SheetNoMaster).Range("A3").Value = Integer.Parse(lastDay)
 
+            '〇カレンダー設定
+            Dim iCalendarLine As Integer = 6
+            For Each PrintCalendarDatarow As DataRow In PrintCalendarData.Rows
+                If PrintCalendarDatarow("WORKINGDAY").ToString() <> "0" Then
+                    '★シーエナジー用
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range("M" + iCalendarLine.ToString("000")).Value = PrintCalendarDatarow("YMD")
+                    '★エルネス用
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range("N" + iCalendarLine.ToString("000")).Value = PrintCalendarDatarow("YMD")
+                    iCalendarLine += 1
+                End If
+            Next
+
+        Catch ex As Exception
+            Throw
+        Finally
+        End Try
     End Sub
 
     ''' <summary>
     ''' 帳票の明細設定
     ''' </summary>
     Private Sub EditDetailArea()
+        Try
+            '〇[３〇〇]シート設定
+            For Each DicCenergyList In WW_DicCenergyList
+                Dim iCnt As Integer = 0
+                Dim iSheetNo As Integer = CInt(DicCenergyList.Value)
+                Dim condition As String = "GYOMUTANKNUM='{0}'"
+                'Dim condition As String = "CENERGYELNESS_SHUKACODE<>'' AND GYOMUTANKNUM='{0}'"
+                condition = String.Format(condition, DicCenergyList.Key)
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE, TODOKEDATE, CENERGYELNESS_SHUKACODE, CENERGYELNESS_TODOKECODE")
+                    If PrintDatarow("CENERGYELNESS_SHUKACODE").ToString() = "" Then Continue For
+                    Dim iStartCnt As Integer = CInt(PrintDatarow("SETSTARTLINE"))
+                    iStartCnt = iStartCnt + iCnt
+                    'If PrintDatarow("TODOKECODE").ToString() <> DicCenergyList.Key Then
+                    '    Continue For
+                    'End If
+                    '◯ 配送日
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL01").ToString() + iStartCnt.ToString()).Value = Date.Parse(PrintDatarow("TODOKEDATE").ToString())
+                    '◯ コード(出荷基地)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL02").ToString() + iStartCnt.ToString()).Value = CInt(PrintDatarow("CENERGYELNESS_SHUKACODE").ToString())
+                    '◯ コード(届　先)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL03").ToString() + iStartCnt.ToString()).Value = CInt(PrintDatarow("CENERGYELNESS_TODOKECODE").ToString())
+                    '◯ コード(計量№)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL04").ToString() + iStartCnt.ToString()).Value = ""
+                    '◯ コード(出荷量(T))
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL05").ToString() + iStartCnt.ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                    iCnt += 1
+                Next
+            Next
 
+            '〇[６〇〇]シート設定
+            For Each DicElNessList In WW_DicElNessList
+                Dim iCnt As Integer = 0
+                Dim iSheetNo As Integer = CInt(DicElNessList.Value)
+                Dim condition As String = "GYOMUTANKNUM='{0}'"
+                'Dim condition As String = "CENERGYELNESS_SHUKACODE<>'' AND GYOMUTANKNUM='{0}'"
+                condition = String.Format(condition, DicElNessList.Key)
+                For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE, TODOKEDATE, CENERGYELNESS_SHUKACODE, CENERGYELNESS_TODOKECODE")
+                    If PrintDatarow("CENERGYELNESS_SHUKACODE").ToString() = "" Then Continue For
+                    Dim iStartCnt As Integer = CInt(PrintDatarow("SETSTARTLINE"))
+                    iStartCnt = iStartCnt + iCnt
+                    'If PrintDatarow("TODOKECODE").ToString() <> DicCenergyList.Key Then
+                    '    Continue For
+                    'End If
+                    '◯ 配送日
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL01").ToString() + iStartCnt.ToString()).Value = Date.Parse(PrintDatarow("TODOKEDATE").ToString())
+                    '◯ コード(出荷基地)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL02").ToString() + iStartCnt.ToString()).Value = CInt(PrintDatarow("CENERGYELNESS_SHUKACODE").ToString())
+                    '◯ コード(届　先)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL03").ToString() + iStartCnt.ToString()).Value = CInt(PrintDatarow("CENERGYELNESS_TODOKECODE").ToString())
+                    '◯ コード(計量№)
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL04").ToString() + iStartCnt.ToString()).Value = ""
+                    '◯ コード(出荷量(T))
+                    WW_Workbook.Worksheets(iSheetNo).Range(PrintDatarow("SETCELL05").ToString() + iStartCnt.ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+                    iCnt += 1
+                Next
+            Next
+
+        Catch ex As Exception
+
+        End Try
     End Sub
 
 End Class

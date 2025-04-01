@@ -905,6 +905,25 @@ Public Class LNT0001InvoiceOutput
 
         'シーエナジー・エルネス
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022302 Then
+            '〇(帳票)項目チェック処理(シーエナジー・エルネス)
+            Dim dcCenergy As New Dictionary(Of String, String)
+            Dim dcElNess As New Dictionary(Of String, String)
+            WW_ReportCheckCenergyElNess(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcCenergy, dcElNess)
+
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputCENERGY_ELNESS(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
+                                                                             LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, dcCenergy, dcElNess,
+                                                                             taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
 
         End If
 
@@ -1106,20 +1125,24 @@ Public Class LNT0001InvoiceOutput
     ''' (帳票)項目チェック処理(シーエナジー・エルネス)
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckCenergyElNess(ByVal reportName As String, ByVal reportCode As String)
+    Protected Sub WW_ReportCheckCenergyElNess(ByVal reportName As String, ByVal reportCode As String,
+                                              ByRef dcCenergyList As Dictionary(Of String, String), ByRef dcElNessList As Dictionary(Of String, String))
         Dim dtCenergyElNessTank As New DataTable
-        Dim dtCenergyElNessTodoke As New DataTable
+        Dim dtCenergyTodoke As New DataTable
+        Dim dtElNessTodoke As New DataTable
         Dim cenergyElNessTankClass As String = ""
-        'Dim cenergyElNessTodokeClass As String = ""
+        Dim cenergyTodokeClass As String = ""
+        Dim elNessTodokeClass As String = ""
         'Dim cenergyElNessKoteihiClass As String = ""
         Dim arrToriCode As String() = {"", "", ""}
         Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
 
         Select Case reportCode
             '"シーエナジー・エルネス　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_020104
+            Case BaseDllConst.CONST_ORDERORGCODE_022302
                 cenergyElNessTankClass = "CENERGY_TANK"
-                'cenergyElNessTodokeClass = ""
+                cenergyTodokeClass = "CENERGY_TODOKE"
+                elNessTodokeClass = "ELNESS_TODOKE"
                 'cenergyElNessKoteihiClass = ""
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0110600000
                 arrToriCode(1) = Nothing
@@ -1129,11 +1152,62 @@ Public Class LNT0001InvoiceOutput
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTankClass, dtCenergyElNessTank)
-            'CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTodokeClass, dtCenergyElNessTodoke)
+            CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
+            CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
+            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
         End Using
 
         '〇(帳票)使用項目の設定
         WW_ReportMeisaiAdd(LNT0001tbl)
+
+        '〇陸事番号マスタ設定
+        For Each dtCenergyElNessTankrow As DataRow In dtCenergyElNessTank.Rows
+            '届先(明細)セル値設定
+            Dim condition As String = String.Format("GYOMUTANKNUM='{0}'", dtCenergyElNessTankrow("KEYCODE04"))
+            WW_CenergyElnessRikugiMas(dtCenergyElNessTankrow, condition, fuzumiLimit, LNT0001tbl)
+        Next
+
+        '〇業務車番(3XX)取得用
+        For Each CenergyElNessTankrow As DataRow In dtCenergyElNessTank.Select("KEYCODE04<>''", "KEYCODE04")
+            If CenergyElNessTankrow("KEYCODE04").ToString().Substring(0, 1) <> "3" Then Continue For
+            Try
+                dcCenergyList.Add(CenergyElNessTankrow("KEYCODE04"), CenergyElNessTankrow("KEYCODE01"))
+            Catch ex As Exception
+            End Try
+        Next
+        '〇(シーエナジー)届先出荷場所車庫マスタ設定(3XX)
+        For Each CenergyTodokerow As DataRow In dtCenergyTodoke.Select("KEYCODE01<>''", "KEYCODE01")
+            If CenergyTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
+            Dim condition As String = String.Format("TODOKECODE='{0}'", CenergyTodokerow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "3" Then Continue For
+                LNT0001tblrow("CENERGYELNESS_SHUKACODE") = CenergyTodokerow("KEYCODE07").ToString()
+                LNT0001tblrow("CENERGYELNESS_SHUKANAME") = CenergyTodokerow("KEYCODE08").ToString()
+                LNT0001tblrow("CENERGYELNESS_TODOKECODE") = CenergyTodokerow("KEYCODE03").ToString()
+                LNT0001tblrow("CENERGYELNESS_TODOKENAME") = CenergyTodokerow("KEYCODE04").ToString()
+            Next
+        Next
+
+        '〇業務車番(6XX)取得用
+        For Each CenergyElNessTankrow As DataRow In dtCenergyElNessTank.Select("KEYCODE04<>''", "KEYCODE04")
+            If CenergyElNessTankrow("KEYCODE04").ToString().Substring(0, 1) <> "6" Then Continue For
+            Try
+                dcElNessList.Add(CenergyElNessTankrow("KEYCODE04"), CenergyElNessTankrow("KEYCODE01"))
+            Catch ex As Exception
+            End Try
+        Next
+        '〇(エルネス)届先出荷場所車庫マスタ設定(6XX)
+        For Each ElNessTodokerow As DataRow In dtElNessTodoke.Select("KEYCODE01<>''", "KEYCODE01")
+            If ElNessTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
+            Dim condition As String = String.Format("TODOKECODE='{0}'", ElNessTodokerow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "6" Then Continue For
+                LNT0001tblrow("CENERGYELNESS_SHUKACODE") = ElNessTodokerow("KEYCODE07").ToString()
+                LNT0001tblrow("CENERGYELNESS_SHUKANAME") = ElNessTodokerow("KEYCODE08").ToString()
+                LNT0001tblrow("CENERGYELNESS_TODOKECODE") = ElNessTodokerow("KEYCODE03").ToString()
+                LNT0001tblrow("CENERGYELNESS_TODOKENAME") = ElNessTodokerow("KEYCODE04").ToString()
+            Next
+        Next
 
     End Sub
 
@@ -1432,6 +1506,64 @@ Public Class LNT0001InvoiceOutput
             End Select
         Next
 
+    End Sub
+
+    ''' <summary>
+    ''' シーエナジー・エルネス(届先(明細)セル値設定)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_CenergyElnessRikugiMas(ByVal dtCenergyElnessTankrow As DataRow, ByVal condition As String, ByVal fuzumiLimit As Decimal, ByRef LNT0001tbl As DataTable)
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            '★届日より日を取得(セル(行数)の設定のため)
+            Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+            Dim lastMonth As Boolean = False
+            If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                lastMonth = True
+            End If
+            Dim iLine As Integer = Integer.Parse(setDay) - 1
+            iLine = (iLine * Integer.Parse(dtCenergyElnessTankrow("VALUE06"))) + Integer.Parse(dtCenergyElnessTankrow("VALUE05"))
+            ''★トリップより位置を取得
+            'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+            'iTrip += iLine
+            LNT0001tblrow("ROWSORTNO") = dtCenergyElnessTankrow("VALUE01")
+            LNT0001tblrow("SETCELL01") = dtCenergyElnessTankrow("VALUE02")
+            LNT0001tblrow("SETCELL02") = dtCenergyElnessTankrow("VALUE03")
+            LNT0001tblrow("SETCELL03") = dtCenergyElnessTankrow("VALUE04")
+            LNT0001tblrow("SETCELL04") = dtCenergyElnessTankrow("VALUE09")
+            LNT0001tblrow("SETCELL05") = dtCenergyElnessTankrow("VALUE10")
+            'LNT0001tblrow("SETCELL01") = dtCenergyElnessTankrow("VALUE02") + iLine.ToString()
+            'LNT0001tblrow("SETCELL02") = dtCenergyElnessTankrow("VALUE03") + iLine.ToString()
+            'LNT0001tblrow("SETCELL03") = dtCenergyElnessTankrow("VALUE04") + iLine.ToString()
+            'LNT0001tblrow("SETCELL04") = dtCenergyElnessTankrow("VALUE09") + iLine.ToString()
+            'LNT0001tblrow("SETCELL05") = dtCenergyElnessTankrow("VALUE10") + iLine.ToString()
+            LNT0001tblrow("SETSTARTLINE") = dtCenergyElnessTankrow("VALUE05")
+            LNT0001tblrow("SETLINE") = iLine
+            LNT0001tblrow("ORDERORGCODE_REP") = dtCenergyElnessTankrow("KEYCODE05")
+            LNT0001tblrow("GYOMUTANKNUM_REP") = dtCenergyElnessTankrow("KEYCODE04")
+            LNT0001tblrow("ROLLY_CONTAINER") = dtCenergyElnessTankrow("KEYCODE03")
+
+            '★表示セルフラグ(1:表示)
+            If dtCenergyElnessTankrow("VALUE07").ToString() = "1" Then
+                LNT0001tblrow("DISPLAYCELL_START") = dtCenergyElnessTankrow("VALUE02").ToString()
+                LNT0001tblrow("DISPLAYCELL_END") = dtCenergyElnessTankrow("VALUE10").ToString()
+                LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtCenergyElnessTankrow("VALUE08").ToString()
+            Else
+                LNT0001tblrow("DISPLAYCELL_START") = ""
+                LNT0001tblrow("DISPLAYCELL_END") = ""
+                LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
+            End If
+
+            '★備考設定用(出荷日と届日が不一致の場合)
+            If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                If lastMonth = True Then
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                Else
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                End If
+            End If
+
+        Next
     End Sub
 
     ''' <summary>
@@ -2134,6 +2266,9 @@ Public Class LNT0001InvoiceOutput
         LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
         LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
         LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
+        LNT0001tbl.Columns.Add("SETCELL04", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(予備)
+        LNT0001tbl.Columns.Add("SETCELL05", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(予備)
+        LNT0001tbl.Columns.Add("SETSTARTLINE", Type.GetType("System.Int32"))            '// 【入力用】EXCEL用(開始行)
         LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
         LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
         LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
@@ -2152,6 +2287,12 @@ Public Class LNT0001InvoiceOutput
         LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
         LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
         LNT0001tbl.Columns.Add("ROLLY_CONTAINER", Type.GetType("System.String"))        '// EXCELシート(ローリー・コンテナ)設定用
+        LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKACODE", Type.GetType("System.Int32"))      '// EXCELシート(シーエナジー・エルネス)出荷コード設定用
+        'LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKACODE", Type.GetType("System.String"))      '// EXCELシート(シーエナジー・エルネス)出荷コード設定用
+        LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKANAME", Type.GetType("System.String"))      '// EXCELシート(シーエナジー・エルネス)出荷名　称設定用
+        LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKECODE", Type.GetType("System.Int32"))     '// EXCELシート(シーエナジー・エルネス)届先コード設定用
+        'LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKECODE", Type.GetType("System.String"))     '// EXCELシート(シーエナジー・エルネス)届先コード設定用
+        LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKENAME", Type.GetType("System.String"))     '// EXCELシート(シーエナジー・エルネス)届先名　称設定用
     End Sub
 
 End Class
