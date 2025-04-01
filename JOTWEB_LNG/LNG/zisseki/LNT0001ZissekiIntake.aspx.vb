@@ -777,6 +777,7 @@ Public Class LNT0001ZissekiIntake
                     CS0054KintoneApi.ApiApplId = ApiInfo(i).AppId
                     CS0054KintoneApi.ApiToken = ApiInfo(i).Token
                     CS0054KintoneApi.ToriCode = WF_TORIhdn.Value
+                    CS0054KintoneApi.OrgCode = ApiInfo(i).Org
                     CS0054KintoneApi.YmdFrom = WF_TaishoYm.Value & "/01"
                     CS0054KintoneApi.YmdTo = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                     LNT0001tbl = CS0054KintoneApi.GetRecords()
@@ -1018,6 +1019,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , SHUKACOLOR1						        " _
                 & "     , SHUKACOLOR2						        " _
                 & "     , SHUKACOLOR3						        " _
+                & "     , REQUIREDTIME						        " _
                 & "     , SHUKADATE						            " _
                 & "     , LOADTIME						            " _
                 & "     , LOADTIMEIN						        " _
@@ -1055,6 +1057,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TRACTORNUMBER						        " _
                 & "     , TRIP						                " _
                 & "     , DRP						                " _
+                & "     , ROTATION					                " _
                 & "     , UNKOUMEMO						            " _
                 & "     , SHUKKINTIME						        " _
                 & "     , STAFFSLCT						            " _
@@ -1154,6 +1157,11 @@ Public Class LNT0001ZissekiIntake
                 & "     , ORDSTDATE						            " _
                 & "     , ORDENDATE						            " _
                 & "     , OPENENDATE						        " _
+                & "     , LUPDKEY						            " _
+                & "     , HUPDKEY						            " _
+                & "     , JXORDUPDKEY						        " _
+                & "     , JXORDFILE						            " _
+                & "     , JXORDROUTE						        " _
                 & "     , UPDATEUSER						        " _
                 & "     , CREATEUSER						        " _
                 & "     , UPDATEYMD						            " _
@@ -1224,6 +1232,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @SHUKACOLOR1						        " _
                 & "     , @SHUKACOLOR2						        " _
                 & "     , @SHUKACOLOR3						        " _
+                & "     , @REQUIREDTIME						        " _
                 & "     , @SHUKADATE						        " _
                 & "     , @LOADTIME						            " _
                 & "     , @LOADTIMEIN						        " _
@@ -1261,6 +1270,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @TRACTORNUMBER						    " _
                 & "     , @TRIP						                " _
                 & "     , @DRP						                " _
+                & "     , @ROTATION						            " _
                 & "     , @UNKOUMEMO						        " _
                 & "     , @SHUKKINTIME						        " _
                 & "     , @STAFFSLCT						        " _
@@ -1360,6 +1370,11 @@ Public Class LNT0001ZissekiIntake
                 & "     , @ORDSTDATE						        " _
                 & "     , @ORDENDATE						        " _
                 & "     , @OPENENDATE						        " _
+                & "     , @LUPDKEY						            " _
+                & "     , @HUPDKEY						            " _
+                & "     , @JXORDUPDKEY						        " _
+                & "     , @JXORDFILE						        " _
+                & "     , @JXORDROUTE						        " _
                 & "     , @UPDATEUSER						        " _
                 & "     , @CREATEUSER						        " _
                 & "     , @UPDATEYMD						        " _
@@ -1430,6 +1445,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , SHUKACOLOR1 = @SHUKACOLOR1				" _
                 & "     , SHUKACOLOR2 = @SHUKACOLOR2				" _
                 & "     , SHUKACOLOR3 = @SHUKACOLOR3				" _
+                & "     , REQUIREDTIME = @REQUIREDTIME				" _
                 & "     , SHUKADATE = @SHUKADATE					" _
                 & "     , LOADTIME = @LOADTIME						" _
                 & "     , LOADTIMEIN = @LOADTIMEIN					" _
@@ -1467,6 +1483,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TRACTORNUMBER = @TRACTORNUMBER			" _
                 & "     , TRIP = @TRIP						        " _
                 & "     , DRP = @DRP						        " _
+                & "     , ROTATION = @ROTATION						" _
                 & "     , UNKOUMEMO = @UNKOUMEMO					" _
                 & "     , SHUKKINTIME = @SHUKKINTIME				" _
                 & "     , STAFFSLCT = @STAFFSLCT					" _
@@ -1566,6 +1583,11 @@ Public Class LNT0001ZissekiIntake
                 & "     , ORDSTDATE = @ORDSTDATE					" _
                 & "     , ORDENDATE = @ORDENDATE					" _
                 & "     , OPENENDATE = @OPENENDATE					" _
+                & "     , LUPDKEY = @LUPDKEY					    " _
+                & "     , HUPDKEY = @HUPDKEY					    " _
+                & "     , JXORDUPDKEY = @JXORDUPDKEY				" _
+                & "     , JXORDFILE = @JXORDFILE				    " _
+                & "     , JXORDROUTE = @JXORDROUTE				    " _
                 & "     , UPDATEUSER = @UPDATEUSER					" _
                 & "     , CREATEUSER = @CREATEUSER					" _
                 & "     , UPDATEYMD = @UPDATEYMD					" _
@@ -1635,6 +1657,7 @@ Public Class LNT0001ZissekiIntake
                     Dim SHUKACOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR1", MySqlDbType.VarChar)  '出荷場所カラーコード_背景色
                     Dim SHUKACOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR2", MySqlDbType.VarChar)  '出荷場所カラーコード_境界色
                     Dim SHUKACOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR3", MySqlDbType.VarChar)  '出荷場所カラーコード_文字色
+                    Dim REQUIREDTIME As MySqlParameter = SQLcmd.Parameters.Add("@REQUIREDTIME", MySqlDbType.VarChar)  '標準所要時間
                     Dim SHUKADATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE", MySqlDbType.Date) '出荷日
                     Dim LOADTIME As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIME", MySqlDbType.VarChar)   '積込時間
                     Dim LOADTIMEIN As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIMEIN", MySqlDbType.VarChar)    '積込時間手入力
@@ -1672,6 +1695,7 @@ Public Class LNT0001ZissekiIntake
                     Dim TRACTORNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUMBER", MySqlDbType.VarChar)  '陸事番号_トラクタ
                     Dim TRIP As MySqlParameter = SQLcmd.Parameters.Add("@TRIP", MySqlDbType.Int16)  'トリップ
                     Dim DRP As MySqlParameter = SQLcmd.Parameters.Add("@DRP", MySqlDbType.Int16)    'ドロップ
+                    Dim ROTATION As MySqlParameter = SQLcmd.Parameters.Add("@ROTATION", MySqlDbType.Int16)    '回転数
                     Dim UNKOUMEMO As MySqlParameter = SQLcmd.Parameters.Add("@UNKOUMEMO", MySqlDbType.VarChar)  '当日前後運行メモ
                     Dim SHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKKINTIME", MySqlDbType.VarChar) '出勤時間
                     Dim STAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@STAFFSLCT", MySqlDbType.VarChar)  '乗務員選択
@@ -1721,7 +1745,7 @@ Public Class LNT0001ZissekiIntake
                     Dim ITIRENNUM As MySqlParameter = SQLcmd.Parameters.Add("@ITIRENNUM", MySqlDbType.VarChar)  '一連指定番号
                     Dim TRACTER1 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER1", MySqlDbType.VarChar)    '陸運局_トラクタ
                     Dim TRACTER2 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER2", MySqlDbType.VarChar)    '分類番号_トラクタ
-                    Dim TRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER3", MySqlDbType.VarChar)    'ひらなが_トラクタ
+                    Dim TRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER3", MySqlDbType.VarChar)    'ひらがな_トラクタ
                     Dim TRACTER4 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER4", MySqlDbType.VarChar)    '一連指定番号_トラクタ
                     Dim TRACTER5 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER5", MySqlDbType.VarChar)    '車両備考1_トラクタ
                     Dim TRACTER6 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER6", MySqlDbType.VarChar)    '車両備考2_トラクタ
@@ -1766,11 +1790,16 @@ Public Class LNT0001ZissekiIntake
                     Dim CALENDERMEMO23 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO23", MySqlDbType.VarChar)    '陸事番号_トラクタ_カレンダー画面メモ
                     Dim CALENDERMEMO24 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO24", MySqlDbType.VarChar)    '陸運局_トラクタ_カレンダー画面メモ
                     Dim CALENDERMEMO25 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO25", MySqlDbType.VarChar)    '分類番号_トラクタ_カレンダー画面メモ
-                    Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらなが_トラクタ_カレンダー画面メモ
+                    Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらがな_トラクタ_カレンダー画面メモ
                     Dim CALENDERMEMO27 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO27", MySqlDbType.VarChar)    '一連指定番号_トラクタ_カレンダー画面メモ
                     Dim ORDSTDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDSTDATE", MySqlDbType.Date)   'オーダー開始日
                     Dim ORDENDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDENDATE", MySqlDbType.Date)   'オーダー終了日
                     Dim OPENENDATE As MySqlParameter = SQLcmd.Parameters.Add("@OPENENDATE", MySqlDbType.Date)   '表示用オーダー終了日
+                    Dim LUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@LUPDKEY", MySqlDbType.VarChar)    'L配更新キー
+                    Dim HUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@HUPDKEY", MySqlDbType.VarChar)    'はこぶわ更新キー
+                    Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
+                    Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
+                    Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
                     Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
                     Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
                     Dim UPDATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEYMD", MySqlDbType.DateTime) '更新日時
@@ -1823,7 +1852,11 @@ Public Class LNT0001ZissekiIntake
                         TORINAME.Value = updRow("届先取引先名称")  '届先取引先名称
                         TODOKEADDR.Value = updRow("届先住所")   '届先住所
                         TODOKETEL.Value = updRow("届先電話番号")  '届先電話番号
-                        TODOKEMAP.Value = updRow("届先Googleマップ") '届先Googleマップ
+                        If updRow("届先緯度") = "" AndAlso updRow("届先経度") = "" Then
+                            TODOKEMAP.Value = updRow("届先Googleマップ")  '届先Googleマップ
+                        Else
+                            TODOKEMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("届先緯度"), updRow("届先経度"))  '届先Googleマップ
+                        End If
                         TODOKEIDO.Value = updRow("届先緯度")    '届先緯度
                         TODOKEKEIDO.Value = updRow("届先経度")  '届先経度
                         TODOKEBIKO1.Value = updRow("届先備考1") '届先備考1
@@ -1840,7 +1873,11 @@ Public Class LNT0001ZissekiIntake
                         SHUKATORINAME.Value = updRow("出荷場所取引先名称")   '出荷場所取引先名称
                         SHUKAADDR.Value = updRow("出荷場所住所")  '出荷場所住所
                         SHUKAADDRTEL.Value = updRow("出荷場所電話番号") '出荷場所電話番号
-                        SHUKAMAP.Value = updRow("出荷場所Googleマップ")    '出荷場所Googleマップ
+                        If updRow("出荷場所緯度") = "" AndAlso updRow("出荷場所経度") = "" Then
+                            SHUKAMAP.Value = updRow("出荷場所Googleマップ")    '出荷場所Googleマップ
+                        Else
+                            SHUKAMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("出荷場所緯度"), updRow("出荷場所経度"))  '出荷場所Googleマップ
+                        End If
                         SHUKAIDO.Value = updRow("出荷場所緯度")   '出荷場所緯度
                         SHUKAKEIDO.Value = updRow("出荷場所経度") '出荷場所経度
                         SHUKABIKOU1.Value = updRow("出荷場所備考1")   '出荷場所備考1
@@ -1849,16 +1886,17 @@ Public Class LNT0001ZissekiIntake
                         SHUKACOLOR1.Value = updRow("出荷場所カラーコード_背景色")    '出荷場所カラーコード_背景色
                         SHUKACOLOR2.Value = updRow("出荷場所カラーコード_境界色")    '出荷場所カラーコード_境界色
                         SHUKACOLOR3.Value = updRow("出荷場所カラーコード_文字色")    '出荷場所カラーコード_文字色
+                        If iTbl.Columns.Contains("標準所要時間") Then
+                            REQUIREDTIME.Value = updRow("標準所要時間") '標準所要時間
+                        Else
+                            REQUIREDTIME.Value = "" '標準所要時間
+                        End If
                         If String.IsNullOrEmpty(updRow("出荷日")) Then
                             SHUKADATE.Value = DBNull.Value    '出荷日
                         Else
                             SHUKADATE.Value = updRow("出荷日") '出荷日
                         End If
-                        If String.IsNullOrEmpty(updRow("積込時間")) Then
-                            LOADTIME.Value = DBNull.Value '積込時間
-                        Else
-                            LOADTIME.Value = updRow("積込時間") '積込時間
-                        End If
+                        LOADTIME.Value = updRow("積込時間") '積込時間
                         LOADTIMEIN.Value = updRow("積込時間手入力")    '積込時間手入力
                         LOADTIMES.Value = updRow("積込時間_画面表示用")  '積込時間_画面表示用
                         If String.IsNullOrEmpty(updRow("届日")) Then
@@ -1866,11 +1904,7 @@ Public Class LNT0001ZissekiIntake
                         Else
                             TODOKEDATE.Value = updRow("届日") '届日
                         End If
-                        If String.IsNullOrEmpty(updRow("指定時間")) Then
-                            SHITEITIME.Value = DBNull.Value   '指定時間
-                        Else
-                            SHITEITIME.Value = updRow("指定時間")   '指定時間
-                        End If
+                        SHITEITIME.Value = updRow("指定時間")   '指定時間
                         SHITEITIMEIN.Value = updRow("指定時間手入力")  '指定時間手入力
                         SHITEITIMES.Value = updRow("指定時間_画面表示用")    '指定時間_画面表示用
                         If String.IsNullOrEmpty(updRow("受注数量")) Then
@@ -1918,12 +1952,17 @@ Public Class LNT0001ZissekiIntake
                         Else
                             DRP.Value = updRow("ドロップ")  'ドロップ
                         End If
-                        UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ
-                        If String.IsNullOrEmpty(updRow("出勤時間")) Then
-                            SHUKKINTIME.Value = DBNull.Value  '出勤時間
+                        If iTbl.Columns.Contains("回転数") Then
+                            If String.IsNullOrEmpty(updRow("回転数")) Then
+                                ROTATION.Value = 0  '回転数
+                            Else
+                                ROTATION.Value = updRow("回転数")  '回転数
+                            End If
                         Else
-                            SHUKKINTIME.Value = updRow("出勤時間")  '出勤時間
+                            ROTATION.Value = 0  '回転数
                         End If
+                        UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ
+                        SHUKKINTIME.Value = updRow("出勤時間")  '出勤時間
                         STAFFSLCT.Value = updRow("乗務員選択")   '乗務員選択
                         STAFFNAME.Value = updRow("氏名_乗務員")  '氏名_乗務員
                         STAFFCODE.Value = updRow("社員番号_乗務員")    '社員番号_乗務員
@@ -1953,34 +1992,18 @@ Public Class LNT0001ZissekiIntake
                         Else
                             KIKODATE.Value = updRow("帰庫日")  '帰庫日
                         End If
-                        If String.IsNullOrEmpty(updRow("帰庫時間")) Then
-                            KIKOTIME.Value = DBNull.Value '帰庫時間
-                        Else
-                            KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
-                        End If
+                        KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
                         CREWBIKOU1.Value = updRow("乗務員備考1") '乗務員備考1
                         CREWBIKOU2.Value = updRow("乗務員備考2") '乗務員備考2
                         SUBCREWBIKOU1.Value = updRow("副乗務員備考1") '副乗務員備考1
                         SUBCREWBIKOU2.Value = updRow("副乗務員備考2") '副乗務員備考2
-                        If String.IsNullOrEmpty(updRow("出勤時間_副乗務員")) Then
-                            SUBSHUKKINTIME.Value = DBNull.Value  '出勤時間_副乗務員
-                        Else
-                            SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
-                        End If
+                        SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
                         CALENDERMEMO11.Value = updRow("乗務員選択_カレンダー画面メモ")    '乗務員選択_カレンダー画面メモ
                         CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
                         CALENDERMEMO13.Value = updRow("内容詳細_カレンダー画面メモ") '内容詳細_カレンダー画面メモ
                         SYABARATANNI.Value = updRow("車腹単位") '車腹単位
-                        If String.IsNullOrEmpty(updRow("退勤時間")) Then
-                            TAIKINTIME.Value = DBNull.Value   '退勤時間
-                        Else
-                            TAIKINTIME.Value = updRow("退勤時間")   '退勤時間
-                        End If
-                        If String.IsNullOrEmpty(updRow("退勤時間_副乗務員")) Then
-                            SUBTIKINTIME.Value = DBNull.Value    '退勤時間_副乗務員
-                        Else
-                            SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員
-                        End If
+                        TAIKINTIME.Value = updRow("退勤時間")   '退勤時間
+                        SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員
                         KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル
                         KVZYUTYU.Value = updRow("kViewer用受注数量") 'kViewer用受注数量
                         KVZISSEKI.Value = updRow("kViewer用実績数量")    'kViewer用実績数量
@@ -1995,7 +2018,7 @@ Public Class LNT0001ZissekiIntake
                         ITIRENNUM.Value = updRow("一連指定番号")  '一連指定番号
                         TRACTER1.Value = updRow("陸運局_トラクタ") '陸運局_トラクタ
                         TRACTER2.Value = updRow("分類番号_トラクタ")    '分類番号_トラクタ
-                        TRACTER3.Value = updRow("ひらなが_トラクタ")    'ひらなが_トラクタ
+                        TRACTER3.Value = updRow("ひらがな_トラクタ")    'ひらがな_トラクタ
                         TRACTER4.Value = updRow("一連指定番号_トラクタ")  '一連指定番号_トラクタ
                         TRACTER5.Value = updRow("車両備考1_トラクタ")   '車両備考1_トラクタ
                         TRACTER6.Value = updRow("車両備考2_トラクタ")   '車両備考2_トラクタ
@@ -2040,7 +2063,7 @@ Public Class LNT0001ZissekiIntake
                         CALENDERMEMO23.Value = updRow("陸事番号_トラクタ_カレンダー画面メモ")    '陸事番号_トラクタ_カレンダー画面メモ
                         CALENDERMEMO24.Value = updRow("陸運局_トラクタ_カレンダー画面メモ") '陸運局_トラクタ_カレンダー画面メモ
                         CALENDERMEMO25.Value = updRow("分類番号_トラクタ_カレンダー画面メモ")    '分類番号_トラクタ_カレンダー画面メモ
-                        CALENDERMEMO26.Value = updRow("ひらなが_トラクタ_カレンダー画面メモ")    'ひらなが_トラクタ_カレンダー画面メモ
+                        CALENDERMEMO26.Value = updRow("ひらがな_トラクタ_カレンダー画面メモ")    'ひらがな_トラクタ_カレンダー画面メモ
                         CALENDERMEMO27.Value = updRow("一連指定番号_トラクタ_カレンダー画面メモ")  '一連指定番号_トラクタ_カレンダー画面メモ
                         If String.IsNullOrEmpty(updRow("オーダー開始日")) Then
                             ORDSTDATE.Value = DBNull.Value 'オーダー開始日
@@ -2056,6 +2079,31 @@ Public Class LNT0001ZissekiIntake
                             OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
                         Else
                             OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
+                        End If
+                        If iTbl.Columns.Contains("L配更新キー") Then
+                            LUPDKEY.Value = updRow("L配更新キー")    'L配更新キー
+                        Else
+                            LUPDKEY.Value = ""    'L配更新キー
+                        End If
+                        If iTbl.Columns.Contains("はこぶわ更新キー") Then
+                            HUPDKEY.Value = updRow("はこぶわ更新キー")    'はこぶわ更新キー
+                        Else
+                            HUPDKEY.Value = ""    'はこぶわ更新キー
+                        End If
+                        If iTbl.Columns.Contains("JX形式オーダー更新キー") Then
+                            JXORDUPDKEY.Value = updRow("JX形式オーダー更新キー")    'JX形式オーダー更新キー
+                        Else
+                            JXORDUPDKEY.Value = ""    'JX形式オーダー更新キー
+                        End If
+                        If iTbl.Columns.Contains("JX形式オーダーファイル名") Then
+                            JXORDFILE.Value = updRow("JX形式オーダーファイル名")    'JX形式オーダーファイル名
+                        Else
+                            JXORDFILE.Value = ""    'JX形式オーダーファイル名
+                        End If
+                        If iTbl.Columns.Contains("JX形式オーダールート番号") Then
+                            JXORDROUTE.Value = updRow("JX形式オーダールート番号")   'JX形式オーダールート番号
+                        Else
+                            JXORDROUTE.Value = ""   'JX形式オーダールート番号
                         End If
                         UPDATEUSER.Value = updRow("更新者")    '更新者
                         CREATEUSER.Value = updRow("作成者")    '作成者
