@@ -230,22 +230,22 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const LNM0009D As String = "ASP.LNG_MAS_LNM0009RETINMDETAIL_ASPX"
 
-        ''' <summary>
-        ''' 特別料金マスタメンテナンス（一覧）
-        ''' </summary>
-        Public Const LNM0010L As String = "ASP.LNG_MAS_LNM0010SPRATELIST_ASPX"
-        ''' <summary>
-        ''' 特別料金マスタメンテナンス（詳細）
-        ''' </summary>
-        Public Const LNM0010D As String = "ASP.LNG_MAS_LNM0010SPRATEDETAIL_ASPX"
-        ''' <summary>
-        ''' 特別料金マスタメンテナンス（北海道ガス詳細）
-        ''' </summary>
-        Public Const LNM0010DKG As String = "ASP.LNG_MAS_LNM0010SPRATEDETAILKG_ASPX"
-        ''' <summary>
-        ''' 特別料金スタメンテナンス（履歴）
-        ''' </summary>
-        Public Const LNM0010H As String = "ASP.LNG_MAS_LNM0010SPRATEHISTORY_ASPX"
+        '''' <summary>
+        '''' 特別料金マスタメンテナンス（一覧）
+        '''' </summary>
+        'Public Const LNM0010L As String = "ASP.LNG_MAS_LNM0010SPRATELIST_ASPX"
+        '''' <summary>
+        '''' 特別料金マスタメンテナンス（詳細）
+        '''' </summary>
+        'Public Const LNM0010D As String = "ASP.LNG_MAS_LNM0010SPRATEDETAIL_ASPX"
+        '''' <summary>
+        '''' 特別料金マスタメンテナンス（北海道ガス詳細）
+        '''' </summary>
+        'Public Const LNM0010DKG As String = "ASP.LNG_MAS_LNM0010SPRATEDETAILKG_ASPX"
+        '''' <summary>
+        '''' 特別料金スタメンテナンス（履歴）
+        '''' </summary>
+        'Public Const LNM0010H As String = "ASP.LNG_MAS_LNM0010SPRATEHISTORY_ASPX"
 
         ''' <summary>
         ''' キロ程マスタメンテナンス（検索）
@@ -272,18 +272,30 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const LNM0013D As String = "ASP.LNG_MAS_LNM0013REKTRMDETAIL_ASPX"
 
+        '''' <summary>
+        '''' 通運発送料マスタメンテナンス（検索）
+        '''' </summary>
+        'Public Const LNM0014S As String = "ASP.LNG_MAS_LNM0014REUTRMSEARCH_ASPX"
+        '''' <summary>
+        '''' 通運発送料マスタメンテナンス（一覧）
+        '''' </summary>
+        'Public Const LNM0014L As String = "ASP.LNG_MAS_LNM0014REUTRMLIST_ASPX"
+        '''' <summary>
+        '''' 通運発送料マスタメンテナンス（詳細）
+        '''' </summary>
+        'Public Const LNM0014D As String = "ASP.LNG_MAS_LNM0014REUTRMDETAIL_ASPX"
         ''' <summary>
-        ''' 通運発送料マスタメンテナンス（検索）
+        ''' 特別料金マスタ改メンテナンス（一覧）
         ''' </summary>
-        Public Const LNM0014S As String = "ASP.LNG_MAS_LNM0014REUTRMSEARCH_ASPX"
+        Public Const LNM0014L As String = "ASP.LNG_MAS_LNM0014SPRATELIST_ASPX"
         ''' <summary>
-        ''' 通運発送料マスタメンテナンス（一覧）
+        ''' 特別料金マスタ改メンテナンス（詳細）
         ''' </summary>
-        Public Const LNM0014L As String = "ASP.LNG_MAS_LNM0014REUTRMLIST_ASPX"
+        Public Const LNM0014D As String = "ASP.LNG_MAS_LNM0014SPRATEDETAIL_ASPX"
         ''' <summary>
-        ''' 通運発送料マスタメンテナンス（詳細）
+        ''' 特別料金スタ改メンテナンス（履歴）
         ''' </summary>
-        Public Const LNM0014D As String = "ASP.LNG_MAS_LNM0014REUTRMDETAIL_ASPX"
+        Public Const LNM0014H As String = "ASP.LNG_MAS_LNM0014SPRATEHISTORY_ASPX"
         ''' <summary>
         ''' 使用料率マスタメンテナンス（検索）
         ''' </summary>

@@ -2460,11 +2460,17 @@ Public Class LNS0001UserList
         End If
 
         '一意キーが未入力の場合処理を終了する
+        'If WW_ROW("USERID") = "" OrElse
+        '    WW_ROW("STYMD") = Date.MinValue OrElse
+        '    WW_ROW("ENDYMD") = Date.MinValue Then
+        '    Exit Function
+        'End If
         If WW_ROW("USERID") = "" OrElse
-            WW_ROW("STYMD") = Date.MinValue OrElse
-            WW_ROW("ENDYMD") = Date.MinValue Then
+            WW_ROW("STYMD") = Date.MinValue Then
             Exit Function
         End If
+
+
 
         '更新前の削除フラグを取得
         Dim SQLStr = New StringBuilder
@@ -2475,17 +2481,17 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(USERID, '')             = @USERID ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        'SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
 
                 P_USERID.Value = WW_ROW("USERID")           'ユーザーID
                 P_STYMD.Value = WW_ROW("STYMD")           '開始年月日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -2543,13 +2549,13 @@ Public Class LNS0001UserList
         SQLStr.Append(" WHERE                                       ")
         SQLStr.Append("         COALESCE(USERID, '')  = @USERID ")
         SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.Append("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        'SQLStr.Append("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
@@ -2557,7 +2563,7 @@ Public Class LNS0001UserList
 
                 P_USERID.Value = WW_ROW("USERID")           'ユーザーID
                 P_STYMD.Value = WW_ROW("STYMD")           '開始年月日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
                 P_UPDYMD.Value = WW_DATENOW                '更新年月日
                 P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID                '更新端末
@@ -3155,17 +3161,17 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(USERID, '')             = @USERID ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        'SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
 
                 P_USERID.Value = WW_ROW("USERID")           'ユーザーID
                 P_STYMD.Value = WW_ROW("STYMD")           '開始年月日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -3272,13 +3278,13 @@ Public Class LNS0001UserList
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(USERID, '') = @USERID ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
+        'SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_USERID As MySqlParameter = SQLcmd.Parameters.Add("@USERID", MySqlDbType.VarChar, 20)     'ユーザーID
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '開始年月日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
+                'Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '終了年月日
 
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
@@ -3293,7 +3299,7 @@ Public Class LNS0001UserList
                 ' DB更新
                 P_USERID.Value = WW_ROW("USERID")           'ユーザーID
                 P_STYMD.Value = WW_ROW("STYMD")           '開始年月日
-                P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
+                'P_ENDYMD.Value = WW_ROW("ENDYMD")           '終了年月日
 
                 '操作区分
                 '変更区分が新規の場合

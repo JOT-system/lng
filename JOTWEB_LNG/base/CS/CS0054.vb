@@ -26,6 +26,11 @@ Public Class CS0054KintoneApi
     ''' <returns></returns>
     Public Property ToriCode As String = ""
     ''' <summary>
+    ''' 部署コード
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property OrgCode As String = ""
+    ''' <summary>
     ''' 開始日付
     ''' </summary>
     ''' <returns></returns>
@@ -141,6 +146,25 @@ Public Class CS0054KintoneApi
                             '項目毎にプロパティより値を取り出す（属性に合わせて取り出す
                             '★　2024/11/22現在は次の４パターンのみ）
                             For Each prop As Reflection.PropertyInfo In properties
+                                Dim propInfo As Object = prop.GetValue(record)
+                                If propInfo Is Nothing Then
+                                    '項目不一致の場合（アボカドに必要項目が存在しない場合）、東京ガス専用の項目ならば空白を設定して次の項目へ
+                                    Dim TGSflg As Boolean = False
+                                    Dim TGSitemProp = GetType(TGSItem).GetProperties()
+                                    For Each TGSprop In TGSitemProp
+                                        If prop.Name = TGSprop.Name Then
+                                            TGSflg = True
+                                            dr(prop.Name) = ""
+                                            Exit For
+                                        End If
+                                    Next
+                                    If TGSflg Then
+                                        Continue For
+                                    Else
+                                        Throw New Exception("KintoneAPIエラー（項目不一致）: " & prop.Name & ",部署：" & OrgCode & ",アプリID:" & ApiApplId)
+                                    End If
+                                End If
+
                                 dr(prop.Name) = ""
                                 Select Case prop.PropertyType.Name
                                     Case "NormalStruct"
@@ -148,29 +172,82 @@ Public Class CS0054KintoneApi
                                         If propRec IsNot Nothing Then
                                             dr(prop.Name) = propRec.value
                                         End If
+                                        '日付形式ならば、形式変換
+                                        dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
                                     Case "ValListStruct"
                                         Dim valueProp = GetNestedPropertyValue(record, prop.Name + ".value[0]")
                                         If valueProp IsNot Nothing Then
                                             dr(prop.Name) = valueProp
                                         End If
+                                        '日付形式ならば、形式変換
+                                        dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
                                     Case "ValNestStruct"
                                         Dim valueProp = GetNestedPropertyValue(record, prop.Name + ".value.code")
                                         If valueProp IsNot Nothing Then
                                             dr(prop.Name) = valueProp
                                         End If
+                                        '日付形式ならば、形式変換
+                                        dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
                                     Case "ValSelectListStruct"
                                         Dim codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].code")
                                         If codeProp IsNot Nothing Then
                                             dr(prop.Name) = codeProp
                                         End If
-                                End Select
+                                        '日付形式ならば、形式変換
+                                        dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
 
-                                '日付形式ならば、形式変換
-                                Dim propInfo As Object = prop.GetValue(record)
-                                If propInfo Is Nothing Then
-                                    Throw New Exception("KintoneAPIエラー（項目不一致）: " & prop.Name)
-                                End If
-                                dr(prop.Name) = ConvertToDate(dr(prop.Name), propInfo.type)
+                                        '--------------------------------------------------------
+                                        'LNGでは、品名テーブルを取込まない 2025/03/26
+                                        '--------------------------------------------------------
+                                        'Case "SubTableStruct"
+                                        '    '品名テーブル対応
+                                        '    Dim additemProp = GetType(AddItemRec).GetProperties()
+                                        '    For Each additemP In additemProp
+                                        '        Dim ItemName As String = additemP.Name
+
+                                        '        Dim codeProp = GetNestedPropertyValue(record, prop.Name + String.Format(".value[0].value.{0}.value", ItemName))
+                                        '        If codeProp IsNot Nothing Then
+                                        '            dr(ItemName) = codeProp
+                                        '        End If
+                                        '    Next
+                                        '上記ロジックに変更（下記は、同じ結果）
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名選択_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名選択_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名2コード_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名2コード_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名2名_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名2名_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.油種名_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("油種名_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名詳細_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名詳細_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名1コード_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名1コード_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.数量_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("数量_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.油種コード_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("油種コード_枝番付き") = codeProp
+                                        'End If
+                                        'codeProp = GetNestedPropertyValue(record, prop.Name + ".value[0].value.品名1名_枝番付き.value")
+                                        'If codeProp IsNot Nothing Then
+                                        '    dr("品名1名_枝番付き") = codeProp
+                                        'End If
+                                End Select
                             Next
                             outTbl.Rows.Add(dr)
                         Next
@@ -309,6 +386,12 @@ Public Class CS0054KintoneApi
         For Each prop In properties
             ioTbl.Columns.Add(prop.Name, GetType(String))
         Next
+
+        '品名テーブルの対応
+        'properties = GetType(AddItemRec).GetProperties()
+        'For Each prop In properties
+        '    ioTbl.Columns.Add(prop.Name, GetType(String))
+        'Next
     End Sub
 
 #Region "レスポンス内容格納クラス"
@@ -319,7 +402,6 @@ Public Class CS0054KintoneApi
         Public Property Records As List(Of AvocadoRec)
         Public Property Totalcount As String
     End Class
-
     ''' <summary>
     ''' KintoneAPIのデータ構造（一般）
     ''' (例）{"出荷場所名称": {"type" "SINGLE_LINE_TEXT","value": "ＸＸ名称"}}
@@ -365,6 +447,33 @@ Public Class CS0054KintoneApi
         End Class
     End Class
 
+    ''' <summary>
+    ''' KintoneAPIのデータ構造（SUBTABLE）
+    ''' (例１） "品名コード": {"type": "SUBTABLE","value": [{"id": "19755130","value":{"枝番":{"type":"NUMBER","value":"1"},"品名選択_枝番付き":{"type":"SINGLE_LINE_TEXT","value":""},....,"品名1名_枝番付き": {"type": "SINGLE_LINE_TEXT",value": ""}}}]}
+    ''' (例２） "品名コード": {"type": "SUBTABLE","value": []}　　← データなしの場合
+    ''' </summary>
+    Public Class SubTableStruct
+        Public Property type As String
+        Public Property value As List(Of SelectList)
+
+        Public Class SelectList
+            Public Property id As String
+            Public Property value As ValListStruct
+        End Class
+
+        Public Class ValListStruct
+            Public Property 枝番 As NormalStruct
+            Public Property 品名選択_枝番付き As NormalStruct
+            Public Property 品名2コード_枝番付き As NormalStruct
+            Public Property 品名2名_枝番付き As NormalStruct
+            Public Property 油種名_枝番付き As NormalStruct
+            Public Property 品名詳細_枝番付き As NormalStruct
+            Public Property 品名1コード_枝番付き As NormalStruct
+            Public Property 数量_枝番付き As NormalStruct
+            Public Property 油種コード_枝番付き As NormalStruct
+            Public Property 品名1名_枝番付き As NormalStruct
+        End Class
+    End Class
     ''' <summary>
     ''' KintoneAPIの返却データ（JSON）：業務データ部分
     ''' </summary>
@@ -510,7 +619,7 @@ Public Class CS0054KintoneApi
         Public Property 一連指定番号 As NormalStruct
         Public Property 陸運局_トラクタ As NormalStruct
         Public Property 分類番号_トラクタ As NormalStruct
-        Public Property ひらなが_トラクタ As NormalStruct
+        Public Property ひらがな_トラクタ As NormalStruct
         Public Property 一連指定番号_トラクタ As NormalStruct
         Public Property 車両備考1_トラクタ As NormalStruct
         Public Property 車両備考2_トラクタ As NormalStruct
@@ -555,7 +664,7 @@ Public Class CS0054KintoneApi
         Public Property 陸事番号_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property 陸運局_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property 分類番号_トラクタ_カレンダー画面メモ As NormalStruct
-        Public Property ひらなが_トラクタ_カレンダー画面メモ As NormalStruct
+        Public Property ひらがな_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property 一連指定番号_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property オーダー開始日 As NormalStruct
         Public Property 表示用オーダー終了日 As NormalStruct
@@ -564,7 +673,40 @@ Public Class CS0054KintoneApi
         Public Property 作成者 As ValNestStruct
         Public Property 更新日時 As NormalStruct
         Public Property 作成日時 As NormalStruct
-
+        '品名テーブルは、LNGでは取込まない 2025/3/26
+        'Public Property 品名テーブル As SubTableStruct
+        Public Property 標準所要時間 As NormalStruct
+        Public Property JX形式オーダー更新キー As NormalStruct
+        Public Property JX形式オーダーファイル名 As NormalStruct
+        Public Property JX形式オーダールート番号 As NormalStruct
+        '東ガスのみの項目
+        Public Property 回転数 As NormalStruct
+        Public Property L配更新キー As NormalStruct
+        Public Property はこぶわ更新キー As NormalStruct
+    End Class
+    ''' <summary>
+    ''' KintoneAPIの返却データ（東ガスのみの項目）を格納
+    ''' </summary>
+    Public Class TGSItem
+        '東ガスのみの項目
+        Public Property 回転数 As NormalStruct
+        Public Property L配更新キー As NormalStruct
+        Public Property はこぶわ更新キー As NormalStruct
+    End Class
+    ''' <summary>
+    ''' KintoneAPIの返却データ（品名テーブル）を格納
+    ''' </summary>
+    Public Class AddItemRec
+        Public Property 枝番 As NormalStruct
+        Public Property 品名選択_枝番付き As NormalStruct
+        Public Property 品名2コード_枝番付き As NormalStruct
+        Public Property 品名2名_枝番付き As NormalStruct
+        Public Property 油種名_枝番付き As NormalStruct
+        Public Property 品名詳細_枝番付き As NormalStruct
+        Public Property 品名1コード_枝番付き As NormalStruct
+        Public Property 数量_枝番付き As NormalStruct
+        Public Property 油種コード_枝番付き As NormalStruct
+        Public Property 品名1名_枝番付き As NormalStruct
     End Class
 
     ''' <summary>
