@@ -27,6 +27,7 @@ Public Class LNT0001InvoiceOutput
     Private LNT0001SKSprate As DataTable                             '-- SK特別料金マスタ
     Private LNT0001SKSurcharge As DataTable                          '-- SK燃料サーチャージマスタ
     Private LNT0001Calendar As DataTable                             '-- カレンダーマスタ
+    Private LNT0001HolidayRate As DataTable                          '-- 休日割増単価マスタ
     Private LNS0006tbl As DataTable                                  '固定値マスタ格納用テーブル
     ''' <summary>
     ''' 定数
@@ -808,6 +809,7 @@ Public Class LNT0001InvoiceOutput
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar,
                                                                              printHachinoheSprateDataClass:=LNT0001HachinoheSprate,
                                                                              printEneosComfeeDataClass:=LNT0001EneosComfee,
+                                                                             printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                              taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
@@ -867,6 +869,7 @@ Public Class LNT0001InvoiceOutput
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGEN(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                   LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
+                                                                                  printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                                   taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
@@ -889,6 +892,7 @@ Public Class LNT0001InvoiceOutput
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGENHokaido(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                          LNT0001tbl, LNT0001Tanktbl, LNT0001SKSprate, LNT0001SKSurcharge, LNT0001Calendar, dcIshikari,
+                                                                                         printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                                          taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
@@ -912,6 +916,7 @@ Public Class LNT0001InvoiceOutput
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputCENERGY_ELNESS(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                              LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, dcCenergy, dcElNess,
+                                                                             printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                              taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
             Try
@@ -1155,6 +1160,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
             CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtCenergyElNessTank, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=cenergyElNessTankClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1243,6 +1249,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001SKSurcharge)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=LNT0001SKSprate, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenKoteihiHKDClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1315,6 +1322,8 @@ Public Class LNT0001InvoiceOutput
         Dim sekiyuSigenTodokeClass As String = ""
         Dim sekiyuSigenSGKoteihiClass As String = ""
         Dim arrToriCode As String() = {"", "", ""}
+        Dim listOrderOrgCode As New List(Of String)
+        Dim commaOrderOrgCode As String = ""
         Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
         Dim arrFuzumi002022_302 As String() = {"T", "U"}    '--（ＳＫ）本田金属　喜多方サテライト(302号車(11.4t車)不積)
         Dim arrFuzumi002019_333 As String() = {"T", "U"}    '--（ＳＫ）テーブルマーク　塩沢      (333号車(14.0t車)不積)
@@ -1332,7 +1341,11 @@ Public Class LNT0001InvoiceOutput
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
                 arrToriCode(1) = Nothing
                 arrToriCode(2) = Nothing
-
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021502)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020601)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020402)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020804)
+                commaOrderOrgCode = String.Join(",", listOrderOrgCode)
             Case Else
                 Exit Sub
         End Select
@@ -1346,6 +1359,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
             CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtSekiyuSigenTodoke, I_ORDERORGCODE:=commaOrderOrgCode, I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenTodokeClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1939,6 +1953,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001HachinoheSprate)
             CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001EneosComfee)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtEneosTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2))
         End Using
 
         '〇(帳票)使用項目の設定

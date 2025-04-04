@@ -23,6 +23,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
     Private PrintCalendarData As DataTable
+    Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -39,10 +40,15 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     ''' <param name="printDataClass">帳票データ</param>
     ''' <param name="printTankDataClass"></param>
     ''' <param name="printKoteihiDataClass">固定費マスタ</param>
+    ''' <param name="printCalendarDataClass">カレンダーマスタ</param>
+    ''' <param name="dicCenergyList">業務車番格納(３〇〇)</param>
+    ''' <param name="dicElNessList"> 業務車番格納(６〇〇)</param>
+    ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                    dicCenergyList As Dictionary(Of String, String), dicElNessList As Dictionary(Of String, String),
+                   Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -53,6 +59,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             'Me.PrintSKKoteichiData = printSKKoteichiDataClass
+            Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -181,8 +188,8 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             EditHeaderArea()
             '◯明細の設定
             EditDetailArea()
-            ''◯(固定費・単価)の設定
-            'EditKoteihiTankaArea()
+            '◯(固定費・単価)の設定
+            EditKoteihiTankaArea()
             '***** TODO処理 ここまで *****
             '★ [ﾏｽﾀ]シート非表示
             WW_Workbook.Worksheets(WW_SheetNoMaster).Visible = Visibility.Hidden
@@ -308,6 +315,44 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の(固定費・単価)の設定
+    ''' </summary>
+    Private Sub EditKoteihiTankaArea()
+
+        Try
+            '■基本料金(基準(川越・知多)・基準(上越))※３〇〇車番
+            '・車番
+            '・単位
+            '・距離単価
+            '・基本運賃
+
+
+            '■基本料金(基準(川越・上越・富山))　　　※６〇〇車番
+            '・車番
+            '・基本運賃(通常)
+            '・基本運賃(冬季)
+
+
+            '■シーエナジー(休日運賃)
+            Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "
+            For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+            Next
+            '■シーエナジー(年末年始料金)
+            conditionSub = "RANGE_YEAREND_NEWYEAR='1' "
+            For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("F{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+            Next
+
+        Catch ex As Exception
+
+        End Try
+
     End Sub
 
 End Class

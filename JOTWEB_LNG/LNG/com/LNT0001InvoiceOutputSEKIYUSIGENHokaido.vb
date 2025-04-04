@@ -25,6 +25,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private PrintKoteihiData As DataTable
     Private PrintSKKoteihiData As DataTable
     Private PrintCalendarData As DataTable
+    Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -32,9 +33,23 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private OutputFileName As String = ""
     Private calcZissekiNumber As Integer
 
+    ''' <summary>
+    ''' コンストラクタ
+    ''' </summary>
+    ''' <param name="mapId">帳票格納先のMAPID</param>
+    ''' <param name="excelFileName">Excelファイル名（フルパスではない)</param>
+    ''' <param name="outputFileName">(出力用)Excelファイル名（フルパスではない)</param>
+    ''' <param name="printDataClass">帳票データ</param>
+    ''' <param name="printTankDataClass"></param>
+    ''' <param name="printKoteihiDataClass">固定費マスタ</param>
+    ''' <param name="printSKKoteihiDataClass"></param>
+    ''' <param name="printCalendarDataClass">カレンダーマスタ</param>
+    ''' <param name="dicIshikariList">>石狩(届先)格納</param>
+    ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printSKKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                dicIshikariList As Dictionary(Of String, String),
+               Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                Optional ByVal taishoYm As String = Nothing,
                Optional ByVal calcNumber As Integer = 1,
                Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -45,6 +60,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintSKKoteihiData = printSKKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
+            Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.WW_DicIshikariList = dicIshikariList
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
@@ -265,6 +281,16 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                     End If
                 End If
             Next
+
+            '〇届先(休日割増単価)設定
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                '■石狩営業所(日祝割増)
+                Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' OR RANGE_YEAREND_NEWYEAR='1' OR RANGE_MAYDAY='1' "
+                For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                    If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("F{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                Next
+            End If
 
             '〇[室蘭ガスサーチャージ]設定
             For Each PrintSKKoteihiDatarow As DataRow In PrintSKKoteihiData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_003563))

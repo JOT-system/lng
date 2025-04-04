@@ -27,6 +27,7 @@ Public Class LNT0001InvoiceOutputReport
     Private PrintHachinoheSprateData As DataTable
     Private PrintEneosComfeeData As DataTable
     Private PrintCalendarData As DataTable
+    Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -49,6 +50,7 @@ Public Class LNT0001InvoiceOutputReport
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                    Optional ByVal printHachinoheSprateDataClass As DataTable = Nothing,
                    Optional ByVal printEneosComfeeDataClass As DataTable = Nothing,
+                   Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -60,6 +62,7 @@ Public Class LNT0001InvoiceOutputReport
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintHachinoheSprateData = printHachinoheSprateDataClass
             Me.PrintEneosComfeeData = printEneosComfeeDataClass
+            Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -527,6 +530,16 @@ Public Class LNT0001InvoiceOutputReport
             For Each PrintEneosComfeeDatarow As DataRow In PrintEneosComfeeData.Select(condition)
                 WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Integer.Parse(PrintEneosComfeeDatarow("KINGAKU").ToString())
             Next
+
+            '〇届先(休日割増単価)設定
+            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
+                '■八戸営業所(日祝割増)
+                Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "
+                For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                    If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                Next
+            End If
 
             '★計算エンジンの有効化
             WW_Workbook.EnableCalculation = True

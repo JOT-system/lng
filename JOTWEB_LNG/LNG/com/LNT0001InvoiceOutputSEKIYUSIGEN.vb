@@ -29,6 +29,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private PrintKoteihiData As DataTable
     Private PrintCalendarData As DataTable
     Private PrintSKKoteichiData As DataTable
+    Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
     Private TaishoMM As String = ""
@@ -45,10 +46,17 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     ''' <param name="printDataClass">帳票データ</param>
     ''' <param name="printTankDataClass"></param>
     ''' <param name="printKoteihiDataClass">固定費マスタ</param>
+    ''' <param name="printCalendarDataClass">カレンダーマスタ</param>
+    ''' <param name="dicNigataList">新潟(届先)格納</param>
+    ''' <param name="dicSyonaiList">庄内(届先)格納</param>
+    ''' <param name="dicTouhokuList">東北(届先)格納</param>
+    ''' <param name="dicIbarakiList">茨城(届先)格納</param>
+    ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable, printSKKoteichiDataClass As DataTable,
                    dicNigataList As Dictionary(Of String, String), dicSyonaiList As Dictionary(Of String, String), dicTouhokuList As Dictionary(Of String, String), dicIbarakiList As Dictionary(Of String, String),
+                   Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
                    Optional ByVal defaultDatakey As String = C_DEFAULT_DATAKEY)
@@ -59,6 +67,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintSKKoteichiData = printSKKoteichiDataClass
+            Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
             Me.TaishoMM = Date.Parse(taishoYm + "/" + "01").ToString("MM")
@@ -421,6 +430,14 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                     setCell = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + "3"
                     WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = PrintDatarow("KOTEICHI_GYOMU").ToString()
                 End If
+            Next
+
+            '■石油資源開発(本州)(休日加算金)
+            Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' OR RANGE_YEAREND_NEWYEAR='1' OR RANGE_MAYDAY='1' "
+            For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+                'WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("D{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
             Next
 
             '★計算エンジンの有効化

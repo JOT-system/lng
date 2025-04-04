@@ -968,4 +968,612 @@ Public Class CmnParts
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 休日割増単価マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    ''' <param name="I_TORICODE">取引先コード</param>
+    ''' <param name="O_dtHOLIDAYRATEMas">検索結果取得用</param>
+    ''' <param name="I_dtTODOKEMas">設定(行)取得用TABLE</param>
+    ''' <param name="I_ORDERORGCODE">受注受付部署コード</param>
+    ''' <param name="I_SHUKABASHO">出荷場所コード</param>
+    ''' <param name="I_TODOKECODE">届先コード</param>
+    ''' <param name="I_CLASS">変換マスタ(分類コード)</param>
+    Public Sub SelectHOLIDAYRATEMaster(ByVal SQLcon As MySqlConnection,
+                                       ByVal I_TORICODE As String, ByRef O_dtHOLIDAYRATEMas As DataTable,
+                                       Optional ByVal I_dtTODOKEMas As DataTable = Nothing,
+                                       Optional ByVal I_ORDERORGCODE As String = Nothing,
+                                       Optional ByVal I_SHUKABASHO As String = Nothing,
+                                       Optional ByVal I_TODOKECODE As String = Nothing,
+                                       Optional ByVal I_CLASS As String = Nothing)
+        If IsNothing(O_dtHOLIDAYRATEMas) Then
+            O_dtHOLIDAYRATEMas = New DataTable
+        End If
+        If O_dtHOLIDAYRATEMas.Columns.Count <> 0 Then
+            O_dtHOLIDAYRATEMas.Columns.Clear()
+        End If
+        O_dtHOLIDAYRATEMas.Clear()
+
+        Dim SQLStr As String = ""
+        SQLStr = selectHOLIDAYRATESentence(I_TORICODE, I_ORDERORGCODE, I_CLASS)
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtHOLIDAYRATEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtHOLIDAYRATEMas.Load(SQLdr)
+                End Using
+            End Using
+
+            '★休日範囲(網羅チェック)
+            For Each dtHOLIDAYRATEMasrow As DataRow In O_dtHOLIDAYRATEMas.Rows
+                Dim iRangeLen As Integer = dtHOLIDAYRATEMasrow("RANGECODE").ToString().Length
+                Dim j As Integer = 0
+                For i As Integer = 1 To iRangeLen
+
+                    Select Case dtHOLIDAYRATEMasrow("RANGECODE").ToString().Substring(j, 1)
+                        '★日曜
+                        Case "1"
+                            dtHOLIDAYRATEMasrow("RANGE_SUNDAY") = "1"
+                        '★祝日
+                        Case "2"
+                            dtHOLIDAYRATEMasrow("RANGE_HOLIDAY") = "1"
+                        '★年末年始
+                        Case "3", "4"
+                            dtHOLIDAYRATEMasrow("RANGE_YEAREND_NEWYEAR") = "1"
+                        '★メーデー(労働者の祭典)
+                        Case "5"
+                            dtHOLIDAYRATEMasrow("RANGE_MAYDAY") = "1"
+                    End Select
+
+                    j += 1
+                Next
+            Next
+
+            '★取引マスタTBL検索
+            SelectTORIMaster(SQLcon, I_dtTORISet:=O_dtHOLIDAYRATEMas)
+            '★受注受付部署マスタTBL検索
+            SelectORDERORGMaster(SQLcon, I_dtORDERORGSet:=O_dtHOLIDAYRATEMas)
+            '★出荷場所マスタTBL検索
+            SelectSHUKABASHOMaster(SQLcon, I_dtSHUKABASHOSet:=O_dtHOLIDAYRATEMas)
+            '★届先マスタTBL検索
+            SelectTODOKEMaster(SQLcon, I_dtTODOKESet:=O_dtHOLIDAYRATEMas)
+
+            '★マスターシート(設定)項目追加 -----------------------------------------------
+            I_dtTODOKEMas.Columns.Add("CHK_TODOKECODE", Type.GetType("System.String"))
+            I_dtTODOKEMas.Columns.Add("CHK_MASCELL", Type.GetType("System.String"))
+            Dim setItem As String() = {"KEYCODE01", "VALUE04"}
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+                AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                '■石油資源開発(北海道)の場合
+                setItem(0) = "TODOKECODE"
+                setItem(1) = "KOTEIHI_CELLNUM"
+            ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                '■シーエナジーの場合
+                setItem(0) = "KEYCODE04"    '※届先がないので、一旦業務車番設定
+                setItem(1) = "VALUE11"
+            End If
+            For Each dtTODOKEMasrow As DataRow In I_dtTODOKEMas.Rows
+                dtTODOKEMasrow("CHK_TODOKECODE") = dtTODOKEMasrow(setItem(0))
+                dtTODOKEMasrow("CHK_MASCELL") = dtTODOKEMasrow(setItem(1))
+            Next
+            ' ----------------------------------------------------------------------------/
+
+            '★[ﾏｽﾀ]シート設定セル取得
+            If Not IsNothing(I_dtTODOKEMas) Then
+                '■石油資源開発(本州)
+                If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+                    AndAlso I_ORDERORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    For Each dtTODOKEMasrow As DataRow In I_dtTODOKEMas.Rows
+                        '★条件
+                        Dim conditionSub As String = ""
+                        '受注受付部署コード
+                        Dim orderOrgcode As String = dtTODOKEMasrow("KEYCODE04").ToString()
+                        conditionSub &= String.Format("ORDERORGCODE = '{0}' ", orderOrgcode)
+                        ''出荷場所コード
+                        'Dim shukaBashocode As String = dtTODOKEMasrow("KEYCODE06").ToString()
+                        'conditionSub &= String.Format("AND SHUKABASHOCODE = '{0}' ", shukaBashocode)
+                        '届先コード
+                        Dim todokeCode As String = dtTODOKEMasrow("KEYCODE01").ToString()
+                        conditionSub &= String.Format("AND TODOKECODE_LNM0005 = '{0}' ", todokeCode)
+
+                        For Each dtHOLIDAYRATEMasrow As DataRow In O_dtHOLIDAYRATEMas.Select(conditionSub)
+                            '〇届け先判定区分(1：対象　2：除外)
+                            selectHOLIDAYRATETodokeJudge(dtTODOKEMasrow, dtHOLIDAYRATEMasrow)
+                        Next
+                    Next
+
+                ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+                    AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    '■石油資源開発(北海道)
+                    For Each dtTODOKEMasrow As DataRow In I_dtTODOKEMas.Rows
+                        Dim detailName As String = dtTODOKEMasrow("DETAILNAME").ToString()
+                        If detailName.Substring(0, 2) <> "日祝" Then
+                            Continue For
+                        End If
+                        For Each dtHOLIDAYRATEMasrow As DataRow In O_dtHOLIDAYRATEMas.Rows
+                            '〇届け先判定区分(1：対象　2：除外)
+                            selectHOLIDAYRATETodokeJudge(dtTODOKEMasrow, dtHOLIDAYRATEMasrow)
+                        Next
+                    Next
+
+                ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                    '■シーエナジーの場合(※業務車番毎のため、判定なし)
+
+                Else
+                    '※上記(以外)
+                    For Each dtTODOKEMasrow As DataRow In I_dtTODOKEMas.Rows
+                        For Each dtHOLIDAYRATEMasrow As DataRow In O_dtHOLIDAYRATEMas.Rows
+                            '〇届け先判定区分(1：対象　2：除外)
+                            selectHOLIDAYRATETodokeJudge(dtTODOKEMasrow, dtHOLIDAYRATEMasrow)
+                        Next
+                    Next
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    Private Function selectHOLIDAYRATESentence(ByVal I_TORICODE As String, ByVal I_ORDERORGCODE As String, ByVal I_CLASS As String) As String
+        Dim SQLStr As String = ""
+        '-- SELECT(共通)
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0017.TORICODE "
+        SQLStr &= " ,  ''   AS TORINAME "
+        SQLStr &= " ,  LNM0017.ORDERORGCODE "
+        SQLStr &= " ,  ''   AS ORDERORGNAME "
+        SQLStr &= " ,  LNM0017.ORDERORGCATEGORY "
+        SQLStr &= " ,  LNM0017.SHUKABASHO AS SHUKABASHOCODE "
+        SQLStr &= " ,  ''   AS SHUKABASHONAME "
+        SQLStr &= " ,  LNM0017.SHUKABASHOCATEGORY "
+        SQLStr &= " ,  LNM0017.TODOKECODE "
+        SQLStr &= " ,  ''   AS TODOKENAME "
+        SQLStr &= " ,  LNM0017.TODOKECATEGORY "
+        SQLStr &= " ,  LNM0017.RANGECODE "
+        SQLStr &= " ,  '0' AS RANGE_SUNDAY "            '-- 日曜
+        SQLStr &= " ,  '0' AS RANGE_HOLIDAY "           '-- 祝日
+        'SQLStr &= " ,  '0' AS RANGE_NEWYEAR "           '-- 元旦
+        SQLStr &= " ,  '0' AS RANGE_YEAREND_NEWYEAR "   '-- 年末年始(元旦含む)
+        SQLStr &= " ,  '0' AS RANGE_MAYDAY "            '-- 労働者の祭典
+        SQLStr &= " ,  LNM0017.GYOMUTANKNUMFROM "
+        SQLStr &= " ,  LNM0017.GYOMUTANKNUMTO "
+        SQLStr &= " ,  LNM0017.TANKA "
+
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso I_ORDERORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '■石油資源開発(本州)
+            SQLStr &= " ,  LNM0005.VALUE04   AS SETMASTERCELL "
+            SQLStr &= " ,  LNM0005.KEYCODE04 AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE05 AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE06 AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE07 AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE01 AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE02 AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT * FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " LNM0017.ORDERORGCODE = LNM0005.KEYCODE04 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE02 NOT LIKE 'TMP%'  "
+
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '■石油資源開発(北海道)
+            SQLStr &= " ,  LNM0005.VALUE02   AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE02 AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE03 AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE05 AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE06 AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT * FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " LNM0017.SHUKABASHO = LNM0005.KEYCODE02 "
+            SQLStr &= " AND LNM0017.TODOKECODE = LNM0005.KEYCODE05 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE08 LIKE '日祝%' "
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '■シーエナジー
+            SQLStr &= " ,  IFNULL(LNM0005.VALUE11,'')   AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  IFNULL(LNM0005.KEYCODE05,'') AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  IFNULL(LNM0005.KEYCODE06,'') AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  IFNULL(LNM0005.KEYCODE04,'') AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT LNM0017.* ,SUBSTRING(LNM0017.GYOMUTANKNUMFROM, 1, 1) AS GYOMUTANK_FIRST "
+            SQLStr &= " FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+            ''★受注受付部署コード
+            'If Not IsNothing(I_ORDERORGCODE) Then
+            '    SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            'End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " 1=1 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND SUBSTRING(LNM0005.KEYCODE04, 1, 1) = GYOMUTANK_FIRST "
+
+            '-- ORDER BY
+            SQLStr &= " ORDER by CAST(LNM0005.VALUE11 AS SIGNED) "
+
+        Else
+            '※上記(以外)
+            SQLStr &= " ,  '' AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+
+        End If
+
+        Return SQLStr
+    End Function
+
+    Private Sub selectHOLIDAYRATETodokeJudge(ByVal dtTODOKEMasrow As DataRow, ByRef dtHOLIDAYRATEMasrow As DataRow)
+        '〇届け先判定区分(1：対象　2：除外)
+        If dtHOLIDAYRATEMasrow("TODOKECATEGORY").ToString() = "1" Then
+            If dtHOLIDAYRATEMasrow("TODOKECODE").ToString() = dtTODOKEMasrow("CHK_TODOKECODE").ToString() Then
+                dtHOLIDAYRATEMasrow("SETMASTERCELL") = dtTODOKEMasrow("CHK_MASCELL").ToString()
+            End If
+        ElseIf dtHOLIDAYRATEMasrow("TODOKECATEGORY").ToString() = "2" Then
+            If dtHOLIDAYRATEMasrow("TODOKECODE").ToString() = dtTODOKEMasrow("CHK_TODOKECODE").ToString() Then
+                dtHOLIDAYRATEMasrow("SETMASTERCELL") = ""
+            End If
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' 取引マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    Public Sub SelectTORIMaster(ByVal SQLcon As MySqlConnection,
+                                Optional ByRef I_dtTORISet As DataTable = Nothing,
+                                Optional ByRef O_dtTORIMas As DataTable = Nothing)
+        If IsNothing(O_dtTORIMas) Then
+            O_dtTORIMas = New DataTable
+        End If
+        If O_dtTORIMas.Columns.Count <> 0 Then
+            O_dtTORIMas.Columns.Clear()
+        End If
+        O_dtTORIMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNT0001.SHUKATORICODE "
+        SQLStr &= " ,  LNT0001.SHUKATORINAME "
+
+        '-- FROM
+        SQLStr &= " FROM ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "       LNT0001.SHUKATORICODE"
+        SQLStr &= "     , LNT0001.SHUKATORINAME"
+        SQLStr &= "     , ROW_NUMBER() OVER(PARTITION BY LNT0001.SHUKATORICODE ORDER BY LNT0001.SHUKATORICODE) RNUM"
+        SQLStr &= "     FROM ( "
+        SQLStr &= "         SELECT DISTINCT "
+        SQLStr &= "           LNT0001.SHUKATORICODE "
+        SQLStr &= "         , LNT0001.SHUKATORINAME "
+        SQLStr &= "         FROM LNG.LNT0001_ZISSEKI LNT0001 "
+        SQLStr &= "         WHERE LNT0001.SHUKATORICODE <> '' "
+        SQLStr &= "     ) LNT0001 "
+        SQLStr &= " ) LNT0001 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= "     LNT0001.RNUM = 1 "
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY LNT0001.SHUKATORICODE "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtTORIMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtTORIMas.Load(SQLdr)
+                End Using
+            End Using
+
+            If Not IsNothing(I_dtTORISet) Then
+                For Each dtTORIMasrow As DataRow In O_dtTORIMas.Rows
+                    Dim condition As String = ""
+                    condition = String.Format("TORICODE='{0}' ", dtTORIMasrow("SHUKATORICODE").ToString())
+                    For Each dtTORISetrow As DataRow In I_dtTORISet.Select(condition)
+                        dtTORISetrow("TORINAME") = dtTORIMasrow("SHUKATORINAME").ToString()
+                    Next
+                Next
+            End If
+
+        Catch ex As Exception
+            'Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 受注受付部署マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    Public Sub SelectORDERORGMaster(ByVal SQLcon As MySqlConnection,
+                                    Optional ByRef I_dtORDERORGSet As DataTable = Nothing,
+                                    Optional ByRef O_dtORDERORGMas As DataTable = Nothing)
+        If IsNothing(O_dtORDERORGMas) Then
+            O_dtORDERORGMas = New DataTable
+        End If
+        If O_dtORDERORGMas.Columns.Count <> 0 Then
+            O_dtORDERORGMas.Columns.Clear()
+        End If
+        O_dtORDERORGMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNT0001.ORDERORGCODE "
+        SQLStr &= " ,  LNT0001.ORDERORGNAME "
+
+        '-- FROM
+        SQLStr &= " FROM ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "       LNT0001.ORDERORGCODE"
+        SQLStr &= "     , LNT0001.ORDERORGNAME"
+        SQLStr &= "     , ROW_NUMBER() OVER(PARTITION BY LNT0001.ORDERORGCODE ORDER BY LNT0001.ORDERORGCODE) RNUM"
+        SQLStr &= "     FROM ( "
+        SQLStr &= "         SELECT DISTINCT "
+        SQLStr &= "           LNT0001.ORDERORGCODE "
+        SQLStr &= "         , LNT0001.ORDERORGNAME "
+        SQLStr &= "         FROM LNG.LNT0001_ZISSEKI LNT0001 "
+        SQLStr &= "         WHERE LNT0001.ORDERORGCODE <> '' "
+        SQLStr &= "     ) LNT0001 "
+        SQLStr &= " ) LNT0001 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= "     LNT0001.RNUM = 1 "
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY LNT0001.ORDERORGCODE "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtORDERORGMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtORDERORGMas.Load(SQLdr)
+                End Using
+            End Using
+
+            If Not IsNothing(I_dtORDERORGSet) Then
+                For Each dtORDERORGMasrow As DataRow In O_dtORDERORGMas.Rows
+                    Dim condition As String = ""
+                    condition = String.Format("ORDERORGCODE='{0}' ", dtORDERORGMasrow("ORDERORGCODE").ToString())
+                    For Each dtORDERORGSetrow As DataRow In I_dtORDERORGSet.Select(condition)
+                        dtORDERORGSetrow("ORDERORGNAME") = dtORDERORGMasrow("ORDERORGNAME").ToString()
+                    Next
+                Next
+            End If
+
+        Catch ex As Exception
+            'Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 出荷場所マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    Public Sub SelectSHUKABASHOMaster(ByVal SQLcon As MySqlConnection,
+                                      Optional ByRef I_dtSHUKABASHOSet As DataTable = Nothing,
+                                      Optional ByRef O_dtSHUKABASHOMas As DataTable = Nothing)
+        If IsNothing(O_dtSHUKABASHOMas) Then
+            O_dtSHUKABASHOMas = New DataTable
+        End If
+        If O_dtSHUKABASHOMas.Columns.Count <> 0 Then
+            O_dtSHUKABASHOMas.Columns.Clear()
+        End If
+        O_dtSHUKABASHOMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNT0001.SHUKABASHO "
+        SQLStr &= " ,  LNT0001.SHUKANAME "
+
+        '-- FROM
+        SQLStr &= " FROM ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "       LNT0001.SHUKABASHO"
+        SQLStr &= "     , LNT0001.SHUKANAME"
+        SQLStr &= "     , ROW_NUMBER() OVER(PARTITION BY LNT0001.SHUKABASHO ORDER BY LNT0001.SHUKABASHO) RNUM"
+        SQLStr &= "     FROM ( "
+        SQLStr &= "         SELECT DISTINCT "
+        SQLStr &= "           LNT0001.SHUKABASHO "
+        SQLStr &= "         , LNT0001.SHUKANAME "
+        SQLStr &= "         FROM LNG.LNT0001_ZISSEKI LNT0001 "
+        SQLStr &= "         WHERE LNT0001.SHUKABASHO <> '' "
+        SQLStr &= "     ) LNT0001 "
+        SQLStr &= " ) LNT0001 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= "     LNT0001.RNUM = 1 "
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY LNT0001.SHUKABASHO "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSHUKABASHOMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSHUKABASHOMas.Load(SQLdr)
+                End Using
+            End Using
+
+            If Not IsNothing(I_dtSHUKABASHOSet) Then
+                For Each dtSHUKABASHOMasrow As DataRow In O_dtSHUKABASHOMas.Rows
+                    Dim condition As String = ""
+                    condition = String.Format("SHUKABASHOCODE='{0}' ", dtSHUKABASHOMasrow("SHUKABASHO").ToString())
+                    For Each dtSHUKABASHOSetrow As DataRow In I_dtSHUKABASHOSet.Select(condition)
+                        dtSHUKABASHOSetrow("SHUKABASHONAME") = dtSHUKABASHOMasrow("SHUKANAME").ToString()
+                    Next
+                Next
+            End If
+
+        Catch ex As Exception
+            'Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 届先マスタTBL検索
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続文字</param>
+    Public Sub SelectTODOKEMaster(ByVal SQLcon As MySqlConnection,
+                                  Optional ByRef I_dtTODOKESet As DataTable = Nothing,
+                                  Optional ByRef O_dtTODOKEMas As DataTable = Nothing)
+        If IsNothing(O_dtTODOKEMas) Then
+            O_dtTODOKEMas = New DataTable
+        End If
+        If O_dtTODOKEMas.Columns.Count <> 0 Then
+            O_dtTODOKEMas.Columns.Clear()
+        End If
+        O_dtTODOKEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNT0001.TODOKECODE "
+        SQLStr &= " ,  LNT0001.TODOKENAME "
+
+        '-- FROM
+        SQLStr &= " FROM ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "       LNT0001.TODOKECODE"
+        SQLStr &= "     , LNT0001.TODOKENAME"
+        SQLStr &= "     , ROW_NUMBER() OVER(PARTITION BY LNT0001.TODOKECODE ORDER BY LNT0001.TODOKECODE) RNUM"
+        SQLStr &= "     FROM ( "
+        SQLStr &= "         SELECT DISTINCT "
+        SQLStr &= "           LNT0001.TODOKECODE "
+        SQLStr &= "         , LNT0001.TODOKENAME "
+        SQLStr &= "         FROM LNG.LNT0001_ZISSEKI LNT0001 "
+        SQLStr &= "         WHERE LNT0001.TODOKECODE <> '' "
+        SQLStr &= "     ) LNT0001 "
+        SQLStr &= " ) LNT0001 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= "     LNT0001.RNUM = 1 "
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY LNT0001.TODOKECODE "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtTODOKEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtTODOKEMas.Load(SQLdr)
+                End Using
+            End Using
+
+            If Not IsNothing(I_dtTODOKESet) Then
+                For Each dtTODOKEMasrow As DataRow In O_dtTODOKEMas.Rows
+                    Dim condition As String = ""
+                    condition = String.Format("TODOKECODE='{0}' ", dtTODOKEMasrow("TODOKECODE").ToString())
+                    For Each dtTODOKESetrow As DataRow In I_dtTODOKESet.Select(condition)
+                        dtTODOKESetrow("TODOKENAME") = dtTODOKEMasrow("TODOKENAME").ToString()
+                    Next
+                Next
+            End If
+
+        Catch ex As Exception
+            'Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
 End Class
