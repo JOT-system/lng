@@ -751,6 +751,89 @@ Public Class CmnParts
     End Sub
 
     ''' <summary>
+    ''' 統合版特別料金マスタTBL検索
+    ''' </summary>
+    Public Sub SelectIntegrationSprateFEEMaster(ByVal SQLcon As MySqlConnection,
+                                                ByVal I_TORICODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSPRATEFEEMas As DataTable,
+                                                Optional ByVal I_ORGCODE As String = Nothing)
+        If IsNothing(O_dtSPRATEFEEMas) Then
+            O_dtSPRATEFEEMas = New DataTable
+        End If
+        If O_dtSPRATEFEEMas.Columns.Count <> 0 Then
+            O_dtSPRATEFEEMas.Columns.Clear()
+        End If
+        O_dtSPRATEFEEMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "      LNM0014.TARGETYM "                 '-- 対象年月
+        SQLStr &= "    , LNM0014.TORICODE "                 '-- 取引先コード
+        SQLStr &= "    , LNM0014.TORINAME "                 '-- 取引先名称
+        SQLStr &= "    , LNM0014.ORGCODE "                  '-- 部門コード
+        SQLStr &= "    , LNM0014.ORGNAME "                  '-- 部門名称
+        SQLStr &= "    , LNM0014.KASANORGCODE "             '-- 加算先部門コード
+        SQLStr &= "    , LNM0014.KASANORGNAME "             '-- 加算先部門名称
+        SQLStr &= "    , LNM0014.TODOKECODE "               '-- 届先コード
+        SQLStr &= "    , LNM0014.TODOKENAME "               '-- 届先名称
+        SQLStr &= "    , LNM0014.GROUPSORTNO "              '-- グループソート順
+        SQLStr &= "    , LNM0014.GROUPID "                  '-- グループID
+        SQLStr &= "    , LNM0014.GROUPNAME "                '-- グループ名
+        SQLStr &= "    , LNM0014.DETAILSORTNO "             '-- 明細ソート順
+        SQLStr &= "    , LNM0014.DETAILID "                 '-- 明細ID
+        SQLStr &= "    , LNM0014.DETAILNAME "               '-- 明細名
+        SQLStr &= "    , LNM0014.TANKA "                    '-- 単価
+        SQLStr &= "    , LNM0014.QUANTITY "                 '-- 数量
+        SQLStr &= "    , LNM0014.CALCUNIT "                 '-- 計算単位
+        SQLStr &= "    , LNM0014.DEPARTURE "                '-- 出荷地
+        SQLStr &= "    , LNM0014.MILEAGE "                  '-- 走行距離
+        SQLStr &= "    , LNM0014.SHIPPINGCOUNT "            '-- 輸送回数
+        SQLStr &= "    , LNM0014.NENPI "                    '-- 燃費
+        SQLStr &= "    , LNM0014.DIESELPRICECURRENT "       '-- 実勢軽油価格
+        SQLStr &= "    , LNM0014.DIESELPRICESTANDARD "      '-- 基準経由価格
+        SQLStr &= "    , LNM0014.DIESELCONSUMPTION "        '-- 燃料使用量
+        SQLStr &= "    , LNM0014.DISPLAYFLG "               '-- 表示フラグ
+        SQLStr &= "    , LNM0014.ASSESSMENTFLG "            '-- 鑑分けフラグ
+        SQLStr &= "    , LNM0014.ATENACOMPANYNAME "         '-- 宛名会社名
+        SQLStr &= "    , LNM0014.ATENACOMPANYDEVNAME "      '-- 宛名会社部門名
+        SQLStr &= "    , LNM0014.FROMORGNAME "              '-- 請求書発行部店名
+        SQLStr &= "    , LNM0014.MEISAICATEGORYID "         '-- 明細区分
+        SQLStr &= "    , LNM0014.BIKOU1 "                   '-- 備考1
+        SQLStr &= "    , LNM0014.BIKOU2 "                   '-- 備考2
+        SQLStr &= "    , LNM0014.BIKOU3 "                   '-- 備考3
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0014_SPRATE LNM0014 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0014.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0014.TARGETYM = '{0}' ", I_TAISHOYM)
+        SQLStr &= String.Format(" AND LNM0014.TORICODE = '{0}' ", I_TORICODE)
+        '★部門コード
+        If Not IsNothing(I_ORGCODE) Then
+            SQLStr &= String.Format(" AND LNM0014.ORGCODE IN ({0}) ", I_ORGCODE)
+        End If
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSPRATEFEEMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSPRATEFEEMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' SK特別料金マスタTBL検索
     ''' </summary>
     Public Sub SelectSKSpecialFEEMaster(ByVal SQLcon As MySqlConnection,

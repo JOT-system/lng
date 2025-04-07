@@ -26,6 +26,7 @@ Public Class LNT0001InvoiceOutputReport
     Private PrintKoteihiData As DataTable
     Private PrintHachinoheSprateData As DataTable
     Private PrintEneosComfeeData As DataTable
+    Private PrintTogouSprate As DataTable
     Private PrintCalendarData As DataTable
     Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
@@ -45,11 +46,14 @@ Public Class LNT0001InvoiceOutputReport
     ''' <param name="printKoteihiDataClass">固定費マスタ</param>
     ''' <param name="printHachinoheSprateDataClass">八戸特別料金マスタ</param>
     ''' <param name="printEneosComfeeDataClass">ENEOS業務委託料マスタ</param>
+    ''' <param name="printTogouSprateDataClass">統合版特別料金マスタ</param>
+    ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                    Optional ByVal printHachinoheSprateDataClass As DataTable = Nothing,
                    Optional ByVal printEneosComfeeDataClass As DataTable = Nothing,
+                   Optional ByVal printTogouSprateDataClass As DataTable = Nothing,
                    Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
@@ -62,6 +66,7 @@ Public Class LNT0001InvoiceOutputReport
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintHachinoheSprateData = printHachinoheSprateDataClass
             Me.PrintEneosComfeeData = printEneosComfeeDataClass
+            Me.PrintTogouSprate = printTogouSprateDataClass
             Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
@@ -531,9 +536,29 @@ Public Class LNT0001InvoiceOutputReport
                 WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Integer.Parse(PrintEneosComfeeDatarow("KINGAKU").ToString())
             Next
 
-            '〇届先(休日割増単価)設定
+            '■八戸営業所
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
-                '■八戸営業所(日祝割増)
+                '〇陸事番号(固定費(八戸人員/八戸出荷))設定
+                For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Rows
+                    '★1：八戸人員
+                    If PrintTogouSpraterow("GROUPID").ToString() = "1" Then
+                        '★1：追加人員固定費１
+                        If PrintTogouSpraterow("DETAILID").ToString() = "1" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G39").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                        End If
+                        '★2：追加人員固定費２
+                        If PrintTogouSpraterow("DETAILID").ToString() = "2" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G40").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                        End If
+                    End If
+                    '★2：八戸出荷
+                    If PrintTogouSpraterow("GROUPID").ToString() = "2" Then
+                        '八戸ターミナル負担分
+                        WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G41").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    End If
+                Next
+
+                '〇届先(休日割増単価)設定
                 Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "
                 For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
                     If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
