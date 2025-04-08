@@ -837,7 +837,7 @@ Public Class CmnParts
                 End Using
             End Using
         Catch ex As Exception
-            Throw '呼び出し元の例外にスロー
+            'Throw '呼び出し元の例外にスロー
         End Try
 
         '-- ★変換マスタより取得
@@ -902,7 +902,7 @@ Public Class CmnParts
                 Next
 
             Catch ex As Exception
-                Throw '呼び出し元の例外にスロー
+                'Throw '呼び出し元の例外にスロー
             End Try
 
         ElseIf Not IsNothing(I_CLASS) _
@@ -954,7 +954,7 @@ Public Class CmnParts
                 Next
 
             Catch ex As Exception
-
+                'Throw '呼び出し元の例外にスロー
             End Try
         End If
 

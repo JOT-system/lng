@@ -538,25 +538,25 @@ Public Class LNT0001InvoiceOutputReport
 
             '■八戸営業所
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
-                '〇陸事番号(固定費(八戸人員/八戸出荷))設定
-                For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Rows
-                    '★1：八戸人員
-                    If PrintTogouSpraterow("GROUPID").ToString() = "1" Then
-                        '★1：追加人員固定費１
-                        If PrintTogouSpraterow("DETAILID").ToString() = "1" Then
-                            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G39").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
-                        End If
-                        '★2：追加人員固定費２
-                        If PrintTogouSpraterow("DETAILID").ToString() = "2" Then
-                            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G40").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
-                        End If
-                    End If
-                    '★2：八戸出荷
-                    If PrintTogouSpraterow("GROUPID").ToString() = "2" Then
-                        '八戸ターミナル負担分
-                        WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G41").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
-                    End If
-                Next
+                ''〇陸事番号(固定費(八戸人員/八戸出荷))設定
+                'For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Rows
+                '    '★1：八戸人員
+                '    If PrintTogouSpraterow("GROUPID").ToString() = "1" Then
+                '        '★1：追加人員固定費１
+                '        If PrintTogouSpraterow("DETAILID").ToString() = "1" Then
+                '            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G39").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                '        End If
+                '        '★2：追加人員固定費２
+                '        If PrintTogouSpraterow("DETAILID").ToString() = "2" Then
+                '            WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G40").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                '        End If
+                '    End If
+                '    '★2：八戸出荷
+                '    If PrintTogouSpraterow("GROUPID").ToString() = "2" Then
+                '        '八戸ターミナル負担分
+                '        WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G41").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                '    End If
+                'Next
 
                 '〇届先(休日割増単価)設定
                 Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "

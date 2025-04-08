@@ -421,18 +421,18 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
 
             Next
 
-            '〇(その他)届名称(追加)用設定
-            For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
-                '〇シート「従量運賃」
-                '★ 配送先
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("DETAILNAME").ToString()
-                '★ 輸送数量
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("K" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = ""
-                '★ 課税対象額
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("O" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
-                '★ 表示
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
-            Next
+            ''〇(その他)届名称(追加)用設定
+            'For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
+            '    '〇シート「従量運賃」
+            '    '★ 配送先
+            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("DETAILNAME").ToString()
+            '    '★ 輸送数量
+            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("K" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = ""
+            '    '★ 課税対象額
+            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("O" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+            '    '★ 表示
+            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
+            'Next
 
             '〇届先(単価)設定
             For Each PrintDatarow As DataRow In PrintSKKoteichiData.Rows

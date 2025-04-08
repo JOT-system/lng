@@ -352,24 +352,24 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 End If
             Next
 
-            '〇[単価][固定費]設定(統合版特別料金マスタ)
-            For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
-                '〇シート「内訳」
-                '★ 月額固定費
-                If PrintTogouSpraterow("GROUPID").ToString() = "3" _
-                    AndAlso (PrintTogouSpraterow("DETAILID").ToString() = "7" _
-                             OrElse PrintTogouSpraterow("DETAILID").ToString() = "8") Then
-                    '〇３）バンカリング追加人件費
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
-                Else
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+            ''〇[単価][固定費]設定(統合版特別料金マスタ)
+            'For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
+            '    '〇シート「内訳」
+            '    '★ 月額固定費
+            '    If PrintTogouSpraterow("GROUPID").ToString() = "3" _
+            '        AndAlso (PrintTogouSpraterow("DETAILID").ToString() = "7" _
+            '                 OrElse PrintTogouSpraterow("DETAILID").ToString() = "8") Then
+            '        '〇３）バンカリング追加人件費
+            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+            '    Else
+            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
-                    ''★数量
-                    'If PrintTogouSpraterow("KUBUN").ToString() = "9" Then
-                    '    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintTogouSpraterow("QUANTITY").ToString())
-                    'End If
-                End If
-            Next
+            '        ''★数量
+            '        'If PrintTogouSpraterow("KUBUN").ToString() = "9" Then
+            '        '    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+            '        'End If
+            '    End If
+            'Next
 
             '〇届先(休日割増単価)設定
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
