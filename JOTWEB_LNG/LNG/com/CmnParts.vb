@@ -755,7 +755,8 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectIntegrationSprateFEEMaster(ByVal SQLcon As MySqlConnection,
                                                 ByVal I_TORICODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSPRATEFEEMas As DataTable,
-                                                Optional ByVal I_ORGCODE As String = Nothing)
+                                                Optional ByVal I_ORGCODE As String = Nothing,
+                                                Optional ByVal I_CLASS As String = Nothing)
         If IsNothing(O_dtSPRATEFEEMas) Then
             O_dtSPRATEFEEMas = New DataTable
         End If
@@ -774,8 +775,8 @@ Public Class CmnParts
         SQLStr &= "    , LNM0014.ORGNAME "                  '-- 部門名称
         SQLStr &= "    , LNM0014.KASANORGCODE "             '-- 加算先部門コード
         SQLStr &= "    , LNM0014.KASANORGNAME "             '-- 加算先部門名称
-        SQLStr &= "    , LNM0014.TODOKECODE "               '-- 届先コード
-        SQLStr &= "    , LNM0014.TODOKENAME "               '-- 届先名称
+        SQLStr &= "    , IFNULL(LNM0014.TODOKECODE, '') AS TODOKECODE "                     '-- 届先コード
+        SQLStr &= "    , IFNULL(LNM0014.TODOKENAME, '') AS TODOKENAME "                     '-- 届先名称
         SQLStr &= "    , LNM0014.GROUPSORTNO "              '-- グループソート順
         SQLStr &= "    , LNM0014.GROUPID "                  '-- グループID
         SQLStr &= "    , LNM0014.GROUPNAME "                '-- グループ名
@@ -783,27 +784,35 @@ Public Class CmnParts
         SQLStr &= "    , LNM0014.DETAILID "                 '-- 明細ID
         SQLStr &= "    , LNM0014.DETAILNAME "               '-- 明細名
         SQLStr &= "    , LNM0014.TANKA "                    '-- 単価
-        SQLStr &= "    , LNM0014.QUANTITY "                 '-- 数量
-        SQLStr &= "    , LNM0014.CALCUNIT "                 '-- 計算単位
-        SQLStr &= "    , LNM0014.DEPARTURE "                '-- 出荷地
-        SQLStr &= "    , LNM0014.MILEAGE "                  '-- 走行距離
-        SQLStr &= "    , LNM0014.SHIPPINGCOUNT "            '-- 輸送回数
-        SQLStr &= "    , LNM0014.NENPI "                    '-- 燃費
-        SQLStr &= "    , LNM0014.DIESELPRICECURRENT "       '-- 実勢軽油価格
-        SQLStr &= "    , LNM0014.DIESELPRICESTANDARD "      '-- 基準経由価格
-        SQLStr &= "    , LNM0014.DIESELCONSUMPTION "        '-- 燃料使用量
-        SQLStr &= "    , LNM0014.DISPLAYFLG "               '-- 表示フラグ
-        SQLStr &= "    , LNM0014.ASSESSMENTFLG "            '-- 鑑分けフラグ
-        SQLStr &= "    , LNM0014.ATENACOMPANYNAME "         '-- 宛名会社名
-        SQLStr &= "    , LNM0014.ATENACOMPANYDEVNAME "      '-- 宛名会社部門名
-        SQLStr &= "    , LNM0014.FROMORGNAME "              '-- 請求書発行部店名
-        SQLStr &= "    , LNM0014.MEISAICATEGORYID "         '-- 明細区分
-        SQLStr &= "    , LNM0014.BIKOU1 "                   '-- 備考1
-        SQLStr &= "    , LNM0014.BIKOU2 "                   '-- 備考2
-        SQLStr &= "    , LNM0014.BIKOU3 "                   '-- 備考3
+        SQLStr &= "    , IFNULL(LNM0014.QUANTITY, 0) AS QUANTITY "                          '-- 数量
+        SQLStr &= "    , LNM0014.CALCUNIT "                                                 '-- 計算単位
+        SQLStr &= "    , IFNULL(LNM0014.DEPARTURE, '') AS DEPARTURE "                       '-- 出荷地
+        SQLStr &= "    , IFNULL(LNM0014.MILEAGE, 0) AS MILEAGE "                            '-- 走行距離
+        SQLStr &= "    , IFNULL(LNM0014.SHIPPINGCOUNT, 0) AS SHIPPINGCOUNT "                '-- 輸送回数
+        SQLStr &= "    , IFNULL(LNM0014.NENPI, 0) AS NENPI "                                '-- 燃費
+        SQLStr &= "    , IFNULL(LNM0014.DIESELPRICECURRENT, 0) AS DIESELPRICECURRENT "      '-- 実勢軽油価格
+        SQLStr &= "    , IFNULL(LNM0014.DIESELPRICESTANDARD, 0) AS DIESELPRICESTANDARD "    '-- 基準経由価格
+        SQLStr &= "    , IFNULL(LNM0014.DIESELCONSUMPTION, 0) AS DIESELCONSUMPTION "        '-- 燃料使用量
+        SQLStr &= "    , IFNULL(LNM0014.DISPLAYFLG, '') AS DISPLAYFLG "                     '-- 表示フラグ
+        SQLStr &= "    , IFNULL(LNM0014.ASSESSMENTFLG, '') AS ASSESSMENTFLG "               '-- 鑑分けフラグ
+        SQLStr &= "    , IFNULL(LNM0014.ATENACOMPANYNAME, '') AS ATENACOMPANYNAME "         '-- 宛名会社名
+        SQLStr &= "    , IFNULL(LNM0014.ATENACOMPANYDEVNAME, '') AS ATENACOMPANYDEVNAME "   '-- 宛名会社部門名
+        SQLStr &= "    , IFNULL(LNM0014.FROMORGNAME, '') AS FROMORGNAME "                   '-- 請求書発行部店名
+        SQLStr &= "    , IFNULL(LNM0014.MEISAICATEGORYID, '') AS MEISAICATEGORYID "         '-- 明細区分
+        SQLStr &= "    , IFNULL(LNM0014.BIKOU1, '') AS BIKOU1 "                             '-- 備考1
+        SQLStr &= "    , IFNULL(LNM0014.BIKOU2, '') AS BIKOU2 "                             '-- 備考2
+        SQLStr &= "    , IFNULL(LNM0014.BIKOU3, '') AS BIKOU3 "                             '-- 備考3
+        SQLStr &= "    , '' AS KOTEIHI_DISPLAYFLG "
+        SQLStr &= "    , '' AS KOTEIHI_CELLNUM "
 
-        '-- FROM
+        '-- FROM(統合版特別料金マスタ)
+        SQLStr &= " FROM ( "
+        SQLStr &= " SELECT LNM0014.* "
+        SQLStr &= "      , CONVERT(LNM0014.GROUPID  ,SIGNED) AS GROUPID_INT "
+        SQLStr &= "      , CONVERT(LNM0014.DETAILID ,SIGNED) AS DETAILID_INT "
+        SQLStr &= "      , IFNULL(LNM0014.TODOKECODE,'')     AS TODOKECODE_CONVERT "
         SQLStr &= " FROM LNG.LNM0014_SPRATE LNM0014 "
+        SQLStr &= " ) LNM0014 "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -830,6 +839,124 @@ Public Class CmnParts
         Catch ex As Exception
             Throw '呼び出し元の例外にスロー
         End Try
+
+        '-- ★変換マスタより取得
+        Dim convertMAS As New DataTable
+        If IsNothing(convertMAS) Then
+            convertMAS = New DataTable
+        End If
+        If convertMAS.Columns.Count <> 0 Then
+            convertMAS.Columns.Clear()
+        End If
+        convertMAS.Clear()
+
+        Dim SQLStrSub As String = ""
+        If Not IsNothing(I_CLASS) _
+            AndAlso I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso I_ORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+
+            '〇石油資源開発(北海道)
+            '-- SELECT
+            SQLStrSub &= " SELECT LNM0005.* "
+            SQLStrSub &= " , ROW_NUMBER() OVER(PARTITION BY LNM0005.KEYCODE01 "
+            SQLStrSub &= "   ORDER BY LNM0005.KEYCODE01,LNM0005.KEYCODE04,LNM0005.KEYCODE07) RNUM "
+            '-- FROM
+            SQLStrSub &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- WHERE
+            SQLStrSub &= " WHERE "
+            SQLStrSub &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStrSub &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStrSub &= " AND LNM0005.KEYCODE08 NOT LIKE '日祝%' "   '※(日祝%)以外が設定されている
+
+            Try
+                Using SQLcmd As New MySqlCommand(SQLStrSub, SQLcon)
+                    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            convertMAS.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        convertMAS.Load(SQLdr)
+                    End Using
+                End Using
+
+                For Each dtSPRATEFEEMasrow As DataRow In O_dtSPRATEFEEMas.Rows
+                    Dim condition As String = ""
+                    '〇条件
+                    '・GRPID
+                    condition &= String.Format(" KEYCODE01='{0}' ", dtSPRATEFEEMasrow("GROUPID"))
+                    '・届先コード
+                    condition &= String.Format(" AND KEYCODE05='{0}' ", dtSPRATEFEEMasrow("TODOKECODE"))
+                    '・明細ID
+                    condition &= String.Format(" AND KEYCODE09='{0}' ", dtSPRATEFEEMasrow("DETAILID"))
+
+                    For Each convertMASrow As DataRow In convertMAS.Select(condition)
+                        '■シート[内訳]
+                        '・表示セルフラグ(1:表示)
+                        dtSPRATEFEEMasrow("KOTEIHI_DISPLAYFLG") = convertMASrow("VALUE01")
+                        '・行(設定)セル
+                        dtSPRATEFEEMasrow("KOTEIHI_CELLNUM") = convertMASrow("VALUE02")
+                    Next
+
+                Next
+
+            Catch ex As Exception
+                Throw '呼び出し元の例外にスロー
+            End Try
+
+        ElseIf Not IsNothing(I_CLASS) _
+            AndAlso I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso I_ORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '〇石油資源開発(本州)
+
+            '-- SELECT
+            SQLStrSub &= " SELECT LNM0005.* "
+            '-- FROM
+            SQLStrSub &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- WHERE
+            SQLStrSub &= " WHERE "
+            SQLStrSub &= String.Format("     LNM0005.DELFLG = '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStrSub &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStrSub &= " AND LNM0005.KEYCODE10 <> '' "    '※(GRPID + 明細ID)が設定されている
+
+            Try
+                Using SQLcmd As New MySqlCommand(SQLStrSub, SQLcon)
+                    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            convertMAS.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        convertMAS.Load(SQLdr)
+                    End Using
+                End Using
+
+                For Each dtSPRATEFEEMasrow As DataRow In O_dtSPRATEFEEMas.Rows
+                    '(結合)GRPID + 明細ID
+                    Dim joinItem As String = dtSPRATEFEEMasrow("GROUPID").ToString() + dtSPRATEFEEMasrow("DETAILID").ToString()
+                    Dim condition As String = ""
+                    '〇条件
+                    '・GRPID + 明細ID
+                    condition &= String.Format(" KEYCODE10='{0}' ", joinItem)
+                    '・部署コード
+                    condition &= String.Format(" AND KEYCODE04='{0}' ", dtSPRATEFEEMasrow("ORGCODE"))
+
+                    For Each convertMASrow As DataRow In convertMAS.Select(condition)
+                        '■シート[従量運賃]
+                        '・表示セルフラグ(1:表示)
+                        dtSPRATEFEEMasrow("KOTEIHI_DISPLAYFLG") = convertMASrow("VALUE02")
+                        '・行(設定)セル
+                        dtSPRATEFEEMasrow("KOTEIHI_CELLNUM") = convertMASrow("VALUE03")
+                    Next
+
+                Next
+
+            Catch ex As Exception
+
+            End Try
+        End If
 
     End Sub
 

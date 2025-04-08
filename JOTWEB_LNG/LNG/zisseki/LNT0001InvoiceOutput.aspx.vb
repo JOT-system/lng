@@ -871,6 +871,7 @@ Public Class LNT0001InvoiceOutput
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGEN(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                   LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
+                                                                                  printTogouSprateDataClass:=LNT0001TogouSprate,
                                                                                   printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                                   taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
@@ -894,6 +895,7 @@ Public Class LNT0001InvoiceOutput
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGENHokaido(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                          LNT0001tbl, LNT0001Tanktbl, LNT0001SKSprate, LNT0001SKSurcharge, LNT0001Calendar, dcIshikari,
+                                                                                         printTogouSprateDataClass:=LNT0001TogouSprate,
                                                                                          printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                                          taishoYm:=Me.WF_TaishoYm.Value)
             Dim url As String
@@ -1250,7 +1252,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
             CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001SKSurcharge)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
+            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=LNT0001SKSprate, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenKoteihiHKDClass)
         End Using
@@ -1362,6 +1364,7 @@ Public Class LNT0001InvoiceOutput
             CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
             CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
+            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtSekiyuSigenTodoke, I_ORDERORGCODE:=commaOrderOrgCode, I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenTodokeClass)
         End Using
 

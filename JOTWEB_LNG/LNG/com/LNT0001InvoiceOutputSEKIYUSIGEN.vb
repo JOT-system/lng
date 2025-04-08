@@ -29,6 +29,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private PrintKoteihiData As DataTable
     Private PrintCalendarData As DataTable
     Private PrintSKKoteichiData As DataTable
+    Private PrintTogouSprate As DataTable
     Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
@@ -56,6 +57,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable, printSKKoteichiDataClass As DataTable,
                    dicNigataList As Dictionary(Of String, String), dicSyonaiList As Dictionary(Of String, String), dicTouhokuList As Dictionary(Of String, String), dicIbarakiList As Dictionary(Of String, String),
+                   Optional ByVal printTogouSprateDataClass As DataTable = Nothing,
                    Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
@@ -67,6 +69,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintSKKoteichiData = printSKKoteichiDataClass
+            Me.PrintTogouSprate = printTogouSprateDataClass
             Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")
@@ -416,6 +419,19 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                 Catch ex As Exception
                 End Try
 
+            Next
+
+            '〇(その他)届名称(追加)用設定
+            For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
+                '〇シート「従量運賃」
+                '★ 配送先
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("DETAILNAME").ToString()
+                '★ 輸送数量
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("K" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = ""
+                '★ 課税対象額
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("O" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
             Next
 
             '〇届先(単価)設定
