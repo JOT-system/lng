@@ -8,6 +8,8 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     'Private WW_SheetNoUnchin As Integer = 0
     Private WW_SheetNoCalendar As Integer = 0
     Private WW_SheetNoMaster As Integer = 0
+    Private WW_SheetNoEvertMonth As Integer = 0
+    Private WW_SheetNoTitle As Integer = 0
     Private WW_DicCenergyList As New Dictionary(Of String, String)
     Private WW_DicElNessList As New Dictionary(Of String, String)
     Private WW_ArrSheetNoCenergy As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// シーエナジー(シート)用
@@ -127,43 +129,20 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             Dim j As Integer() = {0, 0, 0, 0, 0}
             For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
                 If WW_Workbook.Worksheets(i).Name = "入力表" Then
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "寺岡製作所（相馬出荷・東北）" Then
-                    '    WW_SheetNo03(0) = i
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "鶴岡ガス（相馬出荷・東北）" Then
-                    '    WW_SheetNo03(1) = i
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "若松ガス（相馬出荷・東北）" Then
-                    '    WW_SheetNo03(2) = i
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "固定運賃" Then
-                    '    '〇共通(シート[固定運賃])
-                    '    WW_SheetNoSKKoteihi = i
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "従量運賃" Then
-                    '    '〇共通(シート[従量運賃])
-                    '    WW_SheetNoUnchin = i
+
+                ElseIf WW_Workbook.Worksheets(i).Name = "毎月更新" Then
+                    '〇共通(シート[毎月更新])
+                    WW_SheetNoEvertMonth = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "表題" Then
+                    '〇共通(シート[表題])
+                    WW_SheetNoTitle = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "301" Then
                     '〇シーエナジー(シート[届先別])
                     WW_SheetNoCalendar = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
                     '〇共通(シート[ﾏｽﾀ])
                     WW_SheetNoMaster = i
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "TMP6" + (j(0) + 1).ToString("00") Then
-                    '    WW_ArrSheetNo01(j(0)) = i
-                    '    j(0) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "TMP7" + (j(1) + 1).ToString("00") Then
-                    '    WW_ArrSheetNo02(j(1)) = i
-                    '    j(1) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "TMP8" + (j(2) + 1).ToString("00") Then
-                    '    WW_ArrSheetNo03(j(2)) = i
-                    '    j(2) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(3) + 1).ToString("00") Then
-                    '    WW_ArrSheetNo04(j(3)) = i
-                    '    j(3) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟①" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟②" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)秋田" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(東北)" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(茨城)" Then
-                    '    WW_ArrSheetNoKoteichi(j(4)) = i
-                    '    j(4) += 1
+
                 End If
             Next
 
@@ -191,6 +170,10 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             '◯(固定費・単価)の設定
             EditKoteihiTankaArea()
             '***** TODO処理 ここまで *****
+            '★ [毎月更新]シート非表示
+            WW_Workbook.Worksheets(WW_SheetNoEvertMonth).Visible = Visibility.Hidden
+            '★ [表題]シート非表示
+            WW_Workbook.Worksheets(WW_SheetNoTitle).Visible = Visibility.Hidden
             '★ [ﾏｽﾀ]シート非表示
             WW_Workbook.Worksheets(WW_SheetNoMaster).Visible = Visibility.Hidden
             ''★ [固定値]シート非表示

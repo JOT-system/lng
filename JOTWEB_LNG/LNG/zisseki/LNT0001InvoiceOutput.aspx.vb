@@ -1612,6 +1612,10 @@ Public Class LNT0001InvoiceOutput
             ElseIf LNT0001tblrow("TRIP") = "2" Then
                 LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
                 LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE09") + iLine.ToString()
+                If dtSekiyuSigenTankrow("VALUE04").ToString() = "" Then
+                    LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
+                    LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
+                End If
             End If
             LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("KEYCODE02")
             LNT0001tblrow("SETLINE") = iLine
