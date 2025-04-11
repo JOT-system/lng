@@ -259,8 +259,8 @@ Public Class LNT0001InvoiceOutputTNG
                                 If Convert.ToString(OutPutRowData(i)("KAISU")) <> "0" Then
                                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("E" & Convert.ToString(YuuduuSheetRowData("ROWNO"))).Value = Convert.ToString(OutPutRowData(i)("KAISU"))
                                 End If
-                                '固定費マスタ更新
-                                UpdKoteihi(SQLcon, OutPutRowData(i))
+                                '固定費マスタ更新（2025/04/11　一旦コメント（三宅））
+                                'UpdKoteihi(SQLcon, OutPutRowData(i))
                             Next
                         End If
                     End If
@@ -736,27 +736,33 @@ Public Class LNT0001InvoiceOutputTNG
         '-- LEFT JOIN
         SQLStr &= " LEFT JOIN ( "
         SQLStr &= "           SELECT"
-        SQLStr &= "               A11.TAISHOYM "
-        SQLStr &= "              ,A11.SYABAN "
+        SQLStr &= "               DATE_FORMAT(A12.TODOKEDATE, '%Y/%m/01') as TODOKEDATE"
+        SQLStr &= "              ,A11.SYABAN     as SYABAN"
         SQLStr &= "              ,COUNT(A12.TORICODE) AS KAISU "
         SQLStr &= "           FROM LNG.LNM0009_TNGKOTEIHI A11 "
-        SQLStr &= "           LEFT JOIN LNG.LNT0001_ZISSEKI A12 "
+        SQLStr &= "           INNER JOIN LNG.LNT0001_ZISSEKI A12 "
         SQLStr &= "               ON A12.TORICODE = '0175400000' "
         SQLStr &= "               AND A12.GYOMUTANKNUM = A11.SYABAN "
-        SQLStr &= "               AND DATE_FORMAT(A12.TODOKEDATE,'%Y%m') = A11.TAISHOYM "
+        SQLStr &= String.Format(" AND DATE_FORMAT(A12.TODOKEDATE,'%Y/%m') = '{0}' ", TaishoYm)
         SQLStr &= "               AND A12.ZISSEKI <> 0 "
         SQLStr &= "               AND A12.DELFLG = '0' "
+        SQLStr &= "           WHERE "
+        SQLStr &= String.Format("     A11.STYMD   <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A11.ENDYMD  >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= "               AND A11.DELFLG   = '0' "
         SQLStr &= "           GROUP BY "
-        SQLStr &= "               A11.TAISHOYM "
+        SQLStr &= "               DATE_FORMAT(A12.TODOKEDATE, '%Y/%m/01') "
         SQLStr &= "              ,A11.SYABAN "
         SQLStr &= "           ) A02 "
-        SQLStr &= "           ON A02.TAISHOYM = A01.TAISHOYM "
-        SQLStr &= "           AND A02.SYABAN = A01.SYABAN "
+        SQLStr &= "           ON  A02.TODOKEDATE  >= A01.STYMD "
+        SQLStr &= "           AND A02.TODOKEDATE  <= A01.ENDYMD "
+        SQLStr &= "           AND A02.SYABAN       = A01.SYABAN "
 
         '-- WHERE
         SQLStr &= " WHERE "
-        SQLStr &= String.Format("     A01.TAISHOYM = '{0}' ", TaishoYm.Replace("/", ""))
-        SQLStr &= String.Format(" AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format("     A01.STYMD   <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.ENDYMD  >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.DELFLG  <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
