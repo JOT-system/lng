@@ -1162,6 +1162,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , JXORDUPDKEY						        " _
                 & "     , JXORDFILE						            " _
                 & "     , JXORDROUTE						        " _
+                & "     , BRANCHCODE						        " _
                 & "     , UPDATEUSER						        " _
                 & "     , CREATEUSER						        " _
                 & "     , UPDATEYMD						            " _
@@ -1375,6 +1376,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @JXORDUPDKEY						        " _
                 & "     , @JXORDFILE						        " _
                 & "     , @JXORDROUTE						        " _
+                & "     , @BRANCHCODE						        " _
                 & "     , @UPDATEUSER						        " _
                 & "     , @CREATEUSER						        " _
                 & "     , @UPDATEYMD						        " _
@@ -1800,6 +1802,7 @@ Public Class LNT0001ZissekiIntake
                     Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
                     Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
                     Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
+                    Dim BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar)    '枝番
                     Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
                     Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
                     Dim UPDATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEYMD", MySqlDbType.DateTime) '更新日時
@@ -2105,6 +2108,7 @@ Public Class LNT0001ZissekiIntake
                         Else
                             JXORDROUTE.Value = ""   'JX形式オーダールート番号
                         End If
+                        BRANCHCODE.Value = "1"    '枝番
                         UPDATEUSER.Value = updRow("更新者")    '更新者
                         CREATEUSER.Value = updRow("作成者")    '作成者
                         If String.IsNullOrEmpty(updRow("更新日時")) Then
