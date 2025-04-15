@@ -2,7 +2,7 @@
 function InitDisplay() {
 
     /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true, true, true, false);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, false, true, true, false);
 
     // カレンダー表示
     document.querySelectorAll('.datetimepicker').forEach(picker => {
@@ -67,7 +67,7 @@ function InitDisplay() {
     });
 
     /* 共通一覧のスクロールイベント紐づけ */
-    //bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
 }
 
@@ -243,5 +243,53 @@ function commonDownload(url) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+}
+
+/**
+ *  単価調整画面『単価』リスト選択イベント
+ * @param {object} obj TR(行)オブジェクト
+ * @param {string} lineCnt 行No
+ * @param {string} colName カラム名
+ * @return {undefined} なし
+ * @description グリッド内リストボックス選択イベント
+ */
+function statusObjectSelect(obj, lineCnt, colName) {
+
+    var objDataGrid = document.getElementById("pnlListArea_DR");
+
+    if (objDataGrid === null) {
+        return;
+    }
+
+    var objTable = objDataGrid.children[0];
+
+    // 単価（リストボックス）を取得
+    var selectObjs = objTable.querySelectorAll("select[id^='lbOBJECTIVECODE_REPORTBRANCHCODE" + lineCnt);
+
+    document.getElementById("MF_SUBMIT").value = "TRUE";
+    document.getElementById('WF_GridDBclick').value = lineCnt;
+    document.getElementById('WF_FIELD').value = colName;
+    document.getElementById('WF_ButtonClick').value = "WF_ListOBJECTIVE";
+    document.forms[0].submit();
+}
+
+// ○左Box用処理（左Box表示/非表示切り替え）
+function ListField_DBclick(pnlList, Line, fieldNM) {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        document.getElementById('WF_GridDBclick').value = Line;
+        document.getElementById('WF_FIELD').value = fieldNM;
+
+        if (fieldNM === "TANKNO") {
+            document.getElementById('WF_LeftMViewChange').value = 20;
+        }
+        else if (fieldNM === "BRANCHCODE") {
+            document.getElementById('WF_LeftMViewChange').value = 1000;
+        }
+        document.getElementById('WF_LeftboxOpen').value = "Open";
+        document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
+        document.body.style.cursor = "wait";
+        document.forms[0].submit();
     }
 }

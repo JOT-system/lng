@@ -1991,6 +1991,7 @@ Public Class CmnParts
             & "     ,coalesce(LT1.CALENDERMEMO26, '')                     AS CALENDERMEMO26		" _
             & "     ,coalesce(LT1.CALENDERMEMO27, '')                     AS CALENDERMEMO27		" _
             & "     ,coalesce(LT1.BRANCHCODE, '')                         AS BRANCHCODE			" _
+            & "     ,''                                                   AS BRANCHNAME			" _
             & "     ,coalesce(LT1.UPDATEUSER, '')                         AS UPDATEUSER			" _
             & "     ,coalesce(LT1.CREATEUSER, '')                         AS CREATEUSER			" _
             & "     ,coalesce(LT1.UPDATEYMD, '')                          AS UPDATEYMD			" _

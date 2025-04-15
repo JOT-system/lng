@@ -62,11 +62,20 @@ Public Class LNT0001ZissekiAjustMap_aspx
                             WF_TARGETTABLEInitialize()
                         Case "WF_ButtonSearch"          '検索ボタンクリック
                             WF_ButtonSearch_Click()
-                            ''○ 一覧再表示処理
-                            'DisplayGrid()
+
+                        Case "WF_MouseWheelUp"
+
                         Case "WF_ButtonRelease"         '解除ボタンクリック
                             WF_ButtonRelease_Click()
+                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                            WF_FIELD_DBClick()
+                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                            WF_ButtonCan_Click()
                     End Select
+                    If WF_ButtonClick.Value <> "WF_ButtonSearch" AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" Then
+                        '○ 一覧再表示処理
+                        DisplayGrid()
+                    End If
                 End If
             Else
                 '○ 初期化処理
@@ -541,6 +550,67 @@ Public Class LNT0001ZissekiAjustMap_aspx
         '○ GridView初期設定
         GridViewInitialize()
 
+    End Sub
+
+    ''' <summary>
+    ''' フィールドダブルクリック時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_FIELD_DBClick()
+        If Not String.IsNullOrEmpty(WF_LeftMViewChange.Value) Then
+            Try
+                Integer.TryParse(WF_LeftMViewChange.Value, WF_LeftMViewChange.Value)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            With leftview
+                Select Case WF_LeftMViewChange.Value
+                    Case LIST_BOX_CLASSIFICATION.LC_CALENDAR
+
+                    Case Else   '以外
+                        '会社コード
+                        Dim prmData As New Hashtable
+                        prmData.Item(C_PARAMETERS.LP_COMPANY) = work.WF_SEL_CAMPCODE.Text
+
+                        'フィールドによってパラメータを変える
+                        Select Case WF_FIELD.Value
+                            Case "BRANCHCODE"
+                                prmData.Item(C_PARAMETERS.LP_COMPANY) = "01"
+                                '○ LINECNT取得
+                                Dim WW_LINECNT As Integer = 0
+                                If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                                '○ 対象ヘッダー取得
+                                Dim updHeader = LNT0001tbl.AsEnumerable.
+                                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                                If IsNothing(updHeader) Then Exit Sub
+                                '★条件(開始～終了)
+                                prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = WF_TaishoYm.Value + "/01"
+                                '★条件(その他)
+                                prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) =
+                                    " AND VALUE2 = '" + updHeader("TORICODE").ToString() & "'" &      '取扱店コード
+                                    " AND VALUE4 = '" + updHeader("ORDERORGCODE").ToString() & "'" &  '部門コード
+                                    " AND VALUE8 = '" + updHeader("TODOKECODE").ToString() & "'"      '実績届先コード
+
+                                WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_BRANCHCODE
+                        End Select
+                        .SetListBox(WF_LeftMViewChange.Value, WW_Dummy, prmData)
+                        .ActiveListBox()
+                End Select
+            End With
+
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' LeftBoxキャンセルボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonCan_Click()
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
     End Sub
 
     ''' <summary>

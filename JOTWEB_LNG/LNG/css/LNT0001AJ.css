@@ -1,4 +1,33 @@
-﻿#TxtTaishoYm {
+﻿/* 一旦レスポンス用 画像のプリロード */
+body:before {
+    content: url(../img/leftbox.png) url(../img/calendar.png);
+    display: none;
+}
+/* テキストボックス補正 */
+/*input[type=text] {
+    height: 1.6em;
+    font-size: 13.5px;
+    box-sizing: border-box;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}*/
+
+.boxIconArea div, .calendarIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+/* アイコン位置補正 */
+/* Chromeのみアイコンがテキストボックスの中央に行かないので補正 */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .calendarIconArea div, .boxIconArea div {
+        margin-top: calc(100% - 12px);
+    }
+}
+/* Edgeも通ってしまうので打ち消す */
+_:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
+    margin-top: calc(100% - 12.5px);
+}
+
+#TxtTaishoYm {
     width: 120px !important;
     border-radius: 0;
 }
@@ -59,4 +88,33 @@ p {
     border-top-right-radius: 10px;
     border: 1px solid #333;
     height: 35px;
+}
+#LF_LEFTBOX {
+    display: none;
+    padding: 15px;
+    width: 24em;
+    position: fixed;
+    top: 2.4em;
+    bottom: 1.4em;
+    left: 0;
+    overflow: auto;
+    background-color: rgba(242, 242, 242,1);
+    z-index: 20;
+}
+/* 左リストボックス */
+.WF_ListBoxArea {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    height: calc(100% - 8.5em);
+    min-height: 100px;
+    width: 20.0em;
+    overflow: hidden;
+    overflow-y: auto;
+    color: black;
+    border: 1px solid;
+    /*outline: none;*/
+    border-color: rgba(176, 176, 276, 0.6);
+    background-color: rgba(255, 255, 255, 1);
+    font-size: 1em;
+    border-radius: 3px;
 }

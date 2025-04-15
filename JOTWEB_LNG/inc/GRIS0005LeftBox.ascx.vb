@@ -162,6 +162,8 @@ Public Class GRIS0005LeftBox
         '収入管理で使用
         LC_ACCOUNTCODE         '科目コード
         LC_SEGMENTCODE         'セグメント
+        LC_BRANCHCODE          '枝番
+        LC_ADDITINALFROMTO
     End Enum
 
     ''' <summary>
@@ -258,7 +260,8 @@ Public Class GRIS0005LeftBox
         LP_CTNTYPE
         ' 計上年月
         LP_KEIJYOYM
-
+        LP_BRANCHCODE          '枝番
+        LP_ADDITINALFROMTO
     End Enum
     Public Const LEFT_TABLE_SELECTED_KEY As String = "LEFT_TABLE_SELECTED_KEY"
     ''' <summary>
@@ -730,6 +733,11 @@ Public Class GRIS0005LeftBox
             Case LIST_BOX_CLASSIFICATION.LC_SEGMENTCODE
                 'セグメント
                 Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "SEGMENTCODE"
+                lbox = CreateFixValueList(Params, O_RTN)
+
+            Case LIST_BOX_CLASSIFICATION.LC_BRANCHCODE
+                '枝番
+                Params.Item(C_PARAMETERS.LP_FIX_CLASS) = "NEWTANKA"
                 lbox = CreateFixValueList(Params, O_RTN)
 
             Case Else
@@ -1599,6 +1607,11 @@ Public Class GRIS0005LeftBox
                 If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALSORTORDER) AndAlso
                    Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER)) <> "" Then
                     GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALSORTORDER))
+                End If
+                'FixValue抽出用の開始終了条件付与
+                If Params.ContainsKey(C_PARAMETERS.LP_ADDITINALFROMTO) AndAlso
+                   Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO)) <> "" Then
+                    GS0007FIXVALUElst.ADDITIONAL_FROM_TO = Convert.ToString(Params.Item(C_PARAMETERS.LP_ADDITINALFROMTO))
                 End If
                 GS0007FIXVALUElst.GS0007FIXVALUElst()
                 O_RTN = GS0007FIXVALUElst.ERR

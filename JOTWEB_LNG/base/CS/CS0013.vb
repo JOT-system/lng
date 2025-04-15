@@ -702,7 +702,7 @@ Public Class CS0013ProfView
                                 outList.Rows = 1
 
                                 outList.SelectionMode = ListSelectionMode.Single
-
+                                outList.Style.Add("width", "90%")
                                 outList.ClearSelection()
 
                                 For Each item As ListItem In outList.Items

@@ -38,6 +38,10 @@ Public Module PrevDispMap
         ''' 実績数量ゼロ
         ''' </summary>
         Public Const LNT0001Z As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIZERO_ASPX"
+        ''' <summary>
+        ''' 調整画面
+        ''' </summary>
+        Public Const LNT0001AJ As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIAJUSTMAP_ASPX"
 
         ''' <summary>
         ''' リース一覧
