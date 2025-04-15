@@ -255,6 +255,7 @@
     <Content Include="LNG\css\LNS0008D.css" />
     <Content Include="LNG\css\LNS0008L.css" />
     <Content Include="LNG\css\LNS0008S.css" />
+    <Content Include="LNG\css\LNT0001AJ.css" />
     <Content Include="LNG\css\LNT0001D.css" />
     <Content Include="LNG\css\LNT0001I.css" />
     <Content Include="LNG\css\LNT0001L.css" />
@@ -339,10 +340,12 @@
     <Content Include="LNG\script\LNS0001H.js" />
     <Content Include="LNG\script\LNS0001L.js" />
     <Content Include="LNG\script\LNS0001S.js" />
+    <Content Include="LNG\script\LNT0001AJ.js" />
     <Content Include="LNG\script\LNT0001D.js" />
     <Content Include="LNG\script\LNT0001I.js" />
     <Content Include="LNG\script\LNT0001Z.js" />
     <Content Include="LNG\zisseki\LNT0001InvoiceOutput.aspx" />
+    <Content Include="LNG\zisseki\LNT0001ZissekiAjustMap.aspx" />
     <Content Include="LNG\zisseki\LNT0001ZissekiIntake.aspx" />
     <Content Include="LNG\zisseki\LNT0001ZissekiManage.aspx" />
     <Content Include="LNG\mas\LNM0023ShipperDetail.aspx" />
@@ -699,6 +702,13 @@
     <Compile Include="LNG\zisseki\LNT0001InvoiceOutput.aspx.vb">
       <DependentUpon>LNT0001InvoiceOutput.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiAjustMap.aspx.designer.vb">
+      <DependentUpon>LNT0001ZissekiAjustMap.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\zisseki\LNT0001ZissekiAjustMap.aspx.vb">
+      <DependentUpon>LNT0001ZissekiAjustMap.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="LNG\zisseki\LNT0001ZissekiIntake.aspx.designer.vb">
       <DependentUpon>LNT0001ZissekiIntake.aspx</DependentUpon>

@@ -1,0 +1,627 @@
+﻿''************************************************************
+' 調整画面管理
+' 作成日 2025/04/10
+' 更新日 
+' 作成者 
+' 更新者 
+'
+' 修正履歴 
+''************************************************************
+Imports GrapeCity.Documents.Excel
+Imports Newtonsoft.Json
+Imports MySql.Data.MySqlClient
+Imports JOTWEB_LNG.GRIS0005LeftBox
+Public Class LNT0001ZissekiAjustMap_aspx
+    Inherits System.Web.UI.Page
+
+    '○ 検索結果格納Table
+    Private LNT0001tbl As DataTable                                 '実績（アボカド）データ格納用テーブル
+
+    ''' <summary>
+    ''' 定数
+    ''' </summary>
+    Private Const CONST_DISPROWCOUNT As Integer = 60                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
+
+    '○ 共通関数宣言(BASEDLL)
+    Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    Private CS0013ProfView As New CS0013ProfView                    'Tableオブジェクト展開
+    Private CS0020JOURNAL As New CS0020JOURNAL                      '更新ジャーナル出力
+    Private CS0030REPORT As New CS0030REPORT                        '帳票出力
+    Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private CS0051UserInfo As New CS0051UserInfo                    'ユーザー情報取得
+    Private GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
+    Private CMNPTS As New CmnParts                                  '共通関数
+
+    '○ 共通処理結果
+    Private WW_ErrSW As String = ""
+    Private WW_RtnSW As String = ""
+    Private WW_Dummy As String = ""
+    Private WW_ErrCode As String                                    'サブ用リターンコード
+
+    ''' <summary>
+    ''' サーバー処理の遷移先
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Try
+            If IsPostBack Then
+                '○ 各ボタン押下処理
+                If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
+                    '○ 画面表示データ復元
+                    Master.RecoverTable(LNT0001tbl)
+
+                    Select Case WF_ButtonClick.Value
+                        Case "WF_ButtonUPDATE"          '保存ボタンクリック
+                            WF_ButtonUPDATE()
+                        Case "WF_ButtonCLEAR"           '戻るボタンクリック
+                            WF_ButtonEND_Click()
+                        Case "WF_TARGETTABLEChange"     '対象選択クリック
+                            WF_TARGETTABLEInitialize()
+                        Case "WF_ButtonSearch"          '検索ボタンクリック
+                            WF_ButtonSearch_Click()
+                            ''○ 一覧再表示処理
+                            'DisplayGrid()
+                        Case "WF_ButtonRelease"         '解除ボタンクリック
+                            WF_ButtonRelease_Click()
+                    End Select
+                End If
+            Else
+                '○ 初期化処理
+                Initialize()
+            End If
+
+            '○ 画面モード(更新・参照)設定
+            If Master.MAPpermitcode = C_PERMISSION.UPDATE Then
+                WF_MAPpermitcode.Value = "TRUE"
+            Else
+                WF_MAPpermitcode.Value = "FALSE"
+            End If
+
+        Finally
+            '○ 格納Table Close
+            If Not IsNothing(LNT0001tbl) Then
+                LNT0001tbl.Clear()
+                LNT0001tbl.Dispose()
+                LNT0001tbl = Nothing
+            End If
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 初期化処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub Initialize()
+        '○ 画面ID設定
+        Master.MAPID = LNT0001WRKINC.MAPIDAJ
+        '○ HELP表示有無設定
+        Master.dispHelp = False
+        '○ D&D有無設定
+        Master.eventDrop = True
+        '○ Grid情報保存先のファイル名
+        Master.CreateXMLSaveFile()
+
+        '○ 初期値設定
+        WF_FIELD.Value = ""
+        WF_ButtonClick.Value = ""
+        WF_LeftboxOpen.Value = ""
+        WF_RightboxOpen.Value = ""
+        rightview.ResetIndex()
+        leftview.ActiveListBox()
+
+        '○ 右Boxへの値設定
+        rightview.MAPID = Master.MAPID
+        rightview.MAPVARI = Master.MAPvariant
+        rightview.COMPCODE = Master.USERCAMP
+        rightview.PROFID = Master.PROF_REPORT
+        rightview.Initialize("")
+
+        '○ 画面の値設定
+        WW_MAPValueSet()
+
+        ''○ GridView初期設定
+        'GridViewInitialize()
+
+        ''〇 更新画面からの遷移もしくは、アップロード完了の場合、更新完了メッセージを出力
+        'If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
+        '    Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
+        '    work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""
+        'End If
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期値設定処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_MAPValueSet()
+
+        '★ドロップダウンリスト（調整種類）作成
+        Dim dtAjustType As New DataTable
+        GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+        GS0007FIXVALUElst.CLAS = "AJUSTTYPE"
+        GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = "KEYCODE ASC"
+        dtAjustType = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+        If Not isNormal(GS0007FIXVALUElst.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "固定値取得エラー")
+            Exit Sub
+        End If
+        '〇対象(調整種類)
+        setDDLItem(dtAjustType, "KEYCODE", "VALUE1", Me.WF_TARGETTABLE)
+
+        '★対象年月
+        WF_TaishoYm.Value = work.WF_SEL_TAISHOYM.Text
+        '★フィルタ設定(日)
+        setDDLDay(yyyyMM:=WF_TaishoYm.Value)
+
+        '〇実績データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            setZisseki(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+        '★届先
+        setDDLListItem(LNT0001tbl, "TODOKECODE", "TODOKENAME", Me.ddlTODOKE)
+        '★陸事番号
+        setDDLListItem(LNT0001tbl, "TANKNUMBER", "TANKNUMBER", Me.ddlTANKNUMBER)
+        '★業務車番
+        setDDLListItem(LNT0001tbl, "GYOMUTANKNUM", "GYOMUTANKNUM", Me.ddlGYOMUTANKNUM)
+
+        '〇検索エリアを非表示
+        'Me.pnlSpecialFEEArea.Visible = False
+        Me.pnlPriceArea.Visible = False
+        'Me.pnlFixedCostsArea.Visible = False
+        'Me.pnlSurchargeArea.Visible = False
+
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
+
+    End Sub
+
+    ''' <summary>
+    ''' フィルタ(日付)設定
+    ''' </summary>
+    Private Sub setDDLDay(Optional yyyyMM As String = Nothing)
+        '★フィルタ設定(日)
+        Dim resDayFirst As New List(Of ListItem)
+        Dim resDayEnd As New List(Of ListItem)
+        Me.ddlDayFirst.Items.Clear()
+        Me.ddlDayEnd.Items.Clear()
+
+        '◯月の末日を取得
+        Dim lastDay As String = Now.ToString("yyyy/MM") + "/01"
+        If Not IsNothing(yyyyMM) Then
+            lastDay = yyyyMM + "/01"
+        End If
+        lastDay = Date.Parse(lastDay).AddMonths(1).AddDays(-1).ToString("dd")
+        For iDay = 1 To Integer.Parse(lastDay) Step 1
+            resDayFirst.Add(New ListItem(iDay.ToString("00"), iDay.ToString("00")))
+            resDayEnd.Add(New ListItem(iDay.ToString("00"), iDay.ToString("00")))
+        Next
+        Me.ddlDayFirst.Items.AddRange(resDayFirst.ToArray)
+        Me.ddlDayEnd.Items.AddRange(resDayEnd.ToArray)
+        Me.ddlDayEnd.SelectedValue = lastDay
+
+    End Sub
+
+    Private Sub setDDLItem(ByVal dt As DataTable, ByVal ItemCode As String, ByVal ItemaName As String, ByRef ddlList As DropDownList)
+
+        Dim resTrainFlagList As New List(Of ListItem)
+        Dim itemList = From wrkitm In dt Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By g Select g, h
+        'Dim itemList = From wrkitm In LNT0001tbl Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By CDec(g) Select g, h
+        ddlList.Items.Clear()
+        resTrainFlagList = New List(Of ListItem)
+        resTrainFlagList.Add(New ListItem("", ""))
+        For Each itemLists In itemList
+            resTrainFlagList.Add(New ListItem(itemLists.h, itemLists.g))
+        Next
+        ddlList.Items.AddRange(resTrainFlagList.ToArray)
+
+    End Sub
+
+    Private Sub setDDLListItem(ByVal dt As DataTable, ByVal ItemCode As String, ByVal ItemaName As String, ByRef ddlList As ListBox)
+
+        Dim resTrainFlagList As New List(Of ListItem)
+        Dim itemList = From wrkitm In dt Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By g Select g, h
+        'Dim itemList = From wrkitm In LNT0001tbl Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By CDec(g) Select g, h
+        ddlList.Items.Clear()
+        resTrainFlagList = New List(Of ListItem)
+        'resTrainFlagList.Add(New ListItem("", ""))
+        For Each itemLists In itemList
+            resTrainFlagList.Add(New ListItem(itemLists.h, itemLists.g))
+        Next
+        ddlList.Items.AddRange(resTrainFlagList.ToArray)
+
+    End Sub
+
+    Private Sub setZisseki(ByVal SQLcon As MySqlConnection,
+                           Optional ByVal WF_TODOKE As String = Nothing,
+                           Optional ByVal WF_TANKNUMBER As String = Nothing,
+                           Optional ByVal WF_GYOMUTANKNO As String = Nothing)
+        If IsNothing(LNT0001tbl) Then
+            LNT0001tbl = New DataTable
+        End If
+        If LNT0001tbl.Columns.Count <> 0 Then
+            LNT0001tbl.Columns.Clear()
+        End If
+        LNT0001tbl.Clear()
+
+        Dim SQLStr As String = CMNPTS.SelectZissekiSQL(work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
+                                                       WF_TODOKE:=WF_TODOKE, WF_TANKNUMBER:=WF_TANKNUMBER, WF_GYOMUTANKNO:=WF_GYOMUTANKNO)
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar)  '部署
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日FROM
+                Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)  '届日TO
+                Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
+                Dim PARA5 As MySqlParameter = SQLcmd.Parameters.Add("@P5", MySqlDbType.VarChar)  '取引先コード
+                PARA1.Value = work.WF_SEL_ORGCODE.Text
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    PARA2.Value = WF_TaishoYm.Value & "/01"
+                    PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                Else
+                    PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
+                End If
+                Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
+                PARA4.Value = lastMonth
+                PARA5.Value = work.WF_SEL_TORICODE.Text
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNT0001tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    LNT0001tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each LNT0001row As DataRow In LNT0001tbl.Rows
+                    i += 1
+                    LNT0001row("LINECNT") = i        'LINECNT
+                    LNT0001row("TANKNUMBER") = Replace(LNT0001row("TANKNUMBER").ToString(), Space(1), String.Empty)
+                Next
+            End Using
+
+            '★届先
+            setDDLListItem(LNT0001tbl, "TODOKECODE", "TODOKENAME", Me.ddlTODOKE)
+            '★陸事番号
+            setDDLListItem(LNT0001tbl, "TANKNUMBER", "TANKNUMBER", Me.ddlTANKNUMBER)
+            '★業務車番
+            setDDLListItem(LNT0001tbl, "GYOMUTANKNUM", "GYOMUTANKNUM", Me.ddlGYOMUTANKNUM)
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0001AJ SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNT0001AJ Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' GridViewデータ設定
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewInitialize()
+        '○ 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            'setZisseki(SQLcon)
+            setZisseki(SQLcon,
+                       WF_TODOKE:=WF_TODOKECODEhdn.Value,
+                       WF_TANKNUMBER:=WF_TANKNUMBERhdn.Value,
+                       WF_GYOMUTANKNO:=WF_GYOMUTANKNOhdn.Value)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+        '〇 一覧の件数を取得
+        'Me.ListCount.Text = "件数：" + LNT0002tbl.Rows.Count.ToString()
+
+        '○ 一覧表示データ編集(性能対策)
+        Dim TBLview As DataView = New DataView(LNT0001tbl)
+
+        TBLview.RowFilter = "LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT
+
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        'CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTYPE.Text
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        'CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.CS0013ProfView()
+        If Not isNormal(CS0013ProfView.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+            Exit Sub
+        End If
+
+        '○ 先頭行に合わせる
+        WF_GridPosition.Text = "1"
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面表示データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub MAPDataGet(ByVal SQLcon As MySqlConnection)
+
+    End Sub
+
+    ''' <summary>
+    ''' 一覧再表示処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub DisplayGrid()
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNT0001row As DataRow In LNT0001tbl.Rows
+            If LNT0001row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                '行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNT0001row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 表示LINECNT取得
+        If WF_GridPosition.Text = "" Then
+            WW_GridPosition = 1
+        Else
+            Try
+                Integer.TryParse(WF_GridPosition.Text, WW_GridPosition)
+            Catch ex As Exception
+                WW_GridPosition = 1
+            End Try
+        End If
+
+        '○ 表示格納位置決定
+
+        '表示開始_格納位置決定(次頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            If (WW_GridPosition + CONST_SCROLLCOUNT) <= WW_DataCNT Then
+                WW_GridPosition += CONST_SCROLLCOUNT
+            End If
+        End If
+
+        '表示開始_格納位置決定(前頁スクロール)
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" Then
+            If (WW_GridPosition - CONST_SCROLLCOUNT) > 0 Then
+                WW_GridPosition -= CONST_SCROLLCOUNT
+            Else
+                WW_GridPosition = 1
+            End If
+        End If
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(LNT0001tbl)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        'CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTYPE.Text
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        'CS0013ProfView.SCROLLTYPE = CS0013ProfView_TEST.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' 保存ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonUPDATE()
+
+
+    End Sub
+
+    ''' <summary>
+    ''' 戻るボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonEND_Click()
+
+        Master.TransitionPrevPage()
+
+    End Sub
+
+    ''' <summary>
+    ''' 対象選択クリック
+    ''' </summary>
+    Private Sub WF_TARGETTABLEInitialize()
+        '〇検索エリアを非表示
+        'Me.pnlSpecialFEEArea.Visible = False
+        Me.pnlPriceArea.Visible = False
+        'Me.pnlFixedCostsArea.Visible = False
+        'Me.pnlSurchargeArea.Visible = False
+
+        Select Case Me.WF_TARGETTABLE.SelectedItem.Text
+            Case "特別料金"
+                'Me.pnlSpecialFEEArea.Visible = True
+            Case "単価調整"
+                work.WF_SEL_CONTROLTYPE.Text = LNT0001WRKINC.MAPIDAJ
+                Me.pnlPriceArea.Visible = True
+                '○ GridView初期設定
+                GridViewInitialize()
+            Case "固定費調整"
+                'Me.pnlFixedCostsArea.Visible = True
+            Case "サーチャージ"
+                'Me.pnlSurchargeArea.Visible = True
+            Case Else
+                Exit Sub
+        End Select
+
+    End Sub
+
+    ''' <summary>
+    ''' 検索ボタン押下
+    ''' </summary>
+    Private Sub WF_ButtonSearch_Click()
+
+        Dim todokeCode As String = ""
+
+        Select Case Me.WF_TARGETTABLE.SelectedItem.Text
+            Case "特別料金"
+                'Me.pnlSpecialFEEArea.Visible = True
+            Case "単価調整"
+                SetConditionTankaAjust()
+            Case "固定費調整"
+                'Me.pnlFixedCostsArea.Visible = True
+            Case "サーチャージ"
+                'Me.pnlSurchargeArea.Visible = True
+            Case Else
+                Exit Sub
+        End Select
+
+        '○ GridView初期設定
+        GridViewInitialize()
+
+    End Sub
+
+    ''' <summary>
+    ''' 解除ボタン押下
+    ''' </summary>
+    Private Sub WF_ButtonRelease_Click()
+        '〇選択内容初期化
+        '届先
+        Me.WF_TODOKECODEhdn.Value = ""
+        '陸事番号
+        Me.WF_TANKNUMBERhdn.Value = ""
+        '業務車番
+        Me.WF_GYOMUTANKNOhdn.Value = ""
+        '○ GridView初期設定
+        GridViewInitialize()
+
+    End Sub
+
+    ''' <summary>
+    ''' リストボックス選択内容取得(単価調整)
+    ''' </summary>
+    Private Sub SetConditionTankaAjust()
+        '★届先取得
+        Me.WF_TODOKECODEhdn.Value = ""
+        'Me.WF_TODOKENAMEhdn.Value = ""
+        If Me.ddlTODOKE.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To ddlTODOKE.Items.Count - 1
+                If ddlTODOKE.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_TODOKECODEhdn.Value = ddlTODOKE.Items(index).Value
+                        'Me.WF_TODOKENAMEhdn.Value = ddlTODOKE.Items(index).Text
+                        intSelCnt = 1
+                    Else
+                        Me.WF_TODOKECODEhdn.Value = Me.WF_TODOKECODEhdn.Value & "," & ddlTODOKE.Items(index).Value
+                        'Me.WF_TODOKENAMEhdn.Value = Me.WF_TODOKENAMEhdn.Value & "," & ddlTODOKE.Items(index).Text
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
+
+        '★陸事番号取得
+        Me.WF_TANKNUMBERhdn.Value = ""
+        If Me.ddlTANKNUMBER.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To ddlTANKNUMBER.Items.Count - 1
+                If ddlTANKNUMBER.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_TANKNUMBERhdn.Value = "'" & ddlTANKNUMBER.Items(index).Value & "'"
+                        intSelCnt = 1
+                    Else
+                        Me.WF_TANKNUMBERhdn.Value = Me.WF_TANKNUMBERhdn.Value & "," & "'" & ddlTANKNUMBER.Items(index).Value & "'"
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
+
+        '★業務車番取得
+        Me.WF_GYOMUTANKNOhdn.Value = ""
+        If Me.ddlGYOMUTANKNUM.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To ddlGYOMUTANKNUM.Items.Count - 1
+                If ddlGYOMUTANKNUM.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_GYOMUTANKNOhdn.Value = ddlGYOMUTANKNUM.Items(index).Value
+                        intSelCnt = 1
+                    Else
+                        Me.WF_GYOMUTANKNOhdn.Value = Me.WF_GYOMUTANKNOhdn.Value & "," & ddlGYOMUTANKNUM.Items(index).Value
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  共通処理                                                              ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' 遷移先(登録画面)退避データ保存先の作成
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_CreateXMLSaveFile()
+        work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
+            Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
+    End Sub
+
+End Class
