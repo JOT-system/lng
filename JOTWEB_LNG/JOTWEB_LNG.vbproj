@@ -264,6 +264,7 @@
     <Content Include="LNG\css\LNM0023S.css" />
     <Content Include="LNG\css\ex\error.css" />
     <Content Include="LNG\css\LNT0001Z.css" />
+    <Content Include="LNG\css\LNT0002L.css" />
     <Content Include="LNG\ex\page_400.html" />
     <Content Include="LNG\ex\page_401.html" />
     <Content Include="LNG\ex\page_403.html" />
@@ -312,6 +313,7 @@
     <Content Include="LNG\inc\LNS0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0002WRKINC.ascx" />
     <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaList.aspx" />
@@ -344,6 +346,8 @@
     <Content Include="LNG\script\LNT0001D.js" />
     <Content Include="LNG\script\LNT0001I.js" />
     <Content Include="LNG\script\LNT0001Z.js" />
+    <Content Include="LNG\script\LNT0002L.js" />
+    <Content Include="LNG\seikyu\LNT0002TranStatusList.aspx" />
     <Content Include="LNG\zisseki\LNT0001InvoiceOutput.aspx" />
     <Content Include="LNG\zisseki\LNT0001ZissekiAjustMap.aspx" />
     <Content Include="LNG\zisseki\LNT0001ZissekiIntake.aspx" />
@@ -598,6 +602,13 @@
       <DependentUpon>LNT0001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0002WRKINC.ascx.vb">
+      <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\mas\LNM0006TankaDetail.aspx.designer.vb">
       <DependentUpon>LNM0006TankaDetail.aspx</DependentUpon>
     </Compile>
@@ -694,6 +705,13 @@
     </Compile>
     <Compile Include="LNG\mas\LNS0001UserSearch.aspx.vb">
       <DependentUpon>LNS0001UserSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\seikyu\LNT0002TranStatusList.aspx.designer.vb">
+      <DependentUpon>LNT0002TranStatusList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\seikyu\LNT0002TranStatusList.aspx.vb">
+      <DependentUpon>LNT0002TranStatusList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\zisseki\LNT0001InvoiceOutput.aspx.designer.vb">

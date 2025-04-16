@@ -1,0 +1,131 @@
+﻿/*アップロードボタン*/
+#WF_UPLOAD_LABEL {
+    display: block;
+}
+
+input#WF_UPLOAD_BTN {
+    display: none;
+}
+
+#WF_UPLOAD_LABEL:hover {
+    cursor: pointer;
+}
+
+#WF_UPLOAD_LABEL:has(input:disabled) {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+    #WF_UPLOAD_LABEL:has(input:disabled):hover {
+        border-color: #cfcfcf;
+        cursor: default;
+    }
+/*--------------------------------------------------------------
+# 調整（k.miyake)
+--------------------------------------------------------------*/
+#divContensbox {
+    overflow: hidden;
+}
+
+#pnlListArea {
+    margin: 0 0px;
+}
+
+:root, [data-bs-theme=light] {
+    --bs-body-font-size: 1.5rem;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+}
+th {
+    text-align: center;
+}
+/*--------------------------------------------------------------
+# サイズ基準
+# 1rem = 16px
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Bootstrap Customize
+--------------------------------------------------------------*/
+.form-select {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
+
+.calendararea {
+    display: inline-block;
+    width: 190px !important;
+}
+
+#ListCount{
+    margin-right:10px;
+}
+
+.leftSide {
+    display: flex;
+}
+
+
+
+
+#btnAdd, #btnOut, #btnRef, #btnHistOut {
+    padding: 0px;
+    height: 20px;
+    width: 60px;
+    background-color: #04ADE2;
+    color: #FFFFFF;
+}
+
+    #btnAdd:hover, #btnOut:hover, #btnRef:hover, #btnHistOut:hover {
+        cursor: pointer;
+    }
+
+
+/* ************************** */
+/*  履歴画面    */
+/* ************************** */
+#pnlHISTWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    z-index: 9998;
+    background-color: rgba(55, 55, 55, 0.6);
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#pnlHISTArea {
+    height: 80%;
+    width: 40%;
+    margin-top: 0px;
+    margin-left: 0px;
+    align-items: center;
+    font-size: 12pt;
+    padding: 15px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: rgba(225, 225, 225, 1)
+}
+
+
+.detailboxEX {
+    position: relative;
+    left: 5%;
+    width: 100%;
+    height: 80%;
+}

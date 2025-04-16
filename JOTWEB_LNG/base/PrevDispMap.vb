@@ -44,6 +44,15 @@ Public Module PrevDispMap
         Public Const LNT0001AJ As String = "ASP.LNG_ZISSEKI_LNT0001ZISSEKIAJUSTMAP_ASPX"
 
         ''' <summary>
+        ''' 輸送費明細出力状況
+        ''' </summary>
+        Public Const LNT0002L As String = "ASP.LNG_SEIKYU_LNT0002TRANSTATUSLIST_ASPX"
+        ''' <summary>
+        ''' 請求明細追加
+        ''' </summary>
+        Public Const LNT0002D As String = "ASP.LNG_SEIKYU_LNT0002SEIKYUDETAILADD_ASPX"
+
+        ''' <summary>
         ''' リース一覧
         ''' </summary>
         Public Const LNT0005L As String = "ASP.LNG_LEA_LNT0005LEASELIST_ASPX"
