@@ -34,7 +34,10 @@ function InitDisplay() {
         });
     });
 }
-
+// 画面読み込み時処理
+window.onload = function () {
+    document.getElementById('WF_ButtonLogOut').style.display = 'inline';
+}
 /**
  * 全角→半角(英数記号)
  * @param {string} str 変換したい文字列

@@ -37,7 +37,7 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0001L');">実績管理</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0001L');">実績一覧</a></li>
                         <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0001D');">実績取込</a></li>
                         <li class="breadcrumb-item active" aria-current="page">実績数量ゼロ</li>
                     </ol>
@@ -46,8 +46,18 @@
                     <h2 class="w-100 fs-5 fw-bold contents-title">実績数量ゼロ</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
-                            <!-- 作成日時 -->
-                            <div id="actionTrigger" class="d-flex flex-wrap gap-3">
+                            <div class="rightSide">
+                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky btn-action" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
+                                <%--id="WF_ButtonEND"は、メニューへ、ログアウトボタンを追加するキーワードとなる--%>
+                                <%--ここでは、ログアウトボタンを表示したくないためid="WF_ButtonEND2"とする--%>
+                                <input type="button" id="WF_ButtonEND2" class="btn-sticky" value="戻る" onclick="ButtonClick('WF_ButtonEND');" /> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="searchBar">
+                        <!-- 作成日時 -->
+                        <div id="actionTrigger" class="d-flex flex-wrap gap-3 w-100">
+                            <div class="actionButtonBox">
                                 <div class="d-flex align-items-center gap-2 me-3">
                                     <!-- 一覧件数 -->
                                     <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -61,26 +71,21 @@
                                         </span>
                                     </div>
                                 </div>
-<%--                                <div class="d-flex align-items-center gap-2">
-                                    <strong class="flex-shrink-0">荷主</strong>
-                                    <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
-                                </div>--%>
-                                <div class="divItem">
-                                    <div class="divDdlArea">
-                                        <asp:TextBox ID="WF_TORI_L" class="txtlblbox" runat="server" ReadOnly="true" disabled="disabled" Text ="荷主"></asp:TextBox>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="divItem">
+                                        <div class="divDdlArea">
+                                            <asp:TextBox ID="WF_TORI_L" class="txtlblbox" runat="server" ReadOnly="true" disabled="disabled" Text ="荷主"></asp:TextBox>
+                                        </div>
+                                        <a class="divDdlAreaLeft">
+                                            <asp:ListBox ID="WF_TORI" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" SelectionMode="Multiple"></asp:ListBox>
+                                        </a>
                                     </div>
-                                    <a class="divDdlAreaLeft">
-                                        <asp:ListBox ID="WF_TORI" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" SelectionMode="Multiple"></asp:ListBox>
-                                    </a>
+                                    <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
                                 </div>
-                            </div>
-                            <div class="rightSide">
-                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
-                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
-                                <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
-                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 
-                                <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                                <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
+                                <div class="rightSide">
+                                    <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                                    <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
