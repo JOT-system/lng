@@ -203,7 +203,8 @@ Public Structure CS0047XLSMERGE
 
             Try
                 FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLSX"
-                URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                'URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
                 'Workbook.Saveメソッドを呼び出すと、数式セルの結果値が計算され、Excelファイルに保存されます
                 WW_OutWorkbook.Save(FILEpath, SaveFileFormat.Xlsx)
 
