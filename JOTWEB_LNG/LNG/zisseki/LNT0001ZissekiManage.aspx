@@ -37,15 +37,23 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">実績管理</li>
+                        <li class="breadcrumb-item active" aria-current="page">実績一覧</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">実績管理</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title">実績一覧</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
-                            <!-- 作成日時 -->
-                            <div id="actionTrigger" class="d-flex flex-wrap gap-3">
+                            <div class="rightSide">
+                                <input type="button" id="WF_ButtonZisseki" class="btn-sticky btn-action" value="実績取込" onclick="ButtonClick('WF_ButtonZisseki');" />
+                                <input type="button" id="WF_ButtonInvoice" class="btn-sticky btn-action" value="請求書出力" onclick="ButtonClick('WF_ButtonInvoice');" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="searchBar">
+                        <!-- 作成日時 -->
+                        <div id="actionTrigger" class="d-flex flex-wrap gap-3 w-100">
+                            <div class="actionButtonBox">
                                 <div class="d-flex align-items-center gap-2 me-3">
                                     <!-- 一覧件数 -->
                                     <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -64,16 +72,11 @@
                                     <strong class="flex-shrink-0">荷主</strong>
                                     <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORI');" />
                                 </div>
-                            </div>
-                            <div class="rightSide">
-                                <input type="button" id="WF_ButtonExtract" class="btn-sticky" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
-                                <input type="button" id="WF_ButtonZisseki" class="btn-sticky" value="実績取込" onclick="ButtonClick('WF_ButtonZisseki');" />
-                                <input type="button" id="WF_ButtonInvoice" class="btn-sticky" value="請求書出力" onclick="ButtonClick('WF_ButtonInvoice');" />
-                                <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
-                                <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
-                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" hidden="hidden"/> 
-                                <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                                <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
+                                <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
+                                <div class="rightSide">
+                                    <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                                    <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
