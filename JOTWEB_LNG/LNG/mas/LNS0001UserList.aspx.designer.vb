@@ -23,15 +23,6 @@ Partial Public Class LNS0001UserList
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
-    '''ListCount コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_UPLOAD_LABEL コントロール。
     '''</summary>
     '''<remarks>
@@ -48,6 +39,15 @@ Partial Public Class LNS0001UserList
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
+    
+    '''<summary>
+    '''ListCount コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ListCount As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''pnlListArea コントロール。

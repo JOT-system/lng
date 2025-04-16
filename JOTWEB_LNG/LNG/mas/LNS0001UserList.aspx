@@ -41,26 +41,39 @@
                     <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ一覧</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
-                            <div class="leftSide">
-                                <!-- 一覧件数 -->
-                                <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                            <div class="leftSide d-flex align-items-center gap-2 me-3">
+                                <asp:Label ID="WF_UPLOAD_LABEL" AssociatedControlID="WF_UPLOAD_BTN" runat="server" CssClass="btn-sticky btn-action" Text="ｱｯﾌﾟﾛｰﾄﾞ"> 
+                                    <asp:FileUpload ID="WF_UPLOAD_BTN" runat="server"  onchange="ButtonClick('WF_ButtonUPLOAD')"/>
+                                </asp:Label>
+                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky btn-action" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
                             </div>
                             <div class="rightSide">
-                                <input type="button" id="WF_ButtonINSERT"   class="btn-sticky btn-action" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
+                                <input type="button" id="WF_ButtonINSERT"   class="btn-sticky" value="追加"     onclick="ButtonClick('WF_ButtonINSERT');" />
                                 <%--<input type="button" id="WF_ButtonDebug" class="btn-sticky" value="デバッグ" onclick="ButtonClick('WF_ButtonDebug');" />--%>
-                                <asp:Label ID="WF_UPLOAD_LABEL" AssociatedControlID="WF_UPLOAD_BTN" runat="server" CssClass="btn-sticky btn-action" Text="ｱｯﾌﾟﾛｰﾄﾞ"> <asp:FileUpload ID="WF_UPLOAD_BTN" runat="server"  onchange="ButtonClick('WF_ButtonUPLOAD')"/>
-                                </asp:Label>
+                                <%--<asp:Label ID="WF_UPLOAD_LABEL" AssociatedControlID="WF_UPLOAD_BTN" runat="server" CssClass="btn-sticky btn-action" Text="ｱｯﾌﾟﾛｰﾄﾞ"> 
+                                    <asp:FileUpload ID="WF_UPLOAD_BTN" runat="server"  onchange="ButtonClick('WF_ButtonUPLOAD')"/>
+                                </asp:Label>--%>
                                 <input type="button" id="WF_ButtonHISTORY"  class="btn-sticky" value="変更履歴" onclick="ButtonClick('WF_ButtonHISTORY');" />
-                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
+                                <%--<input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />--%>
                                 <%--<input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
                                 <%--<input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />--%>
                                 <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
                                 <%--<div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>--%>
                                 <%--<div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
                             </div>
-                        </div> <!-- End class=actionButtonBox -->
+                        </div>
                     </div> <!-- End class="Operation" -->
-
+                    <div class="searchBar">
+                        <!-- 作成日時 -->
+                        <div id="actionTrigger" class="d-flex flex-wrap gap-3 w-100">
+                            <div class="actionButtonBox">
+                                <div class="d-flex align-items-center gap-2 me-3">
+                                    <!-- 一覧件数 -->
+                                    <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- End class=searchBar -->
 
                     <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
                 </div>
