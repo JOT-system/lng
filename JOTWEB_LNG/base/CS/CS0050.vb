@@ -952,6 +952,23 @@ Public Class CS0050SESSION : Implements IDisposable
             SESSION(C_SESSION_KEY.ENVIRONMENT_FLG) = value
         End Set
     End Property
+
+    ''' <summary>
+    ''' Hypertext Transfer Protocol（Secure）取得用   2025/04/16 ADD
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property HTTPS_GET As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Return Convert.ToString(SESSION(C_SESSION_KEY.HTTPS_GET))
+        End Get
+        Set(ByVal value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.HTTPS_GET) = value
+        End Set
+    End Property
 End Class
 
 

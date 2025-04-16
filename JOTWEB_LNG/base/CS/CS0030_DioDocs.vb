@@ -944,22 +944,22 @@ Public Structure CS0030REPORT
             Select Case FILEtyp
                 Case "pdf"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".pdf"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".pdf"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".pdf"
                     'アクティブシートのみ出力（横1ページに収める）
                     WW_Activesheet.Save(FILEpath, SaveFileFormat.Pdf)
                 Case "csv"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".CSV"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".CSV"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".CSV"
                     WW_Activesheet.Save(FILEpath, SaveFileFormat.Csv)
 
                 Case "xls"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLS"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLS"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLS"
                     'DioDocsでは、xls形式のExcelファイルを読み込んだり、また、作成した内容をxls形式のExcelファイルに保存することはできません。 from GreapeCityナレッジベース
                     WW_Workbook.Save(FILEpath, SaveFileFormat.Xlsx)
                 Case "xlsx"
                     FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLSX"
-                    URL = HttpContext.Current.Request.Url.Scheme & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
                     'Workbook.Saveメソッドを呼び出すと、数式セルの結果値が計算され、Excelファイルに保存されます
                     WW_Workbook.Save(FILEpath, SaveFileFormat.Xlsx)
             End Select

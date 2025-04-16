@@ -198,6 +198,10 @@ Public Module SessionKey
         ''' </summary>
         Public Const LEASEAPPL_SEND_FLG As String = "LaseApplSendFlg"
 
+        ''' <summary>
+        ''' Hypertext Transfer Protocol（Secure）取得用
+        ''' </summary>
+        Public Const HTTPS_GET As String = "HttpsGet"
     End Class
 
 End Module 'End BaseDllConst

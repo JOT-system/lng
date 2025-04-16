@@ -333,6 +333,14 @@ Public Structure CS0001INIFILEget
                             CS0050SESSION.LICENSE_GET = Trim(IniString)
                             IniString = ""
                             IniType = STRINGTYPE.NONE
+
+                            '2025/04/16 ADD
+                            If CS0050SESSION.LICENSE_GET.ToUpper = "HONBAN" Then
+                                CS0050SESSION.HTTPS_GET = "https"
+                            Else
+                                CS0050SESSION.HTTPS_GET = "http"
+                            End If
+                            '2025/04/16 ADD ENDED
                         End If
                     End If
 
