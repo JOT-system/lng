@@ -42,6 +42,20 @@
                 <h2 class="w-100 fs-5 fw-bold contents-title">ユーザーマスタ変更履歴</h2>
                     <div class="Operation">
                         <div class="actionButtonBox">
+                            <div class="leftSide d-flex align-items-center gap-2 me-3">
+                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky btn-action" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
+                            </div>
+                            <div class="rightSide">
+<%--                                <input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
+<%--                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />--%>
+                                <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
+<%--                                <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                                <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
+                            </div>
+                        </div> <!-- End class=actionButtonBox -->
+                    </div> <!-- End class="Operation" -->
+                    <div class="searchBar">
+                        <div id="actionTrigger" class="d-flex flex-wrap gap-3 w-100">
                             <div class="leftSide">
                                 <!-- 一覧件数 -->
                                 <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -53,18 +67,10 @@
                                 <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更ユーザー </label>
                                 <asp:DropDownList ID="WF_DDL_MODIFYUSER" runat="server"/>
                             </div>
-                            <div class="rightSide">
-                                <input type="button" id="WF_ButtonMODIFYVIEW" class="btn-sticky" value="表示する" onclick="ButtonClick('WF_ButtonMODIFYVIEW');" />
-                                <input type="button" id="WF_ButtonDOWNLOAD" class="btn-sticky" value="ﾀﾞｳﾝﾛｰﾄﾞ" onclick="ButtonClick('WF_ButtonDOWNLOAD');" />
-<%--                                <input type="button" id="WF_ButtonPRINT"    class="btn-sticky" value="一覧印刷" onclick="ButtonClick('WF_ButtonPRINT');" />--%>
-<%--                                <input type="button" id="WF_ButtonEND"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />--%>
-                                <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" />
-<%--                                <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
-                                <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
-                            </div>
-                        </div> <!-- End class=actionButtonBox -->
+                            <input type="button" id="WF_ButtonMODIFYVIEW" class="btn-sticky btn-search" value="表示する" onclick="ButtonClick('WF_ButtonMODIFYVIEW');" />
+                        </div>
+                    </div> <!-- End class="searchBar" -->
 
-                    </div> <!-- End class="Operation" -->
                     <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
             </div>
         </div>
