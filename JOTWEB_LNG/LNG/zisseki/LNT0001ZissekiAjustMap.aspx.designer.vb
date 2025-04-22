@@ -164,7 +164,7 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents work As Global.JOTWEB_LNG.LNT0001WRKINC
+    Protected WithEvents work As Global.JOTWEB_LNG.LNT0002WRKINC
     
     '''<summary>
     '''WF_GridDBclick コントロール。
@@ -282,6 +282,15 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TaishoYmhdn コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TaishoYmhdn As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_TODOKECODEhdn コントロール。

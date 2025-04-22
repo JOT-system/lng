@@ -199,7 +199,10 @@ Public Class LNT0001ZissekiManage
                Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001Z Then
             ' 実行画面からの遷移
             WF_TaishoYm.Value = work.WF_SEL_TAISHOYM.Text
-            WF_TORI.SelectedIndex = work.WF_SEL_TORIINDEX.Text
+            Try
+                WF_TORI.SelectedIndex = work.WF_SEL_TORIINDEX.Text
+            Catch ex As Exception
+            End Try
         Else
             ' 再度メニューからの遷移
             WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")

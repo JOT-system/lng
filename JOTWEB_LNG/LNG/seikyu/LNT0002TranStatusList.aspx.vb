@@ -22,11 +22,12 @@ Public Class LNT0002TranStatusList
     Inherits Page
 
     '○ 検索結果格納Table
-    Private LNT0002tbl As DataTable         '一覧格納用テーブル
-    Private LNT0002tblHIST As DataTable     '履歴一覧格納用テーブル
-    Private LNT0002UPDtbl As DataTable      '更新用テーブル
+    Private LNT0002tbl As DataTable           '一覧格納用テーブル
+    Private LNT0002tblHIST As DataTable       '履歴一覧格納用テーブル
+    Private LNT0002UPDtbl As DataTable        '更新用テーブル
     Private UploadFileTbl As New DataTable    '添付ファイルテーブル
     Private LNT0002Exceltbl As New DataTable  'Excelデータ格納用テーブル
+    Private LNT0002Shippers As New DataTable  '荷主一覧格納
 
     ''' <summary>
     ''' 定数
@@ -47,6 +48,7 @@ Public Class LNT0002TranStatusList
     Private CS0025AUTHORget As New CS0025AUTHORget                  '権限チェック(マスタチェック)
     Private CS0030REPORT As New CS0030REPORT                        '帳票出力
     Private CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+    Private GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
 
     '○ 共通処理結果
     Private WW_ErrSW As String = ""
@@ -83,7 +85,8 @@ Public Class LNT0002TranStatusList
                             work.WF_HIST.Text = "visible"
                             WF_ButtonRefClick()
                         Case "WF_ButtonAddClick" '追加ボタン押下時
-                            WF_ButtonAddClick()
+                            'WF_ButtonAddClick()
+                            WF_ButtonAJUST_Click()
                         '閉じるボタン押下時
                         Case "WF_ButtonCLOSE"
                             work.WF_HIST.Text = "hidden"
@@ -222,6 +225,9 @@ Public Class LNT0002TranStatusList
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
 
+        '〇荷主情報取得
+        ShippersGet()
+
     End Sub
 
     ''' <summary>
@@ -302,8 +308,9 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("   , 0                                                                        AS LINECNT             ")
         SQLStr.AppendLine("   , ''                                                                       AS OPERATION           ")
         SQLStr.AppendLine("   , CURDATE()                                                                AS UPDTIMSTP           ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.KEYCODE), '')                                         AS TORICODE            ")
-        SQLStr.AppendLine("   ,  ''                                                                      AS ORGCODE             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.VALUE4), '')                                          AS INDEXKEY            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.VALUE5), '')                                          AS TORICODE            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.VALUE6), '')                                          AS ORGCODE             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.VALUE1), '')                                          AS TRANDETAILNAME      ")
         SQLStr.AppendLine("   ,  ''                                                                      AS DETAIL              ")
         SQLStr.AppendLine("   ,  ''                                                                      AS UPDYMD              ")
@@ -317,10 +324,10 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("     COM.LNS0006_FIXVALUE FIX                                                                        ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("      FIX.DELFLG = '0'                                                                               ")
-        SQLStr.AppendLine("     AND  FIX.CLASS = 'TORICODEDROP'                                                                 ")
+        SQLStr.AppendLine("     AND  FIX.CLASS = 'INVOICE'                                                                 ")
         SQLStr.AppendLine("     AND  FIX.CAMPCODE = '" & Master.USERCAMP & "'                                                   ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     FIX.KEYCODE                                                                                     ")
+        SQLStr.AppendLine("     FIX.VALUE4                                                                                     ")
 
         'SQLStr.AppendLine(" Select                                                                                              ")
         'SQLStr.AppendLine("     1                                                                        AS 'SELECT'            ")
@@ -580,6 +587,32 @@ Public Class LNT0002TranStatusList
 
     End Sub
 
+    Private Sub WF_ButtonAJUST_Click()
+        Dim WW_LINECNT As Integer = 0
+        '○ LINECNT取得
+        Try
+            Integer.TryParse(Me.WF_SelectedIndex.Value, WW_LINECNT)
+            WW_LINECNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        Dim WW_ROW As DataRow
+        WW_ROW = LNT0002tbl.Rows(WW_LINECNT)
+        '選択行
+        work.WF_SEL_LINECNT.Text = WW_ROW("LINECNT")
+        '〇対象年月
+        work.WF_SEL_TARGETYM.Text = WF_TaishoYm.Value
+        Me.WF_TORIORG.SelectedIndex = Integer.Parse(WW_ROW("INDEXKEY").ToString())
+        '〇取引コード
+        work.WF_SEL_TORICODE.Text = Me.WF_TORIORG.SelectedItem.Text
+        '〇部署コード
+        work.WF_SEL_ORGCODE.Text = Me.WF_TORIORG.SelectedValue
+
+        Dim WW_URL As String = ""
+        work.GetURL("LNT0001AJ", WW_URL)
+        Server.Transfer(WW_URL)
+    End Sub
 
     ''' <summary>
     ''' 履歴画面表示データ取得
@@ -903,11 +936,156 @@ Public Class LNT0002TranStatusList
 
     End Sub
 
+    ''' <summary>
+    ''' 荷主情報取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub ShippersGet()
+        ' ドロップダウンリスト（荷主）作成
+        GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+        GS0007FIXVALUElst.CLAS = "INVOICE"
+        GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = "VALUE4 ASC"
+        LNT0002Shippers = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+        If Not isNormal(GS0007FIXVALUElst.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "固定値取得エラー")
+            Exit Sub
+        End If
 
+        'ログインユーザーの操作可能な組織コードを取得
+        Dim orgList = GetOrgList(Master.ROLE_ORG)
 
+        WF_TORI.Items.Clear()
+        WF_TORI.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNT0002Shippers.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_TORI.Items.Add(New ListItem(LNT0002Shippers.Rows(i)("VALUE1"), LNT0002Shippers.Rows(i)("KEYCODE")))
+            End If
 
+        Next
+        WF_TORI.SelectedIndex = 0
 
+        WF_TORIEXL.Items.Clear()
+        WF_TORIEXL.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNT0002Shippers.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_TORIEXL.Items.Add(New ListItem(LNT0002Shippers.Rows(i)("VALUE2"), LNT0002Shippers.Rows(i)("KEYCODE")))
+            End If
+        Next
+        WF_TORIEXL.SelectedIndex = 0
 
+        WF_FILENAME.Items.Clear()
+        WF_FILENAME.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNT0002Shippers.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_FILENAME.Items.Add(New ListItem(LNT0002Shippers.Rows(i)("VALUE3"), LNT0002Shippers.Rows(i)("KEYCODE")))
+            End If
+        Next
+        WF_FILENAME.SelectedIndex = 0
+
+        '取引先、部署（部署は、カンマ区切りで複数あり）
+        WF_TORIORG.Items.Clear()
+        WF_TORIORG.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNT0002Shippers.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_TORIORG.Items.Add(New ListItem(LNT0002Shippers.Rows(i)("VALUE5"), wOrg))
+            End If
+
+        Next
+        WF_TORIORG.SelectedIndex = 0
+    End Sub
+    Protected Function EditOrgCsv(ByVal iRow As DataRow) As String
+        Dim rtnStr As String = ""
+
+        For i As Integer = 6 To 20
+            Dim colName As String = "VALUE" & i.ToString
+            If iRow(colName) <> "" Then
+                If rtnStr.Length = 0 Then
+                    rtnStr = iRow(colName)
+                Else
+                    rtnStr += ","
+                    rtnStr += iRow(colName)
+                End If
+            End If
+        Next
+
+        Return rtnStr
+    End Function
+    ''' <summary>
+    ''' 操作可能な組織コードを取得する
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetOrgList(ByVal iOrg As String) As List(Of String)
+
+        Dim CS0050SESSION As New CS0050SESSION                      'セッション情報操作処理
+        Dim oList As New List(Of String)
+
+        '検索SQL文
+        Try
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()  ' DataBase接続
+
+                Dim SQLStr As String =
+                     " SELECT " _
+                   & "             rtrim(A.CODE)    AS CODE                " _
+                   & " FROM        COM.LNS0005_ROLE A                      " _
+                   & " WHERE                                               " _
+                   & "           A.ROLE        = @P1                       " _
+                   & "       and A.OBJECT      = @P2                       " _
+                   & "       and A.PERMITCODE  = @P3                       " _
+                   & "       and A.STYMD      <= @P4                       " _
+                   & "       and A.ENDYMD     >= @P5                       " _
+                   & "       and A.DELFLG     <> @P6                       " _
+                   & " ORDER BY A.SEQ                                      "
+
+                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                    With SQLcmd.Parameters
+                        .Add("@P1", MySqlDbType.VarChar, 20).Value = iOrg
+                        .Add("@P2", MySqlDbType.VarChar, 20).Value = C_ROLE_VARIANT.USER_ORG
+                        .Add("@P3", MySqlDbType.Int16).Value = "2"
+                        .Add("@P4", MySqlDbType.Date).Value = Date.Now
+                        .Add("@P5", MySqlDbType.Date).Value = Date.Now
+                        .Add("@P6", MySqlDbType.VarChar, 1).Value = C_DELETE_FLG.DELETE
+                    End With
+                    Dim SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+
+                    '権限コード初期値(権限なし)設定
+                    While SQLdr.Read
+                        oList.Add(SQLdr("CODE"))
+                    End While
+
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                    SQLdr = Nothing
+                End Using
+
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+            End Using
+        Catch ex As Exception
+            Dim CS0011LOGWRITE As New CS0011LOGWrite                    'LogOutput DirString Get
+
+            CS0011LOGWRITE.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "DB:LNT0002_ROLE Select"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            Return oList
+        End Try
+
+        Return oList
+
+    End Function
 End Class
 
 

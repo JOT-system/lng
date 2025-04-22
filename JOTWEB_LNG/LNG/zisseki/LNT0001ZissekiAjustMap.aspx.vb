@@ -16,7 +16,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
     '○ 検索結果格納Table
     Private LNT0001tbl As DataTable                                 '実績（アボカド）データ格納用テーブル
-
+    Private WW_GetValue() As String = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""}
     ''' <summary>
     ''' 定数
     ''' </summary>
@@ -52,7 +52,12 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(LNT0001tbl)
-
+                    '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
+                    If CS0013ProfView.SetDispListTextBoxValues(LNT0001tbl, pnlListArea) Then
+                        Master.SaveTable(LNT0001tbl)
+                    End If
+                    '★戻り値(初期化)
+                    WW_ErrSW = ""
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonUPDATE"          '保存ボタンクリック
                             WF_ButtonUPDATE()
@@ -69,10 +74,17 @@ Public Class LNT0001ZissekiAjustMap_aspx
                             WF_ButtonRelease_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FIELD_DBClick()
+                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                            WF_ButtonSel_Click()
                         Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
+                        Case "WF_ListChange"            'リスト変更
+                            WF_ListChange()
                     End Select
-                    If WF_ButtonClick.Value <> "WF_ButtonSearch" AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" Then
+                    If WW_ErrSW <> "ERR" _
+                        AndAlso WF_ButtonClick.Value <> "WF_ButtonSearch" _
+                        AndAlso WF_ButtonClick.Value <> "WF_ButtonRelease" _
+                        AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" Then
                         '○ 一覧再表示処理
                         DisplayGrid()
                     End If
@@ -161,7 +173,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
         setDDLItem(dtAjustType, "KEYCODE", "VALUE1", Me.WF_TARGETTABLE)
 
         '★対象年月
-        WF_TaishoYm.Value = work.WF_SEL_TAISHOYM.Text
+        WF_TaishoYm.Value = work.WF_SEL_TARGETYM.Text
+        WF_TaishoYmhdn.Value = work.WF_SEL_TARGETYM.Text
         '★フィルタ設定(日)
         setDDLDay(yyyyMM:=WF_TaishoYm.Value)
 
@@ -273,13 +286,15 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar)  '前月
                 Dim PARA5 As MySqlParameter = SQLcmd.Parameters.Add("@P5", MySqlDbType.VarChar)  '取引先コード
                 PARA1.Value = work.WF_SEL_ORGCODE.Text
-                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
-                    PARA2.Value = WF_TaishoYm.Value & "/01"
-                    PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
-                Else
-                    PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
-                    PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
-                End If
+                'If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                '    PARA2.Value = WF_TaishoYm.Value & "/01"
+                '    PARA3.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                'Else
+                '    PARA2.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                '    PARA3.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
+                'End If
+                PARA2.Value = WF_TaishoYm.Value & "/" & ddlDayFirst.SelectedValue
+                PARA3.Value = WF_TaishoYm.Value & "/" & ddlDayEnd.SelectedValue
                 Dim lastMonth As String = Date.Parse(Me.WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM")
                 PARA4.Value = lastMonth
                 PARA5.Value = work.WF_SEL_TORICODE.Text
@@ -320,6 +335,45 @@ Public Class LNT0001ZissekiAjustMap_aspx
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
             Exit Sub
         End Try
+
+        '★単価マスタより(単価調整)取得
+        Dim dtTankaAjust As New DataTable
+        GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+        GS0007FIXVALUElst.CLAS = "NEWTANKA"
+        '★条件(開始～終了)
+        GS0007FIXVALUElst.ADDITIONAL_FROM_TO = WF_TaishoYm.Value + "/01"
+        '★条件
+        GS0007FIXVALUElst.ADDITIONAL_CONDITION = " AND VALUE11 = 'TYOSEI' "
+        dtTankaAjust = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+
+        For Each dtTankaAjustrow As DataRow In dtTankaAjust.Rows
+            Dim condition As String = " TORICODE='{0}' AND ORDERORGCODE='{1}' AND TODOKECODE='{2}' "
+            '取引コード
+            Dim toriCode As String = dtTankaAjustrow("VALUE2").ToString()
+            '部署コード
+            Dim orgCode As String = dtTankaAjustrow("VALUE4").ToString()
+            '届先コード
+            Dim avocadoTodokeCode As String = dtTankaAjustrow("VALUE8").ToString()
+            condition = String.Format(condition, toriCode, orgCode, avocadoTodokeCode)
+
+            Dim gyomuTankNo As String = dtTankaAjustrow("VALUE11").ToString()
+            If (toriCode = BaseDllConst.CONST_TORICODE_0132800000 _
+                AndAlso orgCode <> BaseDllConst.CONST_ORDERORGCODE_020104) _
+                OrElse toriCode = BaseDllConst.CONST_TORICODE_0110600000 _
+                OrElse toriCode = BaseDllConst.CONST_TORICODE_0238900000 Then
+                '業務車番
+                condition &= String.Format(" AND GYOMUTANKNUM='{0}' ", dtTankaAjustrow("VALUE10").ToString())
+            End If
+
+            '枝番
+            condition &= String.Format(" AND BRANCHCODE='{0}' ", dtTankaAjustrow("KEYCODE").ToString())
+
+            For Each LNT0001row As DataRow In LNT0001tbl.Select(condition)
+                LNT0001row("BRANCHNAME") = dtTankaAjustrow("VALUE16").ToString()
+            Next
+
+        Next
+
     End Sub
 
     ''' <summary>
@@ -470,6 +524,49 @@ Public Class LNT0001ZissekiAjustMap_aspx
     ''' <remarks></remarks>
     Protected Sub WF_ButtonUPDATE()
 
+        Dim Msg = ""
+        If WF_TARGETTABLE.SelectedValue = "" Then
+            Msg = "対象から調整する内容を選択してください。"
+            Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+            WW_ErrSW = "ERR"
+            Exit Sub
+        End If
+
+        Select Case Me.WF_TARGETTABLE.SelectedItem.Text
+            Case "特別料金"
+            Case "単価調整"
+                '〇変更対象が存在するか確認
+                If LNT0001tbl.Select("OPERATION='1'").Count = 0 Then
+                    Msg = "単価調整の変更はありません。"
+                    Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                    Exit Sub
+                End If
+
+                '〇変更対象(更新)
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    For Each LNT0001row As DataRow In LNT0001tbl.Select("OPERATION='1'")
+                        Dim condition As String = " RECONO = '{0}' AND ORDERORG = '{1}' "
+                        condition = String.Format(condition,
+                                                  LNT0001row("RECONO").ToString(),
+                                                  LNT0001row("ORDERORG").ToString())
+
+                        CMNPTS.UpdateTableCRT(SQLcon, "LNG.LNT0001_ZISSEKI", condition,
+                                              "BRANCHCODE", LNT0001row("BRANCHCODE").ToString())
+
+                        '★変更対象(初期化)
+                        LNT0001row("OPERATION") = ""
+                    Next
+
+                End Using
+
+            Case "固定費調整"
+            Case "サーチャージ"
+            Case Else
+                Exit Sub
+        End Select
+
+        Master.SaveTable(LNT0001tbl)
 
     End Sub
 
@@ -499,6 +596,12 @@ Public Class LNT0001ZissekiAjustMap_aspx
             Case "単価調整"
                 work.WF_SEL_CONTROLTYPE.Text = LNT0001WRKINC.MAPIDAJ
                 Me.pnlPriceArea.Visible = True
+                '〇対象年月(変更)
+                If WF_TaishoYm.Value <> WF_TaishoYmhdn.Value Then
+                    '★フィルタ設定(日)
+                    setDDLDay(yyyyMM:=WF_TaishoYm.Value)
+                    WF_TaishoYmhdn.Value = WF_TaishoYm.Value
+                End If
                 '○ GridView初期設定
                 GridViewInitialize()
             Case "固定費調整"
@@ -523,6 +626,24 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 'Me.pnlSpecialFEEArea.Visible = True
             Case "単価調整"
                 SetConditionTankaAjust()
+
+                Dim dayFirstSelectIndex = ddlDayFirst.SelectedIndex
+                Dim dayEndSelectIndex = ddlDayEnd.SelectedIndex
+
+                If WF_TaishoYm.Value <> WF_TaishoYmhdn.Value Then
+                    '★フィルタ設定(日)
+                    setDDLDay(yyyyMM:=WF_TaishoYm.Value)
+                    WF_TaishoYmhdn.Value = WF_TaishoYm.Value
+                End If
+
+                Dim msg As String = ""
+                If Integer.Parse(ddlDayFirst.SelectedValue) > Integer.Parse(ddlDayEnd.SelectedValue) Then
+                    msg = "届日の指定(開始と終了)が逆転しています。確認をお願いします。"
+                    Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=msg, needsPopUp:=True)
+                    WW_ErrSW = "ERR"
+                    Exit Sub
+                End If
+
             Case "固定費調整"
                 'Me.pnlFixedCostsArea.Visible = True
             Case "サーチャージ"
@@ -547,6 +668,9 @@ Public Class LNT0001ZissekiAjustMap_aspx
         Me.WF_TANKNUMBERhdn.Value = ""
         '業務車番
         Me.WF_GYOMUTANKNOhdn.Value = ""
+        '★フィルタ設定(日)
+        setDDLDay(yyyyMM:=WF_TaishoYm.Value)
+        WF_TaishoYmhdn.Value = WF_TaishoYm.Value
         '○ GridView初期設定
         GridViewInitialize()
 
@@ -575,7 +699,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
                         'フィールドによってパラメータを変える
                         Select Case WF_FIELD.Value
-                            Case "BRANCHCODE"
+                            Case "BRANCHCODE", "BRANCHNAME"
                                 prmData.Item(C_PARAMETERS.LP_COMPANY) = "01"
                                 '○ LINECNT取得
                                 Dim WW_LINECNT As Integer = 0
@@ -589,9 +713,22 @@ Public Class LNT0001ZissekiAjustMap_aspx
                                 prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = WF_TaishoYm.Value + "/01"
                                 '★条件(その他)
                                 prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) =
+                                    " AND VALUE11 = 'TYOSEI'" &                                       '単価用途(単価調整)
                                     " AND VALUE2 = '" + updHeader("TORICODE").ToString() & "'" &      '取扱店コード
                                     " AND VALUE4 = '" + updHeader("ORDERORGCODE").ToString() & "'" &  '部門コード
                                     " AND VALUE8 = '" + updHeader("TODOKECODE").ToString() & "'"      '実績届先コード
+
+                                If updHeader("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0132800000 _
+                                    AndAlso updHeader("ORDERORGCODE").ToString() <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                                    '★石油資源開発(本州)の場合
+                                    prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) &=
+                                    " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"   '業務車番
+                                ElseIf updHeader("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0110600000 _
+                                    OrElse updHeader("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0238900000 Then
+                                    '★シーエナジー(またはエルネス)の場合
+                                    prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) &=
+                                    " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"   '業務車番
+                                End If
 
                                 WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_BRANCHCODE
                         End Select
@@ -601,6 +738,125 @@ Public Class LNT0001ZissekiAjustMap_aspx
             End With
 
         End If
+    End Sub
+
+    ''' <summary>
+    ''' リスト変更時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ListChange()
+        '○ LINECNT取得
+        Dim WW_LINECNT As Integer = 0
+        If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+        '○ 対象ヘッダー取得
+        Dim updHeader = LNT0001tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+        If IsNothing(updHeader) Then Exit Sub
+
+        '〇 一覧の件数取得
+        Dim intListCnt As Integer = LNT0001tbl.Rows.Count
+
+        '○ 設定項目取得
+        '対象フォーム項目取得
+        Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
+        'Dim GetValue() As String = WW_GetValue
+        Dim dtTankaInfo As New DataTable
+
+        Select Case WF_FIELD.Value
+            Case "BRANCHCODE"
+                '★単価情報取得
+                GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+                GS0007FIXVALUElst.CLAS = "NEWTANKA"
+                GS0007FIXVALUElst.ADDITIONAL_CONDITION =
+                " AND VALUE2 = '" + updHeader("TORICODE").ToString() & "'" &            '取扱店コード
+                " AND VALUE4 = '" + updHeader("ORDERORGCODE").ToString() & "'" &        '部門コード
+                " AND VALUE8 = '" + updHeader("TODOKECODE").ToString() & "'"            '実績届先コード
+                If updHeader("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0132800000 _
+                                    AndAlso updHeader("ORDERORGCODE").ToString() <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    GS0007FIXVALUElst.ADDITIONAL_CONDITION &=
+                    " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"     '業務車番
+                End If
+                GS0007FIXVALUElst.ADDITIONAL_CONDITION &= " AND VALUE11 = 'TYOSEI' "
+
+                dtTankaInfo = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+                If Not isNormal(GS0007FIXVALUElst.ERR) Then
+                    Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "単価情報取得エラー")
+                    Exit Sub
+                End If
+
+                '★入力した値が単価マスタに存在するか確認
+                Dim condition As String = " KEYCODE='{0}' "
+                condition = String.Format(condition, WW_ListValue)
+                If dtTankaInfo.Select(condition).Count = 0 Then
+                    Exit Select
+                End If
+                For Each dtTankaInforow As DataRow In dtTankaInfo.Select(condition)
+                    updHeader("OPERATION") = "1"
+                    updHeader("BRANCHCODE") = dtTankaInforow("KEYCODE")
+                    updHeader("BRANCHNAME") = dtTankaInforow("VALUE1")
+                Next
+
+        End Select
+
+        Master.SaveTable(LNT0001tbl)
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  LeftBox関連操作                                                       ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' LeftBox選択時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonSel_Click()
+        Dim WW_SelectValue As String = ""
+        Dim WW_SelectText As String = ""
+
+        '○ 選択内容を取得
+        If leftview.ActiveViewIdx = 2 Then
+            '■ LeftBoxマルチ対応 - START
+            '一覧表表示時
+            Dim selectedLeftTableVal = leftview.GetLeftTableValue()
+            WW_SelectValue = selectedLeftTableVal(LEFT_TABLE_SELECTED_KEY)
+            WW_SelectText = selectedLeftTableVal("VALUE1")
+            '■ LeftBoxマルチ対応 - END
+        ElseIf leftview.WF_LeftListBox.SelectedIndex >= 0 Then
+            WF_SelectedIndex.Value = leftview.WF_LeftListBox.SelectedIndex
+            WW_SelectValue = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Value
+            WW_SelectText = leftview.WF_LeftListBox.Items(WF_SelectedIndex.Value).Text
+        End If
+
+        '○ 選択内容を画面項目へセット
+        Select Case WF_FIELD.Value
+            Case "BRANCHCODE"
+                '○ LINECNT取得
+                Dim WW_LINECNT As Integer = 0
+                If Not Integer.TryParse(WF_GridDBclick.Text, WW_LINECNT) Then Exit Sub
+
+                '○ 設定項目取得
+                Dim WW_SETTEXT As String = WW_SelectText
+                Dim WW_SETVALUE As String = WW_SelectValue
+
+                '○ 画面表示データ復元
+                If Not Master.RecoverTable(LNT0001tbl) Then Exit Sub
+
+                '○ 対象ヘッダー取得
+                Dim updHeader = LNT0001tbl.AsEnumerable.
+                    FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
+                If IsNothing(updHeader) Then Exit Sub
+
+                updHeader.Item("OPERATION") = "1"
+                updHeader.Item("BRANCHCODE") = WW_SETVALUE
+                updHeader.Item("BRANCHNAME") = WW_SETTEXT
+
+        End Select
+
+        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+        WF_FIELD.Value = ""
+        WF_LeftboxOpen.Value = ""
+
     End Sub
 
     ''' <summary>

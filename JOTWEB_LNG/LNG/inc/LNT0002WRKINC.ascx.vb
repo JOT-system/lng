@@ -843,4 +843,69 @@ Public Class LNT0002WRKINC
         End Try
 
     End Sub
+    ''' <summary>
+    ''' 遷移先URLの取得
+    ''' </summary>
+    ''' <param name="I_MAPID"></param>
+    ''' <param name="O_URL"></param>
+    ''' <remarks></remarks>
+    Public Sub GetURL(ByVal I_MAPID As String, ByRef O_URL As String)
+
+        '○共通宣言
+        '*共通関数宣言(APPLDLL)
+        Dim CS0011LOGWRITE As New CS0011LOGWrite            'LogOutput DirString Get
+        Dim CS0050SESSION As New CS0050SESSION          'セッション情報操作処理
+
+        Dim WW_URL As String = ""
+        Try
+            'DataBase接続文字
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open() 'DataBase接続(Open)
+
+                'LNS0007_URL検索SQL文
+                Dim SQL_Str As String =
+                     "SELECT rtrim(URL) as URL " _
+                   & " FROM  COM.LNS0007_URL " _
+                   & " Where MAPID    = @P1 " _
+                   & "   and STYMD   <= @P2 " _
+                   & "   and ENDYMD  >= @P3 " _
+                   & "   and DELFLG  <> @P4 "
+                Using SQLcmd As New MySqlCommand(SQL_Str, SQLcon)
+                    Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.VarChar, 50)
+                    Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)
+                    Dim PARA3 As MySqlParameter = SQLcmd.Parameters.Add("@P3", MySqlDbType.Date)
+                    Dim PARA4 As MySqlParameter = SQLcmd.Parameters.Add("@P4", MySqlDbType.VarChar, 1)
+                    PARA1.Value = I_MAPID
+
+                    PARA2.Value = Date.Now
+                    PARA3.Value = Date.Now
+                    PARA4.Value = C_DELETE_FLG.DELETE
+                    Dim SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+
+                    If SQLdr.Read Then
+                        O_URL = Convert.ToString(SQLdr("URL"))
+                    End If
+
+                    'Close
+                    SQLdr.Close() 'Reader(Close)
+                    SQLdr = Nothing
+
+                End Using
+                'SQL コネクションクローズ
+                SQLcon.Close()
+                SQLcon.Dispose()
+
+            End Using
+
+        Catch ex As Exception
+            CS0011LOGWRITE.INFSUBCLASS = "GetURL"                         'SUBクラス名
+            CS0011LOGWRITE.INFPOSI = "LNS0007_URL SELECT"
+            CS0011LOGWRITE.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWRITE.TEXT = ex.ToString()
+            CS0011LOGWRITE.MESSAGENO = C_MESSAGE_NO.DB_ERROR 'DBエラー。
+            CS0011LOGWRITE.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
 End Class

@@ -423,6 +423,11 @@ Public Module Messages
         ''' <remarks></remarks>
         Public Const RQACKNOWLEDGER_EXIST_ERROR As String = "20054"
 
+        ''' <summary>
+        ''' FREEメッセージ
+        ''' </summary>
+        Public Const OIL_FREE_MESSAGE As String = "20138"
+
 #Region "コンテナ向け"
 
         ''' <summary>

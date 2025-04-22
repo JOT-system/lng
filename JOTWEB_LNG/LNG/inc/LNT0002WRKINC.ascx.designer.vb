@@ -74,7 +74,7 @@ Partial Public Class LNT0002WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_TORINAME As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_TORINAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_ORGCODE コントロール。
@@ -83,7 +83,7 @@ Partial Public Class LNT0002WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_ORGCODE As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_ORGCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_ORGNAME コントロール。
@@ -92,8 +92,17 @@ Partial Public Class LNT0002WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
+    '''WF_SEL_CONTROLTYPE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_CONTROLTYPE As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_TIMESTAMP コントロール。
     '''</summary>

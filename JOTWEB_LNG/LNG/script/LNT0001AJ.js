@@ -69,6 +69,12 @@ function InitDisplay() {
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
+    setTimeout(function () {
+        // テキストボックスEnter縦移動イベントバインド
+        commonBindEnterToVerticalTabStep();
+    }, 100);
+
+
 }
 
 /**
@@ -284,12 +290,23 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         if (fieldNM === "TANKNO") {
             document.getElementById('WF_LeftMViewChange').value = 20;
         }
-        else if (fieldNM === "BRANCHCODE") {
+        else if (fieldNM === "BRANCHCODE"
+              || fieldNM === "BRANCHNAME" ) {
             document.getElementById('WF_LeftMViewChange').value = 1000;
         }
         document.getElementById('WF_LeftboxOpen').value = "Open";
         document.getElementById('WF_ButtonClick').value = "WF_Field_DBClick";
         document.body.style.cursor = "wait";
+        document.forms[0].submit();
+    }
+}
+// ○一覧用処理（チェンジイベント）
+function ListField_Change(pnlList, Line, fieldNM) {
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        document.getElementById("MF_SUBMIT").value = "TRUE";
+        document.getElementById('WF_GridDBclick').value = Line;
+        document.getElementById('WF_FIELD').value = fieldNM;
+        document.getElementById('WF_ButtonClick').value = "WF_ListChange";
         document.forms[0].submit();
     }
 }

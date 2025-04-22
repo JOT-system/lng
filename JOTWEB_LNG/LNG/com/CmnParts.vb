@@ -2065,4 +2065,268 @@ Public Class CmnParts
         Return SQLStr
     End Function
 
+    ''' <summary>
+    ''' マスタ検索処理
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="O_VALUE"></param>
+    Public Sub FixvalueMasterSearch(ByVal I_CODE As String,
+                                       ByVal I_CLASS As String,
+                                       ByVal I_KEYCODE As String,
+                                       ByRef O_VALUE() As String,
+                                       Optional ByVal I_LODDATE As String = Nothing,
+                                       Optional ByVal I_PARA01 As String = Nothing,
+                                       Optional ByVal blnDelete As Boolean = False)
+        Dim Fixvaltbl As DataTable = Nothing
+        If IsNothing(Fixvaltbl) Then
+            Fixvaltbl = New DataTable
+        End If
+
+        If Fixvaltbl.Columns.Count <> 0 Then
+            Fixvaltbl.Columns.Clear()
+        End If
+
+        Fixvaltbl.Clear()
+
+        Try
+            'DBより取得
+            Fixvaltbl = FixvalueMasterDataGet(I_CODE, I_CLASS, I_KEYCODE, I_PARA01)
+            Dim j As Integer = 0
+            If blnDelete = True AndAlso Fixvaltbl.Rows.Count > 1 Then
+                For Each dtfxrow As DataRow In Fixvaltbl.Rows
+                    If j > 0 Then
+                        dtfxrow("DELFLG") = C_DELETE_FLG.DELETE
+                    End If
+                    j += 1
+                Next
+            End If
+
+            If I_KEYCODE.Equals("") Then
+
+                If IsNothing(I_PARA01) Then
+                    For Each dtfxrow As DataRow In Fixvaltbl.Rows
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = Convert.ToString(dtfxrow("VALUE" & i.ToString()))
+                        Next
+                    Next
+                ElseIf I_PARA01 = "1" Then    '### 油種登録用の油種コードを取得 ###
+                    Dim i As Integer = 0
+                    For Each dtfxrow As DataRow In Fixvaltbl.Rows
+                        Try
+                            If Date.Parse(dtfxrow("STYMD").ToString()) <= Date.Parse(I_LODDATE) _
+                                AndAlso Date.Parse(dtfxrow("ENDYMD").ToString()) >= Date.Parse(I_LODDATE) Then
+                                O_VALUE(i) = Convert.ToString(dtfxrow("KEYCODE")).Replace(Convert.ToString(dtfxrow("VALUE2")), "")
+                                i += 1
+                            End If
+                        Catch ex As Exception
+                            Exit For
+                        End Try
+                    Next
+                End If
+
+            Else
+                If IsNothing(I_PARA01) Then
+                    For Each dtfxrow As DataRow In Fixvaltbl.Rows
+                        If blnDelete = True AndAlso Convert.ToString(dtfxrow("DELFLG")) = C_DELETE_FLG.DELETE Then
+                            Continue For
+                        End If
+                        For i = 1 To O_VALUE.Length
+                            O_VALUE(i - 1) = Convert.ToString(dtfxrow("VALUE" & i.ToString()))
+                        Next
+                    Next
+                ElseIf I_PARA01 = "1" Then
+                    Dim i As Integer = 0
+                    For Each dtfxrow As DataRow In Fixvaltbl.Rows
+                        Try
+                            If Date.Parse(dtfxrow("STYMD").ToString()) <= Date.Parse(I_LODDATE) _
+                                AndAlso Date.Parse(dtfxrow("ENDYMD").ToString()) >= Date.Parse(I_LODDATE) Then
+                                O_VALUE(0) = Convert.ToString(dtfxrow("KEYCODE")).Replace(Convert.ToString(dtfxrow("VALUE2")), "")
+                                O_VALUE(1) = Convert.ToString(dtfxrow("VALUE3"))
+                                O_VALUE(2) = Convert.ToString(dtfxrow("VALUE2"))
+                                O_VALUE(3) = Convert.ToString(dtfxrow("VALUE1"))
+                                'O_VALUE(i) = Convert.ToString(OIT0003WKrow("KEYCODE")).Replace(Convert.ToString(OIT0003WKrow("VALUE2")), "")
+                                'i += 1
+                            End If
+                        Catch ex As Exception
+                            Exit For
+                        End Try
+                    Next
+                End If
+            End If
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+    ''' <summary>
+    ''' マスタ検索処理（同じパラメータならDB抽出せずに保持内容を返却）
+    ''' </summary>
+    ''' <param name="I_CODE"></param>
+    ''' <param name="I_CLASS"></param>
+    ''' <param name="I_KEYCODE"></param>
+    ''' <param name="I_PARA01"></param>
+    ''' <returns></returns>
+    Private Function FixvalueMasterDataGet(I_CODE As String, I_CLASS As String, I_KEYCODE As String, I_PARA01 As String) As DataTable
+        Static keyValues As Dictionary(Of String, String)
+        Static retDt As DataTable
+        Dim retFilterdDt As DataTable
+        'キー情報を比較または初期状態または異なるキーの場合は再抽出
+        If keyValues Is Nothing OrElse
+           (Not (keyValues("I_CODE") = I_CODE _
+                 AndAlso keyValues("I_CLASS") = I_CLASS _
+                 AndAlso keyValues("I_PARA01") = I_PARA01)) Then
+            keyValues = New Dictionary(Of String, String) _
+                      From {{"I_CODE", I_CODE}, {"I_CLASS", I_CLASS}, {"I_PARA01", I_PARA01}}
+            retDt = New DataTable
+        Else
+            retFilterdDt = retDt
+            '抽出キー情報が一致しているので保持内容を返却
+            If I_KEYCODE <> "" Then
+                Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+                If qKeyFilterd.Any Then
+                    retFilterdDt = qKeyFilterd.CopyToDataTable
+                Else
+                    retFilterdDt = retDt.Clone
+                End If
+            End If
+
+            Return retFilterdDt
+        End If
+        'キーが変更された場合の抽出処理
+        'DataBase接続文字
+        Dim SQLcon = CS0050SESSION.getConnection
+        SQLcon.Open() 'DataBase接続(Open)
+        MySqlConnection.ClearPool(SQLcon)
+
+        '検索SQL文
+        Dim SQLStr As String =
+           " SELECT" _
+            & "   ISNULL(RTRIM(VIW0001.CAMPCODE), '')    AS CAMPCODE" _
+            & " , ISNULL(RTRIM(VIW0001.CLASS), '')       AS CLASS" _
+            & " , ISNULL(RTRIM(VIW0001.KEYCODE), '')     AS KEYCODE" _
+            & " , ISNULL(RTRIM(VIW0001.STYMD), '')       AS STYMD" _
+            & " , ISNULL(RTRIM(VIW0001.ENDYMD), '')      AS ENDYMD" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE1), '')      AS VALUE1" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE2), '')      AS VALUE2" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE3), '')      AS VALUE3" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE4), '')      AS VALUE4" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE5), '')      AS VALUE5" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE6), '')      AS VALUE6" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE7), '')      AS VALUE7" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE8), '')      AS VALUE8" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE9), '')      AS VALUE9" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE10), '')     AS VALUE10" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE11), '')     AS VALUE11" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE12), '')     AS VALUE12" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE13), '')     AS VALUE13" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE14), '')     AS VALUE14" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE15), '')     AS VALUE15" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE16), '')     AS VALUE16" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE17), '')     AS VALUE17" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE18), '')     AS VALUE18" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE19), '')     AS VALUE19" _
+            & " , ISNULL(RTRIM(VIW0001.VALUE20), '')     AS VALUE20" _
+            & " , ISNULL(RTRIM(VIW0001.SYSTEMKEYFLG), '')   AS SYSTEMKEYFLG" _
+            & " , ISNULL(RTRIM(VIW0001.DELFLG), '')      AS DELFLG" _
+            & " FROM  LNG.VIW0001_FIXVALUE VIW0001" _
+            & " WHERE VIW0001.CLASS = @P01" _
+            & " AND VIW0001.DELFLG <> @P03"
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        '会社コード
+        If Not String.IsNullOrEmpty(I_CODE) Then
+            SQLStr &= String.Format("    AND VIW0001.CAMPCODE = '{0}'", I_CODE)
+        End If
+
+        SQLStr &=
+              " ORDER BY" _
+            & "    VIW0001.KEYCODE"
+
+        Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+
+            Dim PARA01 As MySqlParameter = SQLcmd.Parameters.Add("@P01", MySqlDbType.VarChar)
+            'Dim PARA02 As MySqlParameter = SQLcmd.Parameters.Add("@P02", MySqlDbType.VarChar)
+            Dim PARA03 As MySqlParameter = SQLcmd.Parameters.Add("@P03", MySqlDbType.VarChar)
+
+            PARA01.Value = I_CLASS
+            'PARA02.Value = I_KEYCODE
+            PARA03.Value = C_DELETE_FLG.DELETE
+
+            Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                '○ フィールド名とフィールドの型を取得
+                For index As Integer = 0 To SQLdr.FieldCount - 1
+                    retDt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                Next
+
+                '○ テーブル検索結果をテーブル格納
+                retDt.Load(SQLdr)
+            End Using
+            'CLOSE
+            SQLcmd.Dispose()
+        End Using
+
+        retFilterdDt = retDt
+        '抽出キー情報が一致しているので保持内容を返却
+        If I_KEYCODE <> "" Then
+            Dim qKeyFilterd = From dr In retDt Where dr("KEYCODE").Equals(I_KEYCODE)
+            If qKeyFilterd.Any Then
+                retFilterdDt = qKeyFilterd.CopyToDataTable
+            Else
+                retFilterdDt = retDt.Clone
+            End If
+        End If
+
+        Return retFilterdDt
+    End Function
+
+    ''' <summary>
+    ''' TBL更新(訂正更新用)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <param name="I_TABLENAME">更新対象テーブル名(スキーマ付)</param>
+    ''' <param name="I_WCONDITION">WHERE追加条件(ない場合は空文字)</param>
+    ''' <param name="I_TABLEITEM">更新対象(項目)</param>
+    ''' <param name="I_TABLEITEM_PARA">更新対象(値)</param>
+    ''' <remarks></remarks>
+    Public Sub UpdateTableCRT(ByVal SQLcon As MySqlConnection,
+                              ByVal I_TABLENAME As String, ByVal I_WCONDITION As String,
+                              ByVal I_TABLEITEM As String, ByVal I_TABLEITEM_PARA As String)
+
+        '更新SQL文
+        Dim SQLStr As String = ""
+        '-- TABLE
+        SQLStr &= " UPDATE " & I_TABLENAME
+
+        '-- SET
+        SQLStr &= "    SET "
+        If I_TABLEITEM_PARA = "" Then
+            SQLStr &= String.Format(" {0} = {1} ", I_TABLEITEM, DBNull.Value)
+        Else
+            SQLStr &= String.Format(" {0} = '{1}' ", I_TABLEITEM, I_TABLEITEM_PARA)
+        End If
+
+        '-- WHERE
+        If I_WCONDITION = "" Then
+            SQLStr &= String.Format("  WHERE DELFLG     <> '{0}' ", C_DELETE_FLG.DELETE)
+        Else
+            SQLStr &= String.Format("  WHERE {0} ", I_WCONDITION)
+            SQLStr &= String.Format("    AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+        End If
+
+        Try
+            Dim SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
 End Class

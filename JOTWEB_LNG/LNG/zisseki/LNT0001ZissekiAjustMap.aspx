@@ -6,7 +6,7 @@
 <%@ Register Src="~/inc/GRIS0004RightBox.ascx" TagName="rightview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0005LeftBox.ascx" TagName="leftview" TagPrefix="MSINC" %>
 <%@ Register Src="~/inc/GRIS0006LeftMenu.ascx" TagName="leftmenu" TagPrefix="MSINC" %>
-<%@ Register Src="~/LNG/inc/LNT0001WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
+<%@ Register Src="~/LNG/inc/LNT0002WRKINC.ascx" TagName="wrklist" TagPrefix="MSINC" %>
 <%@ Register Src="~/LNG/inc/GRC0001TILESELECTORWRKINC.ascx" TagName="tilelist" TagPrefix="MSINC" %>
 
 <asp:Content ID="LNT0001AJH" ContentPlaceHolderID="head" runat="server">
@@ -48,7 +48,7 @@
                                 <div id="actionTrigger" class="d-flex flex-wrap gap-3">
                                     <div class="d-flex align-items-center gap-2 me-3">
                                         <strong class="flex-shrink-0">対象年月</strong>
-                                        <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                        <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest" >
                                             <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" data-input >
                                             <span class="input-group-text" data-toggle >
                                                 <span class="material-symbols-outlined">calendar_month</span>
@@ -96,10 +96,12 @@
                                             <asp:ListBox ID="ddlTODOKE" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" SelectionMode="Multiple"></asp:ListBox>
                                         </a>
                                     </div>
-                                    <strong class="flex-shrink-0">　範囲</strong>
+                                    <strong class="flex-shrink-0">　届日</strong>
                                     <asp:DropDownList ID="ddlDayFirst" runat="server" class="form-select rounded-0" />
+                                    <strong class="flex-shrink-0">日</strong>
                                     <strong class="flex-shrink-0">～</strong>
                                     <asp:DropDownList ID="ddlDayEnd" runat="server" class="form-select rounded-0" />
+                                    <strong class="flex-shrink-0">日</strong>
                                     <strong class="flex-shrink-0">　陸事番号</strong>
     <%--                                <asp:DropDownList ID="ddlTANKNUMBER" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TANKNUMBERChange');" />--%>
                                     <div class="divItem">
@@ -175,6 +177,7 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 権限 -->
 
+        <input id="WF_TaishoYmhdn" runat="server" value="" type="text" />
         <input id="WF_TODOKECODEhdn" runat="server" value="" type="text" />
         <input id="WF_TODOKENAMEhdn" runat="server" value="" type="text" />
         <input id="WF_TANKNUMBERhdn" runat="server" value="" type="text" />

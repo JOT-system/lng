@@ -126,6 +126,11 @@
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
+
+        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" />
+        <asp:DropDownList ID="WF_TORIEXL" runat="server" class="form-select rounded-0" />
+        <asp:DropDownList ID="WF_FILENAME" runat="server" class="form-select rounded-0" />
+        <asp:DropDownList ID="WF_TORIORG" runat="server" class="form-select rounded-0" />
     </div>
  
 </asp:Content>

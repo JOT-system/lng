@@ -230,6 +230,42 @@ Partial Public Class LNT0002TranStatusList
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_TORI コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_TORIEXL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORIEXL As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_FILENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FILENAME As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_TORIORG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORIORG As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>
