@@ -1451,15 +1451,18 @@ Public Class LNT0001InvoiceOutput
 #End Region
         Next
         '〇陸事番号マスタ設定(※個別設定用)
+        Dim todokeMerge = CMNPTS.filterItem(dtSekiyuSigenTankSub, "KEYCODE07", "KEYCODE08")
         For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTankSub.Rows
             Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
             If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
                 condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
             End If
             '★届先(個別設定)のみ
-            condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}')",
-                                       BaseDllConst.CONST_TODOKECODE_004012,
-                                       BaseDllConst.CONST_TODOKECODE_005890)
+            'condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}', '{2}')",
+            '                           BaseDllConst.CONST_TODOKECODE_004012,
+            '                           BaseDllConst.CONST_TODOKECODE_005890,
+            '                           BaseDllConst.CONST_TODOKECODE_007273)
+            condition &= String.Format(" AND TODOKECODE IN ({0})", todokeMerge)
             '届先(明細)セル値設定
             WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
         Next

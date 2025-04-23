@@ -433,6 +433,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TODOKECODE_005890 As String = "005890"
     ''' <summary>
+    ''' （SK）ジャパン・パックライス男鹿
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007273 As String = "007273"
+    ''' <summary>
     ''' （ＳＫ）テーブルマーク　塩沢
     ''' </summary>
     Public Const CONST_TODOKECODE_002019 As String = "002019"

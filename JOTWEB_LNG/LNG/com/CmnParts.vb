@@ -2329,4 +2329,23 @@ Public Class CmnParts
         End Try
     End Sub
 
+    Public Function filterItem(ByVal dt As DataTable, ByVal fieldItem01 As String, ByVal fieldItem02 As String) As String
+        Dim viw As New DataView(dt)
+        Dim cols() As String = {fieldItem01, fieldItem02}
+        Dim dtFilter As DataTable = viw.ToTable(True, cols)
+        Dim itemJoint As String = ""
+
+        Dim i As Integer = 0
+        For Each row As DataRow In dtFilter.Rows
+            If i = 0 Then
+                itemJoint = String.Format("'{0}'", row(fieldItem01))
+                i += 1
+            Else
+                itemJoint &= String.Format(",'{0}'", row(fieldItem01))
+            End If
+        Next
+
+        Return itemJoint
+    End Function
+
 End Class
