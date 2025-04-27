@@ -675,14 +675,14 @@ Public Class LNT0001ZissekiIntake
         Dim Msg2 As String = ""
         Dim selCnt As Integer = 0
         Dim MsgType As String = C_MESSAGE_TYPE.INF
-        Dim toriList() As String = WF_TORIhdn.Value.Split(",")
+        Dim toriSplit() As String = WF_TORIhdn.Value.Split(",")
         Dim toriNameList() As String = WF_TORINAMEhdn.Value.Split(",")
         Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 
         Msg1 += "実績取込を行います"
         Msg1 += "<BR>対象年月：" & Me.WF_TaishoYm.Value
-        For i As Integer = 0 To toriList.Count - 1
-            Dim condition As String = String.Format("TORICODE='{0}'", toriList(i))
+        For i As Integer = 0 To toriSplit.Count - 1
+            Dim condition As String = String.Format("TORICODE='{0}'", toriSplit(i))
             Dim selRow() = LNT0003tbl.Select(condition)
             If selRow.Count = 0 Then
                 Msg1 += "<BR>" & sp & "荷主：" & toriNameList(i)
@@ -690,8 +690,8 @@ Public Class LNT0001ZissekiIntake
         Next
 
         selCnt = 0
-        For i As Integer = 0 To toriList.Count - 1
-            Dim condition As String = String.Format("TORICODE='{0}'", toriList(i))
+        For i As Integer = 0 To toriSplit.Count - 1
+            Dim condition As String = String.Format("TORICODE='{0}'", toriSplit(i))
             Dim selRow() = LNT0003tbl.Select(condition)
             If selRow.Count = 0 Then
             Else
@@ -991,6 +991,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TODOKENAMES						        " _
                 & "     , TORICODE						            " _
                 & "     , TORINAME						            " _
+                & "     , TORICODE_AVOCADO  			            " _
                 & "     , TODOKEADDR						        " _
                 & "     , TODOKETEL						            " _
                 & "     , TODOKEMAP						            " _
@@ -1205,6 +1206,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @TODOKENAMES						        " _
                 & "     , @TORICODE						            " _
                 & "     , @TORINAME						            " _
+                & "     , @TORICODE_AVOCADO				            " _
                 & "     , @TODOKEADDR						        " _
                 & "     , @TODOKETEL						        " _
                 & "     , @TODOKEMAP						        " _
@@ -1419,6 +1421,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TODOKENAMES = @TODOKENAMES				" _
                 & "     , TORICODE = @TORICODE						" _
                 & "     , TORINAME = @TORINAME						" _
+                & "     , TORICODE_AVOCADO = @TORICODE_AVOCADO		" _
                 & "     , TODOKEADDR = @TODOKEADDR					" _
                 & "     , TODOKETEL = @TODOKETEL					" _
                 & "     , TODOKEMAP = @TODOKEMAP					" _
@@ -1631,6 +1634,7 @@ Public Class LNT0001ZissekiIntake
                     Dim TODOKENAMES As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAMES", MySqlDbType.VarChar)  '届先略名
                     Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)    '届先取引先コード
                     Dim TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)    '届先取引先名称
+                    Dim TORICODE_AVOCADO As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE_AVOCADO", MySqlDbType.VarChar)    '届先取引先コード_アボカド
                     Dim TODOKEADDR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEADDR", MySqlDbType.VarChar)    '届先住所
                     Dim TODOKETEL As MySqlParameter = SQLcmd.Parameters.Add("@TODOKETEL", MySqlDbType.VarChar)  '届先電話番号
                     Dim TODOKEMAP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEMAP", MySqlDbType.VarChar)  '届先Googleマップ
@@ -1851,8 +1855,9 @@ Public Class LNT0001ZissekiIntake
                         TODOKECODE.Value = updRow("届先コード")  '届先コード
                         TODOKENAME.Value = updRow("届先名称")   '届先名称
                         TODOKENAMES.Value = updRow("届先略名")  '届先略名
-                        TORICODE.Value = updRow("届先取引先コード") '届先取引先コード
+                        TORICODE.Value = updRow("届先取引先コード") '届先取引先コード（先頭5桁＋"00000"に編集済）
                         TORINAME.Value = updRow("届先取引先名称")  '届先取引先名称
+                        TORICODE_AVOCADO.Value = updRow("TORICODE_AVOCADO") '届先取引先コード（アボカドコードをそのまま）
                         TODOKEADDR.Value = updRow("届先住所")   '届先住所
                         TODOKETEL.Value = updRow("届先電話番号")  '届先電話番号
                         If updRow("届先緯度") = "" AndAlso updRow("届先経度") = "" Then
@@ -2203,17 +2208,26 @@ Public Class LNT0001ZissekiIntake
                 & "       , RECEIVEYMD  = @RECEIVEYMD                                     "
 
             Try
+                Dim toriList As New ListBox
+                GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+                GS0007FIXVALUElst.CLAS = "TORICODEDROP"
+                GS0007FIXVALUElst.LISTBOX1 = toriList
+                GS0007FIXVALUElst.ADDITIONAL_SORT_ORDER = ""
+                GS0007FIXVALUElst.GS0007FIXVALUElst()
+                If Not isNormal(GS0007FIXVALUElst.ERR) Then
+                    Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "固定値取得エラー")
+                    Exit Sub
+                End If
+
                 'グルーピング（受注部署、取引先）
                 Dim queryG = From row In iTbl.AsEnumerable()
                              Group row By ORDERORG = row.Field(Of String)("受注受付部署コード"),
                                           ORDERORGNAME = row.Field(Of String)("受注受付部署名"),
-                                          TORICODE = row.Field(Of String)("届先取引先コード"),
-                                          TORINAME = row.Field(Of String)("届先取引先名称") Into Group
+                                          TORICODE = row.Field(Of String)("届先取引先コード") Into Group
                              Select New With {
                             .ORDERORG = ORDERORG,
                             .ORDERORGNAME = ORDERORGNAME,
-                            .TORICODE = TORICODE,
-                            .TORINAME = TORINAME
+                            .TORICODE = TORICODE
                         }
 
                 Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -2241,7 +2255,11 @@ Public Class LNT0001ZissekiIntake
                         ' DB更新
                         TAISHOYM.Value = WF_TaishoYm.Value.Replace("/", "")                     '対象年月
                         TORICODE.Value = result.TORICODE                                        '取引先コード
-                        TORINAME.Value = result.TORINAME                                        '取引先名
+                        For i As Integer = 0 To toriList.Items.Count - 1
+                            If result.TORICODE = toriList.Items(i).Value Then
+                                TORINAME.Value = toriList.Items(i).Text                         '取引先名
+                            End If
+                        Next
                         SHIPORG.Value = result.ORDERORG                                         '営業所コード
                         SHIPORGNAME.Value = result.ORDERORGNAME                                 '営業所名
                         USERID.Value = Master.USERID                                            'ユーザーID

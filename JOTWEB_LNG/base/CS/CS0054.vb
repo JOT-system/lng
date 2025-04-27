@@ -4,6 +4,8 @@ Imports System.Net
 Imports System.Reflection
 Imports System.Runtime.Serialization.Json
 Imports Newtonsoft.Json.Linq
+Imports MySql.Data.MySqlClient
+
 
 ''' <summary>
 ''' Kintoneの管理データを取得するAPI共通クラス
@@ -95,7 +97,8 @@ Public Class CS0054KintoneApi
         Dim GetFields As String = ""
         Dim GetTotalCnt As String = "totalCount=true"
         Dim GetUrl As String = ""
-        Dim repTori As String = ToriCode.Replace(",", """,""")
+        'Dim repTori As String = ToriCode.Replace(",", """,""")
+        Dim splitTori() As String = ToriCode.Split(",")
 
         If String.IsNullOrEmpty(YmdFrom) Then
             YmdFrom = Date.Now.ToString("yyyy-MM-dd")
@@ -109,8 +112,12 @@ Public Class CS0054KintoneApi
         End If
 
         While GetOffset < 10000
-            Dim EditQuery As String = "query= 品名1コード = ""21"" and 届先取引先コード in (""{0}"") and 届日 >= ""{1}"" and 届日 <= ""{2}"" and 実績数量 != ""0"" limit " & GetLimit & " offset " & GetOffset
-            Dim GetQuery As String = String.Format(EditQuery, repTori, YmdFrom, YmdTo)
+            'Dim EditQuery As String = "query= 品名1コード = ""21"" and 届先取引先コード in (""{0}"") and 届日 >= ""{1}"" and 届日 <= ""{2}"" and 実績数量 != ""0"" limit " & GetLimit & " offset " & GetOffset
+            Dim EditQuery As String = "query= 品名1コード = ""21"" "
+            EditQuery += " and 届日 >= ""{0}"" "
+            EditQuery += " and 届日 <= ""{1}"" "
+            EditQuery += " and 実績数量 != ""0"" limit " & GetLimit & " offset " & GetOffset
+            Dim GetQuery As String = String.Format(EditQuery, YmdFrom, YmdTo)
             'Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
 
             GetUrl = Me.ApiBaseUrl + "?"
@@ -281,7 +288,21 @@ Public Class CS0054KintoneApi
 
         End While
 
-        Dim outView As New DataView(outTbl)
+        Dim selTbl As DataTable = outTbl.Clone
+        For Each row As DataRow In outTbl.Rows
+            For Each tori In splitTori
+                If Mid(tori, 1, 5) = Mid(row("届先取引先コード"), 1, 5) Then
+                    Dim dr As DataRow = selTbl.NewRow()
+                    dr.ItemArray = row.ItemArray
+                    dr("TORICODE_AVOCADO") = row("届先取引先コード")
+                    dr("届先取引先コード") = Mid(row("届先取引先コード"), 1, 5) & "00000"
+                    selTbl.Rows.Add(dr)
+                    Exit For
+                End If
+            Next
+        Next
+
+        Dim outView As New DataView(selTbl)
         outView.Sort = "届日,レコード番号"
 
         Return outView.ToTable
@@ -382,6 +403,7 @@ Public Class CS0054KintoneApi
 
         '返却用テーブル（カラム）作成
         ioTbl.Columns.Add("LINECNT", GetType(String)) 'ダウンロードするのに必要なためとりあえず...
+        ioTbl.Columns.Add("TORICODE_AVOCADO", GetType(String)) '取引先（アボカドコード）
         Dim properties = GetType(AvocadoRec).GetProperties()
         For Each prop In properties
             ioTbl.Columns.Add(prop.Name, GetType(String))
