@@ -2331,7 +2331,7 @@ Public Class LNT0001ZissekiIntake
                 Case CONST_TORICODE_0051200000    'Ｄａｉｇａｓエナジー株式会社液化ガスエネ
                     OG_Update(ToriCode, iTaishoYm, WW_ErrSW)
                 Case CONST_TORICODE_0110600000    '株式会社シーエナジー
-                    CENALNESU_Update(ToriCode, iTaishoYm, WW_ErrSW)
+                    'CENALNESU_Update(ToriCode, iTaishoYm, WW_ErrSW)
                 Case CONST_TORICODE_0132800000    '石油資源開発株式会社営業本部
                     SEKIYUHOKKAIDO_Update(ToriCode, iTaishoYm, WW_ErrSW)
                     SEKIYUHONSYU_Update(ToriCode, iTaishoYm, WW_ErrSW)
@@ -2342,7 +2342,7 @@ Public Class LNT0001ZissekiIntake
                 Case "0175400000"    '東北電力株式会社グループ事業推進部
                     TOHOKU_Update(ToriCode, iTaishoYm, WW_ErrSW)
                 Case CONST_TORICODE_0238900000    '北陸エルネス
-                    CENALNESU_Update(ToriCode, iTaishoYm, WW_ErrSW)
+                    'CENALNESU_Update(ToriCode, iTaishoYm, WW_ErrSW)
                 Case "0239900000"    '北海道ＬＮＧ株式会社
                     HOKKAIDOLNG_Update(ToriCode, iTaishoYm, WW_ErrSW)
 
