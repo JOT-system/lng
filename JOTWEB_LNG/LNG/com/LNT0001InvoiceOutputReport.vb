@@ -438,6 +438,8 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 _
                         AndAlso (PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509) Then
                         Select Case PrintDatarow("TODOKEBRANCHCODE").ToString()
+                            Case "01"
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Case "02"
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Case "03"
