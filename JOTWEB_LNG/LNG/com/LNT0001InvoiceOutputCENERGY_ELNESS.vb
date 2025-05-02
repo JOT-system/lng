@@ -311,14 +311,38 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             '・車番
             '・単位
             '・距離単価
-            '・基本運賃
-
-
+            For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0110600000))
+                '・基本運賃
+                Dim setCellNum As String = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
+                setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+            Next
             '■基本料金(基準(川越・上越・富山))　　　※６〇〇車番
             '・車番
-            '・基本運賃(通常)
-            '・基本運賃(冬季)
+            For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0238900000))
+                Dim setCellNum As String = ""
+                '〇季節料金判定区分("1"(通常), "2"(冬季))
+                If PrintKoteihiDatarow("SEASONKBN").ToString() = "1" Then
+                    '・基本運賃(通常)
+                    setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL02").ToString()
+                ElseIf PrintKoteihiDatarow("SEASONKBN").ToString() = "2" Then
+                    '・基本運賃(冬季)
+                    setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
+                Else
+                    Continue For
+                End If
+                setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
 
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+            Next
+
+            '★季節判定
+            Select Case Me.TaishoMM
+                Case "04", "05", "06", "07", "08", "09", "10", "11"
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range("O6").Value = 1
+                Case "12", "01", "02", "03"
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range("O6").Value = 2
+            End Select
 
             '■シーエナジー(休日運賃)
             Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "

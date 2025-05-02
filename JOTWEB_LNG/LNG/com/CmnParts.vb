@@ -473,16 +473,25 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0007.SEASONKBN "
         SQLStr &= "   ,LNM0007.SEASONSTART "
         SQLStr &= "   ,LNM0007.SEASONEND "
-        SQLStr &= "   ,LNM0007.KOTEIHIM AS KOTEIHI "
-        SQLStr &= "   ,LNM0007.KOTEIHID "
-        SQLStr &= "   ,LNM0007.KAISU "
-        SQLStr &= "   ,LNM0007.GENGAKU "
-        SQLStr &= "   ,LNM0007.AMOUNT "
+        SQLStr &= "   ,IFNULL(LNM0007.KOTEIHIM,0) AS KOTEIHI "
+        SQLStr &= "   ,IFNULL(LNM0007.KOTEIHID,0) AS KOTEIHID "
+        SQLStr &= "   ,IFNULL(LNM0007.KAISU,0) AS KAISU "
+        SQLStr &= "   ,IFNULL(LNM0007.GENGAKU,0) AS GENGAKU "
+        SQLStr &= "   ,IFNULL(LNM0007.AMOUNT,0) AS AMOUNT "
         SQLStr &= "   ,LNM0007.BIKOU1 "
         SQLStr &= "   ,LNM0007.BIKOU2 "
         SQLStr &= "   ,LNM0007.BIKOU3 "
         If Not IsNothing(I_CLASS) Then
-            SQLStr &= "   ,LNM0005.VALUE08 AS KOTEIHI_CELLNUM "
+            '--★シーエナジーの場合
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr &= "   ,LNM0005.VALUE11 AS KOTEIHI_CELLNUM "
+                SQLStr &= "   ,LNM0005.VALUE12 AS KOTEIHI_CELL01 "
+                SQLStr &= "   ,LNM0005.VALUE13 AS KOTEIHI_CELL02 "
+                SQLStr &= "   ,LNM0005.VALUE14 AS KOTEIHI_CELL03 "
+                SQLStr &= "   ,LNM0005.VALUE15 AS KOTEIHI_CELL04 "
+            Else
+                SQLStr &= "   ,LNM0005.VALUE08 AS KOTEIHI_CELLNUM "
+            End If
         End If
 
         '-- FROM
@@ -491,23 +500,43 @@ Public Class CmnParts
             SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
             SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
             SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0007.RIKUBAN "
+            '--★シーエナジーの場合
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr &= " AND LNM0005.KEYCODE04 = LNM0007.SYABAN "
+            Else
+                SQLStr &= " AND LNM0005.KEYCODE01 = LNM0007.RIKUBAN "
+            End If
         End If
 
         '-- WHERE
         SQLStr &= " WHERE "
         SQLStr &= String.Format("     LNM0007.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format(" AND LNM0007.TORICODE = '{0}' ", I_TORICODE)
-        SQLStr &= String.Format(" AND LNM0007.ORGCODE = '{0}' ", I_ORGCODE)
+        '--★シーエナジーの場合(北陸エルネスも含める)
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            SQLStr &= String.Format(" AND LNM0007.TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+        Else
+            SQLStr &= String.Format(" AND LNM0007.TORICODE = '{0}' ", I_TORICODE)
+        End If
+        SQLStr &= String.Format(" AND LNM0007.ORGCODE IN ({0}) ", I_ORGCODE)
         SQLStr &= String.Format(" AND LNM0007.TARGETYM = '{0}' ", I_TAISHOYM)
         '★陸事番号が指定されている場合
         If Not IsNothing(I_RIKUBAN) Then
-            SQLStr &= String.Format(" AND LNM0007.RIKUBAN = '{0}' ", I_RIKUBAN)
+            '--★シーエナジーの場合(車番)
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr &= String.Format(" AND LNM0007.SYABAN = '{0}' ", I_RIKUBAN)
+            Else
+                SQLStr &= String.Format(" AND LNM0007.RIKUBAN = '{0}' ", I_RIKUBAN)
+            End If
         End If
 
         '-- ORDER BY
         If Not IsNothing(I_CLASS) Then
-            SQLStr &= " ORDER BY CAST(LNM0005.VALUE08 AS SIGNED) "
+            '--★シーエナジーの場合
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr &= " ORDER BY CAST(LNM0005.VALUE11 AS SIGNED) "
+            Else
+                SQLStr &= " ORDER BY CAST(LNM0005.VALUE08 AS SIGNED) "
+            End If
         End If
 
         Try
@@ -611,6 +640,95 @@ Public Class CmnParts
             Throw '呼び出し元の例外にスロー
         End Try
 
+    End Sub
+
+    ''' <summary>
+    ''' 統合版固定費マスタTBL検索(SK用)
+    ''' </summary>
+    Public Sub SelectSKFIXEDMaster(ByVal SQLcon As MySqlConnection,
+                                   ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtSKFIXEDMas As DataTable,
+                                   Optional ByVal I_CLASS As String = Nothing,
+                                   Optional ByVal I_SYABAN As String = Nothing)
+        If IsNothing(O_dtSKFIXEDMas) Then
+            O_dtSKFIXEDMas = New DataTable
+        End If
+        If O_dtSKFIXEDMas.Columns.Count <> 0 Then
+            O_dtSKFIXEDMas.Columns.Clear()
+        End If
+        O_dtSKFIXEDMas.Clear()
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0007.TORICODE "
+        SQLStr &= "   ,LNM0007.TORINAME "
+        SQLStr &= "   ,LNM0007.ORGCODE "
+        SQLStr &= "   ,LNM0007.ORGNAME "
+        SQLStr &= "   ,LNM0007.KASANORGCODE "
+        SQLStr &= "   ,LNM0007.KASANORGNAME "
+        SQLStr &= "   ,LNM0007.TARGETYM "
+        SQLStr &= "   ,LNM0007.SYABAN "
+        SQLStr &= "   ,LNM0007.RIKUBAN "
+        SQLStr &= "   ,LNM0007.SYAGATA "
+        SQLStr &= "   ,LNM0007.SYAGATANAME "
+        SQLStr &= "   ,LNM0007.SYABARA "
+        SQLStr &= "   ,LNM0007.SEASONKBN "
+        SQLStr &= "   ,LNM0007.SEASONSTART "
+        SQLStr &= "   ,LNM0007.SEASONEND "
+        SQLStr &= "   ,IFNULL(LNM0007.KOTEIHIM,0) AS GETSUGAKU "
+        SQLStr &= "   ,IFNULL(LNM0007.KOTEIHID,0) AS KOTEIHID "
+        SQLStr &= "   ,IFNULL(LNM0007.KAISU,0) AS KAISU "
+        SQLStr &= "   ,IFNULL(LNM0007.GENGAKU,0) AS GENGAKU "
+        SQLStr &= "   ,IFNULL(LNM0007.AMOUNT,0) AS AMOUNT "
+        SQLStr &= "   ,LNM0007.BIKOU1 "
+        SQLStr &= "   ,LNM0007.BIKOU2 "
+        SQLStr &= "   ,LNM0007.BIKOU3 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= "   ,LNM0005.VALUE01 AS KOTEIHI_DISPLAY "
+            SQLStr &= "   ,LNM0005.VALUE02 AS KOTEIHI_CELLNUM "
+        End If
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0007_FIXED LNM0007 "
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
+            SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE04 = LNM0007.SYABAN "
+        End If
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM0007.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0007.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND LNM0007.ORGCODE IN ({0}) ", I_ORGCODE)
+        SQLStr &= String.Format(" AND LNM0007.TARGETYM = '{0}' ", I_TAISHOYM)
+
+        '★車番が指定されている場合
+        If Not IsNothing(I_SYABAN) Then
+            SQLStr &= String.Format(" AND LNM0007.SYABAN = '{0}' ", I_SYABAN)
+        End If
+
+        '-- ORDER BY
+        If Not IsNothing(I_CLASS) Then
+            SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE05 AS SIGNED),CAST(LNM0005.KEYCODE06 AS SIGNED) "
+        End If
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        O_dtSKFIXEDMas.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    O_dtSKFIXEDMas.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
     End Sub
 
     ''' <summary>
