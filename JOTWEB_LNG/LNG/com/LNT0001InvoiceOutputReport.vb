@@ -471,21 +471,29 @@ Public Class LNT0001InvoiceOutputReport
                         cellValue = WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERNO").ToString())).Value.ToString()
 
                         '☆(日本栄船)独自仕様
-                        If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
-                            AndAlso PrintDatarow("SYUBETSU").ToString() = "運行単価" _
-                            AndAlso PrintDatarow("BIKOU1").ToString() = "2名乗車" Then
-                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        'If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
+                        '    AndAlso PrintDatarow("SYUBETSU").ToString() = "運行単価" _
+                        '    AndAlso PrintDatarow("BIKOU1").ToString() = "2名乗車" Then
+                        'WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 Then
+                            If PrintDatarow("MEMO").ToString() = "3名乗車" Then
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Else
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            End If
 
                             '☆(昭和産業㈱)独自仕様※[休日加算金]以外
+                            'ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005866 _
+                            '    AndAlso PrintDatarow("SYUBETSU").ToString() <> "休日加算金" Then
                         ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005866 _
-                            AndAlso PrintDatarow("SYUBETSU").ToString() <> "休日加算金" Then
+                            AndAlso PrintDatarow("MEMO").ToString() <> "休日加算金" Then
                             If cellValue = "昭和産業1" _
-                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン単価" _
-                                AndAlso PrintDatarow("BIKOU1").ToString() = "1運行目" Then
+                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン" _
+                                AndAlso PrintDatarow("MEMO").ToString() = "" Then
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             ElseIf cellValue = "昭和産業2" _
-                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン単価" _
-                                AndAlso PrintDatarow("BIKOU1").ToString() = "2運行目" Then
+                                AndAlso PrintDatarow("SYUBETSU").ToString() = "トン" _
+                                AndAlso PrintDatarow("MEMO").ToString() = "2運行目" Then
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
 
@@ -583,6 +591,30 @@ Public Class LNT0001InvoiceOutputReport
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                 Next
 
+                '■西日本支店車庫(泉北・新宮)
+            ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" _
+                OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "02" Then
+                '〇届先(休日割増単価)設定
+                Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' "
+                For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
+                    If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
+
+                    '★日本栄船の場合
+                    If PrintHolidayRateDatarow("TODOKECODE_LNM0005").ToString() = BaseDllConst.CONST_TODOKECODE_004916 Then
+                        If PrintHolidayRateDatarow("GYOMUTANKNUMFROM").ToString() = "2" Then
+                            '・2名乗車
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                        ElseIf PrintHolidayRateDatarow("GYOMUTANKNUMFROM").ToString() = "3" Then
+                            '・3名乗車
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                        End If
+                    Else
+                        '上記以外
+                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                    End If
+
+                Next
+
                 '■姫路営業所
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 '〇届先(休日割増単価)設定
@@ -591,6 +623,7 @@ Public Class LNT0001InvoiceOutputReport
                     If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                 Next
+
             End If
 
             '★計算エンジンの有効化

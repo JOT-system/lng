@@ -1636,26 +1636,26 @@ Public Class CmnParts
         Dim SQLStr As String = ""
         '-- SELECT(共通)
         SQLStr &= " SELECT "
-        SQLStr &= "    LNM0017.TORICODE "
+        SQLStr &= "    IFNULL(LNM0017.TORICODE,'') AS TORICODE "
         SQLStr &= " ,  ''   AS TORINAME "
-        SQLStr &= " ,  LNM0017.ORDERORGCODE "
+        SQLStr &= " ,  IFNULL(LNM0017.ORDERORGCODE,'') AS ORDERORGCODE "
         SQLStr &= " ,  ''   AS ORDERORGNAME "
-        SQLStr &= " ,  LNM0017.ORDERORGCATEGORY "
-        SQLStr &= " ,  LNM0017.SHUKABASHO AS SHUKABASHOCODE "
+        SQLStr &= " ,  IFNULL(LNM0017.ORDERORGCATEGORY,'') AS ORDERORGCATEGORY "
+        SQLStr &= " ,  IFNULL(LNM0017.SHUKABASHO,'') AS SHUKABASHOCODE "
         SQLStr &= " ,  ''   AS SHUKABASHONAME "
-        SQLStr &= " ,  LNM0017.SHUKABASHOCATEGORY "
-        SQLStr &= " ,  LNM0017.TODOKECODE "
+        SQLStr &= " ,  IFNULL(LNM0017.SHUKABASHOCATEGORY,'') AS SHUKABASHOCATEGORY "
+        SQLStr &= " ,  IFNULL(LNM0017.TODOKECODE,'') AS TODOKECODE "
         SQLStr &= " ,  ''   AS TODOKENAME "
-        SQLStr &= " ,  LNM0017.TODOKECATEGORY "
-        SQLStr &= " ,  LNM0017.RANGECODE "
+        SQLStr &= " ,  IFNULL(LNM0017.TODOKECATEGORY,'') AS TODOKECATEGORY "
+        SQLStr &= " ,  IFNULL(LNM0017.RANGECODE,'') AS RANGECODE "
         SQLStr &= " ,  '0' AS RANGE_SUNDAY "            '-- 日曜
         SQLStr &= " ,  '0' AS RANGE_HOLIDAY "           '-- 祝日
         'SQLStr &= " ,  '0' AS RANGE_NEWYEAR "           '-- 元旦
         SQLStr &= " ,  '0' AS RANGE_YEAREND_NEWYEAR "   '-- 年末年始(元旦含む)
         SQLStr &= " ,  '0' AS RANGE_MAYDAY "            '-- 労働者の祭典
-        SQLStr &= " ,  LNM0017.GYOMUTANKNUMFROM "
-        SQLStr &= " ,  LNM0017.GYOMUTANKNUMTO "
-        SQLStr &= " ,  LNM0017.TANKA "
+        SQLStr &= " ,  IFNULL(LNM0017.GYOMUTANKNUMFROM,'') AS GYOMUTANKNUMFROM "
+        SQLStr &= " ,  IFNULL(LNM0017.GYOMUTANKNUMTO,'') AS GYOMUTANKNUMTO "
+        SQLStr &= " ,  IFNULL(LNM0017.TANKA,0) AS TANKA "
 
         If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
             AndAlso I_ORDERORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
@@ -1758,6 +1758,40 @@ Public Class CmnParts
 
             '-- ORDER BY
             SQLStr &= " ORDER by CAST(LNM0005.VALUE11 AS SIGNED) "
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0051200000 _
+            AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_022702 Then
+            '■DAIGAS(泉北)
+            SQLStr &= " ,  IFNULL(LNM0005.VALUE04,'')   AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  IFNULL(LNM0005.KEYCODE01,'') AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  IFNULL(LNM0005.KEYCODE02,'') AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT LNM0017.* "
+            SQLStr &= " FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " 1=1 "
+            SQLStr &= " AND (LNM0017.TODOKECODE = LNM0005.KEYCODE01 OR LNM0017.TODOKECODE = '') "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.VALUE11 = '1' "
 
         ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0051200000 _
             AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_022801 Then

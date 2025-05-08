@@ -1255,6 +1255,7 @@ Public Class LNT0002TranStatusList
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCodeSub, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar,
                                                                              printHachinoheSprateDataClass:=dtDummy,
                                                                              printEneosComfeeDataClass:=dtDummy,
+                                                                             printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                              taishoYm:=Me.WF_TaishoYm.Value, calcNumber:=iCalcNumber)
             Dim url As String
             Try
@@ -1793,13 +1794,15 @@ Public Class LNT0002TranStatusList
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTodokeClass, dtEneosTodoke)
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
-            CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=eneosTankClass)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
+            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=eneosTankClass)
+            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=eneosTankClass)
             CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001HachinoheSprate)
             CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001EneosComfee)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtEneosTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2))
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtEneosTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=eneosTodokeClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -1972,9 +1975,12 @@ Public Class LNT0002TranStatusList
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTankClass, dtDaigasTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTodokeClass, dtDaigasTodoke)
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
-            CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=daigasTankClass)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
+            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
+            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=daigasTankClass)
+            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=daigasTankClass)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtDaigasTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=daigasTodokeClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -2136,8 +2142,10 @@ Public Class LNT0002TranStatusList
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
+            'CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
             CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
-            CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
+            CMNPTS.SelectSKFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
+            'CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
             CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
@@ -2226,15 +2234,18 @@ Public Class LNT0002TranStatusList
 #End Region
         Next
         '〇陸事番号マスタ設定(※個別設定用)
+        Dim todokeMerge = CMNPTS.filterItem(dtSekiyuSigenTankSub, "KEYCODE07", "KEYCODE08")
         For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTankSub.Rows
             Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
             If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
                 condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
             End If
             '★届先(個別設定)のみ
-            condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}')",
-                                       BaseDllConst.CONST_TODOKECODE_004012,
-                                       BaseDllConst.CONST_TODOKECODE_005890)
+            'condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}', '{2}')",
+            '                           BaseDllConst.CONST_TODOKECODE_004012,
+            '                           BaseDllConst.CONST_TODOKECODE_005890,
+            '                           BaseDllConst.CONST_TODOKECODE_007273)
+            condition &= String.Format(" AND TODOKECODE IN ({0})", todokeMerge)
             '届先(明細)セル値設定
             WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
         Next
@@ -2319,6 +2330,8 @@ Public Class LNT0002TranStatusList
         'Dim cenergyElNessKoteihiClass As String = ""
         Dim arrToriCode As String() = {"", "", ""}
         Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
+        Dim listOrderOrgCode As New List(Of String)
+        Dim commaOrderOrgCode As String = ""
 
         Select Case reportCode
             '"シーエナジー・エルネス　輸送費請求書"
@@ -2330,6 +2343,12 @@ Public Class LNT0002TranStatusList
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0110600000
                 arrToriCode(1) = Nothing
                 arrToriCode(2) = Nothing
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021502)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022302)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021504)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021601)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022401)
+                commaOrderOrgCode = String.Join(",", listOrderOrgCode)
         End Select
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
@@ -2338,6 +2357,7 @@ Public Class LNT0002TranStatusList
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
             CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
+            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=cenergyElNessTankClass)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate)
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtCenergyElNessTank, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=cenergyElNessTankClass)
         End Using
@@ -2366,10 +2386,13 @@ Public Class LNT0002TranStatusList
             Dim condition As String = String.Format("TODOKECODE='{0}'", CenergyTodokerow("KEYCODE01"))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "3" Then Continue For
-                LNT0001tblrow("CENERGYELNESS_SHUKACODE") = CenergyTodokerow("KEYCODE07").ToString()
-                LNT0001tblrow("CENERGYELNESS_SHUKANAME") = CenergyTodokerow("KEYCODE08").ToString()
-                LNT0001tblrow("CENERGYELNESS_TODOKECODE") = CenergyTodokerow("KEYCODE03").ToString()
-                LNT0001tblrow("CENERGYELNESS_TODOKENAME") = CenergyTodokerow("KEYCODE04").ToString()
+                Try
+                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = CenergyTodokerow("KEYCODE07").ToString()
+                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = CenergyTodokerow("KEYCODE08").ToString()
+                    LNT0001tblrow("CENERGYELNESS_TODOKECODE") = CenergyTodokerow("KEYCODE03").ToString()
+                    LNT0001tblrow("CENERGYELNESS_TODOKENAME") = CenergyTodokerow("KEYCODE04").ToString()
+                Catch ex As Exception
+                End Try
             Next
         Next
 
@@ -2387,10 +2410,13 @@ Public Class LNT0002TranStatusList
             Dim condition As String = String.Format("TODOKECODE='{0}'", ElNessTodokerow("KEYCODE01"))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "6" Then Continue For
-                LNT0001tblrow("CENERGYELNESS_SHUKACODE") = ElNessTodokerow("KEYCODE07").ToString()
-                LNT0001tblrow("CENERGYELNESS_SHUKANAME") = ElNessTodokerow("KEYCODE08").ToString()
-                LNT0001tblrow("CENERGYELNESS_TODOKECODE") = ElNessTodokerow("KEYCODE03").ToString()
-                LNT0001tblrow("CENERGYELNESS_TODOKENAME") = ElNessTodokerow("KEYCODE04").ToString()
+                Try
+                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = ElNessTodokerow("KEYCODE07").ToString()
+                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = ElNessTodokerow("KEYCODE08").ToString()
+                    LNT0001tblrow("CENERGYELNESS_TODOKECODE") = ElNessTodokerow("KEYCODE03").ToString()
+                    LNT0001tblrow("CENERGYELNESS_TODOKENAME") = ElNessTodokerow("KEYCODE04").ToString()
+                Catch ex As Exception
+                End Try
             Next
         Next
 
@@ -2424,6 +2450,7 @@ Public Class LNT0002TranStatusList
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankHKDClass, dtSekiyuSigenHKDTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeHKDClass, dtSekiyuSigenHKDTodoke)
+            'CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
             CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
             CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001SKSurcharge)
