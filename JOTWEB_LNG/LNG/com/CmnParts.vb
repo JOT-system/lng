@@ -292,13 +292,15 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0006.SHUKABASHO "
         SQLStr &= "   ,LNM0006.SHUKANAME "
         SQLStr &= "   ,LNM0006.AVOCADOTODOKECODE AS TODOKECODE "
-        SQLStr &= "   ,LPAD(LNM0006.BRANCHCODE,2,'0') AS TODOKEBRANCHCODE "
         SQLStr &= "   ,LNM0006.AVOCADOTODOKENAME AS TODOKENAME "
         SQLStr &= "   ,LNM0006.TODOKECODE AS CONV_TODOKECODE "
         SQLStr &= "   ,LNM0006.TODOKENAME AS CONV_TODOKENAME "
         SQLStr &= "   ,LNM0006.TANKNUMBER AS SYAGOU "
+        SQLStr &= "   ,LNM0006.SHABAN "
         SQLStr &= "   ,LNM0006.STYMD "
         SQLStr &= "   ,LNM0006.ENDYMD "
+        SQLStr &= "   ,LPAD(LNM0006.BRANCHCODE,2,'0') AS TODOKEBRANCHCODE "
+        SQLStr &= "   ,LNM0006.TANKAKBN "
         SQLStr &= "   ,LNM0006.MEMO "
         SQLStr &= "   ,LNM0006.TANKA "
         SQLStr &= "   ,LNM0006.CALCKBN AS SYUBETSU "
@@ -1756,6 +1758,39 @@ Public Class CmnParts
 
             '-- ORDER BY
             SQLStr &= " ORDER by CAST(LNM0005.VALUE11 AS SIGNED) "
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0051200000 _
+            AndAlso I_ORDERORGCODE = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+            '■DAIGAS(姫路営業所)
+            SQLStr &= " ,  IFNULL(LNM0005.VALUE04,'')   AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  '' AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE01 AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE02 AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT LNM0017.* "
+            SQLStr &= " FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " 1=1 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.VALUE11 = '1' "
 
         Else
             '※上記(以外)
