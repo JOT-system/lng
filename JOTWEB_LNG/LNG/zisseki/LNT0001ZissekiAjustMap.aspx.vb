@@ -575,6 +575,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonEND_Click()
+        '★対象年月
+        work.WF_SEL_TARGETYM.Text = WF_TaishoYm.Value
 
         Master.TransitionPrevPage()
 
