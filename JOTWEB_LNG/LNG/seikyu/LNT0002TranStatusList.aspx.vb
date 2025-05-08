@@ -330,7 +330,7 @@ Public Class LNT0002TranStatusList
         '　検索説明
         '     条件指定に従い該当データを輸送費明細出力履歴から取得する
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" Select                                                                                              ")
+        SQLStr.AppendLine(" SELECT                                                                                              ")
         SQLStr.AppendLine("     1                                                                        AS 'SELECT'            ")
         SQLStr.AppendLine("   , 0                                                                        AS HIDDEN              ")
         SQLStr.AppendLine("   , 0                                                                        AS LINECNT             ")
@@ -343,8 +343,11 @@ Public Class LNT0002TranStatusList
 
         SQLStr.AppendLine("   , COALESCE(RTRIM(FIX.KEYCODE), '')                                         AS KEYCODE             ")
 
-        SQLStr.AppendLine("   ,  COALESCE(DATE_FORMAT(B.UPDYMD, '%Y/%m/%d %H:%i:%s'), '')                AS UPDYMD              ")
-        SQLStr.AppendLine("   ,  COALESCE(RTRIM(B.STAFFNAMES), '')                                       AS UPDUSERNAME         ")
+        'SQLStr.AppendLine("   ,  COALESCE(DATE_FORMAT(B.UPDYMD, '%Y/%m/%d %H:%i:%s'), '')                AS UPDYMD              ")
+        'SQLStr.AppendLine("   ,  COALESCE(RTRIM(B.STAFFNAMES), '')                                       AS UPDUSERNAME         ")
+        SQLStr.AppendLine("   ,  ''                                                                       AS UPDYMD             ")
+        SQLStr.AppendLine("   ,  ''                                                                       AS UPDUSERNAME        ")
+
 
         SQLStr.AppendLine("   ,  COALESCE(RTRIM(A.SEQ), '0')                                             AS KAISU               ")
         SQLStr.AppendLine("   ,  COALESCE(DATE_FORMAT(A.INTAKEDATE, '%Y/%m/%d %H:%i:%s'), '')            AS DLYMD               ")
@@ -413,41 +416,41 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("    ) A                                                                                              ")
         SQLStr.AppendLine("      ON  FIX.KEYCODE = A.TORICODE                                                                   ")
 
-        '最終更新日時、最終更新者
-        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
-        SQLStr.AppendLine("          B1.TORICODE                                                                                ")
-        SQLStr.AppendLine("          , B1.ORGCODE                                                                               ")
-        SQLStr.AppendLine("          , B2.UPDUSER                                                                               ")
-        SQLStr.AppendLine("          , B2.UPDYMD                                                                                ")
-        SQLStr.AppendLine("          , US.STAFFNAMES                                                                            ")
-        SQLStr.AppendLine("          FROM(                                                                                      ")
-        SQLStr.AppendLine("              SELECT                                                                                 ")
-        SQLStr.AppendLine("                  TORICODE                                                                           ")
-        SQLStr.AppendLine("                  , ORGCODE                                                                          ")
-        SQLStr.AppendLine("                  , MAX(UPDYMD) AS UPDYMD                                                            ")
-        SQLStr.AppendLine("              FROM                                                                                   ")
-        SQLStr.AppendLine("                  LNG.VIW0004_SEIKYUUPDUSER                                                          ")
-        SQLStr.AppendLine("              WHERE                                                                                  ")
-        SQLStr.AppendLine("                  (CASE  WHEN COALESCE(TARGETYM,'') = '' THEN @TAISHOYMD BETWEEN  STYMD AND ENDYMD   ")
-        SQLStr.AppendLine("                   ELSE  TARGETYM = @TAISHOYM                                                        ")
-        SQLStr.AppendLine("                   END) = TRUE                                                                       ")
-        SQLStr.AppendLine("              GROUP BY                                                                               ")
-        SQLStr.AppendLine("                  TORICODE                                                                           ")
-        SQLStr.AppendLine("                  , ORGCODE                                                                          ")
-        SQLStr.AppendLine("          ) B1                                                                                       ")
-        SQLStr.AppendLine("          INNER JOIN LNG.VIW0004_SEIKYUUPDUSER B2                                                    ")
-        SQLStr.AppendLine("      ON                                                                                             ")
-        SQLStr.AppendLine("           B1.TORICODE = B2.TORICODE                                                                 ")
-        SQLStr.AppendLine("      AND  B1.ORGCODE = B2.ORGCODE                                                                   ")
-        SQLStr.AppendLine("      AND  B1.UPDYMD = B2.UPDYMD                                                                     ")
-        SQLStr.AppendLine("      LEFT JOIN                                                                                      ")
-        SQLStr.AppendLine("      COM.LNS0001_USER US                                                                            ")
-        SQLStr.AppendLine("      ON  B2.UPDUSER = US.USERID                                                                     ")
-        SQLStr.AppendLine("    ) B                                                                                              ")
-        SQLStr.AppendLine("      ON  FIX.VALUE5 = B.TORICODE                                                                    ")
-        SQLStr.AppendLine("     AND  FIX.VALUE6 = B.ORGCODE                                                                     ")
+        ''最終更新日時、最終更新者 
+        'SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        'SQLStr.AppendLine("    (                                                                                                ")
+        'SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        'SQLStr.AppendLine("          B1.TORICODE                                                                                ")
+        'SQLStr.AppendLine("          , B1.ORGCODE                                                                               ")
+        'SQLStr.AppendLine("          , B2.UPDUSER                                                                               ")
+        'SQLStr.AppendLine("          , B2.UPDYMD                                                                                ")
+        'SQLStr.AppendLine("          , US.STAFFNAMES                                                                            ")
+        'SQLStr.AppendLine("          FROM(                                                                                      ")
+        'SQLStr.AppendLine("              SELECT                                                                                 ")
+        'SQLStr.AppendLine("                  TORICODE                                                                           ")
+        'SQLStr.AppendLine("                  , ORGCODE                                                                          ")
+        'SQLStr.AppendLine("                  , MAX(UPDYMD) AS UPDYMD                                                            ")
+        'SQLStr.AppendLine("              FROM                                                                                   ")
+        'SQLStr.AppendLine("                  LNG.VIW0004_SEIKYUUPDUSER                                                          ")
+        'SQLStr.AppendLine("              WHERE                                                                                  ")
+        'SQLStr.AppendLine("                  (CASE  WHEN COALESCE(TARGETYM,'') = '' THEN @TAISHOYMD BETWEEN  STYMD AND ENDYMD   ")
+        'SQLStr.AppendLine("                   ELSE  TARGETYM = @TAISHOYM                                                        ")
+        'SQLStr.AppendLine("                   END) = TRUE                                                                       ")
+        'SQLStr.AppendLine("              GROUP BY                                                                               ")
+        'SQLStr.AppendLine("                  TORICODE                                                                           ")
+        'SQLStr.AppendLine("                  , ORGCODE                                                                          ")
+        'SQLStr.AppendLine("          ) B1                                                                                       ")
+        'SQLStr.AppendLine("          INNER JOIN LNG.VIW0004_SEIKYUUPDUSER B2                                                    ")
+        'SQLStr.AppendLine("      ON                                                                                             ")
+        'SQLStr.AppendLine("           B1.TORICODE = B2.TORICODE                                                                 ")
+        'SQLStr.AppendLine("      AND  B1.ORGCODE = B2.ORGCODE                                                                   ")
+        'SQLStr.AppendLine("      AND  B1.UPDYMD = B2.UPDYMD                                                                     ")
+        'SQLStr.AppendLine("      LEFT JOIN                                                                                      ")
+        'SQLStr.AppendLine("      COM.LNS0001_USER US                                                                            ")
+        'SQLStr.AppendLine("      ON  B2.UPDUSER = US.USERID                                                                     ")
+        'SQLStr.AppendLine("    ) B                                                                                              ")
+        'SQLStr.AppendLine("      ON  FIX.VALUE5 = B.TORICODE                                                                    ")
+        'SQLStr.AppendLine("     AND  FIX.VALUE6 = B.ORGCODE                                                                     ")
 
         '特別料金
         SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
@@ -467,7 +470,7 @@ Public Class LNT0002TranStatusList
         '単価調整
         SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
         SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        SQLStr.AppendLine("      SELECT DISTINCT                                                                                          ")
         SQLStr.AppendLine("          TORICODE                                                                                   ")
         SQLStr.AppendLine("          ,ORGCODE                                                                                   ")
         SQLStr.AppendLine("      FROM                                                                                           ")
@@ -475,7 +478,7 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("      WHERE                                                                                          ")
         SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("      AND @TAISHOYMD BETWEEN STYMD AND ENDYMD                                                        ")
-        SQLStr.AppendLine("      AND BRANCHCODE > '2'                                                                           ")
+        SQLStr.AppendLine("      AND BRANCHCODE > 1                                                                             ")
         SQLStr.AppendLine("    ) TANKA                                                                                          ")
         SQLStr.AppendLine("      ON  FIX.VALUE5 = TANKA.TORICODE                                                                ")
         SQLStr.AppendLine("     AND  FIX.VALUE6 = TANKA.ORGCODE                                                                 ")
@@ -546,6 +549,11 @@ Public Class LNT0002TranStatusList
                     i += 1
                     LNT0002row("LINECNT") = i        'LINECNT
 
+                    '最終更新日時、最終更新者取得
+                    GETLASTUPDATEUSER(SQLcon,
+                                      LNT0002row("TORICODE"), LNT0002row("ORGCODE"),
+                                      LNT0002row("UPDYMD"), LNT0002row("UPDUSERNAME"))
+
                     LNT0002row("DETAIL") = CONST_BTNADD
                     LNT0002row("CONTROL") = CONST_BTNOUT
                     LNT0002row("HISTORY") = CONST_BTNREF
@@ -564,6 +572,105 @@ Public Class LNT0002TranStatusList
             Exit Sub
         End Try
 
+    End Sub
+
+    ''' <summary>
+    '''  最終更新日時、最終更新者取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GETLASTUPDATEUSER(ByVal SQLcon As MySqlConnection,
+                                    ByVal WW_TORICODE As String, ByVal WW_ORGCODE As String,
+                                    ByRef WW_UPDYMD As String, ByRef WW_UPDUSERNAME As String)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("            COALESCE(DATE_FORMAT(A2.UPDYMD, '%Y/%m/%d %H:%i:%s'), '')                 AS UPDYMD      ")
+        SQLStr.AppendLine("          , COALESCE(US.STAFFNAMES,  A2.UPDUSER)                                      AS STAFFNAMES  ")
+        SQLStr.AppendLine("          FROM(                                                                                      ")
+        SQLStr.AppendLine("              SELECT                                                                                 ")
+        SQLStr.AppendLine("                  TORICODE                                                                           ")
+        SQLStr.AppendLine("                  , ORGCODE                                                                          ")
+        SQLStr.AppendLine("                  , TARGETYM                                                                         ")
+        SQLStr.AppendLine("                  , STYMD                                                                            ")
+        SQLStr.AppendLine("                  , ENDYMD                                                                           ")
+        SQLStr.AppendLine("                  , MAX(UPDYMD) AS UPDYMD                                                            ")
+        SQLStr.AppendLine("              FROM                                                                                   ")
+        SQLStr.AppendLine("                  LNG.VIW0004_SEIKYUUPDUSER                                                          ")
+        SQLStr.AppendLine("              WHERE                                                                                  ")
+        SQLStr.AppendLine("                  (CASE  WHEN COALESCE(TARGETYM,'') = '' THEN @TAISHOYMD BETWEEN  STYMD AND ENDYMD   ")
+        SQLStr.AppendLine("                   ELSE  TARGETYM = @TAISHOYM                                                        ")
+        SQLStr.AppendLine("                   END) = TRUE                                                                       ")
+        SQLStr.AppendLine("                AND TORICODE = @TORICODE                                                             ")
+        SQLStr.AppendLine("                AND ORGCODE = @ORGCODE                                                               ")
+        SQLStr.AppendLine("              GROUP BY                                                                               ")
+        SQLStr.AppendLine("                  TORICODE                                                                           ")
+        SQLStr.AppendLine("                , ORGCODE                                                                            ")
+        SQLStr.AppendLine("                , TARGETYM                                                                           ")
+        SQLStr.AppendLine("                , STYMD                                                                              ")
+        SQLStr.AppendLine("                , ENDYMD                                                                             ")
+        SQLStr.AppendLine("          ) A1                                                                                       ")
+        SQLStr.AppendLine("          INNER JOIN LNG.VIW0004_SEIKYUUPDUSER A2                                                    ")
+        SQLStr.AppendLine("      ON                                                                                             ")
+        SQLStr.AppendLine("           A1.TORICODE = A2.TORICODE                                                                 ")
+        SQLStr.AppendLine("      AND  A1.ORGCODE = A2.ORGCODE                                                                   ")
+        SQLStr.AppendLine("      AND  A1.TARGETYM = A2.TARGETYM                                                                 ")
+        SQLStr.AppendLine("      AND  A1.STYMD = A2.STYMD                                                                       ")
+        SQLStr.AppendLine("      AND  A1.ENDYMD = A2.ENDYMD                                                                     ")
+        SQLStr.AppendLine("      AND  A1.UPDYMD = A2.UPDYMD                                                                     ")
+        SQLStr.AppendLine("      LEFT JOIN                                                                                      ")
+        SQLStr.AppendLine("      COM.LNS0001_USER US                                                                            ")
+        SQLStr.AppendLine("      ON  A2.UPDUSER = US.USERID                                                                      ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim Itype As Integer
+                Dim dt As DateTime
+
+                '対象年月
+                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                    Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.VarChar, 6)
+                    P_TAISHOYM.Value = Itype
+                End If
+
+                '対象年月日
+                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
+                    Dim P_TAISHOYMD As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYMD", MySqlDbType.Date)
+                    P_TAISHOYMD.Value = dt
+                End If
+
+                '取引先コード
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
+                P_TORICODE.Value = WW_TORICODE
+
+                '部門コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)
+                P_ORGCODE.Value = WW_ORGCODE
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                    If WW_Tbl.Rows.Count >= 1 Then
+                        WW_UPDYMD = WW_Tbl.Rows(0)("UPDYMD").ToString
+                        WW_UPDUSERNAME = WW_Tbl.Rows(0)("STAFFNAMES").ToString
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0002L SELECT")
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNT0002L Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>
