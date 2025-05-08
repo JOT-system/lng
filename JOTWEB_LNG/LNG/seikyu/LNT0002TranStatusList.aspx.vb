@@ -105,11 +105,13 @@ Public Class LNT0002TranStatusList
                             Master.MAPID = LNT0001WRKINC.MAPIDI
                             WF_ButtonOutClick()
                             Master.MAPID = LNT0002WRKINC.MAPIDL
-                            '出力履歴登録
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()  ' DataBase接続
-                                INSHIST(SQLcon)
-                            End Using
+                            If isNormal(WW_ErrSW) Then
+                                '出力履歴登録
+                                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                                    SQLcon.Open()  ' DataBase接続
+                                    INSHIST(SQLcon)
+                                End Using
+                            End If
                             GridViewInitialize()
                         '閉じるボタン押下時
                         Case "WF_ButtonCLOSE"
@@ -211,10 +213,11 @@ Public Class LNT0002TranStatusList
             Master.TransitionPrevPage(, LNT0002WRKINC.TITLEKBNS)
         End If
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0002D Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001AJ Then
 
-            ' 登録画面からの遷移
+            ' 調整画面からの遷移
             Master.RecoverTable(LNT0002tbl, work.WF_SEL_INPTBL.Text)
+            WF_TaishoYm.Value = Left(work.WF_SEL_TARGETYM.Text, 7)
         Else
             ' サブメニューからの画面遷移
             ' メニューからの画面遷移
@@ -235,6 +238,9 @@ Public Class LNT0002TranStatusList
             work.Initialize()
             Master.CreateXMLSaveFile()
 
+            '対象年月
+            'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         End If
 
         '表示制御項目
@@ -244,10 +250,6 @@ Public Class LNT0002TranStatusList
         Else
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
-
-        '対象年月
-        'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
-        WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -1209,6 +1211,13 @@ Public Class LNT0002TranStatusList
 
             INVOICEDataGet(SQLcon)
         End Using
+
+        WW_ErrSW = C_MESSAGE_NO.NORMAL
+        If LNT0001tbl.Rows.Count = 0 Then
+            Master.Output(C_MESSAGE_NO.CTN_SELECT_EXIST, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            WW_ErrSW = C_MESSAGE_NO.CTN_SELECT_EXIST
+            Exit Sub
+        End If
 
         Dim selectOrgCode As String = Mid(Me.WF_TORI.SelectedValue, 1, 6)
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
