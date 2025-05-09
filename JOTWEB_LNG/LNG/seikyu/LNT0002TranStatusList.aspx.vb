@@ -1220,10 +1220,13 @@ Public Class LNT0002TranStatusList
         End If
 
         Dim selectOrgCode As String = Mid(Me.WF_TORI.SelectedValue, 1, 6)
+        Dim CMNCHK As New CmnCheck(Me.WF_TaishoYm.Value, Me.WF_TORI)
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
             OrElse selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
             '〇(帳票)項目チェック処理(ENEOS)
-            WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+            'WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+            CMNCHK.WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate,
+                                       LNT0001HachinoheSprate:=LNT0001HachinoheSprate, LNT0001EneosComfee:=LNT0001EneosComfee)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputReport(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar,
                                                                              printHachinoheSprateDataClass:=LNT0001HachinoheSprate,
@@ -1251,12 +1254,14 @@ Public Class LNT0002TranStatusList
             '★姫路を選択した場合(ENEOSとフォーマットが同一のため)
             If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 '〇(帳票)項目チェック処理(ENEOS)
-                WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+                'WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+                CMNCHK.WW_ReportCheckEneos(Me.WF_TORI.SelectedItem.Text, selectOrgCode, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
                 iCalcNumber = 1
                 selectOrgCodeSub = selectOrgCode
             Else
                 '〇(帳票)項目チェック処理(DAIGAS)
-                WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+                'WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode)
+                CMNCHK.WW_ReportCheckDaigas(Me.WF_TORI.SelectedItem.Text, selectOrgCode, LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
             End If
 
             Dim dtDummy As New DataTable
@@ -1286,7 +1291,9 @@ Public Class LNT0002TranStatusList
             Dim dcSyonai As New Dictionary(Of String, String)
             Dim dcTouhoku As New Dictionary(Of String, String)
             Dim dcIbaraki As New Dictionary(Of String, String)
-            WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki)
+            'WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki)
+            CMNCHK.WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
+                                             LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001SKKoteichi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGEN(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                   LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
@@ -1310,7 +1317,9 @@ Public Class LNT0002TranStatusList
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
             '〇(帳票)項目チェック処理(石油資源開発(北海道))
             Dim dcIshikari As New Dictionary(Of String, String)
-            WW_ReportCheckSekiyuSigenHokaido(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcIshikari)
+            'WW_ReportCheckSekiyuSigenHokaido(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcIshikari)
+            CMNCHK.WW_ReportCheckSekiyuSigenHokaido(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcIshikari,
+                                                    LNT0001tbl, LNT0001Tanktbl, LNT0001SKSprate, LNT0001SKSurcharge, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGENHokaido(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                                          LNT0001tbl, LNT0001Tanktbl, LNT0001SKSprate, LNT0001SKSurcharge, LNT0001Calendar, dcIshikari,
@@ -1335,7 +1344,9 @@ Public Class LNT0002TranStatusList
             '〇(帳票)項目チェック処理(シーエナジー・エルネス)
             Dim dcCenergy As New Dictionary(Of String, String)
             Dim dcElNess As New Dictionary(Of String, String)
-            WW_ReportCheckCenergyElNess(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcCenergy, dcElNess)
+            'WW_ReportCheckCenergyElNess(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcCenergy, dcElNess)
+            CMNCHK.WW_ReportCheckCenergyElNess(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcCenergy, dcElNess,
+                                               LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputCENERGY_ELNESS(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
                                                                              LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, dcCenergy, dcElNess,

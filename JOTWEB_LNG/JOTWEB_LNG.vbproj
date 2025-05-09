@@ -505,6 +505,7 @@
       <DependentUpon>GRIS0006LeftMenu.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\com\CmnCheck.vb" />
     <Compile Include="LNG\com\CmnLng.vb">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
