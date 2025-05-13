@@ -952,7 +952,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0001_ZISSEKI UPDATE(DELETE)"
@@ -961,7 +961,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -2147,7 +2146,7 @@ Public Class LNT0001ZissekiIntake
                     Next
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0001 UPDATE_INSERT"
@@ -2156,7 +2155,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -2293,7 +2291,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0003 INSERT"
@@ -2302,7 +2300,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -2413,7 +2410,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0016_ENEOSYUSOUHI UPDATE(DELETE)"
@@ -2422,7 +2419,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -2796,7 +2792,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0016_ENEOSYUSOUHI UPDATE(INSERT)"
@@ -2805,7 +2801,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -2877,7 +2872,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0020_ESUKEIYUSOUHI UPDATE(DELETE)"
@@ -2886,7 +2881,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -3162,7 +3156,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0020_ESUKEIYUSOUHI UPDATE(INSERT)"
@@ -3171,7 +3165,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -3243,7 +3236,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0019_SAIBUGUSYUSOUHI UPDATE(DELETE)"
@@ -3252,7 +3245,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -3555,7 +3547,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0019_SAIBUGUSYUSOUHI UPDATE(INSERT)"
@@ -3564,7 +3556,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -3636,7 +3627,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0022_OGYUSOUHI UPDATE(DELETE)"
@@ -3645,7 +3636,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -3998,7 +3988,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0022_OGYUSOUHI UPDATE(INSERT)"
@@ -4007,7 +3997,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -4079,7 +4068,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0025_CENALNESUYUSOUHI UPDATE(DELETE)"
@@ -4088,7 +4077,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -4433,7 +4421,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0025_CENALNESUYUSOUHI UPDATE(INSERT)"
@@ -4442,7 +4430,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -4514,7 +4501,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0023_SEKIYUHOKKAIDOYUSOUHI UPDATE(DELETE)"
@@ -4523,7 +4510,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -4861,7 +4847,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0023_SEKIYUHOKKAIDOYUSOUHI UPDATE(INSERT)"
@@ -4870,7 +4856,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -4942,7 +4927,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0021_SEKIYUHONSYUYUSOUHI UPDATE(DELETE)"
@@ -4951,7 +4936,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -5287,7 +5271,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0021_SEKIYUHONSYUYUSOUHI UPDATE(INSERT)"
@@ -5296,7 +5280,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -5368,7 +5351,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0017_TNGYUSOUHI UPDATE(DELETE)"
@@ -5377,7 +5360,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -5651,7 +5633,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0017_TNGYUSOUHI UPDATE(INSERT)"
@@ -5660,7 +5642,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -5732,7 +5713,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0018_TOHOKUYUSOUHI UPDATE(DELETE)"
@@ -5741,7 +5722,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -6016,7 +5996,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0018_TOHOKUYUSOUHI UPDATE(INSERT)"
@@ -6025,7 +6005,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -6097,7 +6076,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0024_HOKKAIDOLNGYUSOUHI UPDATE(DELETE)"
@@ -6106,7 +6085,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
@@ -6395,7 +6373,7 @@ Public Class LNT0001ZissekiIntake
 
                 End Using
             Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生", "", True)
+                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
                 CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
                 CS0011LOGWrite.INFPOSI = "DB:LNT0024_HOKKAIDOLNGYUSOUHI UPDATE(INSERT)"
@@ -6404,7 +6382,6 @@ Public Class LNT0001ZissekiIntake
                 CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
                 CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                rightviewR.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
                 oResult = C_MESSAGE_NO.DB_ERROR
                 Exit Sub
             End Try
