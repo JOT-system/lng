@@ -464,6 +464,10 @@ Public Module BaseDllConst
     ''' 室蘭港バンカリング
     ''' </summary>
     Public Const CONST_TODOKECODE_006915 As String = "006915"
+    ''' <summary>
+    ''' 商船三井
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007110 As String = "007110"
 #End Region
 
 #Region "業務ID"

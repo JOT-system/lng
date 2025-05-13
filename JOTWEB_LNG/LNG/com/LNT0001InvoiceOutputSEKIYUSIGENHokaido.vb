@@ -23,7 +23,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private PrintData As DataTable
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
-    Private PrintSKKoteihiData As DataTable
+    Private PrintSKSurchargeData As DataTable
     Private PrintTogouSprate As DataTable
     Private PrintCalendarData As DataTable
     Private PrintHolidayRateData As DataTable
@@ -60,7 +60,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             Me.PrintData = printDataClass
             Me.PrintTankData = printTankDataClass
             Me.PrintKoteihiData = printKoteihiDataClass
-            Me.PrintSKKoteihiData = printSKKoteihiDataClass
+            Me.PrintSKSurchargeData = printSKKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintTogouSprate = printTogouSprateDataClass
             Me.PrintHolidayRateData = printHolidayRateDataClass
@@ -383,7 +383,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             End If
 
             '〇[室蘭ガスサーチャージ]設定
-            For Each PrintSKKoteihiDatarow As DataRow In PrintSKKoteihiData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_003563))
+            For Each PrintSKKoteihiDatarow As DataRow In PrintSKSurchargeData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_003563))
                 '走行距離
                 WW_Workbook.Worksheets(WW_SheetNoMuroran).Range("G19").Value = Decimal.Parse(PrintSKKoteihiDatarow("KYORI").ToString())
                 '実勢軽油価格

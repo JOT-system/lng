@@ -1293,10 +1293,10 @@ Public Class LNT0002TranStatusList
             Dim dcIbaraki As New Dictionary(Of String, String)
             'WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki)
             CMNCHK.WW_ReportCheckSekiyuSigen(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
-                                             LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001SKKoteichi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
+                                             LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001SKSurcharge, LNT0001SKKoteichi, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate)
 
             Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputSEKIYUSIGEN(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
-                                                                                  LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
+                                                                                  LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001SKSurcharge, LNT0001Calendar, LNT0001SKKoteichi, dcNigata, dcSyonai, dcTouhoku, dcIbaraki,
                                                                                   printTogouSprateDataClass:=LNT0001TogouSprate,
                                                                                   printHolidayRateDataClass:=LNT0001HolidayRate,
                                                                                   taishoYm:=Me.WF_TaishoYm.Value)

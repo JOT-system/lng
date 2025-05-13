@@ -5,6 +5,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private WW_Workbook As New Workbook  '共通
     Private WW_SheetNo As Integer = 0
     Private WW_SheetNoSKKoteihi As Integer = 0
+    Private WW_SheetNoShosenMitsui As Integer = 0
     Private WW_SheetNoUnchin As Integer = 0
     Private WW_SheetNoCalendar As Integer = 0
     Private WW_SheetNoMaster As Integer = 0
@@ -27,6 +28,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     Private PrintData As DataTable
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
+    Private PrintSKSurchargeData As DataTable
     Private PrintCalendarData As DataTable
     Private PrintSKKoteichiData As DataTable
     Private PrintTogouSprate As DataTable
@@ -55,7 +57,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
     ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     ''' <remarks>テンプレートファイルを読み取りモードとして開く</remarks>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
-                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable, printSKKoteichiDataClass As DataTable,
+                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printSKKoteihiDataClass As DataTable, printCalendarDataClass As DataTable, printSKKoteichiDataClass As DataTable,
                    dicNigataList As Dictionary(Of String, String), dicSyonaiList As Dictionary(Of String, String), dicTouhokuList As Dictionary(Of String, String), dicIbarakiList As Dictionary(Of String, String),
                    Optional ByVal printTogouSprateDataClass As DataTable = Nothing,
                    Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
@@ -67,6 +69,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
             Me.PrintData = printDataClass
             Me.PrintTankData = printTankDataClass
             Me.PrintKoteihiData = printKoteihiDataClass
+            Me.PrintSKSurchargeData = printSKKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintSKKoteichiData = printSKKoteichiDataClass
             Me.PrintTogouSprate = printTogouSprateDataClass
@@ -202,6 +205,9 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                     OrElse WW_Workbook.Worksheets(i).Name = "固定値(茨城)" Then
                     WW_ArrSheetNoKoteichi(j(4)) = i
                     j(4) += 1
+                ElseIf WW_Workbook.Worksheets(i).Name = "サーチャージ明細（商船三井）" Then
+                    '〇共通(シート[サーチャージ明細（商船三井）])
+                    WW_SheetNoShosenMitsui = i
                 End If
             Next
 
@@ -441,7 +447,14 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                 Dim iTanka As Integer = Integer.Parse(PrintDatarow("TANKA").ToString())
                 Dim iSheetNum As Integer = Integer.Parse(PrintDatarow("GRPNO").ToString()) - 1
                 Dim setCell As String = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + PrintDatarow("SET_CELL").ToString()
-                WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = iTanka
+
+                '■単価調整の場合
+                If PrintDatarow("BRANCHCODE").ToString() = "02" Then
+                    '★個別設定項目
+                    SetIndividualItem(PrintDatarow, WW_ArrSheetNoKoteichi(iSheetNum), iTanka)
+                Else
+                    WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = iTanka
+                End If
 
                 If PrintDatarow("MEISAI_HYOJIFLG").ToString() = "1" Then
                     setCell = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + "3"
@@ -457,12 +470,61 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                 WW_Workbook.Worksheets(WW_SheetNoMaster).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
             Next
 
+            ''〇[商船三井サーチャージ]設定
+            'For Each PrintSKSurchargeDatarow As DataRow In PrintSKSurchargeData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_007110))
+            '    '走行距離
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("E18").Value = Decimal.Parse(PrintSKSurchargeDatarow("KYORI").ToString())
+            '    '燃費
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("K18").Value = Decimal.Parse(PrintSKSurchargeDatarow("KEIYU").ToString())
+            '    '実勢軽油価格
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("E23").Value = Decimal.Parse(PrintSKSurchargeDatarow("KEIYU").ToString())
+            '    '基準価格
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("G23").Value = Decimal.Parse(PrintSKSurchargeDatarow("KIZYUN").ToString())
+            '    '輸送回数
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("G18").Value = Integer.Parse(PrintSKSurchargeDatarow("KAISU").ToString())
+            '    '燃料使用量
+            '    WW_Workbook.Worksheets(WW_SheetNoShosenMitsui).Range("K30").Value = Integer.Parse(PrintSKSurchargeDatarow("USAGECHARGE").ToString())
+            'Next
+
             '★計算エンジンの有効化
             WW_Workbook.EnableCalculation = True
 
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub SetIndividualItem(ByVal PrintDatarow As DataRow, ByVal sheetNo As Integer, ByVal tanka As Integer)
+        Dim setCell As String = ""
+
+        Select Case PrintDatarow("TODOKENO").ToString()
+            '〇若松ガス
+            Case BaseDllConst.CONST_TODOKECODE_002025
+                If PrintDatarow("KOTEICHI_GYOMUNO").ToString() = "326" Then
+                    '■業務車番(333)※1.5回転
+                    setCell = "O" + PrintDatarow("SET_CELL").ToString()
+                Else
+                    Exit Sub
+                End If
+
+            '〇ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
+            Case BaseDllConst.CONST_TODOKECODE_002019
+                If PrintDatarow("KOTEICHI_GYOMUNO").ToString() = "333" Then
+                    '■業務車番(333)※不積単価
+                    setCell = "K" + PrintDatarow("SET_CELL").ToString()
+                ElseIf PrintDatarow("KOTEICHI_GYOMUNO").ToString() = "334" Then
+                    '■業務車番(334)※不積単価
+                    setCell = "O" + PrintDatarow("SET_CELL").ToString()
+                Else
+                    Exit Sub
+                End If
+
+            Case Else
+                Exit Sub
+        End Select
+
+        WW_Workbook.Worksheets(sheetNo).Range(setCell).Value = tanka
+
     End Sub
 
 End Class
