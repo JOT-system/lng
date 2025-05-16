@@ -182,7 +182,7 @@ Public Class LNT0001InvoiceOutputTNG
                             '◯明細の設定
                             EditDetailArea(OutPutRowData, i, FirstFLG)
                             '営業日区分が休日割増単価マスタに存在するか
-                            If HolidayRate.Rows(0)("RANGECODE").ToString.IndexOf(Convert.ToString(OutPutRowData(i)("WORKINGDAY"))) > 0 Then
+                            If HolidayRate.Rows(0)("RANGECODE").ToString.IndexOf(Convert.ToString(OutPutRowData(i)("WORKINGDAY"))) >= 0 Then
                                 NichiShukuCount += 1
                             End If
                         Next
