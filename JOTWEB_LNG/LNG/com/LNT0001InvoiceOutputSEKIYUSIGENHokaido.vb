@@ -336,41 +336,76 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             WW_Workbook.EnableCalculation = False
 
             '〇[単価][固定費]設定
-            For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
+            'For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
+            '    '〇シート「内訳」
+            '    '★ 月額固定費
+            '    If PrintKoteihiDatarow("BIGCATEGORYCODE").ToString() = "3" _
+            '        AndAlso PrintKoteihiDatarow("CATEGORYCODE").ToString() = "3" Then
+            '        '〇３）バンカリング追加人件費
+            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("TANKA").ToString())
+            '    Else
+            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("TANKA").ToString())
+
+            '        '★数量
+            '        If PrintKoteihiDatarow("KUBUN").ToString() = "9" Then
+            '            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("QUANTITY").ToString())
+            '        End If
+            '    End If
+            'Next
+
+            '〇[単価]設定(統合版単価マスタ)
+            '〇シート「ﾏｽﾀ」
+            For Each PrintTankDatarow As DataRow In PrintTankData.Rows
+                If PrintTankDatarow("MASTERNO").ToString() = "" Then Continue For
+                Dim setCell As String = ""
+                Select Case PrintTankDatarow("SYABARA").ToString()
+                    Case "15.700"
+                        setCell = "B" + PrintTankDatarow("MASTERNO").ToString()
+                    Case "14.000"
+                        setCell = "C" + PrintTankDatarow("MASTERNO").ToString()
+                    Case "13.200"
+                        setCell = "D" + PrintTankDatarow("MASTERNO").ToString()
+                    Case "40.000"
+                        setCell = "E" + PrintTankDatarow("MASTERNO").ToString()
+                    Case Else
+                        Continue For
+                End Select
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCell).Value = Double.Parse(PrintTankDatarow("TANKA").ToString())
+            Next
+
+            '〇[単価][固定費]設定(統合版特別料金マスタ)
+            For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
                 '〇シート「内訳」
                 '★ 月額固定費
-                If PrintKoteihiDatarow("BIGCATEGORYCODE").ToString() = "3" _
-                    AndAlso PrintKoteihiDatarow("CATEGORYCODE").ToString() = "3" Then
+                If PrintTogouSpraterow("GROUPSORTNO").ToString() = "5" _
+                    AndAlso (PrintTogouSpraterow("DETAILSORTNO").ToString() = "7" _
+                             OrElse PrintTogouSpraterow("DETAILSORTNO").ToString() = "8") Then
                     '〇３）バンカリング追加人件費
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("TANKA").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
                 Else
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("TANKA").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
                     '★数量
-                    If PrintKoteihiDatarow("KUBUN").ToString() = "9" Then
-                        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("QUANTITY").ToString())
+                    If PrintTogouSpraterow("CALCUNIT").ToString() = "式" Then
+                        Try
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+                        Catch ex As Exception
+                        End Try
+
+                        '### [1）勇払向け] かつ [⑤日祝割増運賃] #################################################
+                        'または
+                        '### [2)．日本製鉄室蘭製鉄所　構内バース向け] かつ [①陸上輸送分（15.7t）]以外 ###########
+                    ElseIf (PrintTogouSpraterow("GROUPSORTNO").ToString() = "3" _
+                            AndAlso PrintTogouSpraterow("DETAILSORTNO").ToString() = "5") _
+                        OrElse (PrintTogouSpraterow("GROUPSORTNO").ToString() = "4" _
+                            AndAlso PrintTogouSpraterow("DETAILSORTNO").ToString() <> "1") Then
+                        Try
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+                        Catch ex As Exception
+                        End Try
                     End If
                 End If
             Next
-
-            ''〇[単価][固定費]設定(統合版特別料金マスタ)
-            'For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
-            '    '〇シート「内訳」
-            '    '★ 月額固定費
-            '    If PrintTogouSpraterow("GROUPID").ToString() = "3" _
-            '        AndAlso (PrintTogouSpraterow("DETAILID").ToString() = "7" _
-            '                 OrElse PrintTogouSpraterow("DETAILID").ToString() = "8") Then
-            '        '〇３）バンカリング追加人件費
-            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
-            '    Else
-            '        WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
-
-            '        ''★数量
-            '        'If PrintTogouSpraterow("KUBUN").ToString() = "9" Then
-            '        '    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintTogouSpraterow("QUANTITY").ToString())
-            '        'End If
-            '    End If
-            'Next
 
             '〇届先(休日割増単価)設定
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
@@ -395,6 +430,27 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 '燃料使用量
                 WW_Workbook.Worksheets(WW_SheetNoMuroran).Range("I31").Value = Integer.Parse(PrintSKKoteihiDatarow("USAGECHARGE").ToString())
             Next
+
+            ''〇[日本製鉄室蘭製鉄所構内バース サーチャージ]設定
+            'For Each PrintSKKoteihiDatarow As DataRow In PrintSKSurchargeData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_006915))
+            '    '走行距離(km/回)
+            '    '燃料使用量(㍑/回)
+            '    '実勢軽油価格(年度(４月～３月))
+            '    '基準価格
+            '    '輸送回数
+            'Next
+
+            ''〇[釧路ガス サーチャージ]設定
+            'For Each PrintSKKoteihiDatarow As DataRow In PrintSKSurchargeData.Select(String.Format("TODOKECODE='{0}'", BaseDllConst.CONST_TODOKECODE_003561))
+            '    '走行距離(km/回)
+            '    '実勢軽油価格(直近６ヶ月)
+            '    '基準価格
+            '    '燃料使用量(㍑/回)
+            '    '①15.7ｔ車(直近４ヶ月)
+            '    '②14.0ｔ車(直近４ヶ月)
+            '    '③13.2ｔ車(直近４ヶ月)
+            '    '④40ｆｔ車(直近４ヶ月)
+            'Next
 
             '★計算エンジンの有効化
             WW_Workbook.EnableCalculation = True

@@ -10,6 +10,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     Private WW_SheetNoMaster As Integer = 0
     Private WW_SheetNoEvertMonth As Integer = 0
     Private WW_SheetNoTitle As Integer = 0
+    Private WW_SheetStandards As Integer() = {0, 0, 0}
     Private WW_DicCenergyList As New Dictionary(Of String, String)
     Private WW_DicElNessList As New Dictionary(Of String, String)
     Private WW_ArrSheetNoCenergy As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// シーエナジー(シート)用
@@ -143,6 +144,15 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
                 ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
                     '〇共通(シート[ﾏｽﾀ])
                     WW_SheetNoMaster = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "基準(川越・知多)" Then
+                    '〇共通(シート[基準(川越・知多)])
+                    WW_SheetStandards(0) = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "基準(上越)" Then
+                    '〇共通(シート[基準(上越)])
+                    WW_SheetStandards(1) = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "基準" Then
+                    '〇共通(シート[基準])
+                    WW_SheetStandards(2) = i
 
                 End If
             Next
@@ -307,26 +317,116 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     Private Sub EditKoteihiTankaArea()
 
         Try
+            '■基準シート
+            '①基準(川越・知多)
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "1"))
+                '・往復距離(km)
+                Dim setCellROUNDTRIP As String = ""
+                If PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
+                    setCellROUNDTRIP = PrintTankDatarow("SHEET_CELLNO01").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(0)).Range(setCellROUNDTRIP).Value = Double.Parse(PrintTankDatarow("ROUNDTRIP").ToString())
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "500" Then
+                    setCellROUNDTRIP = PrintTankDatarow("SHEET_CELLNO03").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(0)).Range(setCellROUNDTRIP).Value = Double.Parse(PrintTankDatarow("ROUNDTRIP").ToString())
+                End If
+
+                '・通行料(円)
+                Dim setCellTOLLFEE As String = ""
+                If PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
+                    setCellTOLLFEE = PrintTankDatarow("SHEET_CELLNO02").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(0)).Range(setCellTOLLFEE).Value = Double.Parse(PrintTankDatarow("TOLLFEE").ToString())
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "500" Then
+                    setCellTOLLFEE = PrintTankDatarow("SHEET_CELLNO04").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(0)).Range(setCellTOLLFEE).Value = Double.Parse(PrintTankDatarow("TOLLFEE").ToString())
+                End If
+
+            Next
+            '②基準(上越)
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "2"))
+                '・往復距離(km)
+                Dim setCellROUNDTRIP As String = ""
+                If PrintTankDatarow("SHUKABASHO").ToString() = "900" Then
+                    setCellROUNDTRIP = PrintTankDatarow("SHEET_CELLNO01").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(1)).Range(setCellROUNDTRIP).Value = Double.Parse(PrintTankDatarow("ROUNDTRIP").ToString())
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
+                    setCellROUNDTRIP = PrintTankDatarow("SHEET_CELLNO03").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(1)).Range(setCellROUNDTRIP).Value = Double.Parse(PrintTankDatarow("ROUNDTRIP").ToString())
+                End If
+
+                '・通行料(円)
+                Dim setCellTOLLFEE As String = ""
+                If PrintTankDatarow("SHUKABASHO").ToString() = "900" Then
+                    setCellTOLLFEE = PrintTankDatarow("SHEET_CELLNO02").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(1)).Range(setCellTOLLFEE).Value = Double.Parse(PrintTankDatarow("TOLLFEE").ToString())
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
+                    setCellTOLLFEE = PrintTankDatarow("SHEET_CELLNO04").ToString() + PrintTankDatarow("MASTERNO").ToString()
+                    WW_Workbook.Worksheets(WW_SheetStandards(1)).Range(setCellTOLLFEE).Value = Double.Parse(PrintTankDatarow("TOLLFEE").ToString())
+                End If
+
+            Next
+            '③基準
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "3"))
+                '・運賃(円)
+                Dim setCellGyo As Integer = Integer.Parse(PrintTankDatarow("MASTERNO").ToString())
+                If PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
+                    '### そのまま
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "300" Then
+                    setCellGyo += 101
+                ElseIf PrintTankDatarow("SHUKABASHO").ToString() = "500" Then
+                    setCellGyo += 202
+                End If
+
+                Dim setCellFARE As String = ""
+                setCellFARE = PrintTankDatarow("SHEET_CELLNO01").ToString() + setCellGyo.ToString()
+                WW_Workbook.Worksheets(WW_SheetStandards(2)).Range(setCellFARE).Value = Double.Parse(PrintTankDatarow("TANKA").ToString())
+            Next
+
             '■基本料金(基準(川越・知多)・基準(上越))※３〇〇車番
+            '〇[マスタ]シート
+            '★シーエナジーについて(車番、単価(距離単価)、設定セルNo)をグルーピング
+            Dim queryK = From row In PrintTankData.AsEnumerable()
+                         Where row.Field(Of String)("TORICODE") = BaseDllConst.CONST_TORICODE_0110600000 AndAlso row.Field(Of Decimal)("TANKA") <> 0
+                         Group row By SYAGOU = row.Field(Of String)("SYAGOU"),
+                                      SYABARA = row.Field(Of Decimal)("SYABARA"),
+                                      TANKA = row.Field(Of Decimal)("TANKA"),
+                                      MASTER_CELLKYORITANKA = row.Field(Of String)("MASTER_CELLKYORITANKA"),
+                                      MASTER_CELLLINE = row.Field(Of String)("MASTER_CELLLINE") Into Group
+                         Select New With {
+                            .SYAGOU = SYAGOU,
+                            .SYABARA = SYABARA,
+                            .TANKA = TANKA,
+                            .MASTER_CELLKYORITANKA = MASTER_CELLKYORITANKA,
+                            .MASTER_CELLLINE = MASTER_CELLLINE
+                        }
+
             '・車番
             '・単位
-            '・距離単価
+            '□距離単価
+            For Each result In queryK
+                Dim resSyagou = result.SYAGOU
+                Dim resTanka = result.TANKA
+                Dim resKyoriTanka = result.MASTER_CELLKYORITANKA
+                Dim resCellLine = result.MASTER_CELLLINE
+                Dim setCellNum As String = resKyoriTanka + resCellLine
+                WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = resTanka
+            Next
+            '□基本運賃
             For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0110600000))
-                '・基本運賃
                 Dim setCellNum As String = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
                 setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
                 WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
             Next
+
             '■基本料金(基準(川越・上越・富山))　　　※６〇〇車番
-            '・車番
+            '□車番
             For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0238900000))
                 Dim setCellNum As String = ""
                 '〇季節料金判定区分("1"(通常), "2"(冬季))
                 If PrintKoteihiDatarow("SEASONKBN").ToString() = "1" Then
-                    '・基本運賃(通常)
+                    '□基本運賃(通常)
                     setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL02").ToString()
                 ElseIf PrintKoteihiDatarow("SEASONKBN").ToString() = "2" Then
-                    '・基本運賃(冬季)
+                    '□基本運賃(冬季)
                     setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
                 Else
                     Continue For
@@ -338,8 +438,10 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
 
             '★季節判定
             Select Case Me.TaishoMM
+                '〇04月～11月(通常)
                 Case "04", "05", "06", "07", "08", "09", "10", "11"
                     WW_Workbook.Worksheets(WW_SheetNoMaster).Range("O6").Value = 1
+                '〇12月～03月(冬季)
                 Case "12", "01", "02", "03"
                     WW_Workbook.Worksheets(WW_SheetNoMaster).Range("O6").Value = 2
             End Select

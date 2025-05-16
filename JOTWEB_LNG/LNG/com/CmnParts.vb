@@ -265,7 +265,7 @@ Public Class CmnParts
     End Sub
 
     ''' <summary>
-    ''' (新)単価マスタTBL検索
+    ''' 統合版単価マスタTBL検索
     ''' </summary>
     Public Sub SelectNEWTANKAMaster(ByVal SQLcon As MySqlConnection,
                                     ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable,
@@ -312,23 +312,49 @@ Public Class CmnParts
         SQLStr &= "   ,LNM0006.BIKOU1 "
         SQLStr &= "   ,LNM0006.BIKOU2 "
         SQLStr &= "   ,LNM0006.BIKOU3 "
-        SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
-        SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
-        SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
-        SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
-        SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
+
+        '★取引先コードが「シーエナジー」の場合
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
+            SQLStr &= "   ,LNM0005.VALUE07 AS TODOKE_DISPLAY "
+            SQLStr &= "   ,CAST(LNM0005.VALUE08 AS SIGNED) AS MASTERNO "
+            SQLStr &= "   ,LNM0005.KEYCODE04 AS TODOKENAME_MASTER "
+            'SQLStr &= "   ,'' AS TODOKENAME_SHEET "
+            SQLStr &= "   ,'' AS GRPNO "
+        Else
+            SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
+            SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
+            SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
+            SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
+            SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
+        End If
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0006_NEWTANKA LNM0006 "
         SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
         SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-        SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
+
+        '★取引先コードが「シーエナジー」の場合
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '〇北陸エルネスも含める
+            SQLStr &= String.Format(" AND LNM0005.CLASS IN ('{0}','{1}') ", I_CLASS, "ELNESS_TODOKE")
+            SQLStr &= " AND LNM0005.CLASSNAME = LNM0006.TORICODE "
+            SQLStr &= " AND LNM0005.KEYCODE03 = LNM0006.TODOKECODE "
+        Else
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
+        End If
 
         '-- WHERE
         SQLStr &= " WHERE "
         SQLStr &= String.Format("     LNM0006.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+        '★取引先コードが「シーエナジー」の場合
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '〇北陸エルネスも含める
+            SQLStr &= String.Format(" AND LNM0006.TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+        Else
+            SQLStr &= String.Format(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+        End If
         If Not IsNothing(I_ORGCODE) Then
             SQLStr &= String.Format(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
         End If
@@ -339,7 +365,7 @@ Public Class CmnParts
         End If
 
         '-- ORDER BY
-        SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
+        SQLStr &= " ORDER BY LNM0006.TORICODE, LNM0006.SHUKABASHO, CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -356,6 +382,46 @@ Public Class CmnParts
         Catch ex As Exception
             Throw '呼び出し元の例外にスロー
         End Try
+
+        '★取引先コードが「シーエナジー」の場合
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '★項目[単価]作成
+            '〇基準シート用
+            'O_dtTANKAMas.Columns.Add("GRPNO", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("SHEET_CELLNO01", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("SHEET_CELLNO02", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("SHEET_CELLNO03", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("SHEET_CELLNO04", Type.GetType("System.String"))
+            '〇マスタシート用
+            O_dtTANKAMas.Columns.Add("MASTER_CELLLINE", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("MASTER_CELLTANI", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("MASTER_CELLKYORITANKA", Type.GetType("System.String"))
+            O_dtTANKAMas.Columns.Add("MASTER_CELLKIHONUNCHIN", Type.GetType("System.String"))
+
+            Dim dtCENERGY_TANK As New DataTable
+            '〇変換マスタ(陸事番号(シーエナジー))取得
+            SelectCONVERTMaster(SQLcon, "CENERGY_TANK", dtCENERGY_TANK)
+            Try
+                For Each dtCENERGY_TANKrow As DataRow In dtCENERGY_TANK.Rows
+                    Dim condition As String = ""
+                    condition &= String.Format("SYAGOU = '{0}'", dtCENERGY_TANKrow("KEYCODE04").ToString())
+                    For Each O_dtTANKAMasrow As DataRow In O_dtTANKAMas.Select(condition)
+                        O_dtTANKAMasrow("GRPNO") = dtCENERGY_TANKrow("KEYCODE03").ToString()
+                        O_dtTANKAMasrow("SHEET_CELLNO01") = dtCENERGY_TANKrow("VALUE16").ToString()
+                        O_dtTANKAMasrow("SHEET_CELLNO02") = dtCENERGY_TANKrow("VALUE17").ToString()
+                        O_dtTANKAMasrow("SHEET_CELLNO03") = dtCENERGY_TANKrow("VALUE18").ToString()
+                        O_dtTANKAMasrow("SHEET_CELLNO04") = dtCENERGY_TANKrow("VALUE19").ToString()
+
+                        O_dtTANKAMasrow("MASTER_CELLLINE") = dtCENERGY_TANKrow("VALUE11").ToString()
+                        O_dtTANKAMasrow("MASTER_CELLTANI") = dtCENERGY_TANKrow("VALUE12").ToString()
+                        O_dtTANKAMasrow("MASTER_CELLKYORITANKA") = dtCENERGY_TANKrow("VALUE13").ToString()
+                        O_dtTANKAMasrow("MASTER_CELLKIHONUNCHIN") = dtCENERGY_TANKrow("VALUE14").ToString()
+                    Next
+                Next
+            Catch ex As Exception
+
+            End Try
+        End If
 
     End Sub
 
@@ -1232,7 +1298,7 @@ Public Class CmnParts
             SQLStrSub &= " WHERE "
             SQLStrSub &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
             SQLStrSub &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-            SQLStrSub &= " AND LNM0005.KEYCODE08 NOT LIKE '日祝%' "   '※(日祝%)以外が設定されている
+            'SQLStrSub &= " AND LNM0005.KEYCODE08 NOT LIKE '日祝%' "   '※(日祝%)以外が設定されている
 
             Try
                 Using SQLcmd As New MySqlCommand(SQLStrSub, SQLcon)

@@ -675,8 +675,8 @@ Public Class CmnCheck
             SQLcon.Open()  ' DataBase接続
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankHKDClass, dtSekiyuSigenHKDTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeHKDClass, dtSekiyuSigenHKDTodoke)
-            'CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
+            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
             CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001SKSurcharge)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
@@ -847,6 +847,7 @@ Public Class CmnCheck
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
             CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", cenergyTodokeClass, LNT0001Tanktbl)
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=cenergyElNessTankClass)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate)
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtCenergyElNessTank, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=cenergyElNessTankClass)
