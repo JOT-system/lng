@@ -343,7 +343,10 @@ Public Class LNT0001ZissekiAjustMap_aspx
         '★条件(開始～終了)
         GS0007FIXVALUElst.ADDITIONAL_FROM_TO = WF_TaishoYm.Value + "/01"
         '★条件
-        GS0007FIXVALUElst.ADDITIONAL_CONDITION = " AND VALUE11 = 'TYOSEI' "
+        '-- 取引先コード
+        GS0007FIXVALUElst.ADDITIONAL_CONDITION = String.Format(" AND VALUE2 = '{0}' ", work.WF_SEL_TORICODE.Text)
+        '-- 単価区分"1"(調整単価)
+        GS0007FIXVALUElst.ADDITIONAL_CONDITION &= " AND VALUE19 = '1' "
         dtTankaAjust = GS0007FIXVALUElst.GS0007FIXVALUETbl()
 
         For Each dtTankaAjustrow As DataRow In dtTankaAjust.Rows
@@ -369,7 +372,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
             condition &= String.Format(" AND BRANCHCODE='{0}' ", dtTankaAjustrow("KEYCODE").ToString())
 
             For Each LNT0001row As DataRow In LNT0001tbl.Select(condition)
-                LNT0001row("BRANCHNAME") = dtTankaAjustrow("VALUE16").ToString()
+                LNT0001row("BRANCHNAME") = dtTankaAjustrow("VALUE1").ToString()
             Next
 
         Next
@@ -489,7 +492,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
         '○ ソート
         TBLview.Sort = "LINECNT"
-        TBLview.RowFilter = "SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+        'TBLview.RowFilter = "SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
 
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = work.WF_SEL_CAMPCODE.Text
@@ -566,6 +570,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 Exit Sub
         End Select
 
+        '○ 画面表示データ保存
         Master.SaveTable(LNT0001tbl)
 
     End Sub
@@ -715,7 +720,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
                                 prmData.Item(C_PARAMETERS.LP_ADDITINALFROMTO) = WF_TaishoYm.Value + "/01"
                                 '★条件(その他)
                                 prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) =
-                                    " AND VALUE11 = 'TYOSEI'" &                                       '単価用途(単価調整)
+                                    " AND VALUE19 = '1'" &                                            '単価用途(単価調整)
                                     " AND VALUE2 = '" + updHeader("TORICODE").ToString() & "'" &      '取扱店コード
                                     " AND VALUE4 = '" + updHeader("ORDERORGCODE").ToString() & "'" &  '部門コード
                                     " AND VALUE8 = '" + updHeader("TODOKECODE").ToString() & "'"      '実績届先コード
@@ -779,13 +784,21 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     GS0007FIXVALUElst.ADDITIONAL_CONDITION &=
                     " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"     '業務車番
                 End If
-                GS0007FIXVALUElst.ADDITIONAL_CONDITION &= " AND VALUE11 = 'TYOSEI' "
+                '★条件
+                '-- 単価区分"1"(調整単価)
+                GS0007FIXVALUElst.ADDITIONAL_CONDITION &= " AND VALUE19 = '1' "
 
                 dtTankaInfo = GS0007FIXVALUElst.GS0007FIXVALUETbl()
                 If Not isNormal(GS0007FIXVALUElst.ERR) Then
                     Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "単価情報取得エラー")
                     Exit Sub
                 End If
+
+                ' 画面入力テーブル項目設定
+                Dim WW_NRow = dtTankaInfo.NewRow
+                WW_NRow("KEYCODE") = "1"
+                WW_NRow("VALUE1") = ""
+                dtTankaInfo.Rows.Add(WW_NRow)
 
                 '★入力した値が単価マスタに存在するか確認
                 Dim condition As String = " KEYCODE='{0}' "
@@ -801,6 +814,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
         End Select
 
+        '○ 画面表示データ保存
         Master.SaveTable(LNT0001tbl)
 
     End Sub
@@ -849,9 +863,18 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     FirstOrDefault(Function(x) x.Item("LINECNT") = WW_LINECNT)
                 If IsNothing(updHeader) Then Exit Sub
 
-                updHeader.Item("OPERATION") = "1"
-                updHeader.Item("BRANCHCODE") = WW_SETVALUE
-                updHeader.Item("BRANCHNAME") = WW_SETTEXT
+                If WW_SETVALUE = "" Then
+                    updHeader.Item("OPERATION") = "1"
+                    updHeader.Item("BRANCHCODE") = "1"
+                    updHeader.Item("BRANCHNAME") = ""
+                Else
+                    updHeader.Item("OPERATION") = "1"
+                    updHeader.Item("BRANCHCODE") = WW_SETVALUE
+                    updHeader.Item("BRANCHNAME") = WW_SETTEXT
+                End If
+
+                '○ 画面表示データ保存
+                Master.SaveTable(LNT0001tbl)
 
         End Select
 
@@ -876,7 +899,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
     ''' </summary>
     Private Sub SetConditionTankaAjust()
         '★届先取得
-        Me.WF_TODOKECODEhdn.Value = ""
+        'Me.WF_TODOKECODEhdn.Value = ""
         'Me.WF_TODOKENAMEhdn.Value = ""
         If Me.ddlTODOKE.Items.Count > 0 Then
             Dim SelectedCount As Integer = 0
@@ -899,7 +922,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
         End If
 
         '★陸事番号取得
-        Me.WF_TANKNUMBERhdn.Value = ""
+        'Me.WF_TANKNUMBERhdn.Value = ""
         If Me.ddlTANKNUMBER.Items.Count > 0 Then
             Dim SelectedCount As Integer = 0
             Dim intSelCnt As Integer = 0
@@ -919,7 +942,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
         End If
 
         '★業務車番取得
-        Me.WF_GYOMUTANKNOhdn.Value = ""
+        'Me.WF_GYOMUTANKNOhdn.Value = ""
         If Me.ddlGYOMUTANKNUM.Items.Count > 0 Then
             Dim SelectedCount As Integer = 0
             Dim intSelCnt As Integer = 0
