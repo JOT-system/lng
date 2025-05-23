@@ -4,53 +4,77 @@ window.onload = function () {
 
     //変更不可判断キー
     const DisabledKeyItem = document.getElementById('DisabledKeyItem').value;
-    //const VisibleKeyOrgCode = document.getElementById('VisibleKeyOrgCode').value;
 
     //入力不可キー
     document.getElementById('TxtSelLineCNT').readOnly = true; 
     document.getElementById('TxtCampCode').readOnly = true;
 
-    ////情シス、高圧ガス以外の場合、パンくず(検索)をを非表示にする
-    //if (VisibleKeyOrgCode == "") {
-    //    document.getElementById('PAGE_SEARCH').style.display = "none";
-    //}
-
     //変更不可判断キーに値が入っていない場合
     if (DisabledKeyItem == "") {
         //名称を変更する
-        document.getElementById('PAGE_NAME1').innerText = "特別料金マスタ（追加）";
-        document.getElementById('PAGE_NAME2').innerText = "特別料金マスタ追加";
-        document.getElementById('WF_ButtonUPDATE').value = "追加";
+        document.getElementById('PAGE_NAME1').innerText = "特別料金マスタ（登録）";
+        document.getElementById('PAGE_NAME2').innerText = "特別料金マスタ登録";
+        document.getElementById('WF_ButtonUPDATE').value = "登録";
+    } else {
+        //値復元
+        document.getElementById('WF_TARGETYM').value = document.getElementById('WF_TARGETYM_SAVE').value;
+        document.getElementById('WF_TORI').value = document.getElementById('WF_TORI_SAVE').value;
+        document.getElementById('WF_ORG').value = document.getElementById('WF_ORG_SAVE').value;
+        document.getElementById('TxtGROUPNAME').value = document.getElementById('WF_GROUPNAME_SAVE').value;
+        document.getElementById('TxtDETAILNAME').value = document.getElementById('WF_DETAILNAME_SAVE').value;
 
-        ////選択可能な部門コードが2件(空白行1件と選択可能行1件)の場合
-        //if (document.getElementById('DisabledKeyOrgCount').value == "2") {
-        //    //選択可能な取引先コードが1件の場合
-        //    if (document.getElementById('DisabledKeyToriCount').value == "1") {
-        //       //取引先コード、取引先名称入力不可
-        //        document.getElementById('TxtTORICODE').readOnly = true;
-        //        document.getElementById('TxtTORICODEcommonIcon').style.display = "none";
-        //        document.getElementById('TxtTORINAME').readOnly = true;
-        //       //加算先部門コード、加算先部門名称入力不可
-        //        document.getElementById('TxtKASANORGCODE').readOnly = true;
-        //        document.getElementById('TxtKASANORGCODEcommonIcon').style.display = "none";
-        //        document.getElementById('TxtKASANORGNAME').readOnly = true;
-        //    }
-        //}
-    }
+        document.getElementById('WF_TARGETYM').disabled = true;
+        document.getElementById('WF_TORI').disabled = true;
+        document.getElementById('WF_ORG').disabled = true;
 
-    //変更不可判断キーに値が入っている場合、一意項目を入力不可にする
-    if (DisabledKeyItem != "") { 
-        //取引先コード
-        document.getElementById('TxtTORICODE').readOnly = true;
-        //取引先名称
-        document.getElementById('TxtTORINAME').readOnly = true;
-        //グループ名
-        document.getElementById('TxtGROUPNAME').readOnly = true;
+        document.getElementById('TxtGROUPNAMEcommonIcon').style.display = "none";
+        document.getElementById('TxtGROUPNAME').disabled = true;
+        document.getElementById('TxtDETAILNAMEcommonIcon').style.display = "none";
+        document.getElementById('TxtDETAILNAME').disabled = true;
+
+        document.getElementById('WF_TARGETYM').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_TORI').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_ORG').style.backgroundColor = "#F2F2F2";
+        document.getElementById('TxtGROUPNAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('TxtDETAILNAME').style.backgroundColor = "#F2F2F2";
+
     };
 
+    //ポップアップメッセージ
+    document.getElementById("pnlYusouArea").title = "明細グループ名\n" +
+        "　・・・共通する明細名を束ねたい場合に使用してください。\n" +
+        "　　　　束ねる必要が無い場合は、こちらを明細名としてご使用ください。\n" +
+        "\n" +
+        "明細名\n" +
+        "　・・・グループで束ねたい場合に使用してください。\n" +
+        "　　　　束ねる必要が無い場合はグループ名を使用し、こちらは入力不要です。"; 
+
+    //チェックボックス状態復元
+    if (document.getElementById('WF_ATENACHKSTATUS').value == "true") {
+        document.getElementById('WF_ATENACHANGE').checked = true;
+        document.getElementById('AtenaChangeArea').style.display = 'inline';
+    } else {
+        document.getElementById('WF_ATENACHANGE').checked = false;
+        document.getElementById('AtenaChangeArea').style.display = 'none';
+    }
+
+    //リストボックス状態復元
+    if (document.getElementById('WF_ATENALISTSELECT').value == "MAE") {
+        document.getElementById("ddlMAEKABU").options[1].selected = true;
+    }
+    if (document.getElementById('WF_ATENALISTSELECT').value == "ATO") {
+        document.getElementById("ddlATOKABU").options[1].selected = true;
+    }
 };
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    //現在時刻取得
+    let wk = new Date();
+    //2カ月前取得
+    wk.setMonth(wk.getMonth() - 2);
+    let wkminDate = wk.toLocaleDateString('en-CA');
+
     // カレンダー表示
     document.querySelectorAll('.datetimepicker').forEach(picker => {
         flatpickr(picker, {
@@ -66,7 +90,61 @@ document.addEventListener("DOMContentLoaded", function () {
                     altFormat: "F Y", //defaults to "F Y"
                     theme: "light" // defaults to "light"
                 })
-            ]
+            ],
+            minDate: wkminDate
+
         });
     });
 });
+
+
+//宛名書変更チェックボックス変更時処理
+function ChkAtenaChange() {
+
+    //チェックボックス状態保持
+    document.getElementById('WF_ATENACHKSTATUS').value = document.getElementById('WF_ATENACHANGE').checked;
+
+    if (document.getElementById('WF_ATENACHANGE').checked) {
+        document.getElementById('AtenaChangeArea').style.display = 'inline';
+    } else {
+        document.getElementById('AtenaChangeArea').style.display = 'none';
+    }
+}
+
+//前株リストボックス変更時処理
+function MaekabuChange() {
+    let mae = document.getElementById("ddlMAEKABU");
+    let ato = document.getElementById("ddlATOKABU");
+
+    if (mae.options[1].selected == true && ato.options[1].selected == true) {
+        ato.options[0].selected = true;
+    }
+
+    // リストボックス選択状態保持
+    document.getElementById('WF_ATENALISTSELECT').value = "";
+    if (mae.options[1].selected == true){
+        document.getElementById('WF_ATENALISTSELECT').value = "MAE";
+    }
+    if (ato.options[1].selected == true) {
+        document.getElementById('WF_ATENALISTSELECT').value = "ATO";
+    }
+}
+
+//後株リストボックス変更時処理
+function AtokabuChange() {
+    let mae = document.getElementById("ddlMAEKABU");
+    let ato = document.getElementById("ddlATOKABU");
+
+    if (mae.options[1].selected == true && ato.options[1].selected == true) {
+        mae.options[0].selected = true;
+    }
+
+    // リストボックス選択状態保持
+    document.getElementById('WF_ATENALISTSELECT').value = "";
+    if (mae.options[1].selected == true) {
+        document.getElementById('WF_ATENALISTSELECT').value = "MAE";
+    }
+    if (ato.options[1].selected == true) {
+        document.getElementById('WF_ATENALISTSELECT').value = "ATO";
+    }
+}

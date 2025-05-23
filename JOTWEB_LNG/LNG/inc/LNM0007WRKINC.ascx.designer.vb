@@ -30,25 +30,16 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
-    '''WF_SEL_CONTROLTABLE コントロール。
+    '''WF_SEL_TARGETYM_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_CONTROLTABLE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_SEL_CONTROLTABLEHIST コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_CONTROLTABLEHIST As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_TARGETYM_L As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
@@ -113,22 +104,13 @@ Partial Public Class LNM0007WRKINC
     Public WithEvents WF_SEL_KASANORGNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_STYMD コントロール。
+    '''WF_SEL_TARGETYM コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_STYMD As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_SEL_ENDYMD コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Public WithEvents WF_SEL_ENDYMD As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_TARGETYM As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_SYABAN コントロール。
@@ -176,31 +158,31 @@ Partial Public Class LNM0007WRKINC
     Public WithEvents WF_SEL_SYABARA As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_GETSUGAKU コントロール。
+    '''WF_SEL_SEASONKBN コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_GETSUGAKU As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_SEASONKBN As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_GENGAKU コントロール。
+    '''WF_SEL_SEASONSTART コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_GENGAKU As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_SEASONSTART As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_KOTEIHI コントロール。
+    '''WF_SEL_SEASONEND コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_KOTEIHI As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_SEASONEND As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_KOTEIHIM コントロール。
@@ -230,22 +212,22 @@ Partial Public Class LNM0007WRKINC
     Public WithEvents WF_SEL_KAISU As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_KINGAKU コントロール。
+    '''WF_SEL_GENGAKU コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_KINGAKU As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_GENGAKU As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_BIKOU コントロール。
+    '''WF_SEL_AMOUNT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_BIKOU As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_AMOUNT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_BIKOU1 コントロール。

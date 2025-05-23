@@ -98,14 +98,17 @@ Public Class LNM0014SprateList
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
-                        Case "WF_SelectCALENDARChange", "WF_TORIChange" 'カレンダー変更時,届先変更時
+                        Case "WF_ButtonExtract" '検索ボタン押下時
                             GridViewInitialize()
+                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
+                            WF_ButtonFIRST_Click()
+                        Case "WF_ButtonLAST"            '最終頁ボタン押下
+                            WF_ButtonLAST_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
-                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
-                        Not WF_ButtonClick.Value = "WF_TORIChange" Then
+                        Not WF_ButtonClick.Value = "WF_ButtonExtract" Then
                         DisplayGrid()
                     End If
 
@@ -185,12 +188,38 @@ Public Class LNM0014SprateList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub createListBox()
+        '荷主
         Me.WF_TORI.Items.Clear()
-        Dim retTodokeList As New DropDownList
-        retTodokeList = LNM0014WRKINC.getDowpDownToriList(Master.ROLE_ORG)
-        For index As Integer = 0 To retTodokeList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+        Dim retToriList As New DropDownList
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
+
+        '部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+
+        '届先
+        Me.WF_TODOKE.Items.Clear()
+        Dim retTodokeList As New DropDownList
+        retTodokeList = LNM0014WRKINC.getDowpDownTodokeList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retTodokeList.Items.Count - 1
+            WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+        Next
+
+        '出荷地
+        Me.WF_DEPARTURE.Items.Clear()
+        Dim retDepartureList As New DropDownList
+        retDepartureList = LNM0014WRKINC.getDowpDownDepartureList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retDepartureList.Items.Count - 1
+            WF_DEPARTURE.Items.Add(New ListItem(retDepartureList.Items(index).Text, retDepartureList.Items(index).Value))
+        Next
+
     End Sub
 
     ''' <summary>
@@ -215,6 +244,9 @@ Public Class LNM0014SprateList
 
             ' 登録画面からの遷移
             Master.RecoverTable(LNM0014tbl, work.WF_SEL_INPTBL.Text)
+
+            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM_L.Text, "/", "")
+            WF_TaishoYm.Value = WW_YM.Substring(0, 4) & "/" & WW_YM.Substring(4, 2)
         Else
             ' サブメニューからの画面遷移
             ' メニューからの画面遷移
@@ -235,6 +267,9 @@ Public Class LNM0014SprateList
             work.Initialize()
             Master.CreateXMLSaveFile()
 
+            '対象年月
+            'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         End If
 
         '表示制御項目
@@ -244,10 +279,6 @@ Public Class LNM0014SprateList
         Else
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
-
-        '対象年月
-        'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
-        WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -369,6 +400,28 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.BIKOU3), '')                                      AS BIKOU3              ")
 
+        '画面表示用
+        '単価
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRTANKA                                                                                 ")
+        '燃費
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRNENPI                                                                                 ")
+        '実勢軽油価格
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                                      ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,0)                                                             ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                                    ")
+        '基準経由価格
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,0)                                                            ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                                   ")
+
         SQLStr.AppendLine(" FROM                                                                                                ")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                       ")
 
@@ -391,14 +444,29 @@ Public Class LNM0014SprateList
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim Itype As Integer
 
+        '対象年月
+        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+            SQLStr.AppendLine(" AND  COALESCE(LNM0014.TARGETYM, '0') = COALESCE(@TARGETYM, '0')  ")
+        End If
+
         '取引先コード
         If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
             SQLStr.AppendLine(" AND  LNM0014.TORICODE = @TORICODE                                          ")
         End If
 
-        '対象年月
-        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
-            SQLStr.AppendLine(" AND  COALESCE(LNM0014.TARGETYM, '0') = COALESCE(@TARGETYM, '0')  ")
+        '部門コード
+        If Not String.IsNullOrEmpty(WF_ORG.SelectedValue) Then
+            SQLStr.AppendLine(" AND  LNM0014.ORGCODE = @ORGCODE                                            ")
+        End If
+
+        '届先コード
+        If Not String.IsNullOrEmpty(WF_TODOKE.SelectedValue) Then
+            SQLStr.AppendLine(" AND  LNM0014.TODOKECODE = @TODOKECODE                                      ")
+        End If
+
+        '出荷地
+        If Not String.IsNullOrEmpty(WF_DEPARTURE.SelectedValue) Then
+            SQLStr.AppendLine(" AND  LNM0014.DEPARTURE = @DEPARTURE                                        ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -414,16 +482,34 @@ Public Class LNM0014SprateList
                 Dim P_ROLE As MySqlParameter = SQLcmd.Parameters.Add("@ROLE", MySqlDbType.VarChar, 20)
                 P_ROLE.Value = Master.ROLE_ORG
 
+                '対象年月
+                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                    Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)
+                    P_TARGETYM.Value = Itype
+                End If
+
                 '取引先コード
                 If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
                     Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
                     P_TORICODE.Value = WF_TORI.SelectedValue
                 End If
 
-                '対象年月
-                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
-                    Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)
-                    P_TARGETYM.Value = Itype
+                '部門コード
+                If Not String.IsNullOrEmpty(WF_ORG.SelectedValue) Then
+                    Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)
+                    P_ORGCODE.Value = WF_ORG.SelectedValue
+                End If
+
+                '届先コード
+                If Not String.IsNullOrEmpty(WF_TODOKE.SelectedValue) Then
+                    Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)
+                    P_TODOKECODE.Value = WF_TODOKE.SelectedValue
+                End If
+
+                '出荷地
+                If Not String.IsNullOrEmpty(WF_DEPARTURE.SelectedValue) Then
+                    Dim P_DEPARTURE As MySqlParameter = SQLcmd.Parameters.Add("@DEPARTURE", MySqlDbType.VarChar, 50)
+                    P_DEPARTURE.Value = WF_DEPARTURE.SelectedValue
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -465,6 +551,8 @@ Public Class LNM0014SprateList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
+
         work.WF_SEL_LINECNT.Text = ""                                                   '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)          '削除
 
@@ -505,13 +593,13 @@ Public Class LNM0014SprateList
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DIESELPRICESTANDARD.Text)        '基準経由価格
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DIESELCONSUMPTION.Text)        '燃料使用量
 
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DISPLAYFLG.Text)      '表示フラグ
+        work.WF_SEL_DISPLAYFLG.Text = "1"                                               '請求書表示フラグ(1：表示する 0：表示しない)
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_ASSESSMENTFLG.Text)   '鑑分けフラグ
 
         work.WF_SEL_ATENACOMPANYNAME.Text = ""                                          '宛名会社名
         work.WF_SEL_ATENACOMPANYDEVNAME.Text = ""                                       '宛名会社部門名
-        work.WF_SEL_FROMORGNAME.Text = ""                                               '請求書発行部店名
-        work.WF_SEL_MEISAICATEGORYID.Text = ""                                          '明細区分
+        work.WF_SEL_FROMORGNAME.Text = LNM0014WRKINC.DEFAULT_FROMORGNAME                '請求書発行部店名
+        work.WF_SEL_MEISAICATEGORYID.Text = "1"                                         '明細区分(1：請求追加明細(特別料金) 2：サーチャージ)
         work.WF_SEL_BIKOU1.Text = ""                                                    '備考1
         work.WF_SEL_BIKOU2.Text = ""                                                    '備考2
         work.WF_SEL_BIKOU3.Text = ""                                                    '備考3
@@ -541,6 +629,7 @@ Public Class LNM0014SprateList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
         Server.Transfer("~/LNG/mas/LNM0014SprateHistory.aspx")
     End Sub
 
@@ -698,6 +787,8 @@ Public Class LNM0014SprateList
         Catch ex As Exception
             Exit Sub
         End Try
+
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
 
         work.WF_SEL_LINECNT.Text = LNM0014tbl.Rows(WW_LineCNT)("LINECNT")            '選択行
 
@@ -864,7 +955,7 @@ Public Class LNM0014SprateList
         Dim WW_ENDROW As Integer = 0
 
         WW_STROW = WW_ACTIVEROW
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
         WW_ENDROW = WW_ACTIVEROW - 1
 
         'プルダウンリスト作成
@@ -1156,7 +1247,11 @@ Public Class LNM0014SprateList
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+
+        '数値書式
+        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
+        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
 
         'Dim WW_DEPSTATION As String
 
@@ -1185,15 +1280,41 @@ Public Class LNM0014SprateList
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO") '明細ソート順
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID).Value = Row("DETAILID") '明細ID
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Value = Row("TANKA") '単価
+
+            '単価
+            If Row("TANKA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Value = Row("TANKA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY).Value = Row("QUANTITY") '数量
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.CALCUNIT).Value = Row("CALCUNIT") '計算単位
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DEPARTURE).Value = Row("DEPARTURE") '出荷地
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE).Value = Row("MILEAGE") '走行距離
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT") '輸送回数
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Value = Row("NENPI") '燃費
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Value = Row("DIESELPRICECURRENT") '実勢軽油価格
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = Row("DIESELPRICESTANDARD") '基準経由価格
+
+            '燃費
+            If Row("NENPI") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Value = Row("NENPI")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Value = CDbl(Row("NENPI"))
+            End If
+
+            '実勢軽油価格
+            If Row("DIESELPRICECURRENT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Value = Row("DIESELPRICECURRENT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Value = CDbl(Row("DIESELPRICECURRENT"))
+            End If
+
+            '基準経由価格
+            If Row("DIESELPRICESTANDARD") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = Row("DIESELPRICESTANDARD")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = CDbl(Row("DIESELPRICESTANDARD"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION") '燃料使用量
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG).Value = Row("DISPLAYFLG") '表示フラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG).Value = Row("ASSESSMENTFLG") '鑑分けフラグ
@@ -1204,6 +1325,12 @@ Public Class LNM0014SprateList
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
+
+            '数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Style = NumStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -1848,7 +1975,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '単価
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA)), ",", "")
             WW_DATATYPE = DataTypeHT("TANKA")
             LNM0014Exceltblrow("TANKA") = LNM0014WRKINC.DataConvert("単価", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1896,7 +2023,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '燃費
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI)), ",", "")
             WW_DATATYPE = DataTypeHT("NENPI")
             LNM0014Exceltblrow("NENPI") = LNM0014WRKINC.DataConvert("燃費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1904,7 +2031,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '実勢軽油価格
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT)), ",", "")
             WW_DATATYPE = DataTypeHT("DIESELPRICECURRENT")
             LNM0014Exceltblrow("DIESELPRICECURRENT") = LNM0014WRKINC.DataConvert("実勢軽油価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1912,7 +2039,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '基準経由価格
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD)), ",", "")
             WW_DATATYPE = DataTypeHT("DIESELPRICESTANDARD")
             LNM0014Exceltblrow("DIESELPRICESTANDARD") = LNM0014WRKINC.DataConvert("基準経由価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -2527,16 +2654,66 @@ Public Class LNM0014SprateList
 
                 P_DETAILID.Value = WW_ROW("DETAILID")           '明細ID
                 P_DETAILNAME.Value = WW_ROW("DETAILNAME")           '明細名
-                P_TANKA.Value = WW_ROW("TANKA")           '単価
-                P_QUANTITY.Value = WW_ROW("QUANTITY")           '数量
+
+                '単価
+                If WW_ROW("TANKA").ToString = "0" Or WW_ROW("TANKA").ToString = "" Then
+                    P_TANKA.Value = DBNull.Value
+                Else
+                    P_TANKA.Value = WW_ROW("TANKA")
+                End If
+
+                '数量
+                If WW_ROW("QUANTITY").ToString = "0" Or WW_ROW("QUANTITY").ToString = "" Then
+                    P_QUANTITY.Value = DBNull.Value
+                Else
+                    P_QUANTITY.Value = WW_ROW("QUANTITY")
+                End If
+
                 P_CALCUNIT.Value = WW_ROW("CALCUNIT")           '計算単位
                 P_DEPARTURE.Value = WW_ROW("DEPARTURE")           '出荷地
-                P_MILEAGE.Value = WW_ROW("MILEAGE")           '走行距離
-                P_SHIPPINGCOUNT.Value = WW_ROW("SHIPPINGCOUNT")           '輸送回数
-                P_NENPI.Value = WW_ROW("NENPI")           '燃費
-                P_DIESELPRICECURRENT.Value = WW_ROW("DIESELPRICECURRENT")           '実勢軽油価格
-                P_DIESELPRICESTANDARD.Value = WW_ROW("DIESELPRICESTANDARD")           '基準経由価格
-                P_DIESELCONSUMPTION.Value = WW_ROW("DIESELCONSUMPTION")           '燃料使用量
+
+                '走行距離
+                If WW_ROW("MILEAGE").ToString = "0" Or WW_ROW("MILEAGE").ToString = "" Then
+                    P_MILEAGE.Value = DBNull.Value
+                Else
+                    P_MILEAGE.Value = WW_ROW("MILEAGE")
+                End If
+
+                '輸送回数
+                If WW_ROW("SHIPPINGCOUNT").ToString = "0" Or WW_ROW("SHIPPINGCOUNT").ToString = "" Then
+                    P_SHIPPINGCOUNT.Value = DBNull.Value
+                Else
+                    P_SHIPPINGCOUNT.Value = WW_ROW("SHIPPINGCOUNT")
+                End If
+
+                '燃費
+                If WW_ROW("NENPI").ToString = "0" Or WW_ROW("NENPI").ToString = "" Then
+                    P_NENPI.Value = DBNull.Value
+                Else
+                    P_NENPI.Value = WW_ROW("NENPI")
+                End If
+
+                '実勢軽油価格
+                If WW_ROW("DIESELPRICECURRENT").ToString = "0" Or WW_ROW("DIESELPRICECURRENT").ToString = "" Then
+                    P_DIESELPRICECURRENT.Value = DBNull.Value
+                Else
+                    P_DIESELPRICECURRENT.Value = WW_ROW("DIESELPRICECURRENT")
+                End If
+
+                '基準経由価格
+                If WW_ROW("DIESELPRICESTANDARD").ToString = "0" Or WW_ROW("DIESELPRICESTANDARD").ToString = "" Then
+                    P_DIESELPRICESTANDARD.Value = DBNull.Value
+                Else
+                    P_DIESELPRICESTANDARD.Value = WW_ROW("DIESELPRICESTANDARD")
+                End If
+
+                '燃料使用量
+                If WW_ROW("DIESELCONSUMPTION").ToString = "0" Or WW_ROW("DIESELCONSUMPTION").ToString = "" Then
+                    P_DIESELCONSUMPTION.Value = DBNull.Value
+                Else
+                    P_DIESELCONSUMPTION.Value = WW_ROW("DIESELCONSUMPTION")
+                End If
+
                 P_DISPLAYFLG.Value = WW_ROW("DISPLAYFLG")           '表示フラグ
                 P_ASSESSMENTFLG.Value = WW_ROW("ASSESSMENTFLG")           '鑑分けフラグ
 

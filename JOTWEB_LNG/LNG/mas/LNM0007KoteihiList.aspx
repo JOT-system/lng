@@ -60,30 +60,37 @@
                                 </div>
                             </div> <!-- End class=actionButtonBox -->
                         </div> <!-- End class="Operation" -->
-
-                        <div class="tabBox">
-                            <div class="d-flex align-items-center gap-2">
-                                <strong class="flex-shrink-0">対象</strong>
-                                <asp:DropDownList ID="WF_TARGETTABLE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TARGETTABLEChange');" />
-                            </div>  
-                            <!-- 一覧件数 -->
-                            <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
-                            <!-- 対象年月 -->
-                        <div class="d-flex align-items-center gap-2 me-3">
-                            <strong class="flex-shrink-0">対象年月</strong>
-                            <b class="calendararea">
-                                <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                    <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
-                                    <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
-                                        <span class="material-symbols-outlined">calendar_month</span>
-                                    </span>
-                                </b>
-                            </b>
-                        </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <strong class="flex-shrink-0">荷主</strong>
-                                <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORIChange');" />
-                            </div>   
+                        <div class="searchBar">
+                            <!-- 作成日時 -->
+                            <div id="actionTrigger" class="d-flex flex-wrap gap-3 w-100">
+                                <div class="actionButtonBox">
+                                    <div class="d-flex align-items-center gap-2 me-3">
+                                        <!-- 一覧件数 -->
+                                        <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    </div>
+                                    <!-- 対象年月 -->
+                                    <div class="d-flex align-items-center gap-2 me-3">
+                                        <strong class="flex-shrink-0">対象年月</strong>
+                                        <b class="calendararea">
+                                            <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                                <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
+                                                <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
+                                                    <span class="material-symbols-outlined">calendar_month</span>
+                                                </span>
+                                            </b>
+                                        </b>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <strong class="flex-shrink-0">荷主</strong>
+                                        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORIChange');" />
+                                    </div>
+                                    <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
+                                    <div class="rightSide">
+                                        <div id="WF_ButtonFIRST" class="firstPage" runat="server"                       onclick="ButtonClick('WF_ButtonFIRST');"></div>
+                                        <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
 
@@ -133,8 +140,6 @@
         <input id="WF_ButtonClick" runat="server" value="" type="text" />
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
-        <!-- 自動作成した有効終了日 -->
-        <input id="WF_AUTOENDYMD" runat="server" value="" type="text" />
     </div>
  
 </asp:Content>

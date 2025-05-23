@@ -73,24 +73,28 @@ Public Class LNM0014SprateDetail
                             WF_ButtonSel_Click()
                         Case "btnClearConfirmOK"        '戻るボタン押下後の確認ダイアログでOK押下
                             WF_CLEAR_ConfirmOkClick()
-                        Case "mspToriCodeSingleRowSelected"  '[共通]取引先コード選択ポップアップで行選択
-                            RowSelected_mspToriCodeSingle()
-                        Case "mspKasanOrgCodeSingleRowSelected"  '[共通]加算先部門コード選択ポップアップで行選択
-                            RowSelected_mspKASANORGCodeSingle()
                         Case "mspTodokeCodeSingleRowSelected"  '[共通]届先コード選択ポップアップで行選択
                             RowSelected_mspTodokeCodeSingle()
                         Case "mspGroupIdSingleRowSelected"  '[共通]グループID選択ポップアップで行選択
                             RowSelected_mspGroupIdSingle()
+                        Case "mspDetailIdSingleRowSelected"  '[共通]明細ID選択ポップアップで行選択
+                            RowSelected_mspDetailIdSingle()
+                        Case "WF_TORIChange"    '取引先コードチェンジ
+                            WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
                         Case "WF_ORGChange"    '部門コードチェンジ
-                            If Not ddlSelectORG.SelectedValue = "" Then
-                                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                    SQLcon.Open()  ' DataBase接続
-                                    GetKasanOrg(SQLcon, ddlSelectORG.SelectedValue)
-                                End Using
-                            Else
-                                TxtKASANORGCODE.Text = ""
-                                TxtKASANORGNAME.Text = ""
-                            End If
+                            WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+                        Case "WF_KASANORGChange"    '加算先部門コードチェンジ
+                            WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
+                            'Case "WF_MAEKABUChange"    '前株チェンジ
+                            '    If ddlMAEKABU.SelectedValue = "前株" And ddlATOKABU.SelectedValue = "後株" Then
+                            '        ddlATOKABU.SelectedValue = ""
+                            '    End If
+                            'Case "WF_ATOKABUChange"    '後株チェンジ
+                            '    If ddlMAEKABU.SelectedValue = "前株" And ddlATOKABU.SelectedValue = "後株" Then
+                            '        ddlMAEKABU.SelectedValue = ""
+                            '    End If
+
+
                     End Select
                 End If
             Else
@@ -171,66 +175,61 @@ Public Class LNM0014SprateDetail
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub createListBox()
-        Try
-            '部門ドロップダウンのクリア
-            Me.ddlSelectORG.Items.Clear()
-            Me.ddlSelectORG.Items.Add("")
+        '荷主
+        Me.WF_TORI.Items.Clear()
+        Me.WF_TORI.Items.Add("")
+        Dim retToriList As New DropDownList
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
 
-            '部門ドロップダウンの生成
-            'Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
-            Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList("02", "ORGCODEDROP")
-            Dim WW_OrgPermitHt As New Hashtable
-            If retOfficeList.Items.Count > 0 Then
-                '情シス、高圧ガス以外
-                If LNM0014WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+        '部門
+        Me.WF_ORG.Items.Clear()
+        Me.WF_ORG.Items.Add("")
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
 
-                    Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()  ' DataBase接続
-                        work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
-                        For index As Integer = 0 To retOfficeList.Items.Count - 1
-                            If WW_OrgPermitHt.ContainsKey(retOfficeList.Items(index).Value) = True Then
-                                ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
-                            End If
-                        Next
-                    End Using
-                Else
-                    '情シス、高圧ガスの場合
-                    WW_OrgPermitHt.Add("020104", "EX石狩営業所")
-                    WW_OrgPermitHt.Add("020202", "EX八戸営業所")
-                    WW_OrgPermitHt.Add("020402", "EX東北支店")
-                    WW_OrgPermitHt.Add("023301", "EX水島営業所")
-
-                    'For index As Integer = 0 To retOfficeList.Items.Count - 1
-                    '    ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
-                    'Next
-                    For index As Integer = 0 To retOfficeList.Items.Count - 1
-                        If WW_OrgPermitHt.ContainsKey(retOfficeList.Items(index).Value) = True Then
-                            ddlSelectORG.Items.Add(New ListItem(retOfficeList.Items(index).Text, retOfficeList.Items(index).Value))
+        If retOrgList.Items.Count > 0 Then
+            '情シス、高圧ガス以外
+            If LNM0007WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                Dim WW_OrgPermitHt As New Hashtable
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
+                    For index As Integer = 0 To retOrgList.Items.Count - 1
+                        If WW_OrgPermitHt.ContainsKey(retOrgList.Items(index).Value) = True Then
+                            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
                         End If
                     Next
-                End If
-            End If
-
-            '計算単位ドロップダウンのクリア
-            Me.ddlSelectCALCUNIT.Items.Clear()
-            Me.ddlSelectCALCUNIT.Items.Add("")
-
-            '計算単位ドロップダウンの生成
-            Dim retCALCUNITList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CALCUNITDROP")
-            If retCALCUNITList.Items.Count > 0 Then
-                For index As Integer = 0 To retCALCUNITList.Items.Count - 1
-                    ddlSelectCALCUNIT.Items.Add(New ListItem(retCALCUNITList.Items(index).Text, retCALCUNITList.Items(index).Value))
+                End Using
+            Else
+                For index As Integer = 0 To retOrgList.Items.Count - 1
+                    WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
                 Next
             End If
+        End If
 
-        Catch ex As Exception
-            CS0011LOGWrite.INFSUBCLASS = New StackFrame(0, False).GetMethod.DeclaringType.FullName  ' クラス名
-            CS0011LOGWrite.INFPOSI = Reflection.MethodBase.GetCurrentMethod.Name                    ' メソッド名
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                             ' ログ出力
-        End Try
+        '加算先部門
+        Me.WF_KASANORG.Items.Clear()
+        Me.WF_KASANORG.Items.Add("")
+        Dim retKasanOrgList As New DropDownList
+        retKasanOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retKasanOrgList.Items.Count - 1
+            WF_KASANORG.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
+        Next
+
+        '計算単位ドロップダウンのクリア
+        Me.ddlSelectCALCUNIT.Items.Clear()
+        Me.ddlSelectCALCUNIT.Items.Add("")
+
+        '計算単位ドロップダウンの生成
+        Dim retCALCUNITList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CALCUNITDROP")
+        If retCALCUNITList.Items.Count > 0 Then
+            For index As Integer = 0 To retCALCUNITList.Items.Count - 1
+                ddlSelectCALCUNIT.Items.Add(New ListItem(retCALCUNITList.Items(index).Text, retCALCUNITList.Items(index).Value))
+            Next
+        End If
 
     End Sub
 
@@ -250,26 +249,36 @@ Public Class LNM0014SprateDetail
         '選択行
         TxtSelLineCNT.Text = work.WF_SEL_LINECNT.Text
         '削除
-        ddlDELFLG.SelectedValue = work.WF_SEL_DELFLG.Text
+        RadioDELFLG.SelectedValue = work.WF_SEL_DELFLG.Text
         'CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
         '画面ＩＤ
         TxtMapId.Text = "M00001"
         '会社コード
         TxtCampCode.Text = work.WF_SEL_CAMPCODE.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
-
         '対象年月
-        WF_TARGETYM.Value = work.WF_SEL_TARGETYM.Text
-        '取引先コード
-        TxtTORICODE.Text = work.WF_SEL_TORICODE.Text
-        '取引先名称
-        TxtTORINAME.Text = work.WF_SEL_TORINAME.Text
-        '部門コード
-        ddlSelectORG.SelectedValue = work.WF_SEL_ORGCODE.Text
-        '加算先部門コード
-        TxtKASANORGCODE.Text = work.WF_SEL_KASANORGCODE.Text
-        '加算先部門名称
-        TxtKASANORGNAME.Text = work.WF_SEL_KASANORGNAME.Text
+        Dim WK_TARGETYM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+        If Not WK_TARGETYM = "" Then
+            WF_TARGETYM.Value = WK_TARGETYM.Substring(0, 4) & "/" & WK_TARGETYM.Substring(4, 2)
+        Else
+            WF_TARGETYM.Value = work.WF_SEL_TARGETYM.Text
+        End If
+        WF_TARGETYM_SAVE.Value = WF_TARGETYM.Value
+
+        'WF_TARGETYM.Value = work.WF_SEL_TARGETYM.Text
+        '取引先コード、名称
+        WF_TORI.SelectedValue = work.WF_SEL_TORICODE.Text
+        WF_TORICODE_TEXT.Text = work.WF_SEL_TORICODE.Text
+        WF_TORI_SAVE.Value = work.WF_SEL_TORICODE.Text
+
+        '部門コード、名称
+        WF_ORG.SelectedValue = work.WF_SEL_ORGCODE.Text
+        WF_ORGCODE_TEXT.Text = work.WF_SEL_ORGCODE.Text
+        WF_ORG_SAVE.Value = work.WF_SEL_ORGCODE.Text
+
+        '加算先部門コード、名称
+        WF_KASANORG.SelectedValue = work.WF_SEL_KASANORGCODE.Text
+        WF_KASANORGCODE_TEXT.Text = work.WF_SEL_KASANORGCODE.Text
         '届先コード
         TxtTODOKECODE.Text = work.WF_SEL_TODOKECODE.Text
         '届先名称
@@ -278,20 +287,34 @@ Public Class LNM0014SprateDetail
         TxtGROUPSORTNO.Text = work.WF_SEL_GROUPSORTNO.Text
         'グループID
         TxtGROUPID.Text = work.WF_SEL_GROUPID.Text
+
         'グループ名
         TxtGROUPNAME.Text = work.WF_SEL_GROUPNAME.Text
+        WF_GROUPNAME_SAVE.Value = work.WF_SEL_GROUPNAME.Text
         '明細ソート順
         TxtDETAILSORTNO.Text = work.WF_SEL_DETAILSORTNO.Text
         '明細ID
         TxtDETAILID.Text = work.WF_SEL_DETAILID.Text
+
         '明細名
         TxtDETAILNAME.Text = work.WF_SEL_DETAILNAME.Text
+        WF_DETAILNAME_SAVE.Value = work.WF_SEL_DETAILNAME.Text
+
         '単価
         TxtTANKA.Text = work.WF_SEL_TANKA.Text
         '数量
         TxtQUANTITY.Text = work.WF_SEL_QUANTITY.Text
-        '計算単位
-        ddlSelectCALCUNIT.SelectedValue = work.WF_SEL_CALCUNIT.Text
+
+        '計算単位(KEYは固定値マスタのCALCUNITDROPに合わせる)
+        Select Case work.WF_SEL_CALCUNIT.Text
+            Case "t" : ddlSelectCALCUNIT.SelectedValue = "1"
+            Case "回" : ddlSelectCALCUNIT.SelectedValue = "2"
+            Case "人" : ddlSelectCALCUNIT.SelectedValue = "3"
+            Case "台" : ddlSelectCALCUNIT.SelectedValue = "4"
+            Case "式" : ddlSelectCALCUNIT.SelectedValue = "9"
+            Case Else : ddlSelectCALCUNIT.SelectedValue = ""
+        End Select
+
         '出荷地
         TxtDEPARTURE.Text = work.WF_SEL_DEPARTURE.Text
         '走行距離
@@ -307,9 +330,9 @@ Public Class LNM0014SprateDetail
         '燃料使用量
         TxtDIESELCONSUMPTION.Text = work.WF_SEL_DIESELCONSUMPTION.Text
         '表示フラグ
-        ddlDISPLAYFLG.SelectedValue = work.WF_SEL_DISPLAYFLG.Text
+        RadioDISPLAYFLG.SelectedValue = work.WF_SEL_DISPLAYFLG.Text
         '鑑分けフラグ
-        ddlASSESSMENTFLG.SelectedValue = work.WF_SEL_ASSESSMENTFLG.Text
+        RadioASSESSMENTFLG.SelectedValue = work.WF_SEL_ASSESSMENTFLG.Text
         '宛名会社名
         TxtATENACOMPANYNAME.Text = work.WF_SEL_ATENACOMPANYNAME.Text
         '宛名会社部門名
@@ -337,56 +360,15 @@ Public Class LNM0014SprateDetail
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
 
-        If DisabledKeyItem.Value = "" Then
-            '部門コード件数取得
-            DisabledKeyOrgCount.Value = ddlSelectORG.Items.Count
-            '部門コード件数が2件(空白行1件と選択可能行1件)の場合取引先件数取得
-            If ddlSelectORG.Items.Count = 2 Then
-                If TxtKASANORGCODE.Text = "" Then
-                    Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()  ' DataBase接続
-                        ddlSelectORG.SelectedIndex = 1
-                        ddlSelectORG.Enabled = False
-                        DisabledKeyToriCount.Value = GetToriCnt(SQLcon, ddlSelectORG.SelectedValue)
-                        '取引先件数1件の場合取引先、加算先、届け先取得
-                        If CInt(DisabledKeyToriCount.Value) = 1 Then
-                            GetKasanTodoke(SQLcon, ddlSelectORG.SelectedValue,
-                                       TxtTORICODE.Text, TxtTORINAME.Text,
-                                       TxtKASANORGCODE.Text, TxtKASANORGNAME.Text)
-                            'TxtTORICODE.Enabled = False
-                            'TxtTORINAME.Enabled = False
-                            TxtKASANORGCODE.Enabled = False
-                            TxtKASANORGNAME.Enabled = False
+        ' グループソート順、明細ソート順、輸送回数を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.TxtGROUPSORTNO.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtDETAILSORTNO.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtSHIPPINGCOUNT.Attributes("onkeyPress") = "CheckNum()"
 
-                        End If
-                    End Using
-                End If
-
-            End If
-        Else
-            TxtTORICODE.Enabled = False
-            TxtTORINAME.Enabled = False
-            ddlSelectORG.Enabled = False
-            TxtKASANORGCODE.Enabled = False
-            TxtKASANORGNAME.Enabled = False
-            TxtGROUPNAME.Enabled = False
-        End If
-
-        '情シス、高圧ガス以外の場合
-        If LNM0014WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-            TxtTORICODE.Enabled = False
-            TxtTORINAME.Enabled = False
-        End If
-
-        ' 削除フラグ・取引先コード・加算先部門コード・届先コード・単価を入力するテキストボックスは数値(0～9)のみ可能とする。
-        'Me.TxtDelFlg.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtTORICODE.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtKASANORGCODE.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtTODOKECODE.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtSHIPPINGCOUNT.Attributes("onkeyPress") = "CheckNum()"             '輸送回数
+        ' 入力するテキストボックスは数値(0～9)＋記号(-)のみ可能とする。
+        Me.TxtTANKA.Attributes("onkeyPress") = "CheckTel()"             '単価
 
         ' 入力するテキストボックスは数値(0～9)＋記号(.)のみ可能とする。
-        Me.TxtTANKA.Attributes("onkeyPress") = "CheckDeci()"             '単価
         Me.TxtQUANTITY.Attributes("onkeyPress") = "CheckDeci()"             '数量
         Me.TxtMILEAGE.Attributes("onkeyPress") = "CheckDeci()"             '走行距離
         Me.TxtNENPI.Attributes("onkeyPress") = "CheckDeci()"             '燃費
@@ -438,151 +420,6 @@ Public Class LNM0014SprateDetail
         Catch ex As Exception
         End Try
     End Function
-
-    ''' <summary>
-    ''' 取引先取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <remarks></remarks>
-    Protected Sub GetTori(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String)
-
-        '○ 対象データ取得
-        Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT DISTINCT ")
-        SQLStr.AppendLine("       TORICODE")
-        SQLStr.AppendLine("      ,TORINAME")
-        SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
-        SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-
-                P_ORGCODE.Value = WW_ORGCODE '部門コード
-
-                Dim WW_Tbl = New DataTable
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-                    '○ テーブル検索結果をテーブル格納
-                    WW_Tbl.Load(SQLdr)
-                End Using
-
-                '１件場合は取引先入力欄に入れる
-                If WW_Tbl.Rows.Count = 1 Then
-                    TxtTORICODE.Text = WW_Tbl.Rows(0)("TORICODE")
-                    TxtTORINAME.Text = WW_Tbl.Rows(0)("TORINAME")
-                Else
-                    TxtTORICODE.Text = ""
-                    TxtTORINAME.Text = ""
-                End If
-            End Using
-        Catch ex As Exception
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 加算先部門取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <remarks></remarks>
-    Protected Sub GetKasanOrg(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String)
-
-        '○ 対象データ取得
-        Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT DISTINCT ")
-        SQLStr.AppendLine("       KASANORGCODE")
-        SQLStr.AppendLine("      ,KASANORGNAME")
-        SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
-        SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-
-                P_ORGCODE.Value = WW_ORGCODE '部門コード
-
-                Dim WW_Tbl = New DataTable
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-                    '○ テーブル検索結果をテーブル格納
-                    WW_Tbl.Load(SQLdr)
-                End Using
-
-                '１件の場合は加算先部門入力欄に入れる
-                If WW_Tbl.Rows.Count = 1 Then
-                    TxtKASANORGCODE.Text = WW_Tbl.Rows(0)("KASANORGCODE")
-                    TxtKASANORGNAME.Text = WW_Tbl.Rows(0)("KASANORGNAME")
-                Else
-                    TxtKASANORGCODE.Text = ""
-                    TxtKASANORGNAME.Text = ""
-                End If
-            End Using
-        Catch ex As Exception
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 取引先、加算先、届け先取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <remarks></remarks>
-    Protected Sub GetKasanTodoke(ByVal SQLcon As MySqlConnection, ByVal WW_ORGCODE As String,
-                                 ByRef WW_TORICODE As String, ByRef WW_TORINAME As String,
-                                 ByRef WW_KASANORGCODE As String, ByRef WW_KASANORGNAME As String)
-
-        '○ 対象データ取得
-        Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT DISTINCT ")
-        SQLStr.AppendLine("       TORICODE")
-        SQLStr.AppendLine("      ,TORINAME")
-        SQLStr.AppendLine("      ,KASANORGCODE")
-        SQLStr.AppendLine("      ,KASANORGNAME")
-        SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
-        SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-
-                P_ORGCODE.Value = WW_ORGCODE '部門コード
-
-                Dim WW_Tbl = New DataTable
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-                    '○ テーブル検索結果をテーブル格納
-                    WW_Tbl.Load(SQLdr)
-
-                    If WW_Tbl.Rows.Count > 0 Then
-                        WW_TORICODE = WW_Tbl.Rows(0)("TORICODE")
-                        WW_TORINAME = WW_Tbl.Rows(0)("TORINAME")
-                        WW_KASANORGCODE = WW_Tbl.Rows(0)("KASANORGCODE")
-                        WW_KASANORGNAME = WW_Tbl.Rows(0)("KASANORGNAME")
-
-                    End If
-
-                End Using
-            End Using
-        Catch ex As Exception
-        End Try
-    End Sub
 
     ''' <summary>
     ''' 特別料金マスタ登録更新
@@ -870,16 +707,75 @@ Public Class LNM0014SprateDetail
 
                 P_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
                 P_DETAILNAME.Value = LNM0014row("DETAILNAME")           '明細名
-                P_TANKA.Value = LNM0014row("TANKA")           '単価
-                P_QUANTITY.Value = LNM0014row("QUANTITY")           '数量
-                P_CALCUNIT.Value = LNM0014row("CALCUNIT")           '計算単位
+
+                '単価
+                If LNM0014row("TANKA").ToString = "0" Or LNM0014row("TANKA").ToString = "" Then
+                    P_TANKA.Value = DBNull.Value
+                Else
+                    P_TANKA.Value = LNM0014row("TANKA")
+                End If
+
+                '数量
+                If LNM0014row("QUANTITY").ToString = "0" Or LNM0014row("QUANTITY").ToString = "" Then
+                    P_QUANTITY.Value = DBNull.Value
+                Else
+                    P_QUANTITY.Value = LNM0014row("QUANTITY")
+                End If
+
+                '計算単位
+                Select Case LNM0014row("CALCUNIT").ToString
+                    Case "1" : P_CALCUNIT.Value = "t"
+                    Case "2" : P_CALCUNIT.Value = "回"
+                    Case "3" : P_CALCUNIT.Value = "人"
+                    Case "4" : P_CALCUNIT.Value = "台"
+                    Case "9" : P_CALCUNIT.Value = "式"
+                    Case Else : P_CALCUNIT.Value = ""
+                End Select
+
                 P_DEPARTURE.Value = LNM0014row("DEPARTURE")           '出荷地
-                P_MILEAGE.Value = LNM0014row("MILEAGE")           '走行距離
-                P_SHIPPINGCOUNT.Value = LNM0014row("SHIPPINGCOUNT")           '輸送回数
-                P_NENPI.Value = LNM0014row("NENPI")           '燃費
-                P_DIESELPRICECURRENT.Value = LNM0014row("DIESELPRICECURRENT")           '実勢軽油価格
-                P_DIESELPRICESTANDARD.Value = LNM0014row("DIESELPRICESTANDARD")           '基準経由価格
-                P_DIESELCONSUMPTION.Value = LNM0014row("DIESELCONSUMPTION")           '燃料使用量
+
+                '走行距離
+                If LNM0014row("MILEAGE").ToString = "0" Or LNM0014row("MILEAGE").ToString = "" Then
+                    P_MILEAGE.Value = DBNull.Value
+                Else
+                    P_MILEAGE.Value = LNM0014row("MILEAGE")
+                End If
+
+                '輸送回数
+                If LNM0014row("SHIPPINGCOUNT").ToString = "0" Or LNM0014row("SHIPPINGCOUNT").ToString = "" Then
+                    P_SHIPPINGCOUNT.Value = DBNull.Value
+                Else
+                    P_SHIPPINGCOUNT.Value = LNM0014row("SHIPPINGCOUNT")
+                End If
+
+                '燃費
+                If LNM0014row("NENPI").ToString = "0" Or LNM0014row("NENPI").ToString = "" Then
+                    P_NENPI.Value = DBNull.Value
+                Else
+                    P_NENPI.Value = LNM0014row("NENPI")
+                End If
+
+                '実勢軽油価格
+                If LNM0014row("DIESELPRICECURRENT").ToString = "0" Or LNM0014row("DIESELPRICECURRENT").ToString = "" Then
+                    P_DIESELPRICECURRENT.Value = DBNull.Value
+                Else
+                    P_DIESELPRICECURRENT.Value = LNM0014row("DIESELPRICECURRENT")
+                End If
+
+                '基準経由価格
+                If LNM0014row("DIESELPRICESTANDARD").ToString = "0" Or LNM0014row("DIESELPRICESTANDARD").ToString = "" Then
+                    P_DIESELPRICESTANDARD.Value = DBNull.Value
+                Else
+                    P_DIESELPRICESTANDARD.Value = LNM0014row("DIESELPRICESTANDARD")
+                End If
+
+                '燃料使用量
+                If LNM0014row("DIESELCONSUMPTION").ToString = "0" Or LNM0014row("DIESELCONSUMPTION").ToString = "" Then
+                    P_DIESELCONSUMPTION.Value = DBNull.Value
+                Else
+                    P_DIESELCONSUMPTION.Value = LNM0014row("DIESELCONSUMPTION")
+                End If
+
                 P_DISPLAYFLG.Value = LNM0014row("DISPLAYFLG")           '表示フラグ
                 P_ASSESSMENTFLG.Value = LNM0014row("ASSESSMENTFLG")           '鑑分けフラグ
 
@@ -1251,7 +1147,7 @@ Public Class LNM0014SprateDetail
         '論理削除の場合は入力チェックを省略、削除フラグのみ更新
         If Not DisabledKeyItem.Value = "" And
             work.WF_SEL_DELFLG.Text = C_DELETE_FLG.ALIVE And
-            ddlDELFLG.SelectedValue = C_DELETE_FLG.DELETE Then
+            RadioDELFLG.SelectedValue = C_DELETE_FLG.DELETE Then
 
             ' マスタ更新(削除フラグのみ)
             UpdateMasterDelflgOnly()
@@ -1332,12 +1228,8 @@ Public Class LNM0014SprateDetail
         O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(ddlDELFLG.SelectedValue)      '削除フラグ
+        Master.EraseCharToIgnore(RadioDELFLG.SelectedValue)      '削除フラグ
         Master.EraseCharToIgnore(WF_TARGETYM.Value)  '対象年月
-        Master.EraseCharToIgnore(TxtTORICODE.Text)  '取引先コード
-        Master.EraseCharToIgnore(TxtTORINAME.Text)  '取引先名称
-        Master.EraseCharToIgnore(TxtKASANORGCODE.Text)  '加算先部門コード
-        Master.EraseCharToIgnore(TxtKASANORGNAME.Text)  '加算先部門名称
         Master.EraseCharToIgnore(TxtTODOKECODE.Text)  '届先コード
         Master.EraseCharToIgnore(TxtTODOKENAME.Text)  '届先名称
         Master.EraseCharToIgnore(TxtGROUPSORTNO.Text)  'グループソート順
@@ -1364,7 +1256,7 @@ Public Class LNM0014SprateDetail
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(TxtSelLineCNT.Text) AndAlso
-            String.IsNullOrEmpty(ddlDELFLG.SelectedValue) Then
+            String.IsNullOrEmpty(RadioDELFLG.SelectedValue) Then
             Master.Output(C_MESSAGE_NO.INVALID_PROCCESS_ERROR, C_MESSAGE_TYPE.ERR, "no Detail", needsPopUp:=True)
 
             CS0011LOGWrite.INFSUBCLASS = "DetailBoxToINPtbl"                'SUBクラス名
@@ -1397,29 +1289,43 @@ Public Class LNM0014SprateDetail
         LNM0014INProw("SELECT") = 1
         LNM0014INProw("HIDDEN") = 0
 
-        LNM0014INProw("DELFLG") = ddlDELFLG.SelectedValue             '削除フラグ
+        LNM0014INProw("DELFLG") = RadioDELFLG.SelectedValue             '削除フラグ
 
-        '対象年月
-        If Not WF_TARGETYM.Value = "" Then
-            LNM0014INProw("TARGETYM") = Replace(WF_TARGETYM.Value, "/", "")
+        '更新の場合
+        If Not DisabledKeyItem.Value = "" Then
+            LNM0014INProw("TARGETYM") = work.WF_SEL_TARGETYM.Text         '対象年月
+            LNM0014INProw("TORICODE") = work.WF_SEL_TORICODE.Text     '取引先コード
+            LNM0014INProw("TORINAME") = work.WF_SEL_TORINAME.Text      '取引先名称
+            LNM0014INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text          '部門コード
+            LNM0014INProw("ORGNAME") = work.WF_SEL_ORGNAME.Text           '部門名称
+            LNM0014INProw("GROUPID") = work.WF_SEL_GROUPID.Text           'グループID
+            LNM0014INProw("GROUPNAME") = work.WF_SEL_GROUPNAME.Text           'グループ名
+            LNM0014INProw("DETAILID") = work.WF_SEL_DETAILID.Text           '明細ID
+            LNM0014INProw("DETAILNAME") = work.WF_SEL_DETAILNAME.Text           '明細名
         Else
-            LNM0014INProw("TARGETYM") = WF_TARGETYM.Value
+            '対象年月
+            If Not WF_TARGETYM.Value = "" Then
+                LNM0014INProw("TARGETYM") = Replace(WF_TARGETYM.Value, "/", "")
+            Else
+                LNM0014INProw("TARGETYM") = WF_TARGETYM.Value
+            End If
+            LNM0014INProw("TORICODE") = WF_TORI.SelectedValue            '取引先コード
+            LNM0014INProw("TORINAME") = WF_TORI.SelectedItem            '取引先名称
+            LNM0014INProw("ORGCODE") = WF_ORG.SelectedValue           '部門コード
+            LNM0014INProw("ORGNAME") = WF_ORG.SelectedItem           '部門名称
+            LNM0014INProw("GROUPID") = TxtGROUPID.Text            'グループID
+            LNM0014INProw("GROUPNAME") = TxtGROUPNAME.Text            'グループ名
+            LNM0014INProw("DETAILID") = TxtDETAILID.Text            '明細ID
+            LNM0014INProw("DETAILNAME") = TxtDETAILNAME.Text            '明細名
         End If
 
-        LNM0014INProw("TORICODE") = TxtTORICODE.Text            '取引先コード
-        LNM0014INProw("TORINAME") = TxtTORINAME.Text            '取引先名称
-        LNM0014INProw("ORGCODE") = ddlSelectORG.SelectedValue           '部門コード
-        LNM0014INProw("ORGNAME") = ddlSelectORG.SelectedItem           '部門名称
-        LNM0014INProw("KASANORGCODE") = TxtKASANORGCODE.Text            '加算先部門コード
-        LNM0014INProw("KASANORGNAME") = TxtKASANORGNAME.Text            '加算先部門名称
+        LNM0014INProw("KASANORGCODE") = WF_KASANORG.SelectedValue            '加算先部門コード
+        LNM0014INProw("KASANORGNAME") = WF_KASANORG.SelectedItem            '加算先部門名称
         LNM0014INProw("TODOKECODE") = TxtTODOKECODE.Text            '届先コード
         LNM0014INProw("TODOKENAME") = TxtTODOKENAME.Text            '届先名称
         LNM0014INProw("GROUPSORTNO") = TxtGROUPSORTNO.Text            'グループソート順
-        LNM0014INProw("GROUPID") = TxtGROUPID.Text            'グループID
-        LNM0014INProw("GROUPNAME") = TxtGROUPNAME.Text            'グループ名
         LNM0014INProw("DETAILSORTNO") = TxtDETAILSORTNO.Text            '明細ソート順
-        LNM0014INProw("DETAILID") = TxtDETAILID.Text            '明細ID
-        LNM0014INProw("DETAILNAME") = TxtDETAILNAME.Text            '明細名
+
 
         '単価
         If TxtTANKA.Text = "" Then
@@ -1434,7 +1340,7 @@ Public Class LNM0014SprateDetail
             LNM0014INProw("QUANTITY") = TxtQUANTITY.Text
         End If
 
-        LNM0014INProw("CALCUNIT") = ddlSelectCALCUNIT.SelectedItem            '計算単位
+        LNM0014INProw("CALCUNIT") = ddlSelectCALCUNIT.SelectedValue            '計算単位
         LNM0014INProw("DEPARTURE") = TxtDEPARTURE.Text            '出荷地
 
         '走行距離
@@ -1479,9 +1385,21 @@ Public Class LNM0014SprateDetail
             LNM0014INProw("DIESELCONSUMPTION") = TxtDIESELCONSUMPTION.Text
         End If
 
-        LNM0014INProw("DISPLAYFLG") = ddlDISPLAYFLG.SelectedValue            '表示フラグ
-        LNM0014INProw("ASSESSMENTFLG") = ddlASSESSMENTFLG.SelectedValue            '鑑分けフラグ
-        LNM0014INProw("ATENACOMPANYNAME") = TxtATENACOMPANYNAME.Text            '宛名会社名
+        LNM0014INProw("DISPLAYFLG") = RadioDISPLAYFLG.SelectedValue            '表示フラグ
+        LNM0014INProw("ASSESSMENTFLG") = RadioASSESSMENTFLG.SelectedValue            '鑑分けフラグ
+
+        '宛名会社名
+        If Not TxtATENACOMPANYNAME.Text = "" And Not WF_ATENALISTSELECT.Value = "" Then
+            '既に「株式会社」がついている場合除去
+            TxtATENACOMPANYNAME.Text = Replace(TxtATENACOMPANYNAME.Text, LNM0014WRKINC.KABUSHIKIKAISHA, "")
+            Select Case WF_ATENALISTSELECT.Value
+                Case "MAE" : LNM0014INProw("ATENACOMPANYNAME") = LNM0014WRKINC.KABUSHIKIKAISHA & TxtATENACOMPANYNAME.Text
+                Case "ATO" : LNM0014INProw("ATENACOMPANYNAME") = TxtATENACOMPANYNAME.Text & LNM0014WRKINC.KABUSHIKIKAISHA
+            End Select
+        Else
+            LNM0014INProw("ATENACOMPANYNAME") = TxtATENACOMPANYNAME.Text
+        End If
+
         LNM0014INProw("ATENACOMPANYDEVNAME") = TxtATENACOMPANYDEVNAME.Text            '宛名会社部門名
         LNM0014INProw("FROMORGNAME") = TxtFROMORGNAME.Text            '請求書発行部店名
         LNM0014INProw("MEISAICATEGORYID") = ddlMEISAICATEGORYID.SelectedValue            '明細区分
@@ -1624,12 +1542,7 @@ Public Class LNM0014SprateDetail
 
         TxtSelLineCNT.Text = ""              'LINECNT
         TxtMapId.Text = "M00001"             '画面ＩＤ
-        ddlDELFLG.SelectedValue = ""                  '削除フラグ
         WF_TARGETYM.Value = ""                    '対象年月
-        TxtTORICODE.Text = ""                    '取引先コード
-        TxtTORINAME.Text = ""                    '取引先名称
-        TxtKASANORGCODE.Text = ""                    '加算先部門コード
-        TxtKASANORGNAME.Text = ""                    '加算先部門名称
         TxtTODOKECODE.Text = ""                    '届先コード
         TxtTODOKENAME.Text = ""                    '届先名称
         TxtGROUPSORTNO.Text = ""                    'グループソート順
@@ -1677,20 +1590,6 @@ Public Class LNM0014SprateDetail
                     Case "TxtDelFlg"
                         leftview.Visible = True
                         WW_PrmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
-                    Case "TxtTORICODE"       '取引先コード
-                        leftview.Visible = False
-                        '検索画面
-                        DisplayView_mspToriCodeSingle()
-                        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-                        WF_LeftboxOpen.Value = ""
-                        Exit Sub
-                    Case "TxtKASANORGCODE"       '加算先部門コード
-                        leftview.Visible = False
-                        '検索画面
-                        DisplayView_mspKasanOrgCodeSingle()
-                        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
-                        WF_LeftboxOpen.Value = ""
-                        Exit Sub
                     Case "TxtTODOKECODE"       '届先コード
                         leftview.Visible = False
                         '検索画面
@@ -1705,7 +1604,13 @@ Public Class LNM0014SprateDetail
                         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
                         WF_LeftboxOpen.Value = ""
                         Exit Sub
-
+                    Case "TxtDETAILNAME"       '明細名
+                        leftview.Visible = False
+                        '検索画面
+                        DisplayView_mspDetailIdSingle()
+                        '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+                        WF_LeftboxOpen.Value = ""
+                        Exit Sub
                 End Select
                 .SetListBox(WF_LeftMViewChange.Value, WW_Dummy, WW_PrmData)
                 .ActiveListBox()
@@ -1725,12 +1630,12 @@ Public Class LNM0014SprateDetail
             'Case "TxtDelFlg"      '削除フラグ
             '    CODENAME_get("DELFLG", ddlDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
             '    TxtDelFlg.Focus()
-            Case "TxtTORICODE"
-                CODENAME_get("TORICODE", TxtTORICODE.Text, TxtTORINAME.Text, WW_RtnSW)  '取引先コード
-                TxtTORICODE.Focus()
-            Case "TxtKASANORGCODE"
-                CODENAME_get("KASANORGCODE", TxtKASANORGCODE.Text, TxtKASANORGNAME.Text, WW_RtnSW)  '加算先部門コード
-                TxtKASANORGCODE.Focus()
+            'Case "TxtTORICODE"
+            '    CODENAME_get("TORICODE", TxtTORICODE.Text, TxtTORINAME.Text, WW_RtnSW)  '取引先コード
+            '    TxtTORICODE.Focus()
+            'Case "TxtKASANORGCODE"
+            '    CODENAME_get("KASANORGCODE", TxtKASANORGCODE.Text, TxtKASANORGNAME.Text, WW_RtnSW)  '加算先部門コード
+            '    TxtKASANORGCODE.Focus()
             Case "TxtTODOKECODE"
                 CODENAME_get("TODOKECODE", TxtTODOKECODE.Text, TxtTODOKENAME.Text, WW_RtnSW)  '届先コード
                 TxtTODOKECODE.Focus()
@@ -1765,11 +1670,11 @@ Public Class LNM0014SprateDetail
 
         Dim row As DataRow
         row = LNM0014INPtbl.NewRow
-        row("TARGETYM") = WF_TARGETYM.Value
-        row("TARGETYM") = TxtTORICODE.Text
-        row("ORGCODE") = ddlSelectORG.SelectedValue
-        row("GROUPID") = TxtGROUPID.Text
-        row("DETAILID") = TxtDETAILID.Text
+        row("TARGETYM") = work.WF_SEL_TARGETYM.Text
+        row("TORICODE") = work.WF_SEL_TORICODE.Text
+        row("ORGCODE") = work.WF_SEL_ORGCODE.Text
+        row("GROUPID") = work.WF_SEL_GROUPID.Text
+        row("DETAILID") = work.WF_SEL_DETAILID.Text
         row("DELFLG") = C_DELETE_FLG.DELETE
         LNM0014INPtbl.Rows.Add(row)
 
@@ -1946,83 +1851,6 @@ Public Class LNM0014SprateDetail
     End Sub
 
     ''' <summary>
-    ''' 取引先コード検索時処理
-    ''' </summary>
-    Protected Sub DisplayView_mspToriCodeSingle()
-
-        Me.mspToriCodeSingle.InitPopUp()
-        Me.mspToriCodeSingle.SelectionMode = ListSelectionMode.Single
-
-        Me.mspToriCodeSingle.SQL = CmnSearchSQL.GetSprateToriSQL(ddlSelectORG.SelectedValue)
-
-        Me.mspToriCodeSingle.KeyFieldName = "KEYCODE"
-        Me.mspToriCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateToriTitle)
-
-        Me.mspToriCodeSingle.ShowPopUpList()
-
-    End Sub
-
-    ''' <summary>
-    ''' 取引先コード選択ポップアップで行選択
-    ''' </summary>
-    Protected Sub RowSelected_mspToriCodeSingle()
-
-        Dim selData = Me.mspToriCodeSingle.SelectedSingleItem
-
-        '○ 変更した項目の名称をセット
-        Select Case WF_FIELD.Value
-
-            Case TxtTORICODE.ID
-                Me.TxtTORICODE.Text = selData("TORICODE").ToString '取引先コード
-                Me.TxtTORINAME.Text = selData("TORINAME").ToString '取引先名
-                Me.TxtTORICODE.Focus()
-        End Select
-
-        'ポップアップの非表示
-        Me.mspToriCodeSingle.HidePopUp()
-
-    End Sub
-
-
-    ''' <summary>
-    ''' 加算先部門コード検索時処理
-    ''' </summary>
-    Protected Sub DisplayView_mspKasanOrgCodeSingle()
-
-        Me.mspKasanOrgCodeSingle.InitPopUp()
-        Me.mspKasanOrgCodeSingle.SelectionMode = ListSelectionMode.Single
-
-        Me.mspKasanOrgCodeSingle.SQL = CmnSearchSQL.GetSprateKasanOrgSQL(ddlSelectORG.SelectedValue)
-
-        Me.mspKasanOrgCodeSingle.KeyFieldName = "KEYCODE"
-        Me.mspKasanOrgCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateKasanOrgTitle)
-
-        Me.mspKasanOrgCodeSingle.ShowPopUpList()
-
-    End Sub
-
-    ''' <summary>
-    ''' 加算先部門選択ポップアップで行選択
-    ''' </summary>
-    Protected Sub RowSelected_mspKASANORGCodeSingle()
-
-        Dim selData = Me.mspKasanOrgCodeSingle.SelectedSingleItem
-
-        '○ 変更した項目の名称をセット
-        Select Case WF_FIELD.Value
-
-            Case TxtKASANORGCODE.ID
-                Me.TxtKASANORGCODE.Text = selData("KASANORGCODE").ToString '加算先部門コード
-                Me.TxtKASANORGNAME.Text = selData("KASANORGNAME").ToString '加算先部門名
-                Me.TxtKASANORGCODE.Focus()
-        End Select
-
-        'ポップアップの非表示
-        Me.mspKasanOrgCodeSingle.HidePopUp()
-
-    End Sub
-
-    ''' <summary>
     ''' 届先コード検索時処理
     ''' </summary>
     Protected Sub DisplayView_mspTodokeCodeSingle()
@@ -2030,7 +1858,7 @@ Public Class LNM0014SprateDetail
         Me.mspTodokeCodeSingle.InitPopUp()
         Me.mspTodokeCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetSprateTodokeSQL(ddlSelectORG.SelectedValue)
+        Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetSprateTodokeSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue)
 
         Me.mspTodokeCodeSingle.KeyFieldName = "KEYCODE"
         Me.mspTodokeCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateTodokeTitle)
@@ -2068,7 +1896,7 @@ Public Class LNM0014SprateDetail
         Me.mspGroupIdSingle.InitPopUp()
         Me.mspGroupIdSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspGroupIdSingle.SQL = CmnSearchSQL.GetSprateGroupSQL(TxtTORICODE.Text)
+        Me.mspGroupIdSingle.SQL = CmnSearchSQL.GetSprateGroupSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPNAME.Text)
 
         Me.mspGroupIdSingle.KeyFieldName = "KEYCODE"
         Me.mspGroupIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateGroupTitle)
@@ -2090,6 +1918,7 @@ Public Class LNM0014SprateDetail
             Case TxtGROUPNAME.ID
                 Me.TxtGROUPID.Text = selData("GROUPID").ToString 'グループID
                 Me.TxtGROUPNAME.Text = selData("GROUPNAME").ToString 'グループ名
+                Me.TxtGROUPSORTNO.Text = selData("GROUPSORTNO").ToString 'グループソート順
                 Me.TxtGROUPNAME.Focus()
         End Select
 
@@ -2098,6 +1927,44 @@ Public Class LNM0014SprateDetail
 
     End Sub
 
+    ''' <summary>
+    ''' 明細ID検索時処理
+    ''' </summary>
+    Protected Sub DisplayView_mspDetailIdSingle()
+
+        Me.mspDetailIdSingle.InitPopUp()
+        Me.mspDetailIdSingle.SelectionMode = ListSelectionMode.Single
+
+        Me.mspDetailIdSingle.SQL = CmnSearchSQL.GetSprateDetailSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPID.Text, TxtDETAILNAME.Text)
+
+        Me.mspDetailIdSingle.KeyFieldName = "KEYCODE"
+        Me.mspDetailIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateDetailTitle)
+
+        Me.mspDetailIdSingle.ShowPopUpList()
+
+    End Sub
+
+    ''' <summary>
+    ''' 明細ID選択ポップアップで行選択
+    ''' </summary>
+    Protected Sub RowSelected_mspDetailIdSingle()
+
+        Dim selData = Me.mspDetailIdSingle.SelectedSingleItem
+
+        '○ 変更した項目の名称をセット
+        Select Case WF_FIELD.Value
+
+            Case TxtDETAILNAME.ID
+                Me.TxtDETAILID.Text = selData("DETAILID").ToString 'グループID
+                Me.TxtDETAILNAME.Text = selData("DETAILNAME").ToString 'グループ名
+                Me.TxtDETAILSORTNO.Text = selData("DETAILSORTNO").ToString 'グループソート順
+                Me.TxtDETAILNAME.Focus()
+        End Select
+
+        'ポップアップの非表示
+        Me.mspDetailIdSingle.HidePopUp()
+
+    End Sub
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***

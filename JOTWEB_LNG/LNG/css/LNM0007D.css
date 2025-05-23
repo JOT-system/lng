@@ -159,7 +159,6 @@ p {
     margin-bottom: 0rem;
 }
 
-
 /*--------------------------------------------------------------
 # common微調整
 --------------------------------------------------------------*/
@@ -187,109 +186,289 @@ p {
     width: 30em !important;
 }
 
-#detailkeybox p[id^=KOTEIHI_LINE_] {
-    min-width: 500px;
+#detailkeybox div[id^=RAD_LINE_] {
+    min-width: 500px !important;
+    display: flex;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox div[id^=RAD_LINE_] > span {
+    display: inline-block;
+    width: 11em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_] {
+    min-width: 500px !important;
+    display: flex;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#SetItemBox div[id^=TYPE_] {
     display: flex;
     box-sizing: border-box;
     flex-wrap: wrap;
 }
-/* ************************** */
-/* 単票入力欄の列定義         */
-/* ************************** */
-/* 1項目(名称 文言 列幅) */
-#detailkeybox p[id^=KOTEIHI_LINE_] > span {
-    display: inline-block;
+    /* ************************** */
+    /* 単票入力欄の列定義         */
+    /* ************************** */
+    /* 1項目(名称 文言 列幅) */
+#SetItemBox div[id^=TYPE_] > .divSelectItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/*#detailkeybox p[id^=TYPE_] {
+    margin-left: 10px;
     margin-bottom: 8px;
 }
 
-#detailkeybox p[id^=KOTEIHI_LINE_]:last-of-type > span {
-    margin-bottom: 0;
-}
+    #detailkeybox p[id^=TYPE_] > span {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    #detailkeybox p[id^=TYPE_]:last-of-type > span {
+        margin-bottom: 0;
+    }*/
 
 /* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
-#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(1) {
-    display: inline-block;
-    width: 10em;
-    font-weight: bold;
-}
-/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(2) {
-    display: inline-block;
-    width: 11em;
-}
-/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-    #detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(3) {
+    #detailkeybox p[id^=TYPE_A] > span > :nth-child(1) {
         display: inline-block;
-        width: 5.5em;
-    }
-    #detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(4) {
-        display: inline-block;
-        width: 10em;
+        width: 10.8em;
         font-weight: bold;
     }
 /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(5) {
+#detailkeybox p[id^=TYPE_A] > span > :nth-child(2) {
     display: inline-block;
-    width: 11em;
-}
-/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-#detailkeybox p[id^=KOTEIHI_LINE_] > span > :nth-child(6) {
-    display: inline-block;
-    width: 15.5em;
+    width: 500px;
 }
 
-#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(1) {
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(1) {
     display: inline-block;
-    width: 10em;
-}
-#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(2) {
-    display: inline-block;
-    width: 11.5em;
-}
-#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(3) {
-    display: inline-block;
-    width: 5.5em;
-}
-#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(4) {
-    display: inline-block;
-    width: 10em;
+    width: 10.8em;
     font-weight: bold;
 }
-#detailkeybox p[id^=KOTEIHI_LINE_] > span.magnifier > :nth-child(5) {
+/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(2) {
     display: inline-block;
-    width: 11em;
+    width: 565px;
 }
 
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(2) {
+    display: inline-block;
+    width: 180px;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(3) {
+    margin-left: 1em;
+    display: inline-block;
+    width: 6.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(4) {
+    display: inline-block;
+    width: 90px;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(5) {
+    margin-left: 1em;
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(6) {
+    display: inline-block;
+    width: 90px;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(7) {
+    display: inline-block;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_D] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_D] > span > :nth-child(2) {
+    display: inline-block;
+    width: 180px;
+}
+#detailkeybox p[id^=TYPE_D] > span > :nth-child(3) {
+    display: inline-block;
+    width: 30px;
+    height: 2.0em;
+}
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_E] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
 
-#TxtSelLineCNT, #TxtDelFlg, #TxtCampCode, #TxtTORICODE, #TxtORGCODE, #TxtKASANORGCODE, #TxtTODOKECODE, #TxtTANKA {
+#detailkeybox p[id^=TYPE_E] > span > :nth-child(2) {
+    display: inline-block;
+    width: 100px;
+}
+#detailkeybox p[id^=TYPE_E] > span > :nth-child(3) {
+    margin-left: 7em;
+    display: inline-block;
+    width: 11.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_E] > span > :nth-child(4) {
+    display: inline-block;
+    width: 100px;
+}
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(2) {
+    display: inline-block;
+    width: 160px;
+}
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(3) {
+    display: inline-block;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(4) {
+    margin-left:1.4em;
+    display: inline-block;
+    width: 11.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(5) {
+    display: inline-block;
+    width: 160px;
+}
+#detailkeybox p[id^=TYPE_F] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(2) {
+    display: inline-block;
+    width: 160px;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(3) {
+    margin-left: 2.6em;
+    display: inline-block;
+    font-weight: bold;
+    width: 165px;
+}
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(4) {
+    display: inline-block;
+    width: 160px;
+}
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(5) {
+    display: inline-block;
+    width: 160px;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(2) {
+    display: inline-block;
+    width: 160px;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(3) {
+    display: inline-block;
+    font-weight: bold;
+}
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(2) {
+    display: inline-block;
+    width: 565px;
+}
+
+.WF_RADIO {
+    display: inline-block;
+}
+
+    .WF_RADIO input {
+        display: none;
+    }
+
+    .WF_RADIO label {
+        text-decoration: none;
+        padding: 2px 16px;
+        line-height: 23px;
+        text-align: center;
+        color: #333;
+        border: solid 1px #cfcfcf;
+        background-color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        outline: none;
+        border-radius: 6px;
+        margin-right: 15px;
+        border-color: #5B9BD5;
+        width: 120px;
+    }
+
+    .WF_RADIO input:checked + label {
+        background-color: #F7BDA4;
+        border-color: #ED7D31;
+    }
+
+#TxtSYABARA, #TxtKOTEIHIM, #TxtKOTEIHID, #TxtKAISU, #TxtGENGAKU, #TxtAMOUNT {
     text-align: right !important;
 }
 
-#detailkeybox p[id^=KOTEIHI_LINE_] > span > b {
-    display: inline-block;
-    width: 190px !important;
+#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT,#TxtKAISU, #TxtGENGAKU, #TxtAMOUNT {
+    background-color: #F2F2F2;
 }
 
-.ddlSelectControl {
-    height: 30px;
-    width: 175px !important;
-    font-size: 12pt;
-    padding: 2px;
+/* 中央寄せの箱 */
+.actionButtonBox .centerSide {
+    box-sizing: border-box;
+    margin-left: 150px;
 }
 
-#TxtSYABARA, #TxtKOTEIHI, #TxtGETSUGAKU, #TxtGENGAKU, #TxtKOTEIHIM, #TxtKOTEIHID, #TxtKAISU, #TxtKINGAKU {
-    text-align: right !important;
+#WF_ButtonUPDATE, #WF_ButtonCANCEL {
+    width: 200px !important;
+    height: 50px !important;
 }
 
-#WF_GETSUGAKU_TEXT, #WF_GENGAKU_TEXT, #WF_KOTEIHI_TEXT, #WF_KOTEIHIM_TEXT, #WF_KOTEIHID_TEXT, #WF_KINGAKU_TEXT {
-    font-weight: bold;
-}
-
-#KOTEIHI_LINE_ENDYMD_ANNOTATION {
-    padding-left: 400px;
-}
-
-
-#WF_ENDYMD_L {
-    margin-left: -16px;
+#WF_ButtonCANCEL {
+    margin-left: 100px !important;
 }

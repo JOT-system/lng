@@ -295,6 +295,29 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU1), '')                                      AS BIKOU1              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
+
+        '画面表示用
+        '単価
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRTANKA                                                                                 ")
+        '燃費
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRNENPI                                                                                 ")
+        '実勢軽油価格
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                                      ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,0)                                                             ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                                    ")
+        '基準経由価格
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,0)                                                            ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                                   ")
+
         SQLStr.AppendLine("   , CASE                 ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
@@ -739,7 +762,7 @@ Public Class LNM0014SprateHistory
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -922,8 +945,11 @@ Public Class LNM0014SprateHistory
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
+        '数値書式
+        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
+        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
 
         For Each Row As DataRow In LNM0014tbl.Rows
             '値
@@ -947,15 +973,39 @@ Public Class LNM0014SprateHistory
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO") '明細ソート順
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = Row("DETAILID") '明細ID
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA") '単価
+
+            '単価
+            If Row("TANKA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Value = Row("QUANTITY") '数量
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.CALCUNIT).Value = Row("CALCUNIT") '計算単位
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DEPARTURE).Value = Row("DEPARTURE") '出荷地
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Value = Row("MILEAGE") '走行距離
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT") '輸送回数
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Value = Row("NENPI") '燃費
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Value = Row("DIESELPRICECURRENT") '実勢軽油価格
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Value = Row("DIESELPRICESTANDARD") '基準経由価格
+            '燃費
+            If Row("NENPI") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Value = Row("NENPI")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Value = CDbl(Row("NENPI"))
+            End If
+
+            '実勢軽油価格
+            If Row("DIESELPRICECURRENT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Value = Row("DIESELPRICECURRENT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Value = CDbl(Row("DIESELPRICECURRENT"))
+            End If
+
+            '基準経由価格
+            If Row("DIESELPRICESTANDARD") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Value = Row("DIESELPRICESTANDARD")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Value = CDbl(Row("DIESELPRICESTANDARD"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION") '燃料使用量
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DISPLAYFLG).Value = Row("DISPLAYFLG") '表示フラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.ASSESSMENTFLG).Value = Row("ASSESSMENTFLG") '鑑分けフラグ
@@ -972,6 +1022,12 @@ Public Class LNM0014SprateHistory
                 '変更箇所を塗りつぶし
                 SetMODIFYHATCHING(sheet, WW_ACTIVEROW)
             End If
+
+            '数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Style = NumStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -991,7 +1047,7 @@ Public Class LNM0014SprateHistory
         '開始列から最大列まで変更前後の値を確認
         For index As Integer = WW_STCOL To WW_MAXCOL
             '変更前と変更後が不一致の場合
-            If Not sheet.Cells(WW_ACTIVEROW - 1, index).Value = sheet.Cells(WW_ACTIVEROW, index).Value Then
+            If Not Convert.ToString(sheet.Cells(WW_ACTIVEROW - 1, index).Value) = Convert.ToString(sheet.Cells(WW_ACTIVEROW, index).Value) Then
 
                 '変更後の背景色を塗りつぶし
                 sheet.Cells(WW_ACTIVEROW, index).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)

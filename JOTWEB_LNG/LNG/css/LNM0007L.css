@@ -41,6 +41,7 @@ input#WF_UPLOAD_BTN {
 th {
     text-align: center;
 }
+
 /*--------------------------------------------------------------
 # サイズ基準
 # 1rem = 16px
@@ -62,13 +63,6 @@ p {
     display: inline-block;
     width: 190px !important;
 }
-
-#ListCount {
-    margin-top:7px;
-    margin-right: 20px;
-    margin-left: 15px;
-}
-
 
 /*--------------------------------------------------------------
 # タブエリア

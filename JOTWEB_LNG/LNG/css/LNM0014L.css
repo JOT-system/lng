@@ -70,3 +70,8 @@ p {
 .leftSide {
     display: flex;
 }
+
+#WF_TORI, #WF_ORG, #WF_TODOKE, #WF_DEPARTURE {
+    width: 100px !important;
+    margin-right:10px;
+}
