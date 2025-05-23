@@ -6,7 +6,7 @@
 ' 更新者 
 '
 ' 修正履歴 : 2025/01/20 新規作成
-'          : 
+'          : 2025/05/15 統合版に変更
 ''************************************************************
 Imports MySql.Data.MySqlClient
 Imports System.IO
@@ -99,34 +99,22 @@ Public Class LNM0007KoteihiList
                             WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
-                            DowpDownTORIInitialize()
-                            GridViewInitialize()
-                        Case "WF_SelectCALENDARChange", "WF_TORIChange" 'カレンダー変更時、荷主ドロップダウン変更時
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                GridViewInitialize()
-                            End Using
-                        Case "WF_TARGETTABLEChange" '表示対象テーブル変更時
-                            Select Case WF_TARGETTABLE.SelectedValue
-                                Case LNM0007WRKINC.TableList.固定費, LNM0007WRKINC.LISTNAMETOHOKU
-                                    work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDL
-                                Case LNM0007WRKINC.TableList.SK固定費
-                                    work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDLSK
-                                Case LNM0007WRKINC.TableList.TNG固定費
-                                    work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDLTNG
-                            End Select
-                            'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
-                            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
-                            DowpDownTORIInitialize()
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
-                                    WF_ButtonDEBUG_Click()
-                            End Select
+                            WF_ButtonDEBUG_Click()
+                        Case "WF_ButtonExtract" '検索ボタン押下時
+                            GridViewInitialize()
+                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
+                            WF_ButtonFIRST_Click()
+                        Case "WF_ButtonLAST"            '最終頁ボタン押下
+                            WF_ButtonLAST_Click()
+
+
+                    End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
-                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
-                        Not WF_ButtonClick.Value = "WF_TORIChange" And
-                        Not WF_ButtonClick.Value = "WF_TARGETTABLEChange" Then
+                        Not WF_ButtonClick.Value = "WF_ButtonExtract" Then
                         DisplayGrid()
                     End If
 
@@ -184,6 +172,9 @@ Public Class LNM0007KoteihiList
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize("")
 
+        '○ ドロップダウンリスト生成
+        createListBox()
+
         '○ 画面の値設定
         WW_MAPValueSet()
 
@@ -199,29 +190,32 @@ Public Class LNM0007KoteihiList
     End Sub
 
     ''' <summary>
+    ''' ドロップダウン生成処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub createListBox()
+        '荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+    End Sub
+
+    ''' <summary>
     ''' 画面初期値設定処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0007D Then
+        If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0007D Or
+            Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0007H Then
             ' 登録画面からの遷移
             Master.RecoverTable(LNM0007tbl, work.WF_SEL_INPTBL.Text)
 
-            '表示テーブルドロップダウン設定
-            DowpDownTARGETTABLEInitialize()
-
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.LISTNAMETOHOKU '固定費マスタ
-                    WF_TARGETTABLE.SelectedValue = LNM0007WRKINC.TableList.固定費
-                Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                    WF_TARGETTABLE.SelectedValue = LNM0007WRKINC.TableList.SK固定費
-                Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                    WF_TARGETTABLE.SelectedValue = LNM0007WRKINC.TableList.TNG固定費
-            End Select
-
-            '表示荷主ドロップダウン設定
-            DowpDownTORIInitialize()
+            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+            WF_TaishoYm.Value = WW_YM.Substring(0, 4) & "/" & WW_YM.Substring(4, 2)
         Else
             ' サブメニューからの画面遷移
             ' メニューからの画面遷移
@@ -240,13 +234,11 @@ Public Class LNM0007KoteihiList
             End If
             ' 画面間の情報クリア
             work.Initialize()
-            work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDL
             Master.CreateXMLSaveFile()
 
-            '表示テーブルドロップダウン設定
-            DowpDownTARGETTABLEInitialize()
-            '表示荷主ドロップダウン設定
-            DowpDownTORIInitialize()
+            '対象年月
+            'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
+            WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
         End If
 
         '表示制御項目
@@ -257,55 +249,10 @@ Public Class LNM0007KoteihiList
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
 
-        '対象年月
-        'WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM/dd")
-        WF_TaishoYm.Value = Date.Now.ToString("yyyy/MM")
-
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
 
-    End Sub
-
-    ''' <summary>
-    ''' 表示対象ドロップダウンリスト初期設定処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub DowpDownTARGETTABLEInitialize()
-        Me.WF_TARGETTABLE.Items.Clear()
-
-        Select Case True
-            Case LNM0007WRKINC.AdminCheck(Master.ROLE_ORG) '情シス、高圧ガス
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.固定費), LNM0007WRKINC.TableList.固定費))
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.SK固定費), LNM0007WRKINC.TableList.SK固定費))
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.TNG固定費), LNM0007WRKINC.TableList.TNG固定費))
-            Case LNM0007WRKINC.TohokuCheck(Master.ROLE_ORG) '東北支店
-                WF_TARGETTABLE.Items.Add(New ListItem(LNM0007WRKINC.LISTNAMETOHOKU, LNM0007WRKINC.TableList.固定費))
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.SK固定費), LNM0007WRKINC.TableList.SK固定費))
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.TNG固定費), LNM0007WRKINC.TableList.TNG固定費))
-            Case Else 'その他
-                WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.固定費), LNM0007WRKINC.TableList.固定費))
-        End Select
-    End Sub
-
-    ''' <summary>
-    ''' 荷主一覧初期設定処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub DowpDownTORIInitialize()
-        Me.WF_TORI.Items.Clear()
-        Dim retToriList As New DropDownList
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                retToriList = LNM0007WRKINC.getDowpDownToriList(Master.ROLE_ORG, LNM0007WRKINC.TBLKOTEIHI)
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                retToriList = LNM0007WRKINC.getDowpDownToriList(Master.ROLE_ORG, LNM0007WRKINC.TBLSKKOTEIHI)
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                retToriList = LNM0007WRKINC.getDowpDownToriList(Master.ROLE_ORG, LNM0007WRKINC.TBLTNGKOTEIHI)
-        End Select
-        For index As Integer = 0 To retToriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
-        Next
     End Sub
 
     ''' <summary>
@@ -340,8 +287,7 @@ Public Class LNM0007KoteihiList
 
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        'CS0013ProfView.MAPID = Master.MAPID
-        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTABLE.Text
+        CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
@@ -390,35 +336,58 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("   , 0                                                                        AS HIDDEN              ")
         SQLStr.AppendLine("   , 0                                                                        AS LINECNT             ")
         SQLStr.AppendLine("   , ''                                                                       AS OPERATION           ")
-        SQLStr.AppendLine("   , VIW0002.UPDTIMSTP                                                        AS UPDTIMSTP           ")
-        SQLStr.AppendLine("   , VIW0002.TABLEID                                                          AS TABLEID             ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.DELFLG), '')                                      AS DELFLG              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.TORICODE), '')                                    AS TORICODE              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.TORINAME), '')                                    AS TORINAME              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.ORGCODE), '')                                     AS ORGCODE              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.ORGNAME), '')                                     AS ORGNAME              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KASANORGCODE), '')                                AS KASANORGCODE              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KASANORGNAME), '')                                AS KASANORGNAME              ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(VIW0002.ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYABAN), '')                                      AS SYABAN              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.RIKUBAN), '')                                     AS RIKUBAN              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYAGATA), '')                                     AS SYAGATA              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYAGATANAME), '')                                 AS SYAGATANAME              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.SYABARA), '0')                                    AS SYABARA              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.GETSUGAKU), '0')                                   AS GETSUGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.GENGAKU), '0')                                     AS GENGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KOTEIHI), '0')                                     AS KOTEIHI              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KOTEIHIM), '0')                                    AS KOTEIHIM              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KOTEIHID), '0')                                    AS KOTEIHID              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KAISU), '0')                                       AS KAISU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.KINGAKU), '0')                                     AS KINGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.BIKOU), '')                                       AS BIKOU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.BIKOU1), '')                                      AS BIKOU1              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.BIKOU2), '')                                      AS BIKOU2              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(VIW0002.BIKOU3), '')                                      AS BIKOU3              ")
+        SQLStr.AppendLine("   , LNM0007.UPDTIMSTP                                                        AS UPDTIMSTP           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.DELFLG), '')                                      AS DELFLG              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.TORICODE), '')                                    AS TORICODE              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.TORINAME), '')                                    AS TORINAME              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.ORGCODE), '')                                     AS ORGCODE              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.ORGNAME), '')                                     AS ORGNAME              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KASANORGCODE), '')                                AS KASANORGCODE              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KASANORGNAME), '')                                AS KASANORGNAME              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.TARGETYM), '')                                    AS TARGETYM              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SYABAN), '')                                      AS SYABAN              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.RIKUBAN), '')                                     AS RIKUBAN              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SYAGATA), '')                                     AS SYAGATA              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SYAGATANAME), '')                                 AS SYAGATANAME              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SYABARA), '')                                     AS SYABARA              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONKBN), '')                                   AS SEASONKBN              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONSTART), '')                                 AS SEASONSTART              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONEND), '')                                   AS SEASONEND              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KOTEIHIM), '')                                    AS KOTEIHIM              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KOTEIHID), '')                                    AS KOTEIHID              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KAISU), '')                                       AS KAISU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.GENGAKU), '')                                     AS GENGAKU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.AMOUNT), '')                                      AS AMOUNT              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.BIKOU1), '')                                      AS BIKOU1              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.BIKOU2), '')                                      AS BIKOU2              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.BIKOU3), '')                                      AS BIKOU3              ")
+
+        '画面表示用
+        '季節料金判定区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRSEASONKBN        ")
+        '固定費(月額)
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHIM,0)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRKOTEIHIM                                                                              ")
+        '固定費(日額)
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHID), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHID,0)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRKOTEIHID                                                                              ")
+        '減額費用
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GENGAKU), '') = '' THEN ''                                                 ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GENGAKU,0)                                                                        ")
+        SQLStr.AppendLine("     END AS SCRGENGAKU                                                                               ")
+        '請求額
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(AMOUNT), '') = '' THEN ''                                                  ")
+        SQLStr.AppendLine("      ELSE  FORMAT(AMOUNT,0)                                                                         ")
+        SQLStr.AppendLine("     END AS SCRAMOUNT                                                                                ")
+
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0002_KOTEIHI VIW0002                                                                       ")
+        SQLStr.AppendLine("     LNG.LNM0007_FIXED LNM0007                                                                       ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -431,48 +400,29 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  VIW0002.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine("      ON  LNM0007.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-
-        '対象テーブル
-        SQLStr.AppendLine("    VIW0002.TABLEID = @TABLEID                                               ")
-
+        SQLStr.AppendLine("      LNM0007.DELFLG = '0'                                                      ")
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
-        Dim dt As DateTime
         Dim Itype As Integer
 
-        '削除フラグ
-        'If Not work.WF_SEL_DELFLG_S.Text = "1" Then
-        SQLStr.AppendLine(" AND  VIW0002.DELFLG = '0'                                                      ")
-        'End If
-        '取引先コード
-        If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
-            SQLStr.AppendLine(" AND  VIW0002.TORICODE = @TORICODE                                          ")
+        '対象年月
+        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+            SQLStr.AppendLine(" AND  COALESCE(LNM0007.TARGETYM, '0') = COALESCE(@TARGETYM, '0')  ")
         End If
 
-        '対象年月
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                    SQLStr.AppendLine(" AND  @STYMD BETWEEN VIW0002.STYMD AND VIW0002.ENDYMD  ")
-                End If
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                    SQLStr.AppendLine(" AND  @STYMD BETWEEN VIW0002.STYMD AND VIW0002.ENDYMD  ")
-                End If
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                    SQLStr.AppendLine(" AND  @STYMD BETWEEN VIW0002.STYMD AND VIW0002.ENDYMD  ")
-                End If
-        End Select
+        '取引先コード
+        If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
+            SQLStr.AppendLine(" AND  LNM0007.TORICODE = @TORICODE                                          ")
+        End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
-        SQLStr.AppendLine("     VIW0002.TORICODE                                                           ")
-        SQLStr.AppendLine("    ,VIW0002.ORGCODE                                                            ")
-        SQLStr.AppendLine("    ,VIW0002.STYMD                                                              ")
-        SQLStr.AppendLine("    ,VIW0002.ENDYMD                                                             ")
-        SQLStr.AppendLine("    ,VIW0002.SYABAN                                                             ")
+        SQLStr.AppendLine("     LNM0007.TARGETYM                                                           ")
+        SQLStr.AppendLine("    ,LNM0007.TORICODE                                                           ")
+        SQLStr.AppendLine("    ,LNM0007.ORGCODE                                                            ")
+        SQLStr.AppendLine("    ,LNM0007.SYABAN                                                             ")
+        SQLStr.AppendLine("    ,LNM0007.SEASONKBN                                                          ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -480,41 +430,17 @@ Public Class LNM0007KoteihiList
                 Dim P_ROLE As MySqlParameter = SQLcmd.Parameters.Add("@ROLE", MySqlDbType.VarChar, 20)
                 P_ROLE.Value = Master.ROLE_ORG
 
-                '対象テーブル
-                Dim P_TABLEID As MySqlParameter = SQLcmd.Parameters.Add("@TABLEID", MySqlDbType.VarChar, 30)
-                Select Case work.WF_SEL_CONTROLTABLE.Text
-                    Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLKOTEIHI
-                    Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLSKKOTEIHI
-                    Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLTNGKOTEIHI
-                End Select
+                '対象年月
+                If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+                    Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)
+                    P_TARGETYM.Value = Itype
+                End If
 
                 '取引先コード
                 If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
                     Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
                     P_TORICODE.Value = WF_TORI.SelectedValue
                 End If
-
-                '対象年月
-                Select Case work.WF_SEL_CONTROLTABLE.Text
-                    Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                        If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                            Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
-                            P_STYMD.Value = dt
-                        End If
-                    Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                        If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                            Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
-                            P_STYMD.Value = dt
-                        End If
-                    Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                        If DateTime.TryParse(WF_TaishoYm.Value & "/01", dt) Then
-                            Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
-                            P_STYMD.Value = dt
-                        End If
-                End Select
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -530,6 +456,14 @@ Public Class LNM0007KoteihiList
                 For Each LNM0007row As DataRow In LNM0007tbl.Rows
                     i += 1
                     LNM0007row("LINECNT") = i        'LINECNT
+
+                    Select Case LNM0007row("SEASONKBN").ToString
+                        Case "0" : LNM0007row("SCRSEASONKBN") = "通年"
+                        Case "1" : LNM0007row("SCRSEASONKBN") = "夏季料金"
+                        Case "2" : LNM0007row("SCRSEASONKBN") = "冬季料金"
+                        Case Else : LNM0007row("SCRSEASONKBN") = ""
+                    End Select
+
                 Next
             End Using
 
@@ -558,6 +492,8 @@ Public Class LNM0007KoteihiList
         work.WF_SEL_LINECNT.Text = ""                                             '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)    '削除
 
+        work.WF_SEL_TARGETYM.Text = Date.Now.ToString("yyyy/MM")                       '対象年月
+
         If WF_TORI.SelectedValue = "" Then
             work.WF_SEL_TORICODE.Text = ""                  '取引先コード
             work.WF_SEL_TORINAME.Text = ""                 '取引先名称
@@ -566,29 +502,27 @@ Public Class LNM0007KoteihiList
             work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString                 '取引先名称
         End If
 
-        work.WF_SEL_ORGCODE.Text = ""                                             '部門コード
-        work.WF_SEL_ORGNAME.Text = ""                                             '部門名称
-        work.WF_SEL_KASANORGCODE.Text = ""                                        '加算先部門コード
-        work.WF_SEL_KASANORGNAME.Text = ""                                        '加算先部門名称
-        work.WF_SEL_STYMD.Text = ""                                               '有効開始日
-        'work.WF_SEL_ENDYMD.Text = LNM0007WRKINC.MAX_ENDYMD                       '有効終了日
-        work.WF_SEL_ENDYMD.Text = ""                                              '有効終了日
-        work.WF_SEL_SYABAN.Text = ""                                              '車番
-        work.WF_SEL_RIKUBAN.Text = ""                                             '陸事番号
-        work.WF_SEL_SYAGATA.Text = ""                                             '車型
-        work.WF_SEL_SYAGATANAME.Text = ""                                         '車型名
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_SYABARA.Text)   '車腹
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_GETSUGAKU.Text) '月額運賃
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_GENGAKU.Text)   '減額対象額
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KOTEIHI.Text)   '固定費
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KOTEIHIM.Text)  '月額固定費
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KOTEIHID.Text)  '日額固定費
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KAISU.Text)     '使用回数
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KINGAKU.Text)   '金額
-        work.WF_SEL_BIKOU.Text = ""                                               '備考
-        work.WF_SEL_BIKOU1.Text = ""                                              '備考1
-        work.WF_SEL_BIKOU2.Text = ""                                              '備考2
-        work.WF_SEL_BIKOU3.Text = ""                                              '備考3
+        work.WF_SEL_ORGCODE.Text = ""                                                     '部門コード
+        work.WF_SEL_ORGNAME.Text = ""                                                     '部門名称
+        work.WF_SEL_KASANORGCODE.Text = ""                                                '加算先部門コード
+        work.WF_SEL_KASANORGNAME.Text = ""                                                '加算先部門名称
+        work.WF_SEL_TARGETYM.Text = ""                                                    '対象年月
+        work.WF_SEL_SYABAN.Text = ""                                                      '車番
+        work.WF_SEL_RIKUBAN.Text = ""                                                     '陸事番号
+        work.WF_SEL_SYAGATA.Text = ""                                                     '車型
+        work.WF_SEL_SYAGATANAME.Text = ""                                                 '車型名
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_SYABARA.Text)           '車腹
+        work.WF_SEL_SEASONKBN.Text = ""                                                   '季節料金判定区分
+        work.WF_SEL_SEASONSTART.Text = ""                                                 '季節料金判定開始月日
+        work.WF_SEL_SEASONEND.Text = ""                                                   '季節料金判定終了月日
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KOTEIHIM.Text)          '固定費(月額)
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KOTEIHID.Text)          '固定費(日額)
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_KAISU.Text)             '回数
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_GENGAKU.Text)           '減額費用
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_AMOUNT.Text)            '請求額
+        work.WF_SEL_BIKOU1.Text = ""                                                      '備考1
+        work.WF_SEL_BIKOU2.Text = ""                                                      '備考2
+        work.WF_SEL_BIKOU3.Text = ""                                                      '備考3
 
         work.WF_SEL_TIMESTAMP.Text = ""         　                               'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
@@ -673,8 +607,7 @@ Public Class LNM0007KoteihiList
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        'CS0013ProfView.MAPID = Master.MAPID
-        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTABLE.Text
+        CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
@@ -782,21 +715,20 @@ Public Class LNM0007KoteihiList
         work.WF_SEL_ORGNAME.Text = LNM0007tbl.Rows(WW_LineCNT)("ORGNAME")            '部門名称
         work.WF_SEL_KASANORGCODE.Text = LNM0007tbl.Rows(WW_LineCNT)("KASANORGCODE")  '加算先部門コード
         work.WF_SEL_KASANORGNAME.Text = LNM0007tbl.Rows(WW_LineCNT)("KASANORGNAME")  '加算先部門名称
-        work.WF_SEL_STYMD.Text = LNM0007tbl.Rows(WW_LineCNT)("STYMD")                '有効開始日
-        work.WF_SEL_ENDYMD.Text = LNM0007tbl.Rows(WW_LineCNT)("ENDYMD")              '有効終了日
+        work.WF_SEL_TARGETYM.Text = LNM0007tbl.Rows(WW_LineCNT)("TARGETYM")          '対象年月
         work.WF_SEL_SYABAN.Text = LNM0007tbl.Rows(WW_LineCNT)("SYABAN")              '車番
         work.WF_SEL_RIKUBAN.Text = LNM0007tbl.Rows(WW_LineCNT)("RIKUBAN")            '陸事番号
         work.WF_SEL_SYAGATA.Text = LNM0007tbl.Rows(WW_LineCNT)("SYAGATA")            '車型
         work.WF_SEL_SYAGATANAME.Text = LNM0007tbl.Rows(WW_LineCNT)("SYAGATANAME")    '車型名
         work.WF_SEL_SYABARA.Text = LNM0007tbl.Rows(WW_LineCNT)("SYABARA")            '車腹
-        work.WF_SEL_GETSUGAKU.Text = LNM0007tbl.Rows(WW_LineCNT)("GETSUGAKU")        '月額運賃
-        work.WF_SEL_GENGAKU.Text = LNM0007tbl.Rows(WW_LineCNT)("GENGAKU")            '減額対象額
-        work.WF_SEL_KOTEIHI.Text = LNM0007tbl.Rows(WW_LineCNT)("KOTEIHI")            '固定費
-        work.WF_SEL_KOTEIHIM.Text = LNM0007tbl.Rows(WW_LineCNT)("KOTEIHIM")          '月額固定費
-        work.WF_SEL_KOTEIHID.Text = LNM0007tbl.Rows(WW_LineCNT)("KOTEIHID")          '日額固定費
-        work.WF_SEL_KAISU.Text = LNM0007tbl.Rows(WW_LineCNT)("KAISU")                '使用回数
-        work.WF_SEL_KINGAKU.Text = LNM0007tbl.Rows(WW_LineCNT)("KINGAKU")            '金額
-        work.WF_SEL_BIKOU.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU")                '備考
+        work.WF_SEL_SEASONKBN.Text = LNM0007tbl.Rows(WW_LineCNT)("SEASONKBN")        '季節料金判定区分
+        work.WF_SEL_SEASONSTART.Text = LNM0007tbl.Rows(WW_LineCNT)("SEASONSTART")    '季節料金判定開始月日
+        work.WF_SEL_SEASONEND.Text = LNM0007tbl.Rows(WW_LineCNT)("SEASONEND")        '季節料金判定終了月日
+        work.WF_SEL_KOTEIHIM.Text = LNM0007tbl.Rows(WW_LineCNT)("KOTEIHIM")          '固定費(月額)
+        work.WF_SEL_KOTEIHID.Text = LNM0007tbl.Rows(WW_LineCNT)("KOTEIHID")          '固定費(日額)
+        work.WF_SEL_KAISU.Text = LNM0007tbl.Rows(WW_LineCNT)("KAISU")                '回数
+        work.WF_SEL_GENGAKU.Text = LNM0007tbl.Rows(WW_LineCNT)("GENGAKU")            '減額費用
+        work.WF_SEL_AMOUNT.Text = LNM0007tbl.Rows(WW_LineCNT)("AMOUNT")              '請求額
         work.WF_SEL_BIKOU1.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU1")              '備考1
         work.WF_SEL_BIKOU2.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU2")              '備考2
         work.WF_SEL_BIKOU3.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU3")              '備考3
@@ -819,20 +751,9 @@ Public Class LNM0007KoteihiList
             ' DataBase接続
             SQLcon.Open()
             ' 排他チェック
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                    work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
+            work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
                     work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                    work.WF_SEL_STYMD.Text, work.WF_SEL_SYABAN.Text)
-                Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                    work.HaitaCheckSK(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
-                    work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                    work.WF_SEL_STYMD.Text, work.WF_SEL_SYABAN.Text)
-                Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                    work.HaitaCheckTNG(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
-                    work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                    work.WF_SEL_STYMD.Text, work.WF_SEL_SYABAN.Text)
-            End Select
+                    work.WF_SEL_TARGETYM.Text, work.WF_SEL_SYABAN.Text, work.WF_SEL_SEASONKBN.Text)
         End Using
 
         If Not isNormal(WW_DBDataCheck) Then
@@ -926,14 +847,7 @@ Public Class LNM0007KoteihiList
 
         '最大列(RANGE)を取得
         Dim WW_MAXCOL As Integer = 0
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.INOUTEXCELCOL)).Cast(Of Integer)().Max()
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.INOUTEXCELCOLSK)).Cast(Of Integer)().Max()
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.INOUTEXCELCOLTNG)).Cast(Of Integer)().Max()
-        End Select
+        WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.INOUTEXCELCOL)).Cast(Of Integer)().Max()
 
         'シート名
         wb.ActiveSheet.Name = "入出力"
@@ -950,7 +864,7 @@ Public Class LNM0007KoteihiList
         Dim WW_ENDROW As Integer = 0
 
         WW_STROW = WW_ACTIVEROW
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
         WW_ENDROW = WW_ACTIVEROW - 1
 
         'プルダウンリスト作成
@@ -978,14 +892,7 @@ Public Class LNM0007KoteihiList
         wb.ActiveSheet.Range("A2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED)
         wb.ActiveSheet.Range("B2").Value = "は入力必須"
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "固定費マスタ一覧"
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "SK固定費マスタ一覧"
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "TNG固定費マスタ一覧"
-        End Select
+        wb.ActiveSheet.Range("C1").Value = "固定費マスタ一覧"
 
         wb.ActiveSheet.Range("C2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY)
         wb.ActiveSheet.Range("D2").Value = "は入力不要"
@@ -1012,14 +919,7 @@ Public Class LNM0007KoteihiList
         Dim FilePath As String
         Select Case WW_FILETYPE
             Case LNM0007WRKINC.FILETYPE.EXCEL
-                Select Case work.WF_SEL_CONTROLTABLE.Text
-                    Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                        FileName = "固定費マスタ.xlsx"
-                    Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                        FileName = "SK固定費マスタ.xlsx"
-                    Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                        FileName = "TNG固定費マスタ.xlsx"
-                End Select
+                FileName = "固定費マスタ.xlsx"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -1078,38 +978,15 @@ Public Class LNM0007KoteihiList
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub SetREQUNNECEHATCHING(ByVal sheet As IWorksheet)
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                '入力必須列網掛け
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '削除フラグ
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '取引先コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '部門コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
+        '入力必須列網掛け
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '削除フラグ
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '取引先コード
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '部門コード
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '季節料金判定区分
 
-                '入力不要列網掛け
-                'sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                '入力必須列網掛け
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLSK.TORICODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '取引先コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLSK.ORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '部門コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLSK.SYABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
-
-                '入力不要列網掛け
-
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                '入力必須列網掛け
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '削除フラグ
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLTNG.TORICODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '取引先コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLTNG.ORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '部門コード
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
-                sheet.Columns(LNM0007WRKINC.INOUTEXCELCOLTNG.SYABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
-
-                '入力不要列網掛け
-        End Select
-
+        '入力不要列網掛け
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
 
         '1,2行の網掛けは消す
         sheet.Rows(0).Interior.ColorIndex = 0
@@ -1159,59 +1036,30 @@ Public Class LNM0007KoteihiList
         '値
         Dim WW_HEADERROW As Integer = 2
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Value = "（必須）削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Value = "（必須）取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Value = "（必須）部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.STYMD).Value = "（必須）有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Value = "（必須）車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).Value = "陸事番号"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA).Value = "車型"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = "車型名"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = "車腹"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHI).Value = "固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = "備考1"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = "備考2"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG).Value = "（必須）削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORICODE).Value = "（必須）取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGCODE).Value = "（必須）部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.STYMD).Value = "（必須）有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABAN).Value = "（必須）車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABARA).Value = "車腹"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.GETSUGAKU).Value = "月額運賃"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.GENGAKU).Value = "減額対象額"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.KOTEIHI).Value = "固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.BIKOU).Value = "備考"
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG).Value = "（必須）削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORICODE).Value = "（必須）取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGCODE).Value = "（必須）部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.STYMD).Value = "（必須）有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.SYABAN).Value = "（必須）車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHIM).Value = "月額固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHID).Value = "日額固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KAISU).Value = "使用回数"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KINGAKU).Value = "金額"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.BIKOU).Value = "備考"
-        End Select
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Value = "（必須）削除フラグ"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Value = "（必須）取引先コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME).Value = "取引先名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Value = "（必須）部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME).Value = "部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.TARGETYM).Value = "対象年月"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Value = "（必須）車番"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).Value = "陸事番号"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA).Value = "車型"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = "車型名"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = "車腹"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN).Value = "（必須）季節料金判定区分"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONSTART).Value = "季節料金判定開始月日"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONEND).Value = "季節料金判定終了月日"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Value = "固定費(月額)"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Value = "固定費(日額)"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = "回数"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = "減額費用"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = "請求額"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = "備考1"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = "備考2"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
 
         Dim WW_TEXT As String = ""
         Dim WW_CNT As Integer = 0
@@ -1221,66 +1069,15 @@ Public Class LNM0007KoteihiList
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                    '削除フラグ
-                    COMMENT_get(SQLcon, "DELFLG", WW_TEXT, WW_CNT)
-                    If Not WW_CNT = 0 Then
-                        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).AddComment(WW_TEXT)
-                        With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Comment.Shape
-                            .Width = 50
-                            .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                        End With
-                    End If
-
-                    '有効終了日
-                    WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
-                    '選択比較項目-発荷主コード
-                    sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).AddComment(WW_TEXT)
-                    With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Comment.Shape
-                        .Width = 150
-                        .Height = 30
-                    End With
-
-                Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                    '削除フラグ
-                    COMMENT_get(SQLcon, "DELFLG", WW_TEXT, WW_CNT)
-                    If Not WW_CNT = 0 Then
-                        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG).AddComment(WW_TEXT)
-                        With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG).Comment.Shape
-                            .Width = 50
-                            .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                        End With
-                    End If
-
-                    '有効終了日
-                    WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
-                    '選択比較項目-発荷主コード
-                    sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.ENDYMD).AddComment(WW_TEXT)
-                    With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.ENDYMD).Comment.Shape
-                        .Width = 150
-                        .Height = 30
-                    End With
-                Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                    '削除フラグ
-                    COMMENT_get(SQLcon, "DELFLG", WW_TEXT, WW_CNT)
-                    If Not WW_CNT = 0 Then
-                        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG).AddComment(WW_TEXT)
-                        With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG).Comment.Shape
-                            .Width = 50
-                            .Height = CONST_HEIGHT_PER_ROW * WW_CNT
-                        End With
-                    End If
-
-                    '有効終了日
-                    WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
-                    '選択比較項目-発荷主コード
-                    sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ENDYMD).AddComment(WW_TEXT)
-                    With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ENDYMD).Comment.Shape
-                        .Width = 150
-                        .Height = 30
-                    End With
-            End Select
+            '削除フラグ
+            COMMENT_get(SQLcon, "DELFLG", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Comment.Shape
+                    .Width = 50
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
         End Using
 
     End Sub
@@ -1305,47 +1102,18 @@ Public Class LNM0007KoteihiList
         Dim WW_FORMULA1 As String = ""
 
         '○入力リスト取得
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                '削除フラグ
-                SETFIXVALUELIST(subsheet, "DELFLG", LNM0007WRKINC.INOUTEXCELCOL.DELFLG, WW_FIXENDROW)
-                If Not WW_FIXENDROW = -1 Then
-                    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
-                    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
-                    WW_SUB_STRANGE = subsheet.Cells(0, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
-                    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
-                    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-                    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-                    End With
-                End If
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                '削除フラグ
-                SETFIXVALUELIST(subsheet, "DELFLG", LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG, WW_FIXENDROW)
-                If Not WW_FIXENDROW = -1 Then
-                    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG)
-                    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG)
-                    WW_SUB_STRANGE = subsheet.Cells(0, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG)
-                    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG)
-                    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-                    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-                    End With
-                End If
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                '削除フラグ
-                SETFIXVALUELIST(subsheet, "DELFLG", LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG, WW_FIXENDROW)
-                If Not WW_FIXENDROW = -1 Then
-                    WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG)
-                    WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG)
-                    WW_SUB_STRANGE = subsheet.Cells(0, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG)
-                    WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG)
-                    WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
-                    With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
-                        .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
-                    End With
-                End If
-        End Select
+        '削除フラグ
+        SETFIXVALUELIST(subsheet, "DELFLG", LNM0007WRKINC.INOUTEXCELCOL.DELFLG, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
 
         'メインシートをアクティブにする
         mainsheet.Activate()
@@ -1379,7 +1147,11 @@ Public Class LNM0007KoteihiList
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+
+        '数値書式
+        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
+        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
 
         'Dim WW_DEPSTATION As String
 
@@ -1392,59 +1164,62 @@ Public Class LNM0007KoteihiList
             'CODENAME_get("STATION", WW_DEPSTATION, WW_Dummy, WW_Dummy, WW_DEPSTATIONNM, WW_RtnSW) '発駅名称
 
             '値
-            Select Case work.WF_SEL_CONTROLTABLE.Text
-                Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHI).Value = Row("KOTEIHI") '固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
-                Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABARA).Value = Row("SYABARA") '車腹
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.GETSUGAKU).Value = Row("GETSUGAKU") '月額運賃
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.GENGAKU).Value = Row("GENGAKU") '減額対象額
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.KOTEIHI).Value = Row("KOTEIHI") '固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLSK.BIKOU).Value = Row("BIKOU") '備考
-                Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHIM).Value = Row("KOTEIHIM") '月額固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHID).Value = Row("KOTEIHID") '日額固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KAISU).Value = Row("KAISU") '使用回数
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KINGAKU).Value = Row("KINGAKU") '金額
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOLTNG.BIKOU).Value = Row("BIKOU") '備考
-            End Select
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE).Value = Row("TORICODE") '取引先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME).Value = Row("TORINAME") '取引先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE).Value = Row("ORGCODE") '部門コード
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.TARGETYM).Value = Row("TARGETYM") '対象年月
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN).Value = Row("SYABAN") '車番
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN).Value = Row("SEASONKBN") '季節料金判定区分
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONSTART).Value = Row("SEASONSTART") '季節料金判定開始月日
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONEND).Value = Row("SEASONEND") '季節料金判定終了月日
+
+            '固定費(月額)
+            If Row("KOTEIHIM") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Value = Row("KOTEIHIM")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Value = CDbl(Row("KOTEIHIM"))
+            End If
+
+            '固定費(日額)
+            If Row("KOTEIHID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Value = Row("KOTEIHID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Value = CDbl(Row("KOTEIHID"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = Row("KAISU") '回数
+
+            '減額費用
+            If Row("GENGAKU") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = Row("GENGAKU")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = CDbl(Row("GENGAKU"))
+            End If
+
+            '請求額
+            If Row("AMOUNT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = Row("AMOUNT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = CDbl(Row("AMOUNT"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Style = NumStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -1592,75 +1367,6 @@ Public Class LNM0007KoteihiList
                         Continue For
                     End If
 
-
-                    Select Case work.WF_SEL_CONTROLTABLE.Text
-                        Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG
-#Region "固定費マスタ、SK固定費マスタ、TNG固定費マスタ"
-                            '有効開始日、有効終了日更新
-                            If Not Row("TORICODE") = "" And
-                               Not Row("ORGCODE") = "" And
-                               Not Row("STYMD") = Date.MinValue And
-                               Not Row("SYABAN") = "" Then
-
-
-                                '更新前の最大有効開始日取得
-                                WW_BeforeMAXSTYMD = LNM0007WRKINC.GetSTYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
-                                                                           Row, WW_DBDataCheck)
-                                If Not isNormal(WW_DBDataCheck) Then
-                                    Exit Sub
-                                End If
-
-                                WF_AUTOENDYMD.Value = ""
-
-                                Select Case True
-                                    'DBに登録されている有効開始日が無かった場合
-                                    Case WW_BeforeMAXSTYMD = ""
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                        '同一の場合
-                                    Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
-                                    Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                        'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
-                                        '変更後の有効開始日退避
-                                        WW_STYMD_SAVE = Row("STYMD")
-                                        '変更後の有効終了日退避
-                                        WW_ENDYMD_SAVE = Row("ENDYMD")
-                                        '変更後テーブルに変更前の有効開始日格納
-                                        Row("STYMD") = WW_BeforeMAXSTYMD
-                                        '変更後テーブルに更新用の有効終了日格納
-                                        Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                        '履歴テーブルに変更前データを登録
-                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0007WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                            Exit Sub
-                                        End If
-                                        '変更前の有効終了日更新
-                                        UpdateENDYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
-                                                     Row, WW_DBDataCheck, DATENOW)
-                                        If Not isNormal(WW_DBDataCheck) Then
-                                            Exit Sub
-                                        End If
-                                        '履歴テーブルに変更後データを登録
-                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0007WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                            Exit Sub
-                                        End If
-                                        '退避した有効開始日を元に戻す
-                                        Row("STYMD") = WW_STYMD_SAVE
-                                        '退避した有効終了日を元に戻す
-                                        Row("ENDYMD") = WW_ENDYMD_SAVE
-                                        '有効終了日に最大値を入れる
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                    Case Else
-                                        '有効終了日に有効開始日の月の末日を入れる
-                                        Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                        WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
-                                End Select
-                            End If
-#End Region
-                    End Select
-
                     Dim WW_MODIFYKBN As String = ""
                     Dim WW_BEFDELFLG As String = ""
 
@@ -1721,7 +1427,7 @@ Public Class LNM0007KoteihiList
         CS0025AUTHORget.ENDYMD = Date.Now
         CS0025AUTHORget.CS0025AUTHORget()
         If Not isNormal(CS0025AUTHORget.ERR) OrElse CS0025AUTHORget.PERMITCODE <> C_PERMISSION.UPDATE Then
-            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.WAR, "単価マスタの更新権限がありません")
+            Master.Output(C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR, C_MESSAGE_TYPE.WAR, "固定費マスタの更新権限がありません")
             Exit Sub
         End If
 
@@ -1755,7 +1461,7 @@ Public Class LNM0007KoteihiList
         Dim fileExtention = fileNameParts(fileNameParts.Length - 1)
 
         'アップロードフォルダ作成
-        Dim fileUploadPath As String = CS0050SESSION.UPLOAD_PATH & "\UPLOAD\TANKAEXCEL"
+        Dim fileUploadPath As String = CS0050SESSION.UPLOAD_PATH & "\UPLOAD\FIXEDEXCEL"
         Dim di As System.IO.DirectoryInfo = System.IO.Directory.CreateDirectory(fileUploadPath)
         Dim dir = New System.IO.DirectoryInfo(fileUploadPath)
         Dim files As IEnumerable(Of System.IO.FileInfo) = dir.EnumerateFiles("*", System.IO.SearchOption.AllDirectories)
@@ -1767,7 +1473,7 @@ Public Class LNM0007KoteihiList
         Next
 
         'ファイル名先頭
-        Dim fileNameHead As String = "TANKAEXCEL_TMP_"
+        Dim fileNameHead As String = "FIXEDEXCEL_TMP_"
 
         'ファイルパスの決定
         Dim newfileName As String = fileNameHead & DateTime.Now.ToString("yyyyMMddHHmmss") & "." & fileExtention
@@ -1839,74 +1545,6 @@ Public Class LNM0007KoteihiList
                         WW_UplErrCnt += 1
                         Continue For
                     End If
-
-                    Select Case work.WF_SEL_CONTROLTABLE.Text
-                        Case LNM0007WRKINC.MAPIDL, LNM0007WRKINC.MAPIDLSK, LNM0007WRKINC.MAPIDLTNG
-#Region "固定費マスタ、SK固定費マスタ、TNG固定費マスタ"
-                            '有効開始日、有効終了日更新
-                            If Not Row("TORICODE") = "" And
-                               Not Row("ORGCODE") = "" And
-                               Not Row("STYMD") = Date.MinValue And
-                               Not Row("SYABAN") = "" Then
-
-
-                                '更新前の最大有効開始日取得
-                                WW_BeforeMAXSTYMD = LNM0007WRKINC.GetSTYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
-                                                                           Row, WW_DBDataCheck)
-                                If Not isNormal(WW_DBDataCheck) Then
-                                    Exit Sub
-                                End If
-
-                                WF_AUTOENDYMD.Value = ""
-
-                                Select Case True
-                                    'DBに登録されている有効開始日が無かった場合
-                                    Case WW_BeforeMAXSTYMD = ""
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                        '同一の場合
-                                    Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
-                                    Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
-                                        'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
-                                        '変更後の有効開始日退避
-                                        WW_STYMD_SAVE = Row("STYMD")
-                                        '変更後の有効終了日退避
-                                        WW_ENDYMD_SAVE = Row("ENDYMD")
-                                        '変更後テーブルに変更前の有効開始日格納
-                                        Row("STYMD") = WW_BeforeMAXSTYMD
-                                        '変更後テーブルに更新用の有効終了日格納
-                                        Row("ENDYMD") = DateTime.Parse(WW_STYMD_SAVE).AddDays(-1).ToString("yyyy/MM/dd")
-                                        '履歴テーブルに変更前データを登録
-                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0007WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
-                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                            Exit Sub
-                                        End If
-                                        '変更前の有効終了日更新
-                                        UpdateENDYMD(SQLcon, work.WF_SEL_CONTROLTABLE.Text,
-                                                     Row, WW_DBDataCheck, DATENOW)
-                                        If Not isNormal(WW_DBDataCheck) Then
-                                            Exit Sub
-                                        End If
-                                        '履歴テーブルに変更後データを登録
-                                        InsertHist(SQLcon, Row, C_DELETE_FLG.ALIVE, LNM0007WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
-                                        If Not WW_ErrSW.Equals(C_MESSAGE_NO.NORMAL) Then
-                                            Exit Sub
-                                        End If
-                                        '退避した有効開始日を元に戻す
-                                        Row("STYMD") = WW_STYMD_SAVE
-                                        '退避した有効終了日を元に戻す
-                                        Row("ENDYMD") = WW_ENDYMD_SAVE
-                                        '有効終了日に最大値を入れる
-                                        WF_AUTOENDYMD.Value = LNM0007WRKINC.MAX_ENDYMD
-                                    Case Else
-                                        '有効終了日に有効開始日の月の末日を入れる
-                                        Dim WW_NEXT_YM As String = DateTime.Parse(Row("STYMD")).AddMonths(1).ToString("yyyy/MM")
-                                        WF_AUTOENDYMD.Value = DateTime.Parse(WW_NEXT_YM & "/01").AddDays(-1).ToString("yyyy/MM/dd")
-                                End Select
-                            End If
-#End Region
-                    End Select
 
                     Dim WW_MODIFYKBN As String = ""
                     Dim WW_BEFDELFLG As String = ""
@@ -1994,6 +1632,60 @@ Public Class LNM0007KoteihiList
     Protected Sub SetExceltbl(ByVal SQLcon As MySqlConnection, ByVal FilePath As String, ByRef O_RTN As String)
         Dim DataTypeHT As Hashtable = New Hashtable
 
+        '○ 登録・更新するテーブルのフィールド名とフィールドの型を取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT ")
+        SQLStr.AppendLine("   0   AS LINECNT ")
+        SQLStr.AppendLine("        ,TORICODE  ")
+        SQLStr.AppendLine("        ,TORINAME  ")
+        SQLStr.AppendLine("        ,ORGCODE  ")
+        SQLStr.AppendLine("        ,ORGNAME  ")
+        SQLStr.AppendLine("        ,KASANORGCODE  ")
+        SQLStr.AppendLine("        ,KASANORGNAME  ")
+        SQLStr.AppendLine("        ,TARGETYM  ")
+        SQLStr.AppendLine("        ,SYABAN  ")
+        SQLStr.AppendLine("        ,RIKUBAN  ")
+        SQLStr.AppendLine("        ,SYAGATA  ")
+        'SQLStr.AppendLine("        ,SYAGATANAME  ")
+        SQLStr.AppendLine("        ,SYABARA  ")
+        SQLStr.AppendLine("        ,SEASONKBN  ")
+        SQLStr.AppendLine("        ,SEASONSTART  ")
+        SQLStr.AppendLine("        ,SEASONEND  ")
+        SQLStr.AppendLine("        ,KOTEIHIM  ")
+        SQLStr.AppendLine("        ,KOTEIHID  ")
+        SQLStr.AppendLine("        ,KAISU  ")
+        SQLStr.AppendLine("        ,GENGAKU  ")
+        SQLStr.AppendLine("        ,AMOUNT  ")
+        SQLStr.AppendLine("        ,BIKOU1  ")
+        SQLStr.AppendLine("        ,BIKOU2  ")
+        SQLStr.AppendLine("        ,BIKOU3  ")
+        SQLStr.AppendLine("        ,DELFLG  ")
+        SQLStr.AppendLine(" FROM LNG.LNM0007_FIXED ")
+        SQLStr.AppendLine(" LIMIT 0 ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNM0007Exceltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        DataTypeHT.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index).Name)
+                    Next
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_FIXED SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
         'Excelファイルを開く
         Dim fileStream As FileStream
         fileStream = File.OpenRead(FilePath)
@@ -2014,609 +1706,217 @@ Public Class LNM0007KoteihiList
         Dim WW_CS0024FCHECKERR As String = ""
         Dim WW_CS0024FCHECKREPORT As String = ""
 
-        'アップロードしたExcelファイルがどのテーブルのデータか確認する
-        Dim WW_HEADERROW As Integer = 2
-        Select Case True
-            '陸事番号のヘッダが含まれている場合は固定費マスタ
-            Case WW_EXCELDATA(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).IndexOf("陸事番号") >= 0
-                work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDL
-                '月額運賃のヘッダが含まれている場合はSK固定費マスタ
-            Case WW_EXCELDATA(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLSK.GETSUGAKU).IndexOf("月額運賃") >= 0
-                work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDLSK
-                '月額固定費のヘッダが含まれている場合はTNG固定費マスタ
-            Case WW_EXCELDATA(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHIM).IndexOf("月額固定費") >= 0
-                work.WF_SEL_CONTROLTABLE.Text = LNM0007WRKINC.MAPIDLTNG
-        End Select
-
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '○ 登録・更新するテーブルのフィールド名とフィールドの型を取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" SELECT ")
-                SQLStr.AppendLine("   0   AS LINECNT ")
-                SQLStr.AppendLine("        ,TORICODE  ")
-                SQLStr.AppendLine("        ,TORINAME  ")
-                SQLStr.AppendLine("        ,ORGCODE  ")
-                SQLStr.AppendLine("        ,ORGNAME  ")
-                SQLStr.AppendLine("        ,KASANORGCODE  ")
-                SQLStr.AppendLine("        ,KASANORGNAME  ")
-                SQLStr.AppendLine("        ,STYMD  ")
-                SQLStr.AppendLine("        ,ENDYMD  ")
-                SQLStr.AppendLine("        ,SYABAN  ")
-                SQLStr.AppendLine("        ,RIKUBAN  ")
-                SQLStr.AppendLine("        ,SYAGATA  ")
-                SQLStr.AppendLine("        ,SYAGATANAME  ")
-                SQLStr.AppendLine("        ,SYABARA  ")
-                SQLStr.AppendLine("        ,KOTEIHI  ")
-                SQLStr.AppendLine("        ,BIKOU1  ")
-                SQLStr.AppendLine("        ,BIKOU2  ")
-                SQLStr.AppendLine("        ,BIKOU3  ")
-                SQLStr.AppendLine("        ,DELFLG  ")
-                SQLStr.AppendLine(" FROM LNG.LNM0007_KOTEIHI ")
-                SQLStr.AppendLine(" LIMIT 0 ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                LNM0007Exceltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                                DataTypeHT.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index).Name)
-                            Next
-                        End Using
-                    End Using
-
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_KOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                '○ 登録・更新するテーブルのフィールド名とフィールドの型を取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" SELECT ")
-                SQLStr.AppendLine("   0   AS LINECNT ")
-                SQLStr.AppendLine("        ,TORICODE  ")
-                SQLStr.AppendLine("        ,TORINAME  ")
-                SQLStr.AppendLine("        ,ORGCODE  ")
-                SQLStr.AppendLine("        ,ORGNAME  ")
-                SQLStr.AppendLine("        ,KASANORGCODE  ")
-                SQLStr.AppendLine("        ,KASANORGNAME  ")
-                SQLStr.AppendLine("        ,STYMD  ")
-                SQLStr.AppendLine("        ,ENDYMD  ")
-                SQLStr.AppendLine("        ,SYABAN  ")
-                SQLStr.AppendLine("        ,SYABARA  ")
-                SQLStr.AppendLine("        ,GETSUGAKU  ")
-                SQLStr.AppendLine("        ,GENGAKU  ")
-                SQLStr.AppendLine("        ,KOTEIHI  ")
-                SQLStr.AppendLine("        ,BIKOU  ")
-                SQLStr.AppendLine("        ,DELFLG  ")
-                SQLStr.AppendLine(" FROM LNG.LNM0008_SKKOTEIHI ")
-                SQLStr.AppendLine(" LIMIT 0 ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                LNM0007Exceltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                                DataTypeHT.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index).Name)
-                            Next
-                        End Using
-                    End Using
-
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0008_SKKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0008_SKKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                '○ 登録・更新するテーブルのフィールド名とフィールドの型を取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" SELECT ")
-                SQLStr.AppendLine("   0   AS LINECNT ")
-                SQLStr.AppendLine("        ,TORICODE  ")
-                SQLStr.AppendLine("        ,TORINAME  ")
-                SQLStr.AppendLine("        ,ORGCODE  ")
-                SQLStr.AppendLine("        ,ORGNAME  ")
-                SQLStr.AppendLine("        ,KASANORGCODE  ")
-                SQLStr.AppendLine("        ,KASANORGNAME  ")
-                SQLStr.AppendLine("        ,STYMD  ")
-                SQLStr.AppendLine("        ,ENDYMD  ")
-                SQLStr.AppendLine("        ,SYABAN  ")
-                SQLStr.AppendLine("        ,KOTEIHIM  ")
-                SQLStr.AppendLine("        ,KOTEIHID  ")
-                SQLStr.AppendLine("        ,KAISU  ")
-                SQLStr.AppendLine("        ,KINGAKU  ")
-                SQLStr.AppendLine("        ,BIKOU  ")
-                SQLStr.AppendLine("        ,DELFLG  ")
-                SQLStr.AppendLine(" FROM LNG.LNM0009_TNGKOTEIHI ")
-                SQLStr.AppendLine(" LIMIT 0 ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                LNM0007Exceltbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                                DataTypeHT.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index).Name)
-                            Next
-                        End Using
-                    End Using
-
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0009_TNGKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0009_TNGKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-        End Select
-
         Dim LNM0007Exceltblrow As DataRow
         Dim WW_LINECNT As Integer
 
         WW_LINECNT = 1
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
-                    LNM0007Exceltblrow = LNM0007Exceltbl.NewRow
+        For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
+            LNM0007Exceltblrow = LNM0007Exceltbl.NewRow
 
-                    'LINECNT
-                    LNM0007Exceltblrow("LINECNT") = WW_LINECNT
-                    WW_LINECNT = WW_LINECNT + 1
+            'LINECNT
+            LNM0007Exceltblrow("LINECNT") = WW_LINECNT
+            WW_LINECNT = WW_LINECNT + 1
 
-                    '◆データセット
-                    '取引先コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE))
-                    WW_DATATYPE = DataTypeHT("TORICODE")
-                    LNM0007Exceltblrow("TORICODE") = LNM0007WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '取引先名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME))
-                    WW_DATATYPE = DataTypeHT("TORINAME")
-                    LNM0007Exceltblrow("TORINAME") = LNM0007WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE))
-                    WW_DATATYPE = DataTypeHT("ORGCODE")
-                    LNM0007Exceltblrow("ORGCODE") = LNM0007WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME))
-                    WW_DATATYPE = DataTypeHT("ORGNAME")
-                    LNM0007Exceltblrow("ORGNAME") = LNM0007WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE))
-                    WW_DATATYPE = DataTypeHT("KASANORGCODE")
-                    LNM0007Exceltblrow("KASANORGCODE") = LNM0007WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME))
-                    WW_DATATYPE = DataTypeHT("KASANORGNAME")
-                    LNM0007Exceltblrow("KASANORGNAME") = LNM0007WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効開始日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.STYMD))
-                    WW_DATATYPE = DataTypeHT("STYMD")
-                    LNM0007Exceltblrow("STYMD") = LNM0007WRKINC.DataConvert("有効開始日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効終了日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ENDYMD))
-                    WW_DATATYPE = DataTypeHT("ENDYMD")
-                        LNM0007Exceltblrow("ENDYMD") = LNM0007WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '車番
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN))
-                    WW_DATATYPE = DataTypeHT("SYABAN")
-                    LNM0007Exceltblrow("SYABAN") = LNM0007WRKINC.DataConvert("車番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '陸事番号
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN))
-                    WW_DATATYPE = DataTypeHT("RIKUBAN")
-                    LNM0007Exceltblrow("RIKUBAN") = LNM0007WRKINC.DataConvert("陸事番号", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '車型
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA))
-                    WW_DATATYPE = DataTypeHT("SYAGATA")
-                    LNM0007Exceltblrow("SYAGATA") = LNM0007WRKINC.DataConvert("車型", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    ''車型名
-                    'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME))
-                    'WW_DATATYPE = DataTypeHT("SYAGATANAME")
-                    'LNM0007Exceltblrow("SYAGATANAME") = LNM0007WRKINC.DataConvert("車型名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    'If WW_RESULT = False Then
-                    '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                    '    O_RTN = "ERR"
-                    'End If
-                    ''車腹
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA))
-                    WW_DATATYPE = DataTypeHT("SYABARA")
-                    LNM0007Exceltblrow("SYABARA") = LNM0007WRKINC.DataConvert("車腹", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '固定費
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHI))
-                    WW_DATATYPE = DataTypeHT("KOTEIHI")
-                    LNM0007Exceltblrow("KOTEIHI") = LNM0007WRKINC.DataConvert("固定費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '備考1
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1))
-                    WW_DATATYPE = DataTypeHT("BIKOU1")
-                    LNM0007Exceltblrow("BIKOU1") = LNM0007WRKINC.DataConvert("備考1", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '備考2
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2))
-                    WW_DATATYPE = DataTypeHT("BIKOU2")
-                    LNM0007Exceltblrow("BIKOU2") = LNM0007WRKINC.DataConvert("備考2", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '備考3
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3))
-                    WW_DATATYPE = DataTypeHT("BIKOU3")
-                    LNM0007Exceltblrow("BIKOU3") = LNM0007WRKINC.DataConvert("備考3", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
+            '◆データセット
+            '取引先コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.TORICODE))
+            WW_DATATYPE = DataTypeHT("TORICODE")
+            LNM0007Exceltblrow("TORICODE") = LNM0007WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '取引先名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.TORINAME))
+            WW_DATATYPE = DataTypeHT("TORINAME")
+            LNM0007Exceltblrow("TORINAME") = LNM0007WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '部門コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ORGCODE))
+            WW_DATATYPE = DataTypeHT("ORGCODE")
+            LNM0007Exceltblrow("ORGCODE") = LNM0007WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '部門名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.ORGNAME))
+            WW_DATATYPE = DataTypeHT("ORGNAME")
+            LNM0007Exceltblrow("ORGNAME") = LNM0007WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '加算先部門コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGCODE))
+            WW_DATATYPE = DataTypeHT("KASANORGCODE")
+            LNM0007Exceltblrow("KASANORGCODE") = LNM0007WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '加算先部門名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KASANORGNAME))
+            WW_DATATYPE = DataTypeHT("KASANORGNAME")
+            LNM0007Exceltblrow("KASANORGNAME") = LNM0007WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '対象年月
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.TARGETYM))
+            WW_DATATYPE = DataTypeHT("TARGETYM")
+            LNM0007Exceltblrow("TARGETYM") = LNM0007WRKINC.DataConvert("対象年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '車番
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABAN))
+            WW_DATATYPE = DataTypeHT("SYABAN")
+            LNM0007Exceltblrow("SYABAN") = LNM0007WRKINC.DataConvert("車番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '陸事番号
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN))
+            WW_DATATYPE = DataTypeHT("RIKUBAN")
+            LNM0007Exceltblrow("RIKUBAN") = LNM0007WRKINC.DataConvert("陸事番号", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '車型
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA))
+            WW_DATATYPE = DataTypeHT("SYAGATA")
+            LNM0007Exceltblrow("SYAGATA") = LNM0007WRKINC.DataConvert("車型", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            ''車型名
+            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME))
+            'WW_DATATYPE = DataTypeHT("SYAGATANAME")
+            'LNM0007Exceltblrow("SYAGATANAME") = LNM0007WRKINC.DataConvert("車型名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            'If WW_RESULT = False Then
+            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+            '    O_RTN = "ERR"
+            'End If
+            '車腹
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA))
+            WW_DATATYPE = DataTypeHT("SYABARA")
+            LNM0007Exceltblrow("SYABARA") = LNM0007WRKINC.DataConvert("車腹", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '季節料金判定区分
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN))
+            WW_DATATYPE = DataTypeHT("SEASONKBN")
+            LNM0007Exceltblrow("SEASONKBN") = LNM0007WRKINC.DataConvert("季節料金判定区分", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '季節料金判定開始月日
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONSTART))
+            WW_DATATYPE = DataTypeHT("SEASONSTART")
+            LNM0007Exceltblrow("SEASONSTART") = LNM0007WRKINC.DataConvert("季節料金判定開始月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '季節料金判定終了月日
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONEND))
+            WW_DATATYPE = DataTypeHT("SEASONEND")
+            LNM0007Exceltblrow("SEASONEND") = LNM0007WRKINC.DataConvert("季節料金判定終了月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '固定費(月額)
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM)), ",", "")
+            WW_DATATYPE = DataTypeHT("KOTEIHIM")
+            LNM0007Exceltblrow("KOTEIHIM") = LNM0007WRKINC.DataConvert("固定費(月額)", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '固定費(日額)
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID)), ",", "")
+            WW_DATATYPE = DataTypeHT("KOTEIHID")
+            LNM0007Exceltblrow("KOTEIHID") = LNM0007WRKINC.DataConvert("固定費(日額)", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '回数
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU))
+            WW_DATATYPE = DataTypeHT("KAISU")
+            LNM0007Exceltblrow("KAISU") = LNM0007WRKINC.DataConvert("回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '減額費用
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU)), ",", "")
+            WW_DATATYPE = DataTypeHT("GENGAKU")
+            LNM0007Exceltblrow("GENGAKU") = LNM0007WRKINC.DataConvert("減額費用", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '請求額
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT)), ",", "")
+            WW_DATATYPE = DataTypeHT("AMOUNT")
+            LNM0007Exceltblrow("AMOUNT") = LNM0007WRKINC.DataConvert("請求額", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '備考1
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1))
+            WW_DATATYPE = DataTypeHT("BIKOU1")
+            LNM0007Exceltblrow("BIKOU1") = LNM0007WRKINC.DataConvert("備考1", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '備考2
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2))
+            WW_DATATYPE = DataTypeHT("BIKOU2")
+            LNM0007Exceltblrow("BIKOU2") = LNM0007WRKINC.DataConvert("備考2", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '備考3
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3))
+            WW_DATATYPE = DataTypeHT("BIKOU3")
+            LNM0007Exceltblrow("BIKOU3") = LNM0007WRKINC.DataConvert("備考3", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
 
-                    '削除フラグ
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG))
-                    WW_DATATYPE = DataTypeHT("DELFLG")
-                    LNM0007Exceltblrow("DELFLG") = LNM0007WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
+            '削除フラグ
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.DELFLG))
+            WW_DATATYPE = DataTypeHT("DELFLG")
+            LNM0007Exceltblrow("DELFLG") = LNM0007WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
 
-                    '登録
-                    LNM0007Exceltbl.Rows.Add(LNM0007Exceltblrow)
+            '登録
+            LNM0007Exceltbl.Rows.Add(LNM0007Exceltblrow)
 
-                Next
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
-                    LNM0007Exceltblrow = LNM0007Exceltbl.NewRow
-
-                    'LINECNT
-                    LNM0007Exceltblrow("LINECNT") = WW_LINECNT
-                    WW_LINECNT = WW_LINECNT + 1
-
-                    '◆データセット
-                    '取引先コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORICODE))
-                    WW_DATATYPE = DataTypeHT("TORICODE")
-                    LNM0007Exceltblrow("TORICODE") = LNM0007WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '取引先名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.TORINAME))
-                    WW_DATATYPE = DataTypeHT("TORINAME")
-                    LNM0007Exceltblrow("TORINAME") = LNM0007WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGCODE))
-                    WW_DATATYPE = DataTypeHT("ORGCODE")
-                    LNM0007Exceltblrow("ORGCODE") = LNM0007WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.ORGNAME))
-                    WW_DATATYPE = DataTypeHT("ORGNAME")
-                    LNM0007Exceltblrow("ORGNAME") = LNM0007WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGCODE))
-                    WW_DATATYPE = DataTypeHT("KASANORGCODE")
-                    LNM0007Exceltblrow("KASANORGCODE") = LNM0007WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.KASANORGNAME))
-                    WW_DATATYPE = DataTypeHT("KASANORGNAME")
-                    LNM0007Exceltblrow("KASANORGNAME") = LNM0007WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効開始日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.STYMD))
-                    WW_DATATYPE = DataTypeHT("STYMD")
-                    LNM0007Exceltblrow("STYMD") = LNM0007WRKINC.DataConvert("有効開始日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効終了日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.ENDYMD))
-                    WW_DATATYPE = DataTypeHT("ENDYMD")
-                    LNM0007Exceltblrow("ENDYMD") = LNM0007WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '車番
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABAN))
-                    WW_DATATYPE = DataTypeHT("SYABAN")
-                    LNM0007Exceltblrow("SYABAN") = LNM0007WRKINC.DataConvert("車番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '車腹
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.SYABARA))
-                    WW_DATATYPE = DataTypeHT("SYABARA")
-                    LNM0007Exceltblrow("SYABARA") = LNM0007WRKINC.DataConvert("車腹", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '月額運賃
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.GETSUGAKU))
-                    WW_DATATYPE = DataTypeHT("GETSUGAKU")
-                    LNM0007Exceltblrow("GETSUGAKU") = LNM0007WRKINC.DataConvert("月額運賃", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '減額対象額
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.GENGAKU))
-                    WW_DATATYPE = DataTypeHT("GENGAKU")
-                    LNM0007Exceltblrow("GENGAKU") = LNM0007WRKINC.DataConvert("減額対象額", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '固定費
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.KOTEIHI))
-                    WW_DATATYPE = DataTypeHT("KOTEIHI")
-                    LNM0007Exceltblrow("KOTEIHI") = LNM0007WRKINC.DataConvert("固定費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '備考
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.BIKOU))
-                    WW_DATATYPE = DataTypeHT("BIKOU")
-                    LNM0007Exceltblrow("BIKOU") = LNM0007WRKINC.DataConvert("備考", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-
-                    '削除フラグ
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLSK.DELFLG))
-                    WW_DATATYPE = DataTypeHT("DELFLG")
-                    LNM0007Exceltblrow("DELFLG") = LNM0007WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-
-                    '登録
-                    LNM0007Exceltbl.Rows.Add(LNM0007Exceltblrow)
-
-                Next
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
-                    LNM0007Exceltblrow = LNM0007Exceltbl.NewRow
-
-                    'LINECNT
-                    LNM0007Exceltblrow("LINECNT") = WW_LINECNT
-                    WW_LINECNT = WW_LINECNT + 1
-
-                    '◆データセット
-                    '取引先コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORICODE))
-                    WW_DATATYPE = DataTypeHT("TORICODE")
-                    LNM0007Exceltblrow("TORICODE") = LNM0007WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '取引先名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.TORINAME))
-                    WW_DATATYPE = DataTypeHT("TORINAME")
-                    LNM0007Exceltblrow("TORINAME") = LNM0007WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGCODE))
-                    WW_DATATYPE = DataTypeHT("ORGCODE")
-                    LNM0007Exceltblrow("ORGCODE") = LNM0007WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ORGNAME))
-                    WW_DATATYPE = DataTypeHT("ORGNAME")
-                    LNM0007Exceltblrow("ORGNAME") = LNM0007WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門コード
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGCODE))
-                    WW_DATATYPE = DataTypeHT("KASANORGCODE")
-                    LNM0007Exceltblrow("KASANORGCODE") = LNM0007WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '加算先部門名称
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KASANORGNAME))
-                    WW_DATATYPE = DataTypeHT("KASANORGNAME")
-                    LNM0007Exceltblrow("KASANORGNAME") = LNM0007WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効開始日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.STYMD))
-                    WW_DATATYPE = DataTypeHT("STYMD")
-                    LNM0007Exceltblrow("STYMD") = LNM0007WRKINC.DataConvert("有効開始日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '有効終了日
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.ENDYMD))
-                    WW_DATATYPE = DataTypeHT("ENDYMD")
-                    LNM0007Exceltblrow("ENDYMD") = LNM0007WRKINC.DataConvert("有効終了日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '車番
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.SYABAN))
-                    WW_DATATYPE = DataTypeHT("SYABAN")
-                    LNM0007Exceltblrow("SYABAN") = LNM0007WRKINC.DataConvert("車番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '月額固定費
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHIM))
-                    WW_DATATYPE = DataTypeHT("KOTEIHIM")
-                    LNM0007Exceltblrow("KOTEIHIM") = LNM0007WRKINC.DataConvert("月額固定費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '日額固定費
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KOTEIHID))
-                    WW_DATATYPE = DataTypeHT("KOTEIHID")
-                    LNM0007Exceltblrow("KOTEIHID") = LNM0007WRKINC.DataConvert("日額固定費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '使用回数
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KAISU))
-                    WW_DATATYPE = DataTypeHT("KAISU")
-                    LNM0007Exceltblrow("KAISU") = LNM0007WRKINC.DataConvert("使用回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '金額
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.KINGAKU))
-                    WW_DATATYPE = DataTypeHT("KINGAKU")
-                    LNM0007Exceltblrow("KINGAKU") = LNM0007WRKINC.DataConvert("金額", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-                    '備考
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.BIKOU))
-                    WW_DATATYPE = DataTypeHT("BIKOU")
-                    LNM0007Exceltblrow("BIKOU") = LNM0007WRKINC.DataConvert("備考", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-
-                    '削除フラグ
-                    WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOLTNG.DELFLG))
-                    WW_DATATYPE = DataTypeHT("DELFLG")
-                    LNM0007Exceltblrow("DELFLG") = LNM0007WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-                    If WW_RESULT = False Then
-                        WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                        O_RTN = "ERR"
-                    End If
-
-                    '登録
-                    LNM0007Exceltbl.Rows.Add(LNM0007Exceltblrow)
-
-                Next
-#End Region
-        End Select
+        Next
 
     End Sub
 
@@ -2626,304 +1926,116 @@ Public Class LNM0007KoteihiList
     Protected Function SameDataChk(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow) As Boolean
         SameDataChk = False
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0007_KOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("    SELECT")
+        SQLStr.AppendLine("        TORICODE")
+        SQLStr.AppendLine("    FROM")
+        SQLStr.AppendLine("        LNG.LNM0007_FIXED")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        SQLStr.AppendLine("    AND  COALESCE(RIKUBAN, '')             = @RIKUBAN ")
+        SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        'SQLStr.AppendLine("    AND  COALESCE(SYAGATANAME, '')             = @SYAGATANAME ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '')             = @SYABARA ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONKBN, '')             = @SEASONKBN ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONSTART, '')             = @SEASONSTART ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONEND, '')             = @SEASONEND ")
+        SQLStr.AppendLine("    AND  COALESCE(KOTEIHIM, '0')             = @KOTEIHIM ")
+        SQLStr.AppendLine("    AND  COALESCE(KOTEIHID, '0')             = @KOTEIHID ")
+        SQLStr.AppendLine("    AND  COALESCE(KAISU, '0')             = @KAISU ")
+        SQLStr.AppendLine("    AND  COALESCE(GENGAKU, '0')             = @GENGAKU ")
+        SQLStr.AppendLine("    AND  COALESCE(AMOUNT, '0')             = @AMOUNT ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU1, '')             = @BIKOU1 ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU2, '')             = @BIKOU2 ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU3, '')             = @BIKOU3 ")
+        SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')             = @DELFLG ")
 
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
-                End If
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
+                Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_RIKUBAN As MySqlParameter = SQLcmd.Parameters.Add("@RIKUBAN", MySqlDbType.VarChar, 20)     '陸事番号
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                'Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
+                Dim P_SEASONSTART As MySqlParameter = SQLcmd.Parameters.Add("@SEASONSTART", MySqlDbType.VarChar, 4)     '季節料金判定開始月日
+                Dim P_SEASONEND As MySqlParameter = SQLcmd.Parameters.Add("@SEASONEND", MySqlDbType.VarChar, 4)     '季節料金判定終了月日
+                Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal, 10)     '固定費(月額)
+                Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal, 10)     '固定費(日額)
+                Dim P_KAISU As MySqlParameter = SQLcmd.Parameters.Add("@KAISU", MySqlDbType.Decimal, 3)     '回数
+                Dim P_GENGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GENGAKU", MySqlDbType.Decimal, 10)     '減額費用
+                Dim P_AMOUNT As MySqlParameter = SQLcmd.Parameters.Add("@AMOUNT", MySqlDbType.Decimal, 10)     '請求額
+                Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
+                Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
 
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-                SQLStr.AppendLine("    AND  COALESCE(RIKUBAN, '')             = @RIKUBAN ")
-                SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABARA, '')             = @SYABARA ")
-                SQLStr.AppendLine("    AND  COALESCE(KOTEIHI, '0')             = @KOTEIHI ")
-                SQLStr.AppendLine("    AND  COALESCE(BIKOU1, '')             = @BIKOU1 ")
-                SQLStr.AppendLine("    AND  COALESCE(BIKOU2, '')             = @BIKOU2 ")
-                SQLStr.AppendLine("    AND  COALESCE(BIKOU3, '')             = @BIKOU3 ")
-                SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')             = @DELFLG ")
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
+                P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_RIKUBAN.Value = WW_ROW("RIKUBAN")           '陸事番号
+                P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
+                'P_SYAGATANAME.Value = WW_ROW("SYAGATANAME")           '車型名
+                P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
+                P_SEASONSTART.Value = WW_ROW("SEASONSTART")           '季節料金判定開始月日
+                P_SEASONEND.Value = WW_ROW("SEASONEND")           '季節料金判定終了月日
+                P_KOTEIHIM.Value = WW_ROW("KOTEIHIM")           '固定費(月額)
+                P_KOTEIHID.Value = WW_ROW("KOTEIHID")           '固定費(日額)
+                P_KAISU.Value = WW_ROW("KAISU")           '回数
+                P_GENGAKU.Value = WW_ROW("GENGAKU")           '減額費用
+                P_AMOUNT.Value = WW_ROW("AMOUNT")           '請求額
+                P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
+                P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
+                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
+                P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_RIKUBAN As MySqlParameter = SQLcmd.Parameters.Add("@RIKUBAN", MySqlDbType.VarChar, 20)     '陸事番号
-                        Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
-                        Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
-                        Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                        Dim P_KOTEIHI As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHI", MySqlDbType.Decimal)     '固定費
-                        Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
-                        Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
-                        Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    Dim WW_Tbl = New DataTable
 
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_RIKUBAN.Value = WW_ROW("RIKUBAN")           '陸事番号
-                        P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
-                        P_SYAGATANAME.Value = WW_ROW("SYAGATANAME")           '車型名
-                        P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
-                        P_KOTEIHI.Value = WW_ROW("KOTEIHI")           '固定費
-                        P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
-                        P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
-                        P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
 
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
+                    If WW_Tbl.Rows.Count >= 1 Then
+                        Exit Function
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED SELECT")
 
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        End If
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            If WW_Tbl.Rows.Count >= 1 Then
-                                Exit Function
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_KOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-                    Exit Function
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0008_SKKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
-                End If
-
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABARA, '')             = @SYABARA ")
-                SQLStr.AppendLine("    AND  COALESCE(GETSUGAKU, '0')             = @GETSUGAKU ")
-                SQLStr.AppendLine("    AND  COALESCE(GENGAKU, '0')             = @GENGAKU ")
-                SQLStr.AppendLine("    AND  COALESCE(KOTEIHI, '0')             = @KOTEIHI ")
-                SQLStr.AppendLine("    AND  COALESCE(BIKOU, '')             = @BIKOU ")
-                SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')             = @DELFLG ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                        Dim P_GETSUGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GETSUGAKU", MySqlDbType.Decimal)     '月額運賃
-                        Dim P_GENGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GENGAKU", MySqlDbType.Decimal)     '減額対象額
-                        Dim P_KOTEIHI As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHI", MySqlDbType.Decimal)     '固定費
-                        Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
-
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
-                        P_GETSUGAKU.Value = WW_ROW("GETSUGAKU")           '月額運賃
-                        P_GENGAKU.Value = WW_ROW("GENGAKU")           '減額対象額
-                        P_KOTEIHI.Value = WW_ROW("KOTEIHI")           '固定費
-                        P_BIKOU.Value = WW_ROW("BIKOU")           '備考
-
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
-
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        End If
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            If WW_Tbl.Rows.Count >= 1 Then
-                                Exit Function
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0008_SKKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0008_SKKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-                    Exit Function
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0009_TNGKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
-                End If
-
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-                SQLStr.AppendLine("    AND  COALESCE(KOTEIHIM, '0')             = @KOTEIHIM ")
-                SQLStr.AppendLine("    AND  COALESCE(KOTEIHID, '0')             = @KOTEIHID ")
-                SQLStr.AppendLine("    AND  COALESCE(KAISU, '0')             = @KAISU ")
-                SQLStr.AppendLine("    AND  COALESCE(KINGAKU, '0')             = @KINGAKU ")
-                SQLStr.AppendLine("    AND  COALESCE(BIKOU, '')             = @BIKOU ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal)     '月額固定費
-                        Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal)     '日額固定費
-                        Dim P_KAISU As MySqlParameter = SQLcmd.Parameters.Add("@KAISU", MySqlDbType.Decimal)     '使用回数
-                        Dim P_KINGAKU As MySqlParameter = SQLcmd.Parameters.Add("@KINGAKU", MySqlDbType.Decimal)     '金額
-                        Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
-
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_KOTEIHIM.Value = WW_ROW("KOTEIHIM")           '月額固定費
-                        P_KOTEIHID.Value = WW_ROW("KOTEIHID")           '日額固定費
-                        P_KAISU.Value = WW_ROW("KAISU")           '使用回数
-                        P_KINGAKU.Value = WW_ROW("KINGAKU")           '金額
-                        P_BIKOU.Value = WW_ROW("BIKOU")           '備考
-
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
-
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        End If
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            If WW_Tbl.Rows.Count >= 1 Then
-                                Exit Function
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0009_TNGKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0009_TNGKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-                    Exit Function
-                End Try
-#End Region
-        End Select
-
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_FIXED SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Function
+        End Try
 
         SameDataChk = True
     End Function
@@ -2938,209 +2050,74 @@ Public Class LNM0007KoteihiList
             Exit Function
         End If
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '一意キーが未入力の場合処理を終了する
-                If WW_ROW("TORICODE") = "" OrElse
+        '一意キーが未入力の場合処理を終了する
+        If WW_ROW("TORICODE") = "" OrElse
                     WW_ROW("ORGCODE") = "" OrElse
-                    WW_ROW("STYMD") = Date.MinValue OrElse
-                    WW_ROW("SYABAN") = "" Then
-                    Exit Function
-                End If
+                    WW_ROW("TARGETYM") = "" OrElse
+                    WW_ROW("SYABAN") = "" OrElse
+                    WW_ROW("SEASONKBN") = "" Then
+            Exit Function
+        End If
 
-                '更新前の削除フラグを取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0007_KOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        '更新前の削除フラグを取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("    SELECT")
+        SQLStr.AppendLine("        DELFLG")
+        SQLStr.AppendLine("    FROM")
+        SQLStr.AppendLine("        LNG.LNM0007_FIXED")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONKBN, '')             = @SEASONKBN ")
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
 
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
 
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
 
-                            'データが存在した場合
-                            If WW_Tbl.Rows.Count > 0 Then
-                                '更新前の削除フラグが無効の場合
-                                If WW_Tbl.Rows(0)("DELFLG") = C_DELETE_FLG.ALIVE Then
-                                    ValidationSkipChk = True
-                                    Exit Function
-                                End If
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_KOTEIHI SELECT")
+                    'データが存在した場合
+                    If WW_Tbl.Rows.Count > 0 Then
+                        '更新前の削除フラグが無効の場合
+                        If WW_Tbl.Rows(0)("DELFLG") = C_DELETE_FLG.ALIVE Then
+                            ValidationSkipChk = True
+                            Exit Function
+                        End If
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED SELECT")
 
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_FIXED SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
 
-                    Exit Function
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                '一意キーが未入力の場合処理を終了する
-                If WW_ROW("TORICODE") = "" OrElse
-                    WW_ROW("ORGCODE") = "" OrElse
-                    WW_ROW("STYMD") = Date.MinValue OrElse
-                    WW_ROW("SYABAN") = "" Then
-                    Exit Function
-                End If
-
-                '更新前の削除フラグを取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0008_SKKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            'データが存在した場合
-                            If WW_Tbl.Rows.Count > 0 Then
-                                '更新前の削除フラグが無効の場合
-                                If WW_Tbl.Rows(0)("DELFLG") = C_DELETE_FLG.ALIVE Then
-                                    ValidationSkipChk = True
-                                    Exit Function
-                                End If
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0008_SKKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0008_SKKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-
-                    Exit Function
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                '一意キーが未入力の場合処理を終了する
-                If WW_ROW("TORICODE") = "" OrElse
-                    WW_ROW("ORGCODE") = "" OrElse
-                    WW_ROW("STYMD") = Date.MinValue OrElse
-                    WW_ROW("SYABAN") = "" Then
-                    Exit Function
-                End If
-
-                '更新前の削除フラグを取得
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0009_TNGKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            'データが存在した場合
-                            If WW_Tbl.Rows.Count > 0 Then
-                                '更新前の削除フラグが無効の場合
-                                If WW_Tbl.Rows(0)("DELFLG") = C_DELETE_FLG.ALIVE Then
-                                    ValidationSkipChk = True
-                                    Exit Function
-                                End If
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0009_TNGKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0009_TNGKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-
-                    Exit Function
-                End Try
-#End Region
-        End Select
+            Exit Function
+        End Try
 
     End Function
 
@@ -3153,169 +2130,59 @@ Public Class LNM0007KoteihiList
 
         WW_ErrSW = C_MESSAGE_NO.NORMAL
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '○ 対象データ取得
-                Dim SQLStr As New StringBuilder
-                SQLStr.Append(" UPDATE                                      ")
-                SQLStr.Append("     LNG.LNM0007_KOTEIHI                     ")
-                SQLStr.Append(" SET                                         ")
-                SQLStr.Append("     DELFLG               = '1'              ")
-                SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
-                SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
-                SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
-                SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
-                SQLStr.Append(" WHERE                                       ")
-                SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        '○ 対象データ取得
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" UPDATE                                      ")
+        SQLStr.Append("     LNG.LNM0007_FIXED                     ")
+        SQLStr.Append(" SET                                         ")
+        SQLStr.Append("     DELFLG               = '1'              ")
+        SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
+        SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
+        SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
+        SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
+        SQLStr.Append(" WHERE                                       ")
+        SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.Append("    AND  COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.Append("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        SQLStr.Append("    AND  COALESCE(SEASONKBN, '')             = @SEASONKBN ")
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
 
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_UPDYMD.Value = WW_DATENOW                '更新年月日
-                        P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
+                P_UPDYMD.Value = WW_DATENOW                '更新年月日
+                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
 
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-                    End Using
-                Catch ex As Exception
+                '登録
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
 
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007L UPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                '○ 対象データ取得
-                Dim SQLStr As New StringBuilder
-                SQLStr.Append(" UPDATE                                      ")
-                SQLStr.Append("     LNG.LNM0008_SKKOTEIHI                   ")
-                SQLStr.Append(" SET                                         ")
-                SQLStr.Append("     DELFLG               = '1'              ")
-                SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
-                SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
-                SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
-                SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
-                SQLStr.Append(" WHERE                                       ")
-                SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_UPDYMD.Value = WW_DATENOW                '更新年月日
-                        P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
-
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-                    End Using
-                Catch ex As Exception
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007L UPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                '○ 対象データ取得
-                Dim SQLStr As New StringBuilder
-                SQLStr.Append(" UPDATE                                      ")
-                SQLStr.Append("     LNG.LNM0009_TNGKOTEIHI                  ")
-                SQLStr.Append(" SET                                         ")
-                SQLStr.Append("     DELFLG               = '1'              ")
-                SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
-                SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
-                SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
-                SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
-                SQLStr.Append(" WHERE                                       ")
-                SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_UPDYMD.Value = WW_DATENOW                '更新年月日
-                        P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
-
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-                    End Using
-                Catch ex As Exception
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007L UPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-                    Exit Sub
-                End Try
-#End Region
-        End Select
-
-
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007L UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -3327,464 +2194,241 @@ Public Class LNM0007KoteihiList
     Protected Sub InsUpdExcelData(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByVal WW_DATENOW As DateTime)
         WW_ErrSW = C_MESSAGE_NO.NORMAL
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("  INSERT INTO LNG.LNM0007_KOTEIHI")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,RIKUBAN  ")
-                SQLStr.AppendLine("     ,SYAGATA  ")
-                SQLStr.AppendLine("     ,SYAGATANAME  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU1  ")
-                SQLStr.AppendLine("     ,BIKOU2  ")
-                SQLStr.AppendLine("     ,BIKOU3  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("   )  ")
-                SQLStr.AppendLine("   VALUES  ")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      @TORICODE  ")
-                SQLStr.AppendLine("     ,@TORINAME  ")
-                SQLStr.AppendLine("     ,@ORGCODE  ")
-                SQLStr.AppendLine("     ,@ORGNAME  ")
-                SQLStr.AppendLine("     ,@KASANORGCODE  ")
-                SQLStr.AppendLine("     ,@KASANORGNAME  ")
-                SQLStr.AppendLine("     ,@STYMD  ")
-                SQLStr.AppendLine("     ,@ENDYMD  ")
-                SQLStr.AppendLine("     ,@SYABAN  ")
-                SQLStr.AppendLine("     ,@RIKUBAN  ")
-                SQLStr.AppendLine("     ,@SYAGATA  ")
-                SQLStr.AppendLine("     ,@SYAGATANAME  ")
-                SQLStr.AppendLine("     ,@SYABARA  ")
-                SQLStr.AppendLine("     ,@KOTEIHI  ")
-                SQLStr.AppendLine("     ,@BIKOU1  ")
-                SQLStr.AppendLine("     ,@BIKOU2  ")
-                SQLStr.AppendLine("     ,@BIKOU3  ")
-                SQLStr.AppendLine("     ,@DELFLG  ")
-                SQLStr.AppendLine("     ,@INITYMD  ")
-                SQLStr.AppendLine("     ,@INITUSER  ")
-                SQLStr.AppendLine("     ,@INITTERMID  ")
-                SQLStr.AppendLine("     ,@INITPGID  ")
-                SQLStr.AppendLine("   )   ")
-                SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
-                SQLStr.AppendLine("      TORINAME =  @TORINAME")
-                SQLStr.AppendLine("     ,ORGNAME =  @ORGNAME")
-                SQLStr.AppendLine("     ,KASANORGCODE =  @KASANORGCODE")
-                SQLStr.AppendLine("     ,KASANORGNAME =  @KASANORGNAME")
-                SQLStr.AppendLine("     ,ENDYMD =  @ENDYMD")
-                SQLStr.AppendLine("     ,RIKUBAN =  @RIKUBAN")
-                SQLStr.AppendLine("     ,SYAGATA =  @SYAGATA")
-                SQLStr.AppendLine("     ,SYAGATANAME =  @SYAGATANAME")
-                SQLStr.AppendLine("     ,SYABARA =  @SYABARA")
-                SQLStr.AppendLine("     ,KOTEIHI =  @KOTEIHI")
-                SQLStr.AppendLine("     ,BIKOU1 =  @BIKOU1")
-                SQLStr.AppendLine("     ,BIKOU2 =  @BIKOU2")
-                SQLStr.AppendLine("     ,BIKOU3 =  @BIKOU3")
-                SQLStr.AppendLine("     ,DELFLG =  @DELFLG ")
-                SQLStr.AppendLine("     ,UPDYMD =  @UPDYMD ")
-                SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER ")
-                SQLStr.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
-                SQLStr.AppendLine("     ,UPDPGID =  @UPDPGID ")
-                SQLStr.AppendLine("    ;  ")
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("  INSERT INTO LNG.LNM0007_FIXED")
+        SQLStr.AppendLine("   (  ")
+        SQLStr.AppendLine("      TORICODE  ")
+        SQLStr.AppendLine("     ,TORINAME  ")
+        SQLStr.AppendLine("     ,ORGCODE  ")
+        SQLStr.AppendLine("     ,ORGNAME  ")
+        SQLStr.AppendLine("     ,KASANORGCODE  ")
+        SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,TARGETYM  ")
+        SQLStr.AppendLine("     ,SYABAN  ")
+        SQLStr.AppendLine("     ,RIKUBAN  ")
+        SQLStr.AppendLine("     ,SYAGATA  ")
+        SQLStr.AppendLine("     ,SYAGATANAME  ")
+        SQLStr.AppendLine("     ,SYABARA  ")
+        SQLStr.AppendLine("     ,SEASONKBN  ")
+        SQLStr.AppendLine("     ,SEASONSTART  ")
+        SQLStr.AppendLine("     ,SEASONEND  ")
+        SQLStr.AppendLine("     ,KOTEIHIM  ")
+        SQLStr.AppendLine("     ,KOTEIHID  ")
+        SQLStr.AppendLine("     ,KAISU  ")
+        SQLStr.AppendLine("     ,GENGAKU  ")
+        SQLStr.AppendLine("     ,AMOUNT  ")
+        SQLStr.AppendLine("     ,BIKOU1  ")
+        SQLStr.AppendLine("     ,BIKOU2  ")
+        SQLStr.AppendLine("     ,BIKOU3  ")
+        SQLStr.AppendLine("     ,DELFLG  ")
+        SQLStr.AppendLine("     ,INITYMD  ")
+        SQLStr.AppendLine("     ,INITUSER  ")
+        SQLStr.AppendLine("     ,INITTERMID  ")
+        SQLStr.AppendLine("     ,INITPGID  ")
+        SQLStr.AppendLine("   )  ")
+        SQLStr.AppendLine("   VALUES  ")
+        SQLStr.AppendLine("   (  ")
+        SQLStr.AppendLine("      @TORICODE  ")
+        SQLStr.AppendLine("     ,@TORINAME  ")
+        SQLStr.AppendLine("     ,@ORGCODE  ")
+        SQLStr.AppendLine("     ,@ORGNAME  ")
+        SQLStr.AppendLine("     ,@KASANORGCODE  ")
+        SQLStr.AppendLine("     ,@KASANORGNAME  ")
+        SQLStr.AppendLine("     ,@TARGETYM  ")
+        SQLStr.AppendLine("     ,@SYABAN  ")
+        SQLStr.AppendLine("     ,@RIKUBAN  ")
+        SQLStr.AppendLine("     ,@SYAGATA  ")
+        SQLStr.AppendLine("     ,@SYAGATANAME  ")
+        SQLStr.AppendLine("     ,@SYABARA  ")
+        SQLStr.AppendLine("     ,@SEASONKBN  ")
+        SQLStr.AppendLine("     ,@SEASONSTART  ")
+        SQLStr.AppendLine("     ,@SEASONEND  ")
+        SQLStr.AppendLine("     ,@KOTEIHIM  ")
+        SQLStr.AppendLine("     ,@KOTEIHID  ")
+        SQLStr.AppendLine("     ,@KAISU  ")
+        SQLStr.AppendLine("     ,@GENGAKU  ")
+        SQLStr.AppendLine("     ,@AMOUNT  ")
+        SQLStr.AppendLine("     ,@BIKOU1  ")
+        SQLStr.AppendLine("     ,@BIKOU2  ")
+        SQLStr.AppendLine("     ,@BIKOU3  ")
+        SQLStr.AppendLine("     ,@DELFLG  ")
+        SQLStr.AppendLine("     ,@INITYMD  ")
+        SQLStr.AppendLine("     ,@INITUSER  ")
+        SQLStr.AppendLine("     ,@INITTERMID  ")
+        SQLStr.AppendLine("     ,@INITPGID  ")
+        SQLStr.AppendLine("   )   ")
+        SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
+        SQLStr.AppendLine("      TORICODE =  @TORICODE")
+        SQLStr.AppendLine("     ,TORINAME =  @TORINAME")
+        SQLStr.AppendLine("     ,ORGCODE =  @ORGCODE")
+        SQLStr.AppendLine("     ,ORGNAME =  @ORGNAME")
+        SQLStr.AppendLine("     ,KASANORGCODE =  @KASANORGCODE")
+        SQLStr.AppendLine("     ,KASANORGNAME =  @KASANORGNAME")
+        SQLStr.AppendLine("     ,TARGETYM =  @TARGETYM")
+        SQLStr.AppendLine("     ,SYABAN =  @SYABAN")
+        SQLStr.AppendLine("     ,RIKUBAN =  @RIKUBAN")
+        SQLStr.AppendLine("     ,SYAGATA =  @SYAGATA")
+        SQLStr.AppendLine("     ,SYAGATANAME =  @SYAGATANAME")
+        SQLStr.AppendLine("     ,SYABARA =  @SYABARA")
+        SQLStr.AppendLine("     ,SEASONKBN =  @SEASONKBN")
+        SQLStr.AppendLine("     ,SEASONSTART =  @SEASONSTART")
+        SQLStr.AppendLine("     ,SEASONEND =  @SEASONEND")
+        SQLStr.AppendLine("     ,KOTEIHIM =  @KOTEIHIM")
+        SQLStr.AppendLine("     ,KOTEIHID =  @KOTEIHID")
+        SQLStr.AppendLine("     ,KAISU =  @KAISU")
+        SQLStr.AppendLine("     ,GENGAKU =  @GENGAKU")
+        SQLStr.AppendLine("     ,AMOUNT =  @AMOUNT")
+        SQLStr.AppendLine("     ,BIKOU1 =  @BIKOU1")
+        SQLStr.AppendLine("     ,BIKOU2 =  @BIKOU2")
+        SQLStr.AppendLine("     ,BIKOU3 =  @BIKOU3")
+        SQLStr.AppendLine("     ,DELFLG =  @DELFLG ")
+        SQLStr.AppendLine("     ,UPDYMD =  @UPDYMD ")
+        SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER ")
+        SQLStr.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
+        SQLStr.AppendLine("     ,UPDPGID =  @UPDPGID ")
+        SQLStr.AppendLine("    ;  ")
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_RIKUBAN As MySqlParameter = SQLcmd.Parameters.Add("@RIKUBAN", MySqlDbType.VarChar, 20)     '陸事番号
-                        Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
-                        Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
-                        Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                        Dim P_KOTEIHI As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHI", MySqlDbType.Decimal)     '固定費
-                        Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
-                        Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
-                        Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)     '登録プログラムＩＤ
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)     '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
-                        Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
+                Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_RIKUBAN As MySqlParameter = SQLcmd.Parameters.Add("@RIKUBAN", MySqlDbType.VarChar, 20)     '陸事番号
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
+                Dim P_SEASONSTART As MySqlParameter = SQLcmd.Parameters.Add("@SEASONSTART", MySqlDbType.VarChar, 4)     '季節料金判定開始月日
+                Dim P_SEASONEND As MySqlParameter = SQLcmd.Parameters.Add("@SEASONEND", MySqlDbType.VarChar, 4)     '季節料金判定終了月日
+                Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal, 10)     '固定費(月額)
+                Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal, 10)     '固定費(日額)
+                Dim P_KAISU As MySqlParameter = SQLcmd.Parameters.Add("@KAISU", MySqlDbType.Decimal, 3)     '回数
+                Dim P_GENGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GENGAKU", MySqlDbType.Decimal, 10)     '減額費用
+                Dim P_AMOUNT As MySqlParameter = SQLcmd.Parameters.Add("@AMOUNT", MySqlDbType.Decimal, 10)     '請求額
+                Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
+                Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)     '登録プログラムＩＤ
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)     '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
+                Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
 
-                        'DB更新
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                'DB更新
+                P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
+                P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_RIKUBAN.Value = WW_ROW("RIKUBAN")           '陸事番号
+                P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
 
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        Else
-                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
-                        End If
+                '車型名
+                Select Case WW_ROW("SYAGATA")
+                    Case "1" : P_SYAGATANAME.Value = "単車"
+                    Case "2" : P_SYAGATANAME.Value = "トレーラ"
+                    Case Else : P_SYAGATANAME.Value = ""
+                End Select
 
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_RIKUBAN.Value = WW_ROW("RIKUBAN")           '陸事番号
-                        P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
-                        '車型名
-                        Dim WW_SYAGATANAME As String = ""
-                        CODENAME_get("SYAGATA", WW_ROW("SYAGATA"), WW_SYAGATANAME, WW_RtnSW)
-                        P_SYAGATANAME.Value = WW_SYAGATANAME
+                '車腹
+                If WW_ROW("SYABARA").ToString = "0" Or WW_ROW("SYABARA").ToString = "" Then
+                    P_SYABARA.Value = DBNull.Value
+                Else
+                    P_SYABARA.Value = WW_ROW("SYABARA")
+                End If
 
-                        P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
-                        P_KOTEIHI.Value = WW_ROW("KOTEIHI")           '固定費
-                        P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
-                        P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
-                        P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
 
-                        P_INITYMD.Value = WW_DATENOW                        '登録年月日
-                        P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID              '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name       '登録プログラムＩＤ
-                        P_UPDYMD.Value = WW_DATENOW                         '更新年月日
-                        P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID               '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
-                        P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
+                If WW_ROW("SEASONKBN").ToString = "0" Then
+                    P_SEASONSTART.Value = ""           '季節料金判定開始月日
+                    P_SEASONEND.Value = ""           '季節料金判定終了月日
+                Else
+                    P_SEASONSTART.Value = WW_ROW("SEASONSTART")           '季節料金判定開始月日
+                    P_SEASONEND.Value = WW_ROW("SEASONEND")           '季節料金判定終了月日
+                End If
 
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
+                '固定費(月額)
+                If WW_ROW("KOTEIHIM").ToString = "0" Or WW_ROW("KOTEIHIM").ToString = "" Then
+                    P_KOTEIHIM.Value = DBNull.Value
+                Else
+                    P_KOTEIHIM.Value = WW_ROW("KOTEIHIM")
+                End If
 
-                    End Using
+                '固定費(日額)
+                If WW_ROW("KOTEIHID").ToString = "0" Or WW_ROW("KOTEIHID").ToString = "" Then
+                    P_KOTEIHID.Value = DBNull.Value
+                Else
+                    P_KOTEIHID.Value = WW_ROW("KOTEIHID")
+                End If
 
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_KOTEIHI  INSERTUPDATE")
+                '回数
+                If WW_ROW("KAISU").ToString = "0" Or WW_ROW("KAISU").ToString = "" Then
+                    P_KAISU.Value = DBNull.Value
+                Else
+                    P_KAISU.Value = WW_ROW("KAISU")
+                End If
 
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0007_KOTEIHI  INSERTUPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+                '減額費用
+                If WW_ROW("GENGAKU").ToString = "0" Or WW_ROW("GENGAKU").ToString = "" Then
+                    P_GENGAKU.Value = DBNull.Value
+                Else
+                    P_GENGAKU.Value = WW_ROW("GENGAKU")
+                End If
 
-                    WW_ErrSW = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("  INSERT INTO LNG.LNM0008_SKKOTEIHI")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,GETSUGAKU  ")
-                SQLStr.AppendLine("     ,GENGAKU  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("   )  ")
-                SQLStr.AppendLine("   VALUES  ")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      @TORICODE  ")
-                SQLStr.AppendLine("     ,@TORINAME  ")
-                SQLStr.AppendLine("     ,@ORGCODE  ")
-                SQLStr.AppendLine("     ,@ORGNAME  ")
-                SQLStr.AppendLine("     ,@KASANORGCODE  ")
-                SQLStr.AppendLine("     ,@KASANORGNAME  ")
-                SQLStr.AppendLine("     ,@STYMD  ")
-                SQLStr.AppendLine("     ,@ENDYMD  ")
-                SQLStr.AppendLine("     ,@SYABAN  ")
-                SQLStr.AppendLine("     ,@SYABARA  ")
-                SQLStr.AppendLine("     ,@GETSUGAKU  ")
-                SQLStr.AppendLine("     ,@GENGAKU  ")
-                SQLStr.AppendLine("     ,@KOTEIHI  ")
-                SQLStr.AppendLine("     ,@BIKOU  ")
-                SQLStr.AppendLine("     ,@DELFLG  ")
-                SQLStr.AppendLine("     ,@INITYMD  ")
-                SQLStr.AppendLine("     ,@INITUSER  ")
-                SQLStr.AppendLine("     ,@INITTERMID  ")
-                SQLStr.AppendLine("     ,@INITPGID  ")
-                SQLStr.AppendLine("   )   ")
-                SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
-                SQLStr.AppendLine("      TORINAME =  @TORINAME")
-                SQLStr.AppendLine("     ,ORGNAME =  @ORGNAME")
-                SQLStr.AppendLine("     ,KASANORGCODE =  @KASANORGCODE")
-                SQLStr.AppendLine("     ,KASANORGNAME =  @KASANORGNAME")
-                SQLStr.AppendLine("     ,SYABARA =  @SYABARA")
-                SQLStr.AppendLine("     ,GETSUGAKU =  @GETSUGAKU")
-                SQLStr.AppendLine("     ,GENGAKU =  @GENGAKU")
-                SQLStr.AppendLine("     ,KOTEIHI =  @KOTEIHI")
-                SQLStr.AppendLine("     ,BIKOU =  @BIKOU")
-                SQLStr.AppendLine("     ,DELFLG =  @DELFLG ")
-                SQLStr.AppendLine("     ,UPDYMD =  @UPDYMD ")
-                SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER ")
-                SQLStr.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
-                SQLStr.AppendLine("     ,UPDPGID =  @UPDPGID ")
-                SQLStr.AppendLine("    ;  ")
+                '請求額
+                If WW_ROW("AMOUNT").ToString = "0" Or WW_ROW("AMOUNT").ToString = "" Then
+                    P_AMOUNT.Value = DBNull.Value
+                Else
+                    P_AMOUNT.Value = WW_ROW("AMOUNT")
+                End If
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                        Dim P_GETSUGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GETSUGAKU", MySqlDbType.Decimal)     '月額運賃
-                        Dim P_GENGAKU As MySqlParameter = SQLcmd.Parameters.Add("@GENGAKU", MySqlDbType.Decimal)     '減額対象額
-                        Dim P_KOTEIHI As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHI", MySqlDbType.Decimal)     '固定費
-                        Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)     '登録プログラムＩＤ
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)     '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
-                        Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
+                P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
+                P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
+                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
 
-                        'DB更新
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                P_INITYMD.Value = WW_DATENOW                        '登録年月日
+                P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
+                P_INITTERMID.Value = Master.USERTERMID              '登録端末
+                P_INITPGID.Value = Me.GetType().BaseType.Name       '登録プログラムＩＤ
+                P_UPDYMD.Value = WW_DATENOW                         '更新年月日
+                P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID               '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
+                P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
 
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        Else
-                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
-                        End If
+                '登録
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
 
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
-                        P_GETSUGAKU.Value = WW_ROW("GETSUGAKU")           '月額運賃
-                        P_GENGAKU.Value = WW_ROW("GENGAKU")           '減額対象額
-                        P_KOTEIHI.Value = WW_ROW("KOTEIHI")           '固定費
-                        P_BIKOU.Value = WW_ROW("BIKOU")           '備考
+            End Using
 
-                        P_INITYMD.Value = WW_DATENOW                        '登録年月日
-                        P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID              '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name       '登録プログラムＩＤ
-                        P_UPDYMD.Value = WW_DATENOW                         '更新年月日
-                        P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID               '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
-                        P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED  INSERTUPDATE")
 
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNM0007_FIXED  INSERTUPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
 
-                    End Using
-
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0008_SKKOTEIHI  INSERTUPDATE")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0008_SKKOTEIHI  INSERTUPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-
-                    WW_ErrSW = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("  INSERT INTO LNG.LNM0009_TNGKOTEIHI")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,KOTEIHIM  ")
-                SQLStr.AppendLine("     ,KOTEIHID  ")
-                SQLStr.AppendLine("     ,KAISU  ")
-                SQLStr.AppendLine("     ,KINGAKU  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("   )  ")
-                SQLStr.AppendLine("   VALUES  ")
-                SQLStr.AppendLine("   (  ")
-                SQLStr.AppendLine("      @TORICODE  ")
-                SQLStr.AppendLine("     ,@TORINAME  ")
-                SQLStr.AppendLine("     ,@ORGCODE  ")
-                SQLStr.AppendLine("     ,@ORGNAME  ")
-                SQLStr.AppendLine("     ,@KASANORGCODE  ")
-                SQLStr.AppendLine("     ,@KASANORGNAME  ")
-                SQLStr.AppendLine("     ,@STYMD  ")
-                SQLStr.AppendLine("     ,@ENDYMD  ")
-                SQLStr.AppendLine("     ,@SYABAN  ")
-                SQLStr.AppendLine("     ,@KOTEIHIM  ")
-                SQLStr.AppendLine("     ,@KOTEIHID  ")
-                SQLStr.AppendLine("     ,@KAISU  ")
-                SQLStr.AppendLine("     ,@KINGAKU  ")
-                SQLStr.AppendLine("     ,@BIKOU  ")
-                SQLStr.AppendLine("     ,@DELFLG  ")
-                SQLStr.AppendLine("     ,@INITYMD  ")
-                SQLStr.AppendLine("     ,@INITUSER  ")
-                SQLStr.AppendLine("     ,@INITTERMID  ")
-                SQLStr.AppendLine("     ,@INITPGID  ")
-                SQLStr.AppendLine("   )   ")
-                SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
-                SQLStr.AppendLine("      TORINAME =  @TORINAME")
-                SQLStr.AppendLine("     ,ORGNAME =  @ORGNAME")
-                SQLStr.AppendLine("     ,KASANORGCODE =  @KASANORGCODE")
-                SQLStr.AppendLine("     ,KASANORGNAME =  @KASANORGNAME")
-                SQLStr.AppendLine("     ,KOTEIHIM =  @KOTEIHIM")
-                SQLStr.AppendLine("     ,KOTEIHID =  @KOTEIHID")
-                SQLStr.AppendLine("     ,KAISU =  @KAISU")
-                SQLStr.AppendLine("     ,KINGAKU =  @KINGAKU")
-                SQLStr.AppendLine("     ,BIKOU =  @BIKOU")
-                SQLStr.AppendLine("     ,DELFLG =  @DELFLG ")
-                SQLStr.AppendLine("     ,UPDYMD =  @UPDYMD ")
-                SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER ")
-                SQLStr.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
-                SQLStr.AppendLine("     ,UPDPGID =  @UPDPGID ")
-                SQLStr.AppendLine("    ;  ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                        Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                        Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                        Dim P_KOTEIHIM As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHIM", MySqlDbType.Decimal)     '月額固定費
-                        Dim P_KOTEIHID As MySqlParameter = SQLcmd.Parameters.Add("@KOTEIHID", MySqlDbType.Decimal)     '日額固定費
-                        Dim P_KAISU As MySqlParameter = SQLcmd.Parameters.Add("@KAISU", MySqlDbType.Decimal)     '使用回数
-                        Dim P_KINGAKU As MySqlParameter = SQLcmd.Parameters.Add("@KINGAKU", MySqlDbType.Decimal)     '金額
-                        Dim P_BIKOU As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU", MySqlDbType.VarChar, 100)     '備考
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)     '登録プログラムＩＤ
-                        Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)     '更新年月日
-                        Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
-                        Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
-                        Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
-                        Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
-
-                        'DB更新
-                        P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
-                        P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                        P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-
-                        '有効終了日
-                        If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                            P_ENDYMD.Value = WW_ROW("ENDYMD")
-                        Else
-                            P_ENDYMD.Value = WF_AUTOENDYMD.Value
-                        End If
-
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                        P_KOTEIHIM.Value = WW_ROW("KOTEIHIM")           '月額固定費
-                        P_KOTEIHID.Value = WW_ROW("KOTEIHID")           '日額固定費
-                        P_KAISU.Value = WW_ROW("KAISU")           '使用回数
-                        P_KINGAKU.Value = WW_ROW("KINGAKU")           '金額
-                        P_BIKOU.Value = WW_ROW("BIKOU")           '備考
-
-                        P_INITYMD.Value = WW_DATENOW                        '登録年月日
-                        P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID              '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name       '登録プログラムＩＤ
-                        P_UPDYMD.Value = WW_DATENOW                         '更新年月日
-                        P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
-                        P_UPDTERMID.Value = Master.USERTERMID               '更新端末
-                        P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
-                        P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
-
-                        '登録
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-
-                    End Using
-
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0009_TNGKOTEIHI  INSERTUPDATE")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNM0009_TNGKOTEIHI  INSERTUPDATE"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-
-                    WW_ErrSW = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-        End Select
-
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -3825,468 +2469,239 @@ Public Class LNM0007KoteihiList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '取引先コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '取引先名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効開始日(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "STYMD", WW_ROW("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・有効開始日エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                    If Not isNormal(WW_CS0024FCheckerr) Then
-                        WW_CheckMES1 = "・有効終了日エラーです。"
-                        WW_CheckMES2 = WW_CS0024FCheckReport
-                        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                        WW_LineErr = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-                End If
-                '車番(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYABAN", WW_ROW("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車番エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '陸事番号(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "RIKUBAN", WW_ROW("RIKUBAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・陸事番号エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '車型(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYAGATA", WW_ROW("SYAGATA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車型エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                ''車型名(バリデーションチェック)
-                'Master.CheckField(Master.USERCAMP, "SYAGATANAME", WW_ROW("SYAGATANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                'If Not isNormal(WW_CS0024FCheckerr) Then
-                '    WW_CheckMES1 = "・車型名エラーです。"
-                '    WW_CheckMES2 = WW_CS0024FCheckReport
-                '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                '    WW_LineErr = "ERR"
-                '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                'End If
-                '車腹(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYABARA", WW_ROW("SYABARA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車腹エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '固定費(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KOTEIHI", WW_ROW("KOTEIHI"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・固定費エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '備考1(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "BIKOU1", WW_ROW("BIKOU1"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・備考1エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '備考2(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "BIKOU2", WW_ROW("BIKOU2"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・備考2エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '備考3(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "BIKOU3", WW_ROW("BIKOU3"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・備考3エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    ' 日付大小チェック
-                    If Not WW_ROW("STYMD") = Date.MinValue Then
-                        If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
-                            WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-                            WW_CheckMES2 = "日付大小入力エラー"
-                            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                            WW_LineErr = "ERR"
-                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                        End If
-                    End If
-                End If
+        '取引先コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・取引先コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '取引先名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・取引先名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '部門コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・部門コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '部門名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・部門名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '加算先部門コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・加算先部門コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '加算先部門名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・加算先部門名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '対象年月(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TARGETYM", WW_ROW("TARGETYM"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・対象年月エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '車番(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SYABAN", WW_ROW("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・車番エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '陸事番号(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "RIKUBAN", WW_ROW("RIKUBAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・陸事番号エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '車型(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SYAGATA", WW_ROW("SYAGATA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・車型エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        ''車型名(バリデーションチェック)
+        'Master.CheckField(Master.USERCAMP, "SYAGATANAME", WW_ROW("SYAGATANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・車型名エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        '車腹(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SYABARA", WW_ROW("SYABARA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・車腹エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '季節料金判定区分(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SEASONKBN", WW_ROW("SEASONKBN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・季節料金判定区分エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        ''季節料金判定開始月日(バリデーションチェック)
+        'Master.CheckField(Master.USERCAMP, "SEASONSTART", WW_ROW("SEASONSTART"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・季節料金判定開始月日エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        ''季節料金判定終了月日(バリデーションチェック)
+        'Master.CheckField(Master.USERCAMP, "SEASONEND", WW_ROW("SEASONEND"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・季節料金判定終了月日エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
+        '固定費(月額)(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "KOTEIHIM", WW_ROW("KOTEIHIM"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・固定費(月額)エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '固定費(日額)(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "KOTEIHID", WW_ROW("KOTEIHID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・固定費(日額)エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '回数(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "KAISU", WW_ROW("KAISU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・回数エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '減額費用(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "GENGAKU", WW_ROW("GENGAKU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・減額費用エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '請求額(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "AMOUNT", WW_ROW("AMOUNT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・請求額エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '備考1(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "BIKOU1", WW_ROW("BIKOU1"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・備考1エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '備考2(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "BIKOU2", WW_ROW("BIKOU2"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・備考2エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '備考3(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "BIKOU3", WW_ROW("BIKOU3"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・備考3エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
 
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                '取引先コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '取引先名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効開始日(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "STYMD", WW_ROW("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・有効開始日エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                    If Not isNormal(WW_CS0024FCheckerr) Then
-                        WW_CheckMES1 = "・有効終了日エラーです。"
-                        WW_CheckMES2 = WW_CS0024FCheckReport
-                        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                        WW_LineErr = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-                End If
-                '車番(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYABAN", WW_ROW("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車番エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '車腹(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYABARA", WW_ROW("SYABARA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車腹エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '月額運賃(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "GETSUGAKU", WW_ROW("GETSUGAKU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・月額運賃エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '減額対象額(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "GENGAKU", WW_ROW("GENGAKU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・減額対象額エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '固定費(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KOTEIHI", WW_ROW("KOTEIHI"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・固定費エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '備考(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "BIKOU", WW_ROW("BIKOU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・備考エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    ' 日付大小チェック
-                    If Not WW_ROW("STYMD") = Date.MinValue Then
-                        If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
-                            WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-                            WW_CheckMES2 = "日付大小入力エラー"
-                            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                            WW_LineErr = "ERR"
-                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                        End If
-                    End If
-                End If
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                '取引先コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '取引先名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・取引先名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門コード(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門コードエラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '加算先部門名称(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・加算先部門名称エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効開始日(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "STYMD", WW_ROW("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・有効開始日エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                    If Not isNormal(WW_CS0024FCheckerr) Then
-                        WW_CheckMES1 = "・有効終了日エラーです。"
-                        WW_CheckMES2 = WW_CS0024FCheckReport
-                        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                        WW_LineErr = "ERR"
-                        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                    End If
-                End If
-                '車番(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "SYABAN", WW_ROW("SYABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・車番エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '月額固定費(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KOTEIHIM", WW_ROW("KOTEIHIM"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・月額固定費エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '日額固定費(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KOTEIHID", WW_ROW("KOTEIHID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・日額固定費エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '使用回数(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KAISU", WW_ROW("KAISU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・使用回数エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '金額(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "KINGAKU", WW_ROW("KINGAKU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・金額エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '備考(バリデーションチェック)
-                Master.CheckField(Master.USERCAMP, "BIKOU", WW_ROW("BIKOU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-                If Not isNormal(WW_CS0024FCheckerr) Then
-                    WW_CheckMES1 = "・備考エラーです。"
-                    WW_CheckMES2 = WW_CS0024FCheckReport
-                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                    WW_LineErr = "ERR"
-                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                End If
-                '有効終了日(バリデーションチェック)
-                If Not WW_ROW("ENDYMD") = Date.MinValue Then
-                    ' 日付大小チェック
-                    If Not WW_ROW("STYMD") = Date.MinValue Then
-                        If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
-                            WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-                            WW_CheckMES2 = "日付大小入力エラー"
-                            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                            WW_LineErr = "ERR"
-                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-                        End If
-                    End If
-                End If
-#End Region
-        End Select
+        '季節料金判定開始月日、季節料金判定終了月日チェック
+        Dim dt As DateTime
+        '通年以外の場合
+        If Not WW_ROW("SEASONKBN") = "0" Then
+            '季節料金判定開始月日(バリデーションチェック)
+            If Not WW_ROW("SEASONEND").ToString.Length = 4 OrElse DateTime.TryParse("2099/" &
+                              WW_ROW("SEASONSTART").ToString.Substring(0, 2) & "/" &
+                              WW_ROW("SEASONSTART").ToString.Substring(2, 2), dt) = False Then
+                WW_CheckMES1 = "・季節料金判定開始月日エラーです。"
+                WW_CheckMES2 = "日付入力エラー"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            '季節料金判定終了月日(バリデーションチェック)
+            If Not WW_ROW("SEASONEND").ToString.Length = 4 OrElse DateTime.TryParse("2099/" &
+                              WW_ROW("SEASONEND").ToString.Substring(0, 2) & "/" &
+                              WW_ROW("SEASONEND").ToString.Substring(2, 2), dt) = False Then
+                WW_CheckMES1 = "・季節料金判定終了月日エラーです。"
+                WW_CheckMES2 = "日付入力エラー"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        End If
 
     End Sub
 
@@ -4325,189 +2740,66 @@ Public Class LNM0007KoteihiList
 
         O_RTN = Messages.C_MESSAGE_NO.NORMAL
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '固定費マスタに同一キーのデータが存在するか確認する。
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("       ,DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0007_KOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        '固定費マスタに同一キーのデータが存在するか確認する。
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine("    SELECT")
+        SQLStr.AppendLine("        TORICODE")
+        SQLStr.AppendLine("       ,DELFLG")
+        SQLStr.AppendLine("    FROM")
+        SQLStr.AppendLine("        LNG.LNM0007_FIXED")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONKBN, '')             = @SEASONKBN ")
 
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
 
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_SYABAN.Value = WW_ROW("SYABAN")           '車番
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
 
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
 
-                            '更新の場合(データが存在した場合)は変更区分に変更前をセット
-                            If WW_Tbl.Rows.Count > 0 Then
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.BEFDATA '変更前
-                                WW_BEFDELFLG = WW_Tbl.Rows(0)("DELFLG")
-                            Else
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA '新規
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_KOTEIHI SELECT")
+                    '更新の場合(データが存在した場合)は変更区分に変更前をセット
+                    If WW_Tbl.Rows.Count > 0 Then
+                        WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.BEFDATA '変更前
+                        WW_BEFDELFLG = WW_Tbl.Rows(0)("DELFLG")
+                    Else
+                        WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA '新規
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED SELECT")
 
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0007_KOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_FIXED SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
 
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                'SK固定費マスタに同一キーのデータが存在するか確認する。
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("       ,DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0008_SKKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            '更新の場合(データが存在した場合)は変更区分に変更前をセット
-                            If WW_Tbl.Rows.Count > 0 Then
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.BEFDATA '変更前
-                                WW_BEFDELFLG = WW_Tbl.Rows(0)("DELFLG")
-                            Else
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA '新規
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0008_SKKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0008_SKKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                'TNG固定費マスタに同一キーのデータが存在するか確認する。
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine("    SELECT")
-                SQLStr.AppendLine("        TORICODE")
-                SQLStr.AppendLine("       ,DELFLG")
-                SQLStr.AppendLine("    FROM")
-                SQLStr.AppendLine("        LNG.LNM0009_TNGKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-                SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-                SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                            Dim WW_Tbl = New DataTable
-                            '○ フィールド名とフィールドの型を取得
-                            For index As Integer = 0 To SQLdr.FieldCount - 1
-                                WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                            Next
-
-                            '○ テーブル検索結果をテーブル格納
-                            WW_Tbl.Load(SQLdr)
-
-                            '更新の場合(データが存在した場合)は変更区分に変更前をセット
-                            If WW_Tbl.Rows.Count > 0 Then
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.BEFDATA '変更前
-                                WW_BEFDELFLG = WW_Tbl.Rows(0)("DELFLG")
-                            Else
-                                WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA '新規
-                            End If
-                        End Using
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0009_TNGKOTEIHI SELECT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:LNM0009_TNGKOTEIHI SELECT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-        End Select
-
+            O_RTN = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
 
     End Sub
 
@@ -4525,469 +2817,151 @@ Public Class LNM0007KoteihiList
 
         O_RTN = Messages.C_MESSAGE_NO.NORMAL
 
-        Select Case work.WF_SEL_CONTROLTABLE.Text
-            Case LNM0007WRKINC.MAPIDL
-#Region "固定費マスタ"
-                '○ ＤＢ更新
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNT0006_KOTEIHIHIST ")
-                SQLStr.AppendLine("  (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,RIKUBAN  ")
-                SQLStr.AppendLine("     ,SYAGATA  ")
-                SQLStr.AppendLine("     ,SYAGATANAME  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU1  ")
-                SQLStr.AppendLine("     ,BIKOU2  ")
-                SQLStr.AppendLine("     ,BIKOU3  ")
-                SQLStr.AppendLine("     ,OPERATEKBN  ")
-                SQLStr.AppendLine("     ,MODIFYKBN  ")
-                SQLStr.AppendLine("     ,MODIFYYMD  ")
-                SQLStr.AppendLine("     ,MODIFYUSER  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("  )  ")
-                SQLStr.AppendLine("  SELECT  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,RIKUBAN  ")
-                SQLStr.AppendLine("     ,SYAGATA  ")
-                SQLStr.AppendLine("     ,SYAGATANAME  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU1  ")
-                SQLStr.AppendLine("     ,BIKOU2  ")
-                SQLStr.AppendLine("     ,BIKOU3  ")
-                SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
-                SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
-                SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
-                SQLStr.AppendLine("     ,@MODIFYUSER AS MODIFYUSER ")
-                SQLStr.AppendLine("     ,DELFLG ")
-                SQLStr.AppendLine("     ,@INITYMD AS INITYMD ")
-                SQLStr.AppendLine("     ,@INITUSER AS INITUSER ")
-                SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
-                SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
-                SQLStr.AppendLine("  FROM   ")
-                SQLStr.AppendLine("        LNG.LNM0007_KOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
-                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
-                        Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
-                        Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
-                        Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
-
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
-
-                        ' DB更新
-                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        '操作区分
-                        '変更区分が新規の場合
-                        If WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA Then
-                            P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.NEWDATA).ToString
-                        Else
-                            '削除データの場合
-                            If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = "1" Then
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.DELDATA).ToString
-                            Else
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.UPDDATA).ToString
-                            End If
-                        End If
-
-                        P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
-                        P_MODIFYYMD.Value = WW_NOW               '変更日時
-                        P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
-
-                        P_INITYMD.Value = WW_NOW              '登録年月日
-                        P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID                '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
-
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_KOTEIHIHIST INSERT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0006_KOTEIHIHIST INSERT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-
-                    rightview.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLSK
-#Region "SK固定費マスタ"
-                '○ ＤＢ更新
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNT0007_SKKOTEIHIHIST ")
-                SQLStr.AppendLine("  (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,GETSUGAKU  ")
-                SQLStr.AppendLine("     ,GENGAKU  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,OPERATEKBN  ")
-                SQLStr.AppendLine("     ,MODIFYKBN  ")
-                SQLStr.AppendLine("     ,MODIFYYMD  ")
-                SQLStr.AppendLine("     ,MODIFYUSER  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("  )  ")
-                SQLStr.AppendLine("  SELECT  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,SYABARA  ")
-                SQLStr.AppendLine("     ,GETSUGAKU  ")
-                SQLStr.AppendLine("     ,GENGAKU  ")
-                SQLStr.AppendLine("     ,KOTEIHI  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
-                SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
-                SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
-                SQLStr.AppendLine("     ,@MODIFYUSER AS MODIFYUSER ")
-                SQLStr.AppendLine("     ,DELFLG ")
-                SQLStr.AppendLine("     ,@INITYMD AS INITYMD ")
-                SQLStr.AppendLine("     ,@INITUSER AS INITUSER ")
-                SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
-                SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
-                SQLStr.AppendLine("  FROM   ")
-                SQLStr.AppendLine("        LNG.LNM0008_SKKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
-                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
-                        Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
-                        Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
-                        Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
-
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
-
-                        ' DB更新
-                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        '操作区分
-                        '変更区分が新規の場合
-                        If WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA Then
-                            P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.NEWDATA).ToString
-                        Else
-                            '削除データの場合
-                            If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = "1" Then
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.DELDATA).ToString
-                            Else
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.UPDDATA).ToString
-                            End If
-                        End If
-
-                        P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
-                        P_MODIFYYMD.Value = WW_NOW               '変更日時
-                        P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
-
-                        P_INITYMD.Value = WW_NOW              '登録年月日
-                        P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID                '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
-
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0007_SKKOTEIHIHIST INSERT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0007_SKKOTEIHIHIST INSERT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-
-                    rightview.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-            Case LNM0007WRKINC.MAPIDLTNG
-#Region "TNG固定費マスタ"
-                '○ ＤＢ更新
-                Dim SQLStr = New StringBuilder
-                SQLStr.AppendLine(" INSERT INTO LNG.LNT0008_TNGKOTEIHIHIST ")
-                SQLStr.AppendLine("  (  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,KOTEIHIM  ")
-                SQLStr.AppendLine("     ,KOTEIHID  ")
-                SQLStr.AppendLine("     ,KAISU  ")
-                SQLStr.AppendLine("     ,KINGAKU  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,OPERATEKBN  ")
-                SQLStr.AppendLine("     ,MODIFYKBN  ")
-                SQLStr.AppendLine("     ,MODIFYYMD  ")
-                SQLStr.AppendLine("     ,MODIFYUSER  ")
-                SQLStr.AppendLine("     ,DELFLG  ")
-                SQLStr.AppendLine("     ,INITYMD  ")
-                SQLStr.AppendLine("     ,INITUSER  ")
-                SQLStr.AppendLine("     ,INITTERMID  ")
-                SQLStr.AppendLine("     ,INITPGID  ")
-                SQLStr.AppendLine("  )  ")
-                SQLStr.AppendLine("  SELECT  ")
-                SQLStr.AppendLine("      TORICODE  ")
-                SQLStr.AppendLine("     ,TORINAME  ")
-                SQLStr.AppendLine("     ,ORGCODE  ")
-                SQLStr.AppendLine("     ,ORGNAME  ")
-                SQLStr.AppendLine("     ,KASANORGCODE  ")
-                SQLStr.AppendLine("     ,KASANORGNAME  ")
-                SQLStr.AppendLine("     ,STYMD  ")
-                SQLStr.AppendLine("     ,ENDYMD  ")
-                SQLStr.AppendLine("     ,SYABAN  ")
-                SQLStr.AppendLine("     ,KOTEIHIM  ")
-                SQLStr.AppendLine("     ,KOTEIHID  ")
-                SQLStr.AppendLine("     ,KAISU  ")
-                SQLStr.AppendLine("     ,KINGAKU  ")
-                SQLStr.AppendLine("     ,BIKOU  ")
-                SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
-                SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
-                SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
-                SQLStr.AppendLine("     ,@MODIFYUSER AS MODIFYUSER ")
-                SQLStr.AppendLine("     ,DELFLG ")
-                SQLStr.AppendLine("     ,@INITYMD AS INITYMD ")
-                SQLStr.AppendLine("     ,@INITUSER AS INITUSER ")
-                SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
-                SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
-                SQLStr.AppendLine("  FROM   ")
-                SQLStr.AppendLine("        LNG.LNM0009_TNGKOTEIHI")
-                SQLStr.AppendLine("    WHERE")
-                SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
-                SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-                SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-                SQLStr.AppendLine("   AND SYABAN  = @SYABAN            ")
-
-                Try
-                    Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                        Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
-                        Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                        Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                        Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-
-                        Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
-                        Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
-                        Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
-                        Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
-
-                        Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
-                        Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
-                        Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
-                        Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
-
-                        ' DB更新
-                        P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
-                        P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
-                        P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                        P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-
-                        '操作区分
-                        '変更区分が新規の場合
-                        If WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA Then
-                            P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.NEWDATA).ToString
-                        Else
-                            '削除データの場合
-                            If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = "1" Then
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.DELDATA).ToString
-                            Else
-                                P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.UPDDATA).ToString
-                            End If
-                        End If
-
-                        P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
-                        P_MODIFYYMD.Value = WW_NOW               '変更日時
-                        P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
-
-                        P_INITYMD.Value = WW_NOW              '登録年月日
-                        P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
-                        P_INITTERMID.Value = Master.USERTERMID                '登録端末
-                        P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
-
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-
-                    End Using
-                Catch ex As Exception
-                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0008_TNGKOTEIHIHIST INSERT")
-
-                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-                    CS0011LOGWrite.INFPOSI = "DB:" + "LNT0008_TNGKOTEIHIHIST INSERT"
-                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                    CS0011LOGWrite.TEXT = ex.ToString()
-                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                    CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
-
-                    rightview.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
-                    O_RTN = C_MESSAGE_NO.DB_ERROR
-                    Exit Sub
-                End Try
-#End Region
-        End Select
-
-
-
-    End Sub
-
-    ''' <summary>
-    ''' 有効終了日更新
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <param name="WW_ROW"></param>
-    Public Sub UpdateENDYMD(ByVal SQLcon As MySqlConnection, ByVal WW_CONTROLTABLE As String, ByVal WW_ROW As DataRow,
-                            ByRef O_MESSAGENO As String, ByVal WW_NOW As String)
-
-
-        Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
-        O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
-
-        '○ 対象データ更新
-        Dim SQLStr As New StringBuilder
-        SQLStr.Append(" UPDATE                                      ")
-        Select Case WW_CONTROLTABLE
-            Case LNM0007WRKINC.MAPIDL '固定費マスタ
-                SQLStr.Append("     LNG.LNM0007_KOTEIHI             ")
-            Case LNM0007WRKINC.MAPIDLSK 'SK固定費マスタ
-                SQLStr.Append("     LNG.LNM0008_SKKOTEIHI           ")
-            Case LNM0007WRKINC.MAPIDLTNG 'TNG固定費マスタ
-                SQLStr.Append("     LNG.LNM0009_TNGKOTEIHI          ")
-        End Select
-        SQLStr.Append(" SET                                         ")
-        SQLStr.Append("     ENDYMD               = @ENDYMD          ")
-        SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
-        SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
-        SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
-        SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
-        SQLStr.Append(" WHERE                                       ")
-        SQLStr.Append("       TORICODE  = @TORICODE                 ")
-        SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.Append("   AND SYABAN  = @SYABAN             ")
+        '○ ＤＢ更新
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" INSERT INTO LNG.LNT0006_FIXEDHIST ")
+        SQLStr.AppendLine("  (  ")
+        SQLStr.AppendLine("      TORICODE  ")
+        SQLStr.AppendLine("     ,TORINAME  ")
+        SQLStr.AppendLine("     ,ORGCODE  ")
+        SQLStr.AppendLine("     ,ORGNAME  ")
+        SQLStr.AppendLine("     ,KASANORGCODE  ")
+        SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,TARGETYM  ")
+        SQLStr.AppendLine("     ,SYABAN  ")
+        SQLStr.AppendLine("     ,RIKUBAN  ")
+        SQLStr.AppendLine("     ,SYAGATA  ")
+        SQLStr.AppendLine("     ,SYAGATANAME  ")
+        SQLStr.AppendLine("     ,SYABARA  ")
+        SQLStr.AppendLine("     ,SEASONKBN  ")
+        SQLStr.AppendLine("     ,SEASONSTART  ")
+        SQLStr.AppendLine("     ,SEASONEND  ")
+        SQLStr.AppendLine("     ,KOTEIHIM  ")
+        SQLStr.AppendLine("     ,KOTEIHID  ")
+        SQLStr.AppendLine("     ,KAISU  ")
+        SQLStr.AppendLine("     ,GENGAKU  ")
+        SQLStr.AppendLine("     ,AMOUNT  ")
+        SQLStr.AppendLine("     ,BIKOU1  ")
+        SQLStr.AppendLine("     ,BIKOU2  ")
+        SQLStr.AppendLine("     ,BIKOU3  ")
+        SQLStr.AppendLine("     ,OPERATEKBN  ")
+        SQLStr.AppendLine("     ,MODIFYKBN  ")
+        SQLStr.AppendLine("     ,MODIFYYMD  ")
+        SQLStr.AppendLine("     ,MODIFYUSER  ")
+        SQLStr.AppendLine("     ,DELFLG  ")
+        SQLStr.AppendLine("     ,INITYMD  ")
+        SQLStr.AppendLine("     ,INITUSER  ")
+        SQLStr.AppendLine("     ,INITTERMID  ")
+        SQLStr.AppendLine("     ,INITPGID  ")
+        SQLStr.AppendLine("  )  ")
+        SQLStr.AppendLine("  SELECT  ")
+        SQLStr.AppendLine("      TORICODE  ")
+        SQLStr.AppendLine("     ,TORINAME  ")
+        SQLStr.AppendLine("     ,ORGCODE  ")
+        SQLStr.AppendLine("     ,ORGNAME  ")
+        SQLStr.AppendLine("     ,KASANORGCODE  ")
+        SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,TARGETYM  ")
+        SQLStr.AppendLine("     ,SYABAN  ")
+        SQLStr.AppendLine("     ,RIKUBAN  ")
+        SQLStr.AppendLine("     ,SYAGATA  ")
+        SQLStr.AppendLine("     ,SYAGATANAME  ")
+        SQLStr.AppendLine("     ,SYABARA  ")
+        SQLStr.AppendLine("     ,SEASONKBN  ")
+        SQLStr.AppendLine("     ,SEASONSTART  ")
+        SQLStr.AppendLine("     ,SEASONEND  ")
+        SQLStr.AppendLine("     ,KOTEIHIM  ")
+        SQLStr.AppendLine("     ,KOTEIHID  ")
+        SQLStr.AppendLine("     ,KAISU  ")
+        SQLStr.AppendLine("     ,GENGAKU  ")
+        SQLStr.AppendLine("     ,AMOUNT  ")
+        SQLStr.AppendLine("     ,BIKOU1  ")
+        SQLStr.AppendLine("     ,BIKOU2  ")
+        SQLStr.AppendLine("     ,BIKOU3  ")
+        SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
+        SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
+        SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
+        SQLStr.AppendLine("     ,@MODIFYUSER AS MODIFYUSER ")
+        SQLStr.AppendLine("     ,DELFLG ")
+        SQLStr.AppendLine("     ,@INITYMD AS INITYMD ")
+        SQLStr.AppendLine("     ,@INITUSER AS INITUSER ")
+        SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
+        SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
+        SQLStr.AppendLine("  FROM   ")
+        SQLStr.AppendLine("        LNG.LNM0007_FIXED")
+        SQLStr.AppendLine("    WHERE")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABAN, '')             = @SYABAN ")
+        SQLStr.AppendLine("    AND  COALESCE(SEASONKBN, '')             = @SEASONKBN ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
                 Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)     '車番
-                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
-                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
-                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+                Dim P_SEASONKBN As MySqlParameter = SQLcmd.Parameters.Add("@SEASONKBN", MySqlDbType.VarChar, 1)     '季節料金判定区分
 
-                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
-                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
-                'P_ENDYMD.Value = DateTime.Parse(WW_NEWSTYMD).AddDays(-1).ToString("yyyy/MM/dd") '有効終了日
-                P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
+                Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
+                Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
+                Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
+                Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
+
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
+
+                ' DB更新
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
                 P_SYABAN.Value = WW_ROW("SYABAN")           '車番
-                P_UPDYMD.Value = WW_NOW                '更新年月日
-                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
-                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+                P_SEASONKBN.Value = WW_ROW("SEASONKBN")           '季節料金判定区分
 
-                '登録
+                '操作区分
+                '変更区分が新規の場合
+                If WW_MODIFYKBN = LNM0007WRKINC.MODIFYKBN.NEWDATA Then
+                    P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.NEWDATA).ToString
+                Else
+                    '削除データの場合
+                    If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = "1" Then
+                        P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.DELDATA).ToString
+                    Else
+                        P_OPERATEKBN.Value = CInt(LNM0007WRKINC.OPERATEKBN.UPDDATA).ToString
+                    End If
+                End If
+
+                P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
+                P_MODIFYYMD.Value = WW_NOW               '変更日時
+                P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
+
+                P_INITYMD.Value = WW_NOW              '登録年月日
+                P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
+                P_INITTERMID.Value = Master.USERTERMID                '登録端末
+                P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
+
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
             End Using
         Catch ex As Exception
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0007 UPDATE"
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_FIXEDHIST INSERT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0006_FIXEDHIST INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+
+            rightview.AddErrorReport("DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。")
+            O_RTN = C_MESSAGE_NO.DB_ERROR
             Exit Sub
         End Try
+
     End Sub
 
 #End Region

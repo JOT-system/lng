@@ -42,6 +42,15 @@
                     <div class="Operation">
                         <div class="actionButtonBox">
                             <div class="leftSide">
+                                <!-- 一覧件数 -->
+                                <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                <!-- 変更年月 -->
+                                <label class="WF_TEXT_LEFT" style="margin-left:30px;">変更年月 </label>
+                                <asp:DropDownList ID="WF_DDL_MODIFYYM" runat="server" onchange="ButtonClick('WF_SelectMODIFYYMChange');" />
+                                <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更日</label>
+                                <asp:DropDownList ID="WF_DDL_MODIFYDD" runat="server" onchange="ButtonClick('WF_SelectMODIFYDDChange');" />
+                                <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更ユーザー </label>
+                                <asp:DropDownList ID="WF_DDL_MODIFYUSER" runat="server"/>
                             </div>
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonMODIFYVIEW" class="btn-sticky" value="表示する" onclick="ButtonClick('WF_ButtonMODIFYVIEW');" />
@@ -53,25 +62,8 @@
                                 <div id="WF_ButtonLAST" class="lastPage" runat="server"                         onclick="ButtonClick('WF_ButtonLAST');"></div>--%>
                             </div>
                         </div> <!-- End class=actionButtonBox -->
-                    </div> <!-- End class="Operation" -->
-                    <div class="tabBox">
-                            <div class="d-flex align-items-center gap-2">
-                                <strong class="flex-shrink-0">対象</strong>
-                                <asp:DropDownList ID="WF_TARGETTABLE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TARGETTABLEChange');" />
-                            </div>  
 
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- 一覧件数 -->
-                            <asp:Label ID="ListCount" runat="server" CssClass="WF_TEXT_LEFT"></asp:Label>
-                            <!-- 変更年月 -->                                   
-                            <label class="WF_TEXT_LEFT" style="margin-left:30px;">変更年月 </label>                                                           
-                            <asp:DropDownList ID="WF_DDL_MODIFYYM" runat="server" onchange="ButtonClick('WF_SelectMODIFYYMChange');" />
-                            <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更日</label>
-                            <asp:DropDownList ID="WF_DDL_MODIFYDD" runat="server" onchange="ButtonClick('WF_SelectMODIFYDDChange');" />
-                            <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更ユーザー </label>
-                            <asp:DropDownList ID="WF_DDL_MODIFYUSER" runat="server"/>
-                        </div> 
-                    </div>
+                    </div> <!-- End class="Operation" -->
                     <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
             </div>
         </div>

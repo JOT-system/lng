@@ -522,6 +522,18 @@ Public Class CmnSearchSQL
         Return colTitle
     End Function
 
+    ''' <summary>
+    ''' 特別料金明細名検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateDetailTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("DETAILID", "明細ID", "100"),
+                New DispFieldItem("DETAILNAME", "明細名", "500")
+            }
+        Return colTitle
+    End Function
 
     ''' <summary>
     ''' 特別料金取引先取得SQL
@@ -583,7 +595,7 @@ Public Class CmnSearchSQL
     ''' 特別料金届先取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetSprateTodokeSQL(Optional ByVal prmOrgCode As String = "") As String
+    Public Shared Function GetSprateTodokeSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String) As String
 
         Dim SQLBldr As New StringBuilder
 
@@ -597,6 +609,10 @@ Public Class CmnSearchSQL
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
         SQLBldr.AppendLine("  AND TODOKECODE <> ''")
+        '取引先コードが入力されている場合条件に含める
+        If Not prmToriCode = "" Then
+            SQLBldr.AppendLine("  AND TORICODE LIKE '%" & prmToriCode & "%'")
+        End If
         '部門コードが入力されている場合条件に含める
         If Not prmOrgCode = "" Then
             SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
@@ -646,7 +662,7 @@ Public Class CmnSearchSQL
     ''' 特別料金グループ名取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetSprateGroupSQL(ByVal prmToriCode As String) As String
+    Public Shared Function GetSprateGroupSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, Optional ByVal prmGroupName As String = "") As String
 
         Dim SQLBldr As New StringBuilder
 
@@ -658,13 +674,54 @@ Public Class CmnSearchSQL
         SQLBldr.AppendLine("    ) AS KEYCODE")
         SQLBldr.AppendLine("    , RTRIM(GROUPID) AS GROUPID")
         SQLBldr.AppendLine("    , RTRIM(GROUPNAME) AS GROUPNAME")
+        SQLBldr.AppendLine("    , GROUPSORTNO AS GROUPSORTNO")
         SQLBldr.AppendLine(" FROM")
         SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
         SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+        'グループ名が入力されている場合条件に含める
+        If Not prmGroupName = "" Then
+            SQLBldr.AppendLine("  AND GROUPNAME LIKE '%" & prmGroupName & "%'")
+        End If
         SQLBldr.AppendLine(" ORDER BY")
         SQLBldr.AppendLine("     GROUPID")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金明細名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateDetailSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, ByVal prmGroupId As String, Optional ByVal prmGroupName As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(DETAILID, '00')")
+        SQLBldr.AppendLine("  + DETAILNAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(DETAILID) AS DETAILID")
+        SQLBldr.AppendLine("    , RTRIM(DETAILNAME) AS DETAILNAME")
+        SQLBldr.AppendLine("    , DETAILSORTNO AS DETAILSORTNO")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+        SQLBldr.AppendLine("  AND GROUPID = '" & prmGroupId & "'")
+        'グループ名が入力されている場合条件に含める
+        If Not prmGroupName = "" Then
+            SQLBldr.AppendLine("  AND DETAILNAME LIKE '%" & prmGroupName & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     DETAILID")
 
         Return SQLBldr.ToString
 

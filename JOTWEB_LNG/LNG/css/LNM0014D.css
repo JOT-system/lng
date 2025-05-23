@@ -186,32 +186,239 @@ p {
     width: 30em !important;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] {
-    min-width: 500px;
+#detailkeybox div[id^=RAD_LINE_] {
+    min-width: 500px !important;
     display: flex;
     box-sizing: border-box;
     flex-wrap: wrap;
-}
-/* ************************** */
-/* 単票入力欄の列定義         */
-/* ************************** */
-
-#TxtSelLineCNT, #TxtTORICODE, #TxtORGCODE, #TxtKASANORGCODE, #TxtTODOKECODE, #TxtTANKA, #TxtQUANTITY, #TxtMILEAGE, #TxtSHIPPINGCOUNT, #TxtNENPI, #TxtDIESELPRICECURRENT, #TxtDIESELPRICESTANDARD, #TxtDIESELCONSUMPTION {
-    text-align: right !important;
+    align-items: center;
+    padding-top:10px;
+    padding-bottom:10px;
 }
 
-#TxtTORICODE {
-    width: 150px !important;
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+    #detailkeybox div[id^=RAD_LINE_] > span {
+        display: inline-block;
+        width: 14em;
+        font-weight: bold;
+    }
+
+#detailkeybox p[id^=YUSOU_LINE_] {
+    margin-left: 10px;
+    margin-bottom: 8px;
 }
 
-#TxtTORINAME, #TxtKASANORGNAME, #TxtTODOKENAME, #TxtGROUPNAME, #TxtDETAILNAME, #TxtDEPARTURE, #TxtATENACOMPANYNAME, #TxtATENACOMPANYDEVNAME, #TxtFROMORGNAME, #TxtBIKOU1, #TxtBIKOU2, #TxtBIKOU3 {
+
+#detailkeybox p[id^=YUSOU_LINE_] > span {
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+#detailkeybox p[id^=YUSOU_LINE_]:last-of-type > span {
+    margin-bottom: 0;
+}
+
+/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+#detailkeybox p[id^=YUSOU_LINE_] > span > :nth-child(1) {
+    display: inline-block;
+    width: 13.8em;
+    font-weight: bold;
+}
+/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+    #detailkeybox p[id^=YUSOU_LINE_] > span > :nth-child(2) {
+        display: inline-block;
+        width: 500px;
+    }
+/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
+    #detailkeybox p[id^=YUSOU_LINE_] > span > :nth-child(3) {
+        display: inline-block;
+        width: 8em;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+
+#detailkeybox p[id^=YUSOU_LINE_] > span > :nth-child(4) {
+    display: inline-block;
+    width: 2em;
+}
+
+    #detailkeybox p[id^=YUSOU_LINE_] > span.magnifier > :nth-child(1) {
+        display: inline-block;
+        width: 13.8em;
+    }
+
+    #detailkeybox p[id^=YUSOU_LINE_] > span.magnifier > :nth-child(2) {
+        display: inline-block;
+        width: 500px;
+    }
+
+    #detailkeybox p[id^=YUSOU_LINE_] > span.magnifier > :nth-child(3) {
+        display: inline-block;
+        width: 8em;
+        font-weight: bold;
+        margin-left:10px;
+    }
+
+#detailkeybox p[id^=YUSOU_LINE_] > span.magnifier > :nth-child(4) {
+    display: inline-block;
+    width: 2em;
+}
+
+
+
+#detailkeybox p[id^=ASSESSMENT_LINE_] {
+    margin-left: 10px;
+    margin-bottom: 8px;
+}
+
+
+    #detailkeybox p[id^=ASSESSMENT_LINE_] > span {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    #detailkeybox p[id^=ASSESSMENT_LINE_]:last-of-type > span {
+        margin-bottom: 0;
+    }
+
+    /* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+    #detailkeybox p[id^=ASSESSMENT_LINE_] > span > :nth-child(1) {
+        display: inline-block;
+        width: 13.8em;
+        font-weight: bold;
+    }
+    /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+    #detailkeybox p[id^=ASSESSMENT_LINE_] > span > :nth-child(2) {
+        display: inline-block;
+        width: 500px;
+    }
+
+#detailkeybox p[id^=ASSESSMENT_LINE_] > span.magnifier > :nth-child(1) {
+    display: inline-block;
+    width: 13.8em;
+}
+
+#detailkeybox p[id^=ASSESSMENT_LINE_] > span.magnifier > :nth-child(2) {
+    display: inline-block;
+    width: 100px;
+}
+
+    #detailkeybox p[id^=ASSESSMENT_LINE_] > span.magnifier > :nth-child(3) {
+        display: inline-block;
+        width: 100px;
+        margin-left: 295px;
+    }
+
+
+#detailkeybox p[id^=ASSESSMENT_CHK_LINE_] {
+    margin-left: 10px;
+    margin-bottom: 8px;
+}
+
+
+    #detailkeybox p[id^=ASSESSMENT_CHK_LINE_] > span {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    #detailkeybox p[id^=ASSESSMENT_CHK_LINE_]:last-of-type > span {
+        margin-bottom: 0;
+    }
+
+    /* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
+    #detailkeybox p[id^=ASSESSMENT_CHK_LINE_] > span > :nth-child(1) {
+        display: inline-block;
+        width: 13.8em;
+        font-weight: bold;
+        margin-top: -1.5ex !important;
+    }
+    /* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
+    #detailkeybox p[id^=ASSESSMENT_CHK_LINE_] > span > :nth-child(2) {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+    }
+
+
+#WF_ASSESSMENTFLG_L {
+    margin-left:10px;
+}
+
+
+#WF_TORI, #WF_ORG, #WF_KASANORG, #TxtTODOKENAME {
     width: 500px !important;
 }
 
-    .ddlSelectControl {
-        height: 30px;
-        width: 200px !important;
-        font-size: 12pt;
-        padding: 2px;
+#ddlSelectCALCUNIT {
+    width: 180px !important;
+}
+
+#TxtTANKA, #TxtQUANTITY, #TxtGROUPSORTNO, #TxtDETAILSORTNO {
+    text-align: right !important;
+}
+
+#pnlYusouArea, #pnlAssessmentArea {
+    border-radius: 6px;
+    border: solid 2px black;
+    margin-left: -10px;
+    margin-bottom: 8px;
+}
+
+#WF_YUSOU_L::after {
+    content: "";
+    background-image: url(../img/help.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-left: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
+}
+
+
+.WF_RADIO {
+    display: inline-block;
+}
+
+    .WF_RADIO input {
+        display: none;
     }
 
+    .WF_RADIO label {
+        text-decoration: none;
+        padding: 2px 16px;
+        line-height: 23px;
+        text-align: center;
+        color: #333;
+        border: solid 1px #cfcfcf;
+        background-color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        outline: none;
+        border-radius: 6px;
+        margin-right: 15px;
+        border-color: #5B9BD5;
+        width:120px;
+    }
+
+    .WF_RADIO input:checked + label {
+        background-color: #F7BDA4;
+        border-color: #ED7D31;
+    }
+
+
+/* 中央寄せの箱 */
+.actionButtonBox .centerSide {
+    box-sizing: border-box;
+    margin-left: 100px;
+}
+
+#WF_ButtonUPDATE, #WF_ButtonCANCEL {
+    width: 200px !important;
+    height: 50px !important;
+}
+
+#WF_ButtonCANCEL {
+    margin-left: 100px !important;
+}

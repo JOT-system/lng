@@ -77,13 +77,13 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''ddlDELFLG コントロール。
+    '''RadioDELFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents ddlDELFLG As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents RadioDELFLG As Global.System.Web.UI.WebControls.RadioButtonList
     
     '''<summary>
     '''WF_CAMPCODE_L コントロール。
@@ -140,13 +140,13 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_TORICODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtTORICODE コントロール。
+    '''WF_TORI コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtTORICODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''WF_TORICODE_TEXT コントロール。
@@ -158,24 +158,6 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_TORICODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TORINAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TORINAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTORINAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTORINAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_ORGCODE_L コントロール。
     '''</summary>
     '''<remarks>
@@ -185,13 +167,22 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_ORGCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''ddlSelectORG コントロール。
+    '''WF_ORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents ddlSelectORG As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_ORGCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_KASANORGCODE_L コントロール。
@@ -203,13 +194,13 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_KASANORGCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtKASANORGCODE コントロール。
+    '''WF_KASANORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtKASANORGCODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_KASANORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''WF_KASANORGCODE_TEXT コントロール。
@@ -221,33 +212,6 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_KASANORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_KASANORGNAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGNAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtKASANORGNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtKASANORGNAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_KASANORGNAME_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGNAME_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_TODOKECODE_L コントロール。
     '''</summary>
     '''<remarks>
@@ -255,33 +219,6 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TODOKECODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTODOKECODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTODOKECODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TODOKECODE_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKECODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_TODOKENAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKENAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''TxtTODOKENAME コントロール。
@@ -293,49 +230,31 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents TxtTODOKENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_TODOKENAME_TEXT コントロール。
+    '''TxtTODOKECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TODOKENAME_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents TxtTODOKECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_GROUPSORTNO_L コントロール。
+    '''pnlYusouArea コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GROUPSORTNO_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents pnlYusouArea As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
-    '''TxtGROUPSORTNO コントロール。
+    '''WF_YUSOU_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtGROUPSORTNO As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_GROUPID_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_GROUPID_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtGROUPID コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtGROUPID As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_YUSOU_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_GROUPNAME_L コントロール。
@@ -356,40 +275,22 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents TxtGROUPNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DETAILSORTNO_L コントロール。
+    '''WF_GROUPSORTNO_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DETAILSORTNO_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_GROUPSORTNO_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDETAILSORTNO コントロール。
+    '''TxtGROUPSORTNO コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDETAILSORTNO As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_DETAILID_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_DETAILID_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtDETAILID コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtDETAILID As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtGROUPSORTNO As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_DETAILNAME_L コントロール。
@@ -410,6 +311,60 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents TxtDETAILNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_DETAILSORTNO_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DETAILSORTNO_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtDETAILSORTNO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtDETAILSORTNO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_GROUPID_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_GROUPID_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtGROUPID コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtGROUPID As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_DETAILID_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DETAILID_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtDETAILID コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtDETAILID As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_TANKA_L コントロール。
     '''</summary>
     '''<remarks>
@@ -426,6 +381,15 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtTANKA As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TANKA_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_QUANTITY_L コントロール。
@@ -462,6 +426,132 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents ddlSelectCALCUNIT As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_DISPLAYFLG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DISPLAYFLG_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''RadioDISPLAYFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents RadioDISPLAYFLG As Global.System.Web.UI.WebControls.RadioButtonList
+    
+    '''<summary>
+    '''pnlAssessmentArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlAssessmentArea As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
+    '''WF_ASSESSMENT_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ASSESSMENT_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ASSESSMENTFLG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ASSESSMENTFLG_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''RadioASSESSMENTFLG コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents RadioASSESSMENTFLG As Global.System.Web.UI.WebControls.RadioButtonList
+    
+    '''<summary>
+    '''WF_ATENA_CHANGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENA_CHANGE As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ATENACOMPANYNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENACOMPANYNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ATENACOMPANYNAME2_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENACOMPANYNAME2_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtATENACOMPANYNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtATENACOMPANYNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ATENACOMPANYDEVNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENACOMPANYDEVNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtATENACOMPANYDEVNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtATENACOMPANYDEVNAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_FROMORGNAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_FROMORGNAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtFROMORGNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtFROMORGNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_DEPARTURE_L コントロール。
@@ -590,96 +680,6 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents TxtDIESELCONSUMPTION As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DISPLAYFLG_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_DISPLAYFLG_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ddlDISPLAYFLG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ddlDISPLAYFLG As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
-    '''WF_ASSESSMENTFLG_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ASSESSMENTFLG_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ddlASSESSMENTFLG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ddlASSESSMENTFLG As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
-    '''WF_ATENACOMPANYNAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ATENACOMPANYNAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtATENACOMPANYNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtATENACOMPANYNAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_ATENACOMPANYDEVNAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ATENACOMPANYDEVNAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtATENACOMPANYDEVNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtATENACOMPANYDEVNAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_FROMORGNAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_FROMORGNAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtFROMORGNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtFROMORGNAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''WF_MEISAICATEGORYID_L コントロール。
     '''</summary>
     '''<remarks>
@@ -779,24 +779,6 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents work As Global.JOTWEB_LNG.LNM0014WRKINC
     
     '''<summary>
-    '''mspToriCodeSingle コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents mspToriCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
-    '''<summary>
-    '''mspKasanOrgCodeSingle コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents mspKasanOrgCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
-    '''<summary>
     '''mspTodokeCodeSingle コントロール。
     '''</summary>
     '''<remarks>
@@ -813,6 +795,15 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents mspGroupIdSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
+    
+    '''<summary>
+    '''mspDetailIdSingle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mspDetailIdSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
     
     '''<summary>
     '''DisabledKeyItem コントロール。
@@ -966,6 +957,69 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ATENACHKSTATUS コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENACHKSTATUS As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ATENALISTSELECT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ATENALISTSELECT As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TARGETYM_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TARGETYM_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORI_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORI_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ORG_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORG_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_GROUPNAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_GROUPNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_DETAILNAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DETAILNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

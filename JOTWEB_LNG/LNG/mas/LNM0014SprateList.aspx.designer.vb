@@ -23,6 +23,24 @@ Partial Public Class LNM0014SprateList
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
+    '''WF_UPLOAD_LABEL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_UPLOAD_LABEL As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_UPLOAD_BTN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
+    
+    '''<summary>
     '''ListCount コントロール。
     '''</summary>
     '''<remarks>
@@ -50,22 +68,49 @@ Partial Public Class LNM0014SprateList
     Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_UPLOAD_LABEL コントロール。
+    '''WF_ORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_UPLOAD_LABEL As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_UPLOAD_BTN コントロール。
+    '''WF_TODOKE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_UPLOAD_BTN As Global.System.Web.UI.WebControls.FileUpload
+    Protected WithEvents WF_TODOKE As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_DEPARTURE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_DEPARTURE As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_ButtonFIRST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_ButtonLAST コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
     '''pnlListArea コントロール。

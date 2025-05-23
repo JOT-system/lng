@@ -6,7 +6,7 @@
 ' 更新者 
 '
 ' 修正履歴 : 2025/01/20 新規作成
-'          : 
+'          : 2025/05/15 統合版に変更
 ''************************************************************
 Imports MySql.Data.MySqlClient
 Imports System.Drawing
@@ -97,17 +97,6 @@ Public Class LNM0007KoteihiHistory
                                 '〇 一覧の件数を取得
                                 Me.ListCount.Text = "件数：" + LNM0007tbl.Rows.Count.ToString()
                             End Using
-                        Case "WF_TARGETTABLEChange" '表示対象テーブル変更時
-                            Select Case WF_TARGETTABLE.SelectedValue
-                                Case LNM0007WRKINC.TableList.固定費, LNM0007WRKINC.LISTNAMETOHOKU
-                                    work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDH
-                                Case LNM0007WRKINC.TableList.SK固定費
-                                    work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDHSK
-                                Case LNM0007WRKINC.TableList.TNG固定費
-                                    work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDHTNG
-                            End Select
-                            DowpDownInitialize()
-                            GridViewInitialize()
                     End Select
 
                     '○ 一覧再表示処理
@@ -183,21 +172,6 @@ Public Class LNM0007KoteihiHistory
     ''' <remarks></remarks>
     Protected Sub WW_MAPValueSet()
 
-        DowpDownInitialize()
-        DowpDownTARGETTABLEInitialize()
-
-        work.WF_SEL_CONTROLTABLEHIST.Text = LNM0007WRKINC.MAPIDH
-
-        '○ サイドメニューへの値設定
-        leftmenu.COMPCODE = Master.USERCAMP
-        leftmenu.ROLEMENU = Master.ROLE_MENU
-    End Sub
-
-    ''' <summary>
-    ''' ドロップダウン初期設定処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub DowpDownInitialize()
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()       'DataBase接続
 
@@ -208,18 +182,10 @@ Public Class LNM0007KoteihiHistory
             '変更ユーザ取得
             MODIFYUSERGet(SQLcon)
         End Using
-    End Sub
 
-    ''' <summary>
-    ''' 表示対象ドロップダウンリスト初期設定処理
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub DowpDownTARGETTABLEInitialize()
-        '表示テーブル
-        Me.WF_TARGETTABLE.Items.Clear()
-        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.固定費), LNM0007WRKINC.TableList.固定費))
-        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.SK固定費), LNM0007WRKINC.TableList.SK固定費))
-        WF_TARGETTABLE.Items.Add(New ListItem([Enum].GetName(GetType(LNM0007WRKINC.TableList), LNM0007WRKINC.TableList.TNG固定費), LNM0007WRKINC.TableList.TNG固定費))
+        '○ サイドメニューへの値設定
+        leftmenu.COMPCODE = Master.USERCAMP
+        leftmenu.ROLEMENU = Master.ROLE_MENU
     End Sub
 
     ''' <summary>
@@ -248,8 +214,7 @@ Public Class LNM0007KoteihiHistory
 
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        'CS0013ProfView.MAPID = Master.MAPID
-        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTABLEHIST.Text
+        CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
@@ -302,7 +267,6 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("   , 0                                                                            AS LINECNT                  ")
         SQLStr.AppendLine("   , ''                                                                           AS OPERATION                ")
         SQLStr.AppendLine("   , UPDTIMSTP                                                        AS UPDTIMSTP           ")
-        SQLStr.AppendLine("   , TABLEID                                                          AS TABLEID             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(DELFLG), '')                                                    AS DELFLG                   ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TORICODE), '')                                    AS TORICODE              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TORINAME), '')                                    AS TORINAME              ")
@@ -310,24 +274,48 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(ORGNAME), '')                                     AS ORGNAME              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGCODE), '')                                AS KASANORGCODE              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGNAME), '')                                AS KASANORGNAME              ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
-        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TARGETYM), '')                                    AS TARGETYM              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYABAN), '')                                      AS SYABAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(RIKUBAN), '')                                     AS RIKUBAN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATA), '')                                     AS SYAGATA              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATANAME), '')                                 AS SYAGATANAME              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(SYABARA), '0')                                    AS SYABARA              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(GETSUGAKU), '0')                                   AS GETSUGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(GENGAKU), '0')                                     AS GENGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(KOTEIHI), '0')                                     AS KOTEIHI              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(KOTEIHIM), '0')                                    AS KOTEIHIM              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(KOTEIHID), '0')                                    AS KOTEIHID              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(KAISU), '0')                                       AS KAISU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(KINGAKU), '0')                                     AS KINGAKU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU), '')                                       AS BIKOU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SYABARA), '')                                     AS SYABARA              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEASONKBN), '')                                   AS SEASONKBN              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEASONSTART), '')                                 AS SEASONSTART              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEASONEND), '')                                   AS SEASONEND              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(KOTEIHIM), '')                                    AS KOTEIHIM              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(KOTEIHID), '')                                    AS KOTEIHID              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(KAISU), '')                                       AS KAISU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(GENGAKU), '')                                     AS GENGAKU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(AMOUNT), '')                                      AS AMOUNT              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU1), '')                                      AS BIKOU1              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
+
+        '画面表示用
+        '季節料金判定区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRSEASONKBN        ")
+        '固定費(月額)
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHIM,0)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRKOTEIHIM                                                                              ")
+        '固定費(日額)
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHID), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHID,0)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRKOTEIHID                                                                              ")
+        '減額費用
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GENGAKU), '') = '' THEN ''                                                 ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GENGAKU,0)                                                                        ")
+        SQLStr.AppendLine("     END AS SCRGENGAKU                                                                               ")
+        '請求額
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(AMOUNT), '') = '' THEN ''                                                  ")
+        SQLStr.AppendLine("      ELSE  FORMAT(AMOUNT,0)                                                                         ")
+        SQLStr.AppendLine("     END AS SCRAMOUNT                                                                                ")
+
         SQLStr.AppendLine("   , CASE                 ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
@@ -346,7 +334,7 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("   , DATE_FORMAT(MODIFYYMD, '%Y/%m/%d %T')                                     AS MODIFYYMD                 ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(MODIFYUSER), '')                                           AS MODIFYUSER                ")
         SQLStr.AppendLine(" FROM                                                                                                          ")
-        SQLStr.AppendLine("     LNG.VIW0003_KOTEIHIHIST                                                                                     ")
+        SQLStr.AppendLine("     LNG.LNT0006_FIXEDHIST                                                                                     ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -359,15 +347,13 @@ Public Class LNM0007KoteihiHistory
             SQLStr.AppendLine(" AND COALESCE(RTRIM(MODIFYUSER), '')  =  @MODIFYUSER ")
         End If
 
-        '対象テーブル
-        SQLStr.AppendLine(" AND TABLEID = @TABLEID  ")
-
         SQLStr.AppendLine(" ORDER BY                                                                                              ")
         SQLStr.AppendLine("    MODIFYYMD DESC                                                                                     ")
+        SQLStr.AppendLine("    ,TARGETYM                                                           ")
         SQLStr.AppendLine("    ,TORICODE                                                           ")
         SQLStr.AppendLine("    ,ORGCODE                                                            ")
-        SQLStr.AppendLine("    ,STYMD                                                              ")
         SQLStr.AppendLine("    ,SYABAN                                                             ")
+        SQLStr.AppendLine("    ,SEASONKBN                                                          ")
         SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
         Try
@@ -388,17 +374,6 @@ Public Class LNM0007KoteihiHistory
                     P_MODIFYUSER.Value = ""
                 End If
 
-                '対象テーブル
-                Dim P_TABLEID As MySqlParameter = SQLcmd.Parameters.Add("@TABLEID", MySqlDbType.VarChar, 30)
-                Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                    Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLSKKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLTNGKOTEIHIHIST
-                End Select
-
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
@@ -413,6 +388,14 @@ Public Class LNM0007KoteihiHistory
                 For Each LNM0007row As DataRow In LNM0007tbl.Rows
                     i += 1
                     LNM0007row("LINECNT") = i        'LINECNT
+
+                    Select Case LNM0007row("SEASONKBN").ToString
+                        Case "0" : LNM0007row("SCRSEASONKBN") = "通年"
+                        Case "1" : LNM0007row("SCRSEASONKBN") = "夏季料金"
+                        Case "2" : LNM0007row("SCRSEASONKBN") = "冬季料金"
+                        Case Else : LNM0007row("SCRSEASONKBN") = ""
+                    End Select
+
                 Next
             End Using
         Catch ex As Exception
@@ -440,24 +423,11 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'yyyy/MM') AS MODIFYYM ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%Y/%m') AS MODIFYYM ")
-        SQLStr.AppendLine(" FROM LNG.VIW0003_KOTEIHIHIST ")
-        SQLStr.AppendLine(" WHERE                      ")
-        SQLStr.AppendLine("    TABLEID = @TABLEID      ")
+        SQLStr.AppendLine(" FROM LNG.LNT0006_FIXEDHIST ")
         SQLStr.AppendLine(" ORDER BY MODIFYYM DESC     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                '対象テーブル
-                Dim P_TABLEID As MySqlParameter = SQLcmd.Parameters.Add("@TABLEID", MySqlDbType.VarChar, 30)
-                Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                    Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLSKKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLTNGKOTEIHIHIST
-                End Select
-
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
                     Dim WW_Tbl = New DataTable
@@ -485,10 +455,10 @@ Public Class LNM0007KoteihiHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "VIW0003_KOTEIHIHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_FIXEDHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:VIW0003_KOTEIHIHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0006_FIXEDHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -509,27 +479,16 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'dd') AS MODIFYDD ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%d') AS MODIFYDD ")
-        SQLStr.AppendLine(" FROM LNG.VIW0003_KOTEIHIHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0006_FIXEDHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         'SQLStr.AppendLine("    FORMAT(MODIFYYMD, 'yyyy/MM')  = @MODIFYYM                                                         ")
         SQLStr.AppendLine("      DATE_FORMAT(MODIFYYMD, '%Y/%m')  = @MODIFYYM                                                         ")
-        SQLStr.AppendLine("  AND TABLEID = @TABLEID      ")
         SQLStr.AppendLine(" ORDER BY MODIFYDD ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_MODIFYYM As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYM", MySqlDbType.VarChar, 7)         '変更年月
                 P_MODIFYYM.Value = WF_DDL_MODIFYYM.SelectedValue
-                '対象テーブル
-                Dim P_TABLEID As MySqlParameter = SQLcmd.Parameters.Add("@TABLEID", MySqlDbType.VarChar, 30)
-                Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                    Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLSKKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLTNGKOTEIHIHIST
-                End Select
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
@@ -550,10 +509,10 @@ Public Class LNM0007KoteihiHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "VIW0003_KOTEIHIHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_FIXEDHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:VIW0003_KOTEIHIHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0006_FIXEDHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -573,7 +532,7 @@ Public Class LNM0007KoteihiHistory
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT ")
         SQLStr.AppendLine("     MODIFYUSER ")
-        SQLStr.AppendLine(" FROM LNG.VIW0003_KOTEIHIHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0006_FIXEDHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -583,7 +542,6 @@ Public Class LNM0007KoteihiHistory
             'SQLStr.AppendLine("    FORMAT(MODIFYYMD, 'yyyy/MM/01')  = @MODIFYYMD                                                  ")
             SQLStr.AppendLine("    DATE_FORMAT(MODIFYYMD,'%Y/%m/01')  = @MODIFYYMD                                                  ")
         End If
-        SQLStr.AppendLine(" AND TABLEID = @TABLEID      ")
         SQLStr.AppendLine(" ORDER BY MODIFYUSER  ")
 
         Try
@@ -595,16 +553,6 @@ Public Class LNM0007KoteihiHistory
                 Else
                     P_MODIFYYMD.Value = WF_DDL_MODIFYYM.SelectedValue + "/01"
                 End If
-                '対象テーブル
-                Dim P_TABLEID As MySqlParameter = SQLcmd.Parameters.Add("@TABLEID", MySqlDbType.VarChar, 30)
-                Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                    Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLSKKOTEIHIHIST
-                    Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                        P_TABLEID.Value = LNM0007WRKINC.TBLTNGKOTEIHIHIST
-                End Select
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
@@ -625,10 +573,10 @@ Public Class LNM0007KoteihiHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "VIW0003_KOTEIHIHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0006_FIXEDHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:VIW0003_KOTEIHIHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0006_FIXEDHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -693,8 +641,7 @@ Public Class LNM0007KoteihiHistory
         '○ 一覧作成
         CS0013ProfView.CAMPCODE = Master.USERCAMP
         CS0013ProfView.PROFID = Master.PROF_VIEW
-        'CS0013ProfView.MAPID = Master.MAPID
-        CS0013ProfView.MAPID = work.WF_SEL_CONTROLTABLEHIST.Text
+        CS0013ProfView.MAPID = Master.MAPID
         CS0013ProfView.VARI = Master.VIEWID
         CS0013ProfView.SRCDATA = TBLview.ToTable
         CS0013ProfView.TBLOBJ = pnlListArea
@@ -809,14 +756,7 @@ Public Class LNM0007KoteihiHistory
 
         '最大列(RANGE)を取得
         Dim WW_MAXCOL As Integer = 0
-        Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-            Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
-            Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOLSK)).Cast(Of Integer)().Max()
-            Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOLTNG)).Cast(Of Integer)().Max()
-        End Select
+        WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
 
         'シート名
         wb.ActiveSheet.Name = Left(WF_DDL_MODIFYYM.SelectedValue, 4) + "年" + Right(WF_DDL_MODIFYYM.SelectedValue, 2) + "月"
@@ -829,7 +769,7 @@ Public Class LNM0007KoteihiHistory
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -846,14 +786,7 @@ Public Class LNM0007KoteihiHistory
         wb.ActiveSheet.Range("A1").Value = "ID:" + Master.MAPID
         wb.ActiveSheet.Range("A2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)
         wb.ActiveSheet.Range("B2").Value = "は変更項目"
-        Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-            Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "固定費マスタ変更履歴一覧"
-            Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "SK固定費マスタ変更履歴一覧"
-            Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                wb.ActiveSheet.Range("C1").Value = "TNG固定費マスタ変更履歴一覧"
-        End Select
+        wb.ActiveSheet.Range("C1").Value = "固定費マスタ変更履歴一覧"
 
         '列幅自動調整
         wb.ActiveSheet.Range("A3:" + WW_MAXRANGE).EntireColumn.AutoFit()
@@ -877,14 +810,7 @@ Public Class LNM0007KoteihiHistory
         Dim FilePath As String
         Select Case WW_FILETYPE
             Case LNM0007WRKINC.FILETYPE.EXCEL
-                Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                    Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                        FileName = "固定費マスタ変更履歴.xlsx"
-                    Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                        FileName = "SK固定費マスタ変更履歴.xlsx"
-                    Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                        FileName = "TNG固定費マスタ変更履歴.xlsx"
-                End Select
+                FileName = "固定費マスタ変更履歴.xlsx"
                 FilePath = IO.Path.Combine(UploadRootPath, FileName)
 
                 '保存
@@ -981,147 +907,110 @@ Public Class LNM0007KoteihiHistory
         '値
         Dim WW_HEADERROW As Integer = 2
 
-        Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-            Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = "操作区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = "変更区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = "変更日時"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = "変更USER"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.DELFLG).Value = "削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.TORICODE).Value = "取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGCODE).Value = "部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABAN).Value = "車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.RIKUBAN).Value = "陸事番号"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATA).Value = "車型"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = "車型名"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = "車腹"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHI).Value = "固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = "備考1"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = "備考2"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = "備考3"
-            Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.OPERATEKBNNAME).Value = "操作区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYKBNNAME).Value = "変更区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYYMD).Value = "変更日時"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYUSER).Value = "変更USER"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.DELFLG).Value = "削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TORICODE).Value = "取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGCODE).Value = "部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABAN).Value = "車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABARA).Value = "車腹"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GETSUGAKU).Value = "月額運賃"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GENGAKU).Value = "減額対象額"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KOTEIHI).Value = "固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLSK.BIKOU).Value = "備考"
-            Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.OPERATEKBNNAME).Value = "操作区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYKBNNAME).Value = "変更区分"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYYMD).Value = "変更日時"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYUSER).Value = "変更USER"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.DELFLG).Value = "削除フラグ"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TORICODE).Value = "取引先コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TORINAME).Value = "取引先名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGCODE).Value = "部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGNAME).Value = "部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGCODE).Value = "加算先部門コード"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGNAME).Value = "加算先部門名称"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.SYABAN).Value = "車番"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHIM).Value = "月額固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHID).Value = "日額固定費"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KAISU).Value = "使用回数"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KINGAKU).Value = "金額"
-                sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.BIKOU).Value = "備考"
-        End Select
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = "操作区分"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = "変更区分"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = "変更日時"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = "変更USER"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.DELFLG).Value = "削除フラグ"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.TORICODE).Value = "取引先コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.TORINAME).Value = "取引先名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGCODE).Value = "部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGNAME).Value = "部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.TARGETYM).Value = "対象年月"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABAN).Value = "車番"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.RIKUBAN).Value = "陸事番号"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATA).Value = "車型"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = "車型名"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = "車腹"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONKBN).Value = "季節料金判定区分"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONSTART).Value = "季節料金判定開始月日"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONEND).Value = "季節料金判定終了月日"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Value = "固定費(月額)"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Value = "固定費(日額)"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = "回数"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Value = "減額費用"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Value = "請求額"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = "備考1"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = "備考2"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = "備考3"
+
     End Sub
 
     ''' <summary>
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
+        '数値書式
+        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
+        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
 
         For Each Row As DataRow In LNM0007tbl.Rows
             '値
-            Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-                Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHI).Value = Row("KOTEIHI") '固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
-                Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.SYABARA).Value = Row("SYABARA") '車腹
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GETSUGAKU).Value = Row("GETSUGAKU") '月額運賃
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.GENGAKU).Value = Row("GENGAKU") '減額対象額
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.KOTEIHI).Value = Row("KOTEIHI") '固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLSK.BIKOU).Value = Row("BIKOU") '備考
-                Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.DELFLG).Value = Row("DELFLG") '削除フラグ
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TORICODE).Value = Row("TORICODE") '取引先コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.TORINAME).Value = Row("TORINAME") '取引先名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGCODE).Value = Row("ORGCODE") '部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ORGNAME).Value = Row("ORGNAME") '部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.STYMD).Value = Row("STYMD") '有効開始日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.ENDYMD).Value = Row("ENDYMD") '有効終了日
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.SYABAN).Value = Row("SYABAN") '車番
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHIM).Value = Row("KOTEIHIM") '月額固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KOTEIHID).Value = Row("KOTEIHID") '日額固定費
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KAISU).Value = Row("KAISU") '使用回数
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.KINGAKU).Value = Row("KINGAKU") '金額
-                    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOLTNG.BIKOU).Value = Row("BIKOU") '備考
-            End Select
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYKBNNAME).Value = Row("MODIFYKBNNAME") '変更区分
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYYMD).Value = Row("MODIFYYMD") '変更日時
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.TORICODE).Value = Row("TORICODE") '取引先コード	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.TORINAME).Value = Row("TORINAME") '取引先名称	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGCODE).Value = Row("ORGCODE") '部門コード	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.TARGETYM).Value = Row("TARGETYM") '対象年月	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABAN).Value = Row("SYABAN") '車番	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONKBN).Value = Row("SEASONKBN") '季節料金判定区分	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONSTART).Value = Row("SEASONSTART") '季節料金判定開始月日	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONEND).Value = Row("SEASONEND") '季節料金判定終了月日	
+
+            '固定費(月額)
+            If Row("KOTEIHIM") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Value = Row("KOTEIHIM")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Value = CDbl(Row("KOTEIHIM"))
+            End If
+
+            '固定費(日額)
+            If Row("KOTEIHID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Value = Row("KOTEIHID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Value = CDbl(Row("KOTEIHID"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = Row("KAISU") '回数	
+
+
+            '減額費用
+            If Row("GENGAKU") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Value = Row("GENGAKU")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Value = CDbl(Row("GENGAKU"))
+            End If
+
+            '請求額
+            If Row("AMOUNT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Value = Row("AMOUNT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Value = CDbl(Row("AMOUNT"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2	
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3	
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Style = NumStyle
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0007WRKINC.MODIFYKBN.AFTDATA Then
@@ -1142,22 +1031,13 @@ Public Class LNM0007KoteihiHistory
         Dim WW_MAXCOL As Integer = 0
         Dim WW_STCOL As Integer = 0
 
-        Select Case work.WF_SEL_CONTROLTABLEHIST.Text
-            Case LNM0007WRKINC.MAPIDH '固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
-                WW_STCOL = LNM0007WRKINC.HISTORYEXCELCOL.DELFLG   '削除フラグ
-            Case LNM0007WRKINC.MAPIDHSK 'SK固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOLSK)).Cast(Of Integer)().Max()
-                WW_STCOL = LNM0007WRKINC.HISTORYEXCELCOLSK.DELFLG   '削除フラグ
-            Case LNM0007WRKINC.MAPIDHTNG 'TNG固定費マスタ
-                WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOLTNG)).Cast(Of Integer)().Max()
-                WW_STCOL = LNM0007WRKINC.HISTORYEXCELCOLTNG.DELFLG   '削除フラグ
-        End Select
+        WW_MAXCOL = [Enum].GetValues(GetType(LNM0007WRKINC.HISTORYEXCELCOL)).Cast(Of Integer)().Max()
+        WW_STCOL = LNM0007WRKINC.HISTORYEXCELCOL.DELFLG   '削除フラグ
 
         '開始列から最大列まで変更前後の値を確認
         For index As Integer = WW_STCOL To WW_MAXCOL
             '変更前と変更後が不一致の場合
-            If Not sheet.Cells(WW_ACTIVEROW - 1, index).Value = sheet.Cells(WW_ACTIVEROW, index).Value Then
+            If Not Convert.ToString(sheet.Cells(WW_ACTIVEROW - 1, index).Value) = Convert.ToString(sheet.Cells(WW_ACTIVEROW, index).Value) Then
 
                 '変更後の背景色を塗りつぶし
                 sheet.Cells(WW_ACTIVEROW, index).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)

@@ -23,15 +23,6 @@ Partial Public Class LNM0007KoteihiHistory
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
-    '''WF_TARGETTABLE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TARGETTABLE As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
     '''ListCount コントロール。
     '''</summary>
     '''<remarks>
