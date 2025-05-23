@@ -301,10 +301,9 @@ Public Class LNT0001InvoiceOutputReport
             '★八戸営業所の場合([東部瓦斯]独自対応)
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
                 '届日メインで設定
-                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER IN ('1','2')", "C", "D", WW_SheetNoTobuGas)
-                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER >= '3'", "E", "F", WW_SheetNoTobuGas)
-                'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER<>'3'", "C", "D", WW_SheetNoTobuGas)
-                'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER='3'", "E", "F", WW_SheetNoTobuGas)
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER IN ('1','2') AND BRANCHCODE = '1' ", "C", "D", WW_SheetNoTobuGas)
+                EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND (TODOKEDATE_ORDER >= '3' OR BRANCHCODE = '2') ", "E", "F", WW_SheetNoTobuGas)
+                'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER >= '3'", "E", "F", WW_SheetNoTobuGas)
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
                 '★水島営業所の場合([三井Ｅ＆Ｓ]独自対応)
