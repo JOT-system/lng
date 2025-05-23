@@ -216,7 +216,7 @@ Public Module PrevDispMap
         ''' <summary>
         ''' 固定費スタメンテナンス（履歴）
         ''' </summary>
-        Public Const LNM0007H As String = "ASP.LNG_MAS_LNM0007TANKAHISTORY_ASPX"
+        Public Const LNM0007H As String = "ASP.LNG_MAS_LNM0007KOTEIHIHISTORY_ASPX"
 
         ''' <summary>
         ''' コード変換特例２マスタメンテナンス（検索）

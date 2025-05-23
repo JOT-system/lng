@@ -245,7 +245,7 @@ Public Class LNM0014SprateList
             ' 登録画面からの遷移
             Master.RecoverTable(LNM0014tbl, work.WF_SEL_INPTBL.Text)
 
-            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM_L.Text, "/", "")
             WF_TaishoYm.Value = WW_YM.Substring(0, 4) & "/" & WW_YM.Substring(4, 2)
         Else
             ' サブメニューからの画面遷移
@@ -551,6 +551,8 @@ Public Class LNM0014SprateList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
+
         work.WF_SEL_LINECNT.Text = ""                                                   '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)          '削除
 
@@ -627,7 +629,7 @@ Public Class LNM0014SprateList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
-        work.WF_SEL_TARGETYM.Text = WF_TaishoYm.Value
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
         Server.Transfer("~/LNG/mas/LNM0014SprateHistory.aspx")
     End Sub
 
@@ -785,6 +787,8 @@ Public Class LNM0014SprateList
         Catch ex As Exception
             Exit Sub
         End Try
+
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
 
         work.WF_SEL_LINECNT.Text = LNM0014tbl.Rows(WW_LineCNT)("LINECNT")            '選択行
 

@@ -214,7 +214,7 @@ Public Class LNM0007KoteihiList
             ' 登録画面からの遷移
             Master.RecoverTable(LNM0007tbl, work.WF_SEL_INPTBL.Text)
 
-            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+            Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM_L.Text, "/", "")
             WF_TaishoYm.Value = WW_YM.Substring(0, 4) & "/" & WW_YM.Substring(4, 2)
         Else
             ' サブメニューからの画面遷移
@@ -489,6 +489,8 @@ Public Class LNM0007KoteihiList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
+
         work.WF_SEL_LINECNT.Text = ""                                             '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)    '削除
 
@@ -549,6 +551,7 @@ Public Class LNM0007KoteihiList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
         Server.Transfer("~/LNG/mas/LNM0007KoteihiHistory.aspx")
     End Sub
 
@@ -706,6 +709,8 @@ Public Class LNM0007KoteihiList
         Catch ex As Exception
             Exit Sub
         End Try
+
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
 
         work.WF_SEL_LINECNT.Text = LNM0007tbl.Rows(WW_LineCNT)("LINECNT")            '選択行
 

@@ -6,6 +6,9 @@
     <asp:TextBox ID="WF_SEL_CAMPCODE" runat="server"></asp:TextBox>                 <!-- 会社コード -->
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>                  <!-- 選択行 -->
 
+    <!-- 一覧用 -->
+    <asp:TextBox ID="WF_SEL_TARGETYM_L" runat="server"></asp:TextBox>              <!-- 対象年月 -->
+
     <!-- 登録・更新用 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                <!-- 削除フラグ -->
     <asp:TextBox ID="WF_SEL_TORICODE" runat="server"></asp:TextBox>              <!-- 取引先コード -->

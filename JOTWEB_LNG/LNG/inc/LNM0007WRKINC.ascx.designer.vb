@@ -30,7 +30,16 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_TARGETYM_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_TARGETYM_L As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
@@ -39,7 +48,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TORICODE コントロール。
     '''</summary>
@@ -48,7 +57,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TORICODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TORINAME コントロール。
     '''</summary>
@@ -57,7 +66,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TORINAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORGCODE コントロール。
     '''</summary>
@@ -66,7 +75,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ORGNAME コントロール。
     '''</summary>
@@ -75,7 +84,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KASANORGCODE コントロール。
     '''</summary>
@@ -84,7 +93,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KASANORGCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KASANORGNAME コントロール。
     '''</summary>
@@ -93,7 +102,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KASANORGNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TARGETYM コントロール。
     '''</summary>
@@ -102,7 +111,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TARGETYM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SYABAN コントロール。
     '''</summary>
@@ -111,7 +120,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SYABAN As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_RIKUBAN コントロール。
     '''</summary>
@@ -120,7 +129,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_RIKUBAN As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SYAGATA コントロール。
     '''</summary>
@@ -129,7 +138,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SYAGATA As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SYAGATANAME コントロール。
     '''</summary>
@@ -138,7 +147,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SYAGATANAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SYABARA コントロール。
     '''</summary>
@@ -147,7 +156,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SYABARA As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEASONKBN コントロール。
     '''</summary>
@@ -156,7 +165,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEASONKBN As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEASONSTART コントロール。
     '''</summary>
@@ -165,7 +174,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEASONSTART As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEASONEND コントロール。
     '''</summary>
@@ -174,7 +183,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEASONEND As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KOTEIHIM コントロール。
     '''</summary>
@@ -183,7 +192,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KOTEIHIM As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KOTEIHID コントロール。
     '''</summary>
@@ -192,7 +201,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KOTEIHID As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_KAISU コントロール。
     '''</summary>
@@ -201,7 +210,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_KAISU As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_GENGAKU コントロール。
     '''</summary>
@@ -210,7 +219,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_GENGAKU As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_AMOUNT コントロール。
     '''</summary>
@@ -219,7 +228,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_AMOUNT As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BIKOU1 コントロール。
     '''</summary>
@@ -228,7 +237,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BIKOU1 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BIKOU2 コントロール。
     '''</summary>
@@ -237,7 +246,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BIKOU2 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BIKOU3 コントロール。
     '''</summary>
@@ -246,7 +255,7 @@ Partial Public Class LNM0007WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_BIKOU3 As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TIMESTAMP コントロール。
     '''</summary>
