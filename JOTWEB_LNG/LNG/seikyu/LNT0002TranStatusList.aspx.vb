@@ -387,7 +387,7 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("               SELECT                                                                                ")
         SQLStr.AppendLine("                 TAISHOYM                                                                            ")
         SQLStr.AppendLine("                ,TORICODE                                                                            ")
-        SQLStr.AppendLine("                ,MAX(SEQ) AS  SEQ                                                                    ")
+        SQLStr.AppendLine("                ,MAX(CONVERT(COALESCE(RTRIM(SEQ), '0') , DECIMAL)) AS  SEQ                           ")
         SQLStr.AppendLine("               FROM                                                                                  ")
         SQLStr.AppendLine("                 LNG.LNT0026_SEIKYUHIST                                                              ")
         SQLStr.AppendLine("               WHERE DELFLG <> '1'                                                                   ")
@@ -2941,7 +2941,7 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("   , ''                                                                       AS OPERATION           ")
         SQLStr.AppendLine("   , LNT0002.UPDTIMSTP                                                        AS UPDTIMSTP           ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0002.DELFLG), '')                                      AS DELFLG              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0002.SEQ), '')                                         AS KAISU               ")
+        SQLStr.AppendLine("   , LPAD(COALESCE(RTRIM(LNT0002.SEQ), ''),2,'0')                             AS KAISU               ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNT0002.INTAKEDATE, '%Y/%m/%d %H:%i:%s'), '')       AS DLYMD               ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0002.USERNAME), '')                                    AS DLUSERNAME          ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(A.ORGNAME), '')                                           AS DLORGNAME           ")
@@ -2968,7 +2968,7 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine(" AND  COALESCE(LNT0002.TAISHOYM, '0') = COALESCE(@TAISHOYM, '0')                                     ")
         SQLStr.AppendLine(" AND  COALESCE(LNT0002.TORICODE, '0') = COALESCE(@TORICODE, '0')                                     ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     LNT0002.SEQ                                                                                     ")
+        SQLStr.AppendLine("     LPAD(COALESCE(RTRIM(LNT0002.SEQ), ''),2,'0')                                                    ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
