@@ -460,19 +460,19 @@ Public Class CmnCheck
         '〇石油資源開発(不積判定の設定) ----------------------------------------------------------
         '■若松ｶﾞｽ(喜多方) 
         '  --302号車(11.4t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, LNT0001tbl, "302")
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, LNT0001tbl, gyomuNo:="302")
         '■ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
         '  --333号車(14.0t車)不積 
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, LNT0001tbl, "333")
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, LNT0001tbl, gyomuNo:="333", tyoseiFlg:=True)
         '  --334号車(15.7t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, LNT0001tbl, "334")
+        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, LNT0001tbl, gyomuNo:="334", tyoseiFlg:=True)
         ' ---------------------------------------------------------------------------------------/
 
         '〇石油資源開発(1.5回転の設定) -----------------------------------------------------------
         '■若松ｶﾞｽ(玉川)
         '  --326号車(若松1.5回転)
         WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "積込", "積置", "326", arrOPFCycle_002025_326, LNT0001tbl, judgeDate:="SHUKADATE")
-        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326, LNT0001tbl)
+        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326, LNT0001tbl, tyoseiFlg:=True)
         ' ---------------------------------------------------------------------------------------/
 
         '〇(石油資源開発)届先出荷場所車庫マスタ設定
@@ -587,10 +587,16 @@ Public Class CmnCheck
     ''' </summary>
     Protected Sub WW_SetSekiyuSigenFuzumi(ByVal todokeCode As String, cellSet As String(),
                                           ByRef LNT0001tbl As DataTable,
-                                          Optional ByVal gyomuNo As String = Nothing)
+                                          Optional ByVal gyomuNo As String = Nothing,
+                                          Optional ByVal tyoseiFlg As Boolean = False)
         Dim condition As String = ""
         condition &= String.Format("TODOKECODE='{0}' ", todokeCode)
-        condition &= "AND ZISSEKI_FUZUMIFLG='TRUE' "
+        If tyoseiFlg = False Then
+            condition &= "AND ZISSEKI_FUZUMIFLG='TRUE' "
+        Else
+            '★単価調整にて"2"(不積単価)設定
+            condition &= "AND (ZISSEKI_FUZUMIFLG='TRUE' OR BRANCHCODE=2) "
+        End If
         For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
             If Not IsNothing(gyomuNo) AndAlso LNT0001tblrow("GYOMUTANKNUM_REP").ToString() <> gyomuNo Then
                 Continue For
@@ -609,7 +615,8 @@ Public Class CmnCheck
     ''' <param name="stackingType">積置区分</param>
     Protected Sub WW_SetSekiyuSigenOnePointFiveCycle(ByVal todokeCode As String, ByVal loadUnloType As String, ByVal stackingType As String, ByVal gyomuNo As String, cellSet As String(),
                                                      ByRef LNT0001tbl As DataTable,
-                                                     Optional ByVal judgeDate As String = "TODOKEDATE")
+                                                     Optional ByVal judgeDate As String = "TODOKEDATE",
+                                                     Optional ByVal tyoseiFlg As Boolean = False)
         Dim condition As String = ""
         condition &= String.Format("TODOKECODE='{0}' ", todokeCode)             '-- 届先
         condition &= String.Format("AND LOADUNLOTYPE='{0}' ", loadUnloType)     '-- 積込荷卸区分
@@ -628,6 +635,16 @@ Public Class CmnCheck
                 LNT0001tblrow("SETCELL01") = cellSet(0) + LNT0001tblrow("SETLINE").ToString()
                 LNT0001tblrow("SETCELL02") = cellSet(1) + LNT0001tblrow("SETLINE").ToString()
             Next
+        Next
+
+        '〇単価調整フラグFALSEの場合は終了
+        If tyoseiFlg = False Then Exit Sub
+
+        '★単価調整にて"2"(1.5回転)設定
+        condition &= " AND BRANCHCODE=2 "
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+            LNT0001tblrow("SETCELL01") = cellSet(0) + LNT0001tblrow("SETLINE").ToString()
+            LNT0001tblrow("SETCELL02") = cellSet(1) + LNT0001tblrow("SETLINE").ToString()
         Next
 
     End Sub
