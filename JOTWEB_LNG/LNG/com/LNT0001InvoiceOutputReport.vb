@@ -318,7 +318,7 @@ Public Class LNT0001InvoiceOutputReport
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='14.000'", "I", "J", WW_SheetNoCocacola)
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='12.300'", "C", "D", WW_SheetNoCocacola)
                 '-- [不積対応分]設定
-                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND ZISSEKI_FUZUMIFLG='TRUE'", "K", "L", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND (ZISSEKI_FUZUMIFLG='TRUE' OR BRANCHCODE=2) ", "K", "L", WW_SheetNoCocacola, tyoseiFlg:=True)
 
             End If
 
@@ -699,7 +699,8 @@ Public Class LNT0001InvoiceOutputReport
     ''' <summary>
     ''' 帳票の明細設定([コカ・コーラボトラーズジャパン株式会社]独自対応)
     ''' </summary>
-    Private Sub EditDetailAreaCocacola(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String, ByVal sheetNoCocacola As Integer)
+    Private Sub EditDetailAreaCocacola(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String, ByVal sheetNoCocacola As Integer,
+                                       Optional ByVal tyoseiFlg As Boolean = False)
         Dim zissekiNum As Double = 0    '【数量 （t）】設定用
         Dim zissekiCnt As Integer = 0   '【台数】設定用
         Dim cellStart As Integer = 12   '[設定行]
@@ -718,6 +719,14 @@ Public Class LNT0001InvoiceOutputReport
 
             WW_Workbook.Worksheets(sheetNoCocacola).Range("C" + lineNum.ToString()).Value = ""
             WW_Workbook.Worksheets(sheetNoCocacola).Range("D" + lineNum.ToString()).Value = ""
+            If tyoseiFlg = True Then
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("E" + lineNum.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("F" + lineNum.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("G" + lineNum.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("H" + lineNum.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("I" + lineNum.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNoCocacola).Range("J" + lineNum.ToString()).Value = ""
+            End If
             WW_Workbook.Worksheets(sheetNoCocacola).Range(cellNum + lineNum.ToString()).Value = zissekiNum
             WW_Workbook.Worksheets(sheetNoCocacola).Range(cellCnt + lineNum.ToString()).Value = zissekiCnt
 
