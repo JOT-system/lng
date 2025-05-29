@@ -10,9 +10,12 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp04 As Integer = 0
     Private WW_SheetNoTmp05 As Integer = 0
     Private WW_SheetNoTmp06 As Integer = 0
-    Private WW_SheetNoTobuGas As Integer = 0
-    Private WW_SheetNoMitsuiES As Integer = 0
-    Private WW_SheetNoCocacola As Integer = 0
+    Private WW_SheetNoTobuGas As Integer = 0            '-- ＥＮＥＯＳ(八戸)[東部瓦斯]
+    Private WW_SheetNoMitsuiES As Integer = 0           '-- ＥＮＥＯＳ(水島)[三井Ｅ＆Ｓ]
+    Private WW_SheetNoCocacola As Integer = 0           '-- ＥＮＥＯＳ(水島)[コカ・コーラ　ボトラーズジャパン]
+    Private WW_SheetNoNichiei As Integer = 0            '-- ＤＧＥ(泉北)[日栄]
+    Private WW_SheetNoSyowasangyo As Integer = 0        '-- ＤＧＥ(泉北)[昭和産業(株)]
+    Private WW_SheetNoNagaseKemutekkusu As Integer = 0  '-- ＤＧＥ(姫路)[ナガセケムテックス]
     Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
     ''' <summary>
@@ -152,6 +155,15 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 AndAlso WW_Workbook.Worksheets(i).Name = "コカ・コーラ") Then
                         '〇ENEOS(シート[コカ・コーラ])
                         WW_SheetNoCocacola = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" AndAlso WW_Workbook.Worksheets(i).Name = "日本栄船") Then
+                        '〇DAIGAS(シート[日本栄船])
+                        WW_SheetNoNichiei = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" AndAlso WW_Workbook.Worksheets(i).Name = "昭和産業") Then
+                        '〇DAIGAS(シート[昭和産業])
+                        WW_SheetNoSyowasangyo = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 AndAlso WW_Workbook.Worksheets(i).Name = "ナガセケムテックス") Then
+                        '〇DAIGAS(シート[ナガセケムテックス])
+                        WW_SheetNoNagaseKemutekkusu = i
                     ElseIf WW_Workbook.Worksheets(i).Name = "TMP" + (j + 1).ToString("00") Then
                         WW_ArrSheetNo(j) = i
                         j += 1
@@ -319,6 +331,14 @@ Public Class LNT0001InvoiceOutputReport
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='12.300'", "C", "D", WW_SheetNoCocacola)
                 '-- [不積対応分]設定
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND (ZISSEKI_FUZUMIFLG='TRUE' OR BRANCHCODE=2) ", "K", "L", WW_SheetNoCocacola, tyoseiFlg:=True)
+
+            ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" Then
+                '★ＤＧＥ(泉北)の場合([日栄]独自対応)
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_004916, "AND BRANCHCODE = '2' ", "L", "M", WW_SheetNoNichiei, 12)
+
+            ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
+                '★ＤＧＥ(姫路営業所)の場合([ナガセケムテックス]独自対応)
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_006880, "AND BRANCHCODE = '2' ", "E", "F", WW_SheetNoNagaseKemutekkusu, 12)
 
             End If
 
@@ -732,6 +752,38 @@ Public Class LNT0001InvoiceOutputReport
 
             syukaDate = PrintDatarow("SHUKADATE").ToString()
         Next
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(単価調整)
+    ''' </summary>
+    Private Sub EditDetailAreaTankaTyosei(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String, ByVal sheetNo As Integer, ByVal sheetStartNum As Integer)
+        Dim condition As String = String.Format("TODOKECODE='{0}' {1} ", todokeCode, todokeOrder)
+
+        For Each PrintDatarow As DataRow In PrintData.Select(condition, "SHUKADATE")
+            Dim dateNum As String = Date.Parse(PrintDatarow("TODOKEDATE").ToString()).ToString("dd")
+            Dim cellLine = sheetStartNum + (Integer.Parse(dateNum) - 1)
+
+            '★ＤＧＥ(泉北)の場合([日栄]独自対応)
+            If todokeCode = BaseDllConst.CONST_TODOKECODE_004916 Then
+                WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = 1
+            Else
+                Dim regNumber As New Regex("[0-9]")
+                Dim setCell01 = regNumber.Replace(PrintDatarow("SETCELL01").ToString(), "")
+                Dim setCell02 = regNumber.Replace(PrintDatarow("SETCELL02").ToString(), "")
+
+                '★入替項目の退避
+                Dim evaQuantity = WW_Workbook.Worksheets(sheetNo).Range(setCell01 + cellLine.ToString()).Value
+                Dim evaNumber = WW_Workbook.Worksheets(sheetNo).Range(setCell02 + cellLine.ToString()).Value
+                '★入替後、初期化(空白)
+                WW_Workbook.Worksheets(sheetNo).Range(setCell01 + cellLine.ToString()).Value = ""
+                WW_Workbook.Worksheets(sheetNo).Range(setCell02 + cellLine.ToString()).Value = ""
+                '★退避した内容を設定
+                WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = evaQuantity
+                WW_Workbook.Worksheets(sheetNo).Range(cellCnt + cellLine.ToString()).Value = evaNumber
+            End If
+        Next
+
     End Sub
 
 End Class

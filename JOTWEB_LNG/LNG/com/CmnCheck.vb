@@ -334,8 +334,18 @@ Public Class CmnCheck
             Dim condition As String = String.Format("TODOKECODE='{0}'", dtDaigasTodokerow("KEYCODE01"))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 LNT0001tblrow("SHEETSORTNO_REP") = dtDaigasTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = dtDaigasTodokerow("VALUE01")
-                LNT0001tblrow("SHEETNAME_REP") = dtDaigasTodokerow("VALUE06")
+
+                '★ＤＧＥ(泉北)の場合([昭和産業㈱]独自対応)
+                If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005866 Then
+                    '１運行目は"1"(枝番)、２運行目は"2"(枝番)を後ろにつけて設定
+                    Dim sheetName = dtDaigasTodokerow("VALUE01").ToString().Replace("1", "").Replace("2", "")
+                    Dim blanchCode = LNT0001tblrow("BRANCHCODE").ToString()
+                    LNT0001tblrow("TODOKENAME_REP") = sheetName + blanchCode
+                    LNT0001tblrow("SHEETNAME_REP") = sheetName + blanchCode
+                Else
+                    LNT0001tblrow("TODOKENAME_REP") = dtDaigasTodokerow("VALUE01")
+                    LNT0001tblrow("SHEETNAME_REP") = dtDaigasTodokerow("VALUE06")
+                End If
 
                 '〇届先が追加された場合
                 If dtDaigasTodokerow("VALUE02").ToString() = "1" Then
