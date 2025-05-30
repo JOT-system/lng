@@ -856,6 +856,9 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= String.Format(" AND A01.AVOCADOSHUKABASHO = '{0}' ", SHUKABASHO)
         SQLStr &= String.Format(" AND A01.AVOCADOTODOKECODE = '{0}' ", TODOKECODE)
         SQLStr &= String.Format(" AND A01.BRANCHCODE = '{0}' ", BRANCHCODE)
+        SQLStr &= String.Format(" AND A01.STYMD  <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.ENDYMD >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
