@@ -412,6 +412,12 @@ Public Class LNT0001InvoiceOutputReport
                 If PrintDatarow("ORDERORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 Then
                     '★ 設定(向け先)
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
+
+                    '〇DAIGAS(泉北)の場合
+                ElseIf PrintDatarow("ORDERORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
+                    '★ 設定(向け先)
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
+
                 End If
 
                 Try
@@ -498,7 +504,10 @@ Public Class LNT0001InvoiceOutputReport
                         '〇西日本支店車庫(泉北)独自仕様
                     ElseIf PrintDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
                         Dim cellValue As String = ""
-                        cellValue = WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERNO").ToString())).Value.ToString()
+                        Try
+                            cellValue = WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("A{0}", PrintDatarow("MASTERNO").ToString())).Value.ToString()
+                        Catch ex As Exception
+                        End Try
 
                         '☆(日本栄船)独自仕様
                         'If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
@@ -527,6 +536,13 @@ Public Class LNT0001InvoiceOutputReport
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
 
+                            '☆(ハルナプロデュース)独自仕様
+                        ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
+                            If PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            Else
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            End If
                         Else
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If

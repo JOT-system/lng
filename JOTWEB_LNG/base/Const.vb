@@ -429,6 +429,18 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TODOKECODE_006880 As String = "006880"
     ''' <summary>
+    ''' 三ツ星ベルト綾部
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007293 As String = "007293"
+    ''' <summary>
+    ''' ハルナプロデュース和歌山
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007304 As String = "007304"
+    ''' <summary>
+    ''' レンゴー㈱武生工場
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007309 As String = "007309"
+    ''' <summary>
     ''' リコー福井事業所
     ''' </summary>
     Public Const CONST_TODOKECODE_004559 As String = "004559"

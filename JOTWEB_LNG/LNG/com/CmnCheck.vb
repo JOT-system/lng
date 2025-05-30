@@ -342,6 +342,16 @@ Public Class CmnCheck
                     Dim blanchCode = LNT0001tblrow("BRANCHCODE").ToString()
                     LNT0001tblrow("TODOKENAME_REP") = sheetName + blanchCode
                     LNT0001tblrow("SHEETNAME_REP") = sheetName + blanchCode
+
+                ElseIf LNT0001tblrow("BRANCHCODE").ToString() = "2" Then
+                    '★ＤＧＥ(泉北)の場合([ハルナプロデュース]独自対応)
+                    If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
+                        Dim sheetName = dtDaigasTodokerow("VALUE01").ToString().Replace("1", "").Replace("2", "")
+                        Dim blanchCode = LNT0001tblrow("BRANCHCODE").ToString()
+                        LNT0001tblrow("TODOKENAME_REP") = sheetName + blanchCode
+                        'LNT0001tblrow("SHEETNAME_REP") = sheetName + blanchCode
+                    End If
+
                 Else
                     LNT0001tblrow("TODOKENAME_REP") = dtDaigasTodokerow("VALUE01")
                     LNT0001tblrow("SHEETNAME_REP") = dtDaigasTodokerow("VALUE06")
