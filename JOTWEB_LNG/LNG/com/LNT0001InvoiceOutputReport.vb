@@ -11,6 +11,7 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp05 As Integer = 0
     Private WW_SheetNoTmp06 As Integer = 0
     Private WW_SheetNoTobuGas As Integer = 0            '-- ＥＮＥＯＳ(八戸)[東部瓦斯]
+    Private WW_SheetNoNipuro As Integer = 0             '-- ＥＮＥＯＳ(八戸)[ニプロ]
     Private WW_SheetNoMitsuiES As Integer = 0           '-- ＥＮＥＯＳ(水島)[三井Ｅ＆Ｓ]
     Private WW_SheetNoCocacola As Integer = 0           '-- ＥＮＥＯＳ(水島)[コカ・コーラ　ボトラーズジャパン]
     Private WW_SheetNoNichiei As Integer = 0            '-- ＤＧＥ(泉北)[日栄]
@@ -149,6 +150,9 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "東部瓦斯") Then
                         '〇ENEOS(シート[東部瓦斯])
                         WW_SheetNoTobuGas = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "ニプロ") Then
+                        '〇ENEOS(シート[ニプロ])
+                        WW_SheetNoNipuro = i
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 AndAlso WW_Workbook.Worksheets(i).Name = "三井Ｅ＆Ｓ") Then
                         '〇ENEOS(シート[三井Ｅ＆Ｓ])
                         WW_SheetNoMitsuiES = i
@@ -310,12 +314,19 @@ Public Class LNT0001InvoiceOutputReport
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = PrintDatarow("REMARK_REP").ToString()
             Next
 
-            '★八戸営業所の場合([東部瓦斯]独自対応)
+            '★八戸営業所の場合
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
+                '★[東部瓦斯]独自対応
                 '届日メインで設定
                 EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER IN ('1','2') AND BRANCHCODE = '1' ", "C", "D", WW_SheetNoTobuGas)
                 EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND (TODOKEDATE_ORDER >= '3' OR BRANCHCODE = '2') ", "E", "F", WW_SheetNoTobuGas)
                 'EditDetailAreaTobugas(BaseDllConst.CONST_TODOKECODE_005487, "AND TODOKEDATE_ORDER >= '3'", "E", "F", WW_SheetNoTobuGas)
+
+                '★[ニプロ]独自対応
+                '・ニプロ（株）伊藤忠
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_001269, "AND BRANCHCODE = '2' ", "L", "", WW_SheetNoNipuro, 12)
+                '・ニプロ（株）カメイ
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_003840, "AND BRANCHCODE = '2' ", "M", "", WW_SheetNoNipuro, 12)
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
                 '★水島営業所の場合([三井Ｅ＆Ｓ]独自対応)
@@ -334,7 +345,7 @@ Public Class LNT0001InvoiceOutputReport
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" Then
                 '★ＤＧＥ(泉北)の場合([日栄]独自対応)
-                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_004916, "AND BRANCHCODE = '2' ", "L", "M", WW_SheetNoNichiei, 12)
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_004916, "AND BRANCHCODE = '2' ", "L", "", WW_SheetNoNichiei, 12)
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 '★ＤＧＥ(姫路営業所)の場合([ナガセケムテックス]独自対応)
@@ -536,6 +547,14 @@ Public Class LNT0001InvoiceOutputReport
                         If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005487 _
                             AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_001269 _
+                            AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                            '☆(ニプロ)独自仕様※ニプロ（株）伊藤忠
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_003840 _
+                            AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                            '☆(ニプロ)独自仕様※ニプロ（株）カメイ
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         Else
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If
@@ -757,8 +776,13 @@ Public Class LNT0001InvoiceOutputReport
     ''' <summary>
     ''' 帳票の明細設定(単価調整)
     ''' </summary>
-    Private Sub EditDetailAreaTankaTyosei(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String, ByVal sheetNo As Integer, ByVal sheetStartNum As Integer)
+    Private Sub EditDetailAreaTankaTyosei(ByVal todokeCode As String, ByVal todokeOrder As String, ByVal cellNum As String, ByVal cellCnt As String, ByVal sheetNo As Integer, ByVal sheetStartNum As Integer,
+                                          Optional multiTodokeCode As String = Nothing)
         Dim condition As String = String.Format("TODOKECODE='{0}' {1} ", todokeCode, todokeOrder)
+        If Not IsNothing(multiTodokeCode) Then
+            condition = String.Format("TODOKECODE IN ({0}) {1} ", multiTodokeCode, todokeOrder)
+        End If
+        Dim evaDateNum As String = ""
 
         For Each PrintDatarow As DataRow In PrintData.Select(condition, "SHUKADATE")
             Dim dateNum As String = Date.Parse(PrintDatarow("TODOKEDATE").ToString()).ToString("dd")
@@ -767,6 +791,30 @@ Public Class LNT0001InvoiceOutputReport
             '★ＤＧＥ(泉北)の場合([日栄]独自対応)
             If todokeCode = BaseDllConst.CONST_TODOKECODE_004916 Then
                 WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = 1
+
+                '★ＥＮＥＯＳ(八戸)の場合([ニプロ]独自対応)
+            ElseIf todokeCode = BaseDllConst.CONST_TODOKECODE_001269 _
+                OrElse todokeCode = BaseDllConst.CONST_TODOKECODE_003840 Then
+                If evaDateNum = "" OrElse evaDateNum <> dateNum Then
+                    '〇届先日が前回明細と不一致の場合(または初回明細)
+                    WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = 1
+                    evaDateNum = dateNum
+                ElseIf evaDateNum = dateNum Then
+                    '〇届先日が前回明細と一致の場合
+                    '★設定済みのカウントに加算する。
+                    Dim evaCount = WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value
+                    evaCount = Integer.Parse(evaCount.ToString()) + 1
+                    WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = evaCount
+                End If
+
+                '設定済みの項目(数量 （t）, 台数)を取得
+                Dim evaQuantity = Double.Parse(WW_Workbook.Worksheets(sheetNo).Range("E" + cellLine.ToString()).Value.ToString())
+                Dim evaNumber = Integer.Parse(WW_Workbook.Worksheets(sheetNo).Range("F" + cellLine.ToString()).Value.ToString())
+                evaQuantity = evaQuantity - Double.Parse(PrintDatarow("zisseki").ToString())
+                evaNumber -= 1
+                WW_Workbook.Worksheets(sheetNo).Range("E" + cellLine.ToString()).Value = evaQuantity
+                WW_Workbook.Worksheets(sheetNo).Range("F" + cellLine.ToString()).Value = evaNumber
+
             Else
                 Dim regNumber As New Regex("[0-9]")
                 Dim setCell01 = regNumber.Replace(PrintDatarow("SETCELL01").ToString(), "")
