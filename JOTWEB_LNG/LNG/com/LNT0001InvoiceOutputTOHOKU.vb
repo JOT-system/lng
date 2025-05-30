@@ -231,7 +231,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
                         Dim OutPutRowData As DataRow() = TankaData.Select("TODOKECODE ='" & Convert.ToString(HaiSheetRowData("TODOKECODE")) & "' and SHUKABASHO = '" & Convert.ToString(HaiSheetRowData("SHUKABASHO")) & "'")
                         If OutPutRowData.Length > 0 Then
                             For i As Integer = 0 To OutPutRowData.Length - 1
-                                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" & PrintTankaRowIdx.ToString).Value = OutPutRowData(i)("SYAGOU")
+                                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" & PrintTankaRowIdx.ToString).Value = OutPutRowData(i)("SHABAN")
                                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" & PrintTankaRowIdx.ToString).Value = OutPutRowData(i)("TANKA")
                                 PrintTankaRowIdx += 1
                             Next
@@ -383,130 +383,6 @@ Public Class LNT0001InvoiceOutputTOHOKU
         End Try
 
     End Sub
-
-    ''' <summary>
-    ''' 帳票の合計設定
-    ''' </summary>
-    Private Sub EditTotalArea(ByVal pOutputRowData As DataRow, ByVal pSheetRowData As DataRow)
-
-        Dim srcRange As IRange = Nothing
-        Dim destRange As IRange = Nothing
-
-        Try
-            '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("B3:I3")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
-
-            Dim Fomula1 As String = "=COUNTIF($D$12:$D$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")+COUNTIF($I$12:$I$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")"
-            Dim Fomula2 As String = "=SUMIF($D$12:$D$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$E$12:$E$" & pSheetRowData("MAXROW").ToString & ")+SUMIF($I$12:$I$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$J$12:$J$" & pSheetRowData("MAXROW").ToString & ")"
-            Dim Fomula3 As String = "=ROUND(E" & Me.PrintOutputRowIdx.ToString() & "*F" & Me.PrintOutputRowIdx.ToString() & ",0)"
-
-            '車号
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" + Me.PrintOutputRowIdx.ToString()).Value = pOutputRowData("SYAGOU")
-            '車数
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("D" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula1
-            '単価
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Value = pOutputRowData("TANKA")
-            '数量
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("F" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula2
-            '金額
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula3
-
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-        Catch ex As Exception
-            Throw
-        Finally
-        End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' 帳票の合計設定
-    ''' </summary>
-    Private Sub EditTotalLastArea(ByVal pSheetRowData As DataRow)
-
-        Dim srcRange As IRange = Nothing
-        Dim destRange As IRange = Nothing
-
-        Try
-            '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("B4:I4")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
-
-            Dim Fomula1 As String = "=SUM(D" & Me.PrintTotalFirstRowIdx.ToString() & ":D" & Me.PrintTotalLastRowIdx.ToString() & ")"
-            Dim Fomula2 As String = "=SUM(F" & Me.PrintTotalFirstRowIdx.ToString() & ":G" & Me.PrintTotalLastRowIdx.ToString() & ")"
-            Dim Fomula3 As String = "=SUM(H" & Me.PrintTotalFirstRowIdx.ToString() & ":I" & Me.PrintTotalLastRowIdx.ToString() & ")"
-
-            '車数
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("D" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula1
-            '数量
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("F" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula2
-            '金額
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula3
-
-            '出力件数加算
-            Me.AddPrintRowCnt(2)
-
-            '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A6:F11")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
-
-            '合計
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" + Me.PrintOutputRowIdx.ToString()).Value = pSheetRowData("TOTALNAME")
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=H" & (Me.PrintOutputRowIdx - 2).ToString()
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            '日・祝日割増料金
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=D" & Me.PrintOutputRowIdx.ToString() & "*20000"
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            '小計
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=SUM(E" & (Me.PrintOutputRowIdx - 2).ToString() & ":E" & (Me.PrintOutputRowIdx - 1).ToString() & ")"
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            '合計
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=E" & (Me.PrintOutputRowIdx - 1).ToString()
-            PrintTotalRowIdx = PrintOutputRowIdx
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            '消費税
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=ROUND(E" & (Me.PrintOutputRowIdx - 1).ToString() & "*0.1,0)"
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            'ご請求合計
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=SUM(E" & (Me.PrintOutputRowIdx - 2).ToString() & ":E" & (Me.PrintOutputRowIdx - 1).ToString() & ")"
-            '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-        Catch ex As Exception
-            Throw
-        Finally
-        End Try
-
-    End Sub
-
-    ''' <summary>
-    ''' 文字列置換
-    ''' </summary>
-    Private Function StrReplace(ByVal Str As String) As String
-
-        Dim RetrunStr As String = ""
-
-        RetrunStr = Str.Replace("（出荷地）", "")
-        RetrunStr = RetrunStr.Replace("（ＴＮＧ）", "")
-
-        Return RetrunStr
-    End Function
 
     ''' <summary>
     ''' 帳票出力データ取得
@@ -831,19 +707,22 @@ Public Class LNT0001InvoiceOutputTOHOKU
         Dim SQLStr As String = ""
         '-- SELECT
         SQLStr &= " SELECT "
-        SQLStr &= "   A01.SYAGOU"
+        SQLStr &= "   A01.SHABAN"
         SQLStr &= " , A01.TANKA "
-        SQLStr &= " , A01.TODOKECODE "
-        SQLStr &= " , A01.BIKOU1 AS SHUKABASHO "
+        SQLStr &= " , A01.AVOCADOTODOKECODE "
+        SQLStr &= " , A01.AVOCADOSHUKABASHO "
         SQLStr &= " , A01.BRANCHCODE "
 
         '-- FROM
-        SQLStr &= " FROM LNG.LNM0006_TANKA A01 "
+        SQLStr &= " FROM LNG.LNM0006_NEWTANKA A01 "
 
         '-- WHERE
         SQLStr &= " WHERE "
         SQLStr &= String.Format("     A01.TORICODE = '{0}' ", "0175400000")
         SQLStr &= String.Format(" AND A01.ORGCODE IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format(" AND A01.STYMD  <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.ENDYMD >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
