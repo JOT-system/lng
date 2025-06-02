@@ -13,6 +13,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(石狩)
     Private WW_ArrSheetNoKoteichi As Integer() = {0, 0, 0, 0, 0}            '// 単価シート用
     Private WW_DicIshikariList As Dictionary(Of String, String)
+    Private WW_ReportOtherNo As String() = {"⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩"}
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -382,6 +383,18 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                              OrElse PrintTogouSpraterow("DETAILSORTNO").ToString() = "8") Then
                     '〇３）バンカリング追加人件費
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+
+                ElseIf PrintTogouSpraterow("GROUPSORTNO").ToString() = "6" Then
+                    Dim otDetailNo As Integer = 0
+                    otDetailNo = CInt(PrintTogouSpraterow("DETAILID").ToString())
+                    '★ その他
+                    '・名称設定
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("DETAILNAME").ToString()
+                    '・金額設定
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
+
                 Else
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
