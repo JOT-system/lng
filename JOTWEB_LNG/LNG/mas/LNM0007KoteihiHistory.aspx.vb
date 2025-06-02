@@ -295,6 +295,11 @@ Public Class LNM0007KoteihiHistory
         '画面表示用
         '季節料金判定区分
         SQLStr.AppendLine("   , ''                                                                       AS SCRSEASONKBN        ")
+        '車腹
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SYABARA), '') = '' THEN ''                                                 ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SYABARA,3)                                                                        ")
+        SQLStr.AppendLine("     END AS SCRSYABARA                                                                               ")
         '固定費(月額)
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN ''                                                ")
@@ -761,15 +766,15 @@ Public Class LNM0007KoteihiHistory
         'シート名
         wb.ActiveSheet.Name = Left(WF_DDL_MODIFYYM.SelectedValue, 4) + "年" + Right(WF_DDL_MODIFYYM.SelectedValue, 2) + "月"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
         SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -855,7 +860,7 @@ Public Class LNM0007KoteihiHistory
         sheet.Rows.RowHeight = 15.75
         'フォント
         With sheet.Columns.Font
-            .Color = Color.FromArgb(0, 0, 0)
+            '.Color = Color.FromArgb(0, 0, 0)
             .Name = "Meiryo UI"
             .Size = 11
         End With
@@ -944,9 +949,13 @@ Public Class LNM0007KoteihiHistory
     ''' <remarks></remarks>
     Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
-        '数値書式
-        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
-        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.000_);[Red](#,##0.000)"
 
         For Each Row As DataRow In LNM0007tbl.Rows
             '値
@@ -966,7 +975,14 @@ Public Class LNM0007KoteihiHistory
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名	
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹	
+
+            '車腹
+            If Row("SYABARA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Value = CDbl(Row("SYABARA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONKBN).Value = Row("SEASONKBN") '季節料金判定区分	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONSTART).Value = Row("SEASONSTART") '季節料金判定開始月日	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEASONEND).Value = Row("SEASONEND") '季節料金判定終了月日	
@@ -985,8 +1001,12 @@ Public Class LNM0007KoteihiHistory
                 sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Value = CDbl(Row("KOTEIHID"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = Row("KAISU") '回数	
-
+            '回数
+            If Row("KAISU") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = Row("KAISU")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = CDbl(Row("KAISU"))
+            End If
 
             '減額費用
             If Row("GENGAKU") = "" Then
@@ -1007,10 +1027,12 @@ Public Class LNM0007KoteihiHistory
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3	
 
             '金額を数値形式に変更
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SYABARA).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHIM).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KOTEIHID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Style = IntStyle
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0007WRKINC.MODIFYKBN.AFTDATA Then

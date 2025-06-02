@@ -297,29 +297,69 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
 
         '画面表示用
+        'グループソート順
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPSORTNO), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GROUPSORTNO,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRGROUPSORTNO                                                                                 ")
+        'グループID
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPID), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GROUPID,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRGROUPID                                                                                 ")
+        '明細ソート順
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILSORTNO), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DETAILSORTNO,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRDETAILSORTNO                                                                                 ")
+        '明細ID
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILID), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DETAILID,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRDETAILID                                                                                 ")
         '単価
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                          ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,2)                                                                          ")
         SQLStr.AppendLine("     END AS SCRTANKA                                                                                 ")
+        '数量
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(QUANTITY), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(QUANTITY,2)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRQUANTITY                                                                                 ")
+        '走行距離
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(MILEAGE), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(MILEAGE,2)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRMILEAGE                                                                                 ")
+        '輸送回数
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SHIPPINGCOUNT), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SHIPPINGCOUNT,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRSHIPPINGCOUNT                                                                                 ")
         '燃費
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,0)                                                                          ")
+        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,2)                                                                          ")
         SQLStr.AppendLine("     END AS SCRNENPI                                                                                 ")
         '実勢軽油価格
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                                      ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,0)                                                             ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,2)                                                             ")
         SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                                    ")
         '基準経由価格
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                                     ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,0)                                                            ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,2)                                                            ")
         SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                                   ")
+        '燃料使用量
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELCONSUMPTION), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                            ")
+        SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                                   ")
 
-        SQLStr.AppendLine("   , CASE                 ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
+        SQLStr.AppendLine("   , Case                 ")
+        SQLStr.AppendLine("      When COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='3' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 削除' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='3' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 削除' ")
@@ -754,15 +794,15 @@ Public Class LNM0014SprateHistory
         'シート名
         wb.ActiveSheet.Name = Left(WF_DDL_MODIFYYM.SelectedValue, 4) + "年" + Right(WF_DDL_MODIFYYM.SelectedValue, 2) + "月"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
         SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -848,7 +888,7 @@ Public Class LNM0014SprateHistory
         sheet.Rows.RowHeight = 15.75
         'フォント
         With sheet.Columns.Font
-            .Color = Color.FromArgb(0, 0, 0)
+            '.Color = Color.FromArgb(0, 0, 0)
             .Name = "Meiryo UI"
             .Size = 11
         End With
@@ -947,9 +987,13 @@ Public Class LNM0014SprateHistory
     ''' <remarks></remarks>
     Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
-        '数値書式
-        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
-        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.00_);[Red](#,##0.00)"
 
         For Each Row As DataRow In LNM0014tbl.Rows
             '値
@@ -967,11 +1011,37 @@ Public Class LNM0014SprateHistory
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO") 'グループソート順
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = Row("GROUPID") 'グループID
+
+            'グループソート順
+            If Row("GROUPSORTNO") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = CDbl(Row("GROUPSORTNO"))
+            End If
+
+            'グループID
+            If Row("GROUPID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = Row("GROUPID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = CDbl(Row("GROUPID"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPNAME).Value = Row("GROUPNAME") 'グループ名
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO") '明細ソート順
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = Row("DETAILID") '明細ID
+
+            '明細ソート順
+            If Row("DETAILSORTNO") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = CDbl(Row("DETAILSORTNO"))
+            End If
+
+            '明細ID
+            If Row("DETAILID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = Row("DETAILID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = CDbl(Row("DETAILID"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
 
             '単価
@@ -981,10 +1051,30 @@ Public Class LNM0014SprateHistory
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Value = Row("QUANTITY") '数量
+            '数量
+            If Row("QUANTITY") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Value = Row("QUANTITY")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Value = CDbl(Row("QUANTITY"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.CALCUNIT).Value = Row("CALCUNIT") '計算単位
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DEPARTURE).Value = Row("DEPARTURE") '出荷地
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Value = Row("MILEAGE") '走行距離
+
+            '走行距離
+            If Row("MILEAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Value = Row("MILEAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Value = CDbl(Row("MILEAGE"))
+            End If
+
+            '輸送回数
+            If Row("SHIPPINGCOUNT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SHIPPINGCOUNT).Value = CDbl(Row("SHIPPINGCOUNT"))
+            End If
+
             '燃費
             If Row("NENPI") = "" Then
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Value = Row("NENPI")
@@ -1006,7 +1096,13 @@ Public Class LNM0014SprateHistory
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Value = CDbl(Row("DIESELPRICESTANDARD"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION") '燃料使用量
+            '燃料使用量
+            If Row("DIESELCONSUMPTION") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELCONSUMPTION).Value = CDbl(Row("DIESELCONSUMPTION"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DISPLAYFLG).Value = Row("DISPLAYFLG") '表示フラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.ASSESSMENTFLG).Value = Row("ASSESSMENTFLG") '鑑分けフラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.ATENACOMPANYNAME).Value = Row("ATENACOMPANYNAME") '宛名会社名
@@ -1017,17 +1113,25 @@ Public Class LNM0014SprateHistory
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
 
+            '数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SHIPPINGCOUNT).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELCONSUMPTION).Style = DecStyle
+
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0014WRKINC.MODIFYKBN.AFTDATA Then
                 '変更箇所を塗りつぶし
                 SetMODIFYHATCHING(sheet, WW_ACTIVEROW)
             End If
-
-            '数値形式に変更
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.NENPI).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICECURRENT).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DIESELPRICESTANDARD).Style = NumStyle
 
             WW_ACTIVEROW += 1
         Next

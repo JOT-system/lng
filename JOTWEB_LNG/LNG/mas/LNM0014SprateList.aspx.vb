@@ -401,26 +401,66 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.BIKOU3), '')                                      AS BIKOU3              ")
 
         '画面表示用
+        'グループソート順
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPSORTNO), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GROUPSORTNO,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRGROUPSORTNO                                                                                 ")
+        'グループID
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPID), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(GROUPID,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRGROUPID                                                                                 ")
+        '明細ソート順
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILSORTNO), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DETAILSORTNO,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRDETAILSORTNO                                                                                 ")
+        '明細ID
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILID), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DETAILID,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRDETAILID                                                                                 ")
         '単価
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                          ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,2)                                                                          ")
         SQLStr.AppendLine("     END AS SCRTANKA                                                                                 ")
+        '数量
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(QUANTITY), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(QUANTITY,2)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRQUANTITY                                                                                 ")
+        '走行距離
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(MILEAGE), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(MILEAGE,2)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRMILEAGE                                                                                 ")
+        '輸送回数
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SHIPPINGCOUNT), '') = '' THEN ''                                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SHIPPINGCOUNT,0)                                                                          ")
+        SQLStr.AppendLine("     END AS SCRSHIPPINGCOUNT                                                                                 ")
         '燃費
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,0)                                                                          ")
+        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,2)                                                                          ")
         SQLStr.AppendLine("     END AS SCRNENPI                                                                                 ")
         '実勢軽油価格
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                                      ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,0)                                                             ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,2)                                                             ")
         SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                                    ")
         '基準経由価格
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                                     ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,0)                                                            ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,2)                                                            ")
         SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                                   ")
+        '燃料使用量
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELCONSUMPTION), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                            ")
+        SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                                   ")
 
         SQLStr.AppendLine(" FROM                                                                                                ")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                       ")
@@ -943,9 +983,6 @@ Public Class LNM0014SprateList
         'シート名
         wb.ActiveSheet.Name = "入出力"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
@@ -957,6 +994,9 @@ Public Class LNM0014SprateList
         WW_STROW = WW_ACTIVEROW
         SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
         WW_ENDROW = WW_ACTIVEROW - 1
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         'プルダウンリスト作成
         SetPULLDOWNLIST(wb, WW_STROW, WW_ENDROW)
@@ -1249,9 +1289,13 @@ Public Class LNM0014SprateList
     ''' <remarks></remarks>
     Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
-        '数値書式
-        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
-        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.00_);[Red](#,##0.00)"
 
         'Dim WW_DEPSTATION As String
 
@@ -1274,11 +1318,37 @@ Public Class LNM0014SprateList
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO") 'グループソート順
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID).Value = Row("GROUPID") 'グループID
+
+            'グループソート順
+            If Row("GROUPSORTNO") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO).Value = CDbl(Row("GROUPSORTNO"))
+            End If
+
+            'グループID
+            If Row("GROUPID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID).Value = Row("GROUPID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID).Value = CDbl(Row("GROUPID"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPNAME).Value = Row("GROUPNAME") 'グループ名
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO") '明細ソート順
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID).Value = Row("DETAILID") '明細ID
+
+            '明細ソート順
+            If Row("DETAILSORTNO") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO).Value = CDbl(Row("DETAILSORTNO"))
+            End If
+
+            '明細ID
+            If Row("DETAILID") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID).Value = Row("DETAILID")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID).Value = CDbl(Row("DETAILID"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
 
             '単価
@@ -1288,11 +1358,29 @@ Public Class LNM0014SprateList
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY).Value = Row("QUANTITY") '数量
+            '数量
+            If Row("QUANTITY") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY).Value = Row("QUANTITY")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY).Value = CDbl(Row("QUANTITY"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.CALCUNIT).Value = Row("CALCUNIT") '計算単位
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DEPARTURE).Value = Row("DEPARTURE") '出荷地
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE).Value = Row("MILEAGE") '走行距離
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT") '輸送回数
+
+            '走行距離
+            If Row("MILEAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE).Value = Row("MILEAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE).Value = CDbl(Row("MILEAGE"))
+            End If
+
+            '輸送回数
+            If Row("SHIPPINGCOUNT") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = CDbl(Row("SHIPPINGCOUNT"))
+            End If
 
             '燃費
             If Row("NENPI") = "" Then
@@ -1315,7 +1403,13 @@ Public Class LNM0014SprateList
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = CDbl(Row("DIESELPRICESTANDARD"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION") '燃料使用量
+            '燃料使用量
+            If Row("DIESELCONSUMPTION") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION).Value = Row("DIESELCONSUMPTION")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION).Value = CDbl(Row("DIESELCONSUMPTION"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG).Value = Row("DISPLAYFLG") '表示フラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG).Value = Row("ASSESSMENTFLG") '鑑分けフラグ
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.ATENACOMPANYNAME).Value = Row("ATENACOMPANYNAME") '宛名会社名
@@ -1327,10 +1421,18 @@ Public Class LNM0014SprateList
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
 
             '数値形式に変更
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION).Style = DecStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -1927,7 +2029,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             'グループソート順
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO)), ",", "")
             WW_DATATYPE = DataTypeHT("GROUPSORTNO")
             LNM0014Exceltblrow("GROUPSORTNO") = LNM0014WRKINC.DataConvert("グループソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1935,7 +2037,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             'グループID
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID)), ",", "")
             WW_DATATYPE = DataTypeHT("GROUPID")
             LNM0014Exceltblrow("GROUPID") = LNM0014WRKINC.DataConvert("グループID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1951,7 +2053,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '明細ソート順
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO)), ",", "")
             WW_DATATYPE = DataTypeHT("DETAILSORTNO")
             LNM0014Exceltblrow("DETAILSORTNO") = LNM0014WRKINC.DataConvert("明細ソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1959,7 +2061,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '明細ID
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID)), ",", "")
             WW_DATATYPE = DataTypeHT("DETAILID")
             LNM0014Exceltblrow("DETAILID") = LNM0014WRKINC.DataConvert("明細ID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1983,7 +2085,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '数量
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY)), ",", "")
             WW_DATATYPE = DataTypeHT("QUANTITY")
             LNM0014Exceltblrow("QUANTITY") = LNM0014WRKINC.DataConvert("数量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -2007,7 +2109,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '走行距離
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE)), ",", "")
             WW_DATATYPE = DataTypeHT("MILEAGE")
             LNM0014Exceltblrow("MILEAGE") = LNM0014WRKINC.DataConvert("走行距離", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -2015,7 +2117,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '輸送回数
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT)), ",", "")
             WW_DATATYPE = DataTypeHT("SHIPPINGCOUNT")
             LNM0014Exceltblrow("SHIPPINGCOUNT") = LNM0014WRKINC.DataConvert("輸送回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -2047,7 +2149,7 @@ Public Class LNM0014SprateList
                 O_RTN = "ERR"
             End If
             '燃料使用量
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION)), ",", "")
             WW_DATATYPE = DataTypeHT("DIESELCONSUMPTION")
             LNM0014Exceltblrow("DIESELCONSUMPTION") = LNM0014WRKINC.DataConvert("燃料使用量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then

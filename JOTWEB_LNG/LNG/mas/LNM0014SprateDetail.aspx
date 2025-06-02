@@ -219,7 +219,7 @@
                                 </p>
                                 <div id="RAD_LINE_30">
                                     <!-- 鑑分けフラグ -->
-                                        <asp:Label ID="WF_ASSESSMENTFLG_L" runat="server" Text="鑑分けフラグ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:Label ID="WF_ASSESSMENTFLG_L" runat="server" Text="請求書鑑分" CssClass="WF_TEXT_LEFT"></asp:Label>
                                         <asp:RadioButtonList ID="RadioASSESSMENTFLG" runat="server" RepeatDirection="Horizontal" CssClass="WF_RADIO">
                                         <asp:ListItem Value="1">する</asp:ListItem>
                                         <asp:ListItem Value="0">しない</asp:ListItem>

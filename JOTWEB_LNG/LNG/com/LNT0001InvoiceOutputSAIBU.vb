@@ -77,6 +77,9 @@ Public Class LNT0001InvoiceOutputSAIBU
                 If WW_Workbook.Worksheets(i).Name = "明細書" Then
                     WW_SheetNo = i
                 End If
+                If WW_Workbook.Worksheets(i).Name = "TEMP" Then
+                    WW_SheetNoTmp = i
+                End If
             Next
 
         Catch ex As Exception
@@ -202,6 +205,7 @@ Public Class LNT0001InvoiceOutputSAIBU
         PrintData.Columns.Add("SETCELL02", Type.GetType("System.String"))
         PrintData.Columns.Add("SETCELL03", Type.GetType("System.String"))
         PrintData.Columns.Add("SETCELL04", Type.GetType("System.String"))
+        PrintData.Columns.Add("ROW", Type.GetType("System.String"))
 
         '〇請求書出力情報を保存
         For Each dtKyushuTodokerow As DataRow In dtKyushuTodoke.Rows
@@ -218,6 +222,7 @@ Public Class LNT0001InvoiceOutputSAIBU
             prtRow("DAISU") = 0
             prtRow("ZISSEKI") = 0
             prtRow("AMT") = 0
+            prtRow("ROW") = dtKyushuTodokerow("VALUE06").ToString
             PrintData.Rows.Add(prtRow)
         Next
 
@@ -290,7 +295,7 @@ Public Class LNT0001InvoiceOutputSAIBU
             '〇 年月（鏡用）
             Dim lastDate As String = Me.TaishoYYYY + "/" + Me.TaishoMM + "/01"
             lastDate = Date.Parse(lastDate).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
-            WW_Workbook.Worksheets(WW_SheetNoTmp).Range("D1").Value = Date.Parse(lastDate)
+            WW_Workbook.Worksheets(WW_SheetNo).Range("D1").Value = Date.Parse(lastDate)
 
         Catch ex As Exception
             Throw
@@ -302,8 +307,22 @@ Public Class LNT0001InvoiceOutputSAIBU
     ''' </summary>
     Private Sub EditDetailArea()
         Try
+            Dim srcRange As IRange = Nothing
+            Dim destRange As IRange = Nothing
+            Dim rowInx As Integer = 11
             Dim Formula1 As String = ""
             Dim Formula2 As String = ""
+            Dim FormulaT1 As String = ""
+            Dim FormulaT2 As String = ""
+            Dim FormulaT3 As String = ""
+            Dim KoteihiCell As String = ""
+            Dim FirstFlg As Boolean = False
+
+            '一旦、ローリー変動費をクリアしておく（行削除）
+            '最終行の取得
+            Dim lastRow As Integer = WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Row + WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Rows.Count - 1
+            WW_Workbook.Worksheets(WW_SheetNo).Range(rowInx.ToString + ":" + lastRow.ToString).Delete()
+
             For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO")
                 If PrintDatarow("TODOKECLASS").ToString = "K" Then
                     '固定費の編集
@@ -311,7 +330,58 @@ Public Class LNT0001InvoiceOutputSAIBU
                     WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
                     '◯ 固定費
                     WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("AMT").ToString())
+
+                    KoteihiCell = PrintDatarow("SETCELL02").ToString()
+
+                ElseIf PrintDatarow("TODOKECLASS").ToString = "H" Then
+                    '変動費合計の編集
+                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A9:E10")
+                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) - 1).ToString())
+                    '行の高さコピー
+                    destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A9").RowHeight
+                    destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A10").RowHeight
+                    srcRange.Copy(destRange)
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
+                    '◯ 台数
+                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Formula = FormulaT1
+                    '◯ 数量
+                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Formula = FormulaT2
+                    '◯ 輸送費
+                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL04").ToString()).Formula = FormulaT3
+
+                    '合計の編集
+                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A11:E15")
+                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) + 1).ToString())
+                    '行の高さコピー
+                    destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A11").RowHeight
+                    destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A12").RowHeight
+                    destRange.Rows(2).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A13").RowHeight
+                    destRange.Rows(3).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A14").RowHeight
+                    destRange.Rows(4).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A15").RowHeight
+                    srcRange.Copy(destRange)
+                    '◯ 輸送費（小計＝固定費＋変動費）
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("E" & (Val(PrintDatarow("ROW")) + 3).ToString()).Formula = "=" & KoteihiCell & "+" & PrintDatarow("SETCELL04").ToString()
+                    '◯ 輸送費（消費税、合計はEXCELに任せる）
                 Else
+                    '変動費明細
+                    '行コピー
+                    If PrintDatarow("TODOKECLASS").ToString = "1" Then
+                        srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A3:E4")
+                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) - 1).ToString())
+                        '行の高さコピー
+                        destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A3").RowHeight
+                        destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4").RowHeight
+                        srcRange.Copy(destRange)
+                    ElseIf PrintDatarow("TODOKECLASS").ToString = "2" Then
+                        srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A7:E8")
+                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & Val(PrintDatarow("ROW")).ToString())
+                        '行の高さコピー
+                        destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A7").RowHeight
+                        destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A8").RowHeight
+                        srcRange.Copy(destRange)
+                    End If
+
                     '届先別の輸送費編集
                     '◯ 届先名
                     WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
@@ -339,6 +409,20 @@ Public Class LNT0001InvoiceOutputSAIBU
                         WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = Double.Parse(PrintDatarow("DAISU").ToString())
                         '◯ 実績数量
                         WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL04").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                    End If
+
+                    '変動費の合計行の数式編集
+                    If IsNumeric(PrintDatarow("TODOKECLASS")) Then
+                        If FirstFlg = False Then
+                            FirstFlg = True
+                            FormulaT1 &= "=C" & PrintDatarow("ROW").ToString
+                            FormulaT2 &= "=D" & PrintDatarow("ROW").ToString
+                            FormulaT3 &= "=E" & PrintDatarow("ROW").ToString
+                        Else
+                            FormulaT1 &= "+C" & PrintDatarow("ROW").ToString
+                            FormulaT2 &= "+D" & PrintDatarow("ROW").ToString
+                            FormulaT3 &= "+E" & PrintDatarow("ROW").ToString
+                        End If
                     End If
                 End If
             Next

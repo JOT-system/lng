@@ -77,13 +77,13 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''ddlDELFLG コントロール。
+    '''RadioDELFLG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents ddlDELFLG As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents RadioDELFLG As Global.System.Web.UI.WebControls.RadioButtonList
     
     '''<summary>
     '''WF_CAMPCODE_L コントロール。
@@ -113,195 +113,6 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents LblCampCodeName As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TORICODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TORICODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTORICODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTORICODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TORICODE_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TORICODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_TORINAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TORINAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTORINAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTORINAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TORINAME_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TORINAME_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_ORGCODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_ORGCODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''ddlSelectORG コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents ddlSelectORG As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
-    '''WF_KASANORGCODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGCODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtKASANORGCODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtKASANORGCODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_KASANORGCODE_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_KASANORGNAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGNAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtKASANORGNAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtKASANORGNAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_KASANORGNAME_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_KASANORGNAME_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_TODOKECODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKECODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTODOKECODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTODOKECODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TODOKECODE_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKECODE_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''WF_TODOKENAME_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKENAME_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTODOKENAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTODOKENAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_TODOKENAME_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKENAME_TEXT As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''Label32 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents Label32 As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
     '''WF_STYMD_L コントロール。
     '''</summary>
     '''<remarks>
@@ -318,15 +129,6 @@ Partial Public Class LNM0006TankaDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_StYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''WF_STYMD_TEXT コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_STYMD_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''WF_ENDYMD_L コントロール。
@@ -347,121 +149,319 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents WF_EndYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_ENDYMD_TEXT コントロール。
+    '''WF_TORICODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ENDYMD_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_TORICODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TANKA_L コントロール。
+    '''WF_TORINAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TANKA_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_TORINAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtTANKA コントロール。
+    '''WF_TORICODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtTANKA As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_TORICODE_TEXT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_TANKA_TEXT コントロール。
+    '''WF_TORI コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TANKA_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_BRANCHCODE_L コントロール。
+    '''WF_TORI_DL コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_BRANCHCODE_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_TORI_DL As Global.System.Web.UI.HtmlControls.HtmlGenericControl
     
     '''<summary>
-    '''TxtBRANCHCODE コントロール。
+    '''Label1 コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtBRANCHCODE As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents Label1 As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_BRANCHCODE_TEXT コントロール。
+    '''WF_ORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_BRANCHCODE_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_SYAGATA_L コントロール。
+    '''WF_ORGCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYAGATA_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_ORGCODE_TEXT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''ddlSelectSYAGATA コントロール。
+    '''WF_KASANORGCODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents ddlSelectSYAGATA As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents WF_KASANORGCODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_SYAGATA_TEXT コントロール。
+    '''WF_KASANORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYAGATA_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_KASANORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_SYAGOU_L コントロール。
+    '''WF_KASANORGCODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYAGOU_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_KASANORGCODE_TEXT As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''TxtSYAGOU コントロール。
+    '''WF_AVOCADOSHUKABASHO_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtSYAGOU As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_AVOCADOSHUKABASHO_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_SYAGOU_TEXT コントロール。
+    '''WF_AVOCADOSHUKANAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYAGOU_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_AVOCADOSHUKANAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVOCADOSHUKABASHO_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOSHUKABASHO_TEXT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVOCADOSHUKA コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOSHUKA As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_AVOCADOSHUKA_DL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOSHUKA_DL As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_SHUKA_CHANGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHUKA_CHANGE As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SHUKANAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHUKANAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtSHUKANAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtSHUKANAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SHUKABASHO_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHUKABASHO_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtSHUKABASHO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtSHUKABASHO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKECODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKECODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKENAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKECODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKECODE_TEXT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKE As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKE_DL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKE_DL As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
+    '''WF_TODOKE_CHANGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TODOKE_CHANGE As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TODOKENAME_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TODOKENAME_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTODOKENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTODOKENAME As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TODOKECODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TODOKECODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTODOKECODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTODOKECODE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TANKNUMBER_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKNUMBER_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTANKNUMBER コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTANKNUMBER As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SHABAN_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHABAN_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtSHABAN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtSHABAN As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SYABARA_L コントロール。
@@ -491,31 +491,184 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents WF_SYABARA_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_SYUBETSU_L コントロール。
+    '''WF_SYAGATA_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYUBETSU_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SYAGATA_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtSYUBETSU コントロール。
+    '''WF_SYAGATA コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtSYUBETSU As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents WF_SYAGATA As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_SYUBETSU_TEXT コントロール。
+    '''WF_SYAGATA_CODE_TEXT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SYUBETSU_TEXT As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SYAGATA_CODE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TANKA_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKA_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTANKA コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTANKA As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TANKA_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKA_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_CALCKBN_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_CALCKBN_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''ddlSelectCALCKBN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ddlSelectCALCKBN As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_ROUNDTRIP_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ROUNDTRIP_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtROUNDTRIP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtROUNDTRIP As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ROUNDTRIP_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ROUNDTRIP_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TOLLFEE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TOLLFEE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtTOLLFEE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtTOLLFEE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_TOLLFEE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TOLLFEE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TANKAKBN_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TANKAKBN_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''RadioTANKAKBN コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents RadioTANKAKBN As Global.System.Web.UI.WebControls.RadioButtonList
+    
+    '''<summary>
+    '''WF_MEMO_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_MEMO_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtMEMO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtMEMO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_BRANCHCODE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BRANCHCODE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtBRANCHCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtBRANCHCODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_BIKOU1_L コントロール。
@@ -626,33 +779,6 @@ Partial Public Class LNM0006TankaDetail
     Protected WithEvents work As Global.JOTWEB_LNG.LNM0006WRKINC
     
     '''<summary>
-    '''mspToriCodeSingle コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents mspToriCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
-    '''<summary>
-    '''mspKasanOrgCodeSingle コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents mspKasanOrgCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
-    '''<summary>
-    '''mspTodokeCodeSingle コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents mspTodokeCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
-    '''<summary>
     '''DisabledKeyItem コントロール。
     '''</summary>
     '''<remarks>
@@ -660,24 +786,6 @@ Partial Public Class LNM0006TankaDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents DisabledKeyItem As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''DisabledKeyOrgCount コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents DisabledKeyOrgCount As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
-    '''<summary>
-    '''DisabledKeyToriCount コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents DisabledKeyToriCount As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''VisibleKeyOrgCode コントロール。
@@ -822,6 +930,132 @@ Partial Public Class LNM0006TankaDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_AUTOENDYMD As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SHUKACHKSTATUS コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHUKACHKSTATUS As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TODOKECHKSTATUS コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TODOKECHKSTATUS As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORINAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORINAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_TORICODE_TEXT_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TORICODE_TEXT_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_ORG_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ORG_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_KASANORG_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_KASANORG_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_AVOCADOSHUKANAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOSHUKANAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_AVOCADOSHUKABASHO_TEXT_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOSHUKABASHO_TEXT_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKENAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_AVOCADOTODOKECODE_TEXT_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_AVOCADOTODOKECODE_TEXT_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SHABAN_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHABAN_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_BRANCHCODE_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BRANCHCODE_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SYAGATA_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SYAGATA_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SYABARA_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SYABARA_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

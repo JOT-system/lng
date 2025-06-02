@@ -6,7 +6,7 @@
 ' 更新者 
 '
 ' 修正履歴 : 2024/12/16 新規作成
-'          : 
+'          : 2025/05/23 統合版に変更
 ''************************************************************
 Imports MySql.Data.MySqlClient
 Imports System.IO
@@ -89,23 +89,22 @@ Public Class LNM0006TankaList
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
-                        Case "WF_SelectCALENDARChange", "WF_TODOKEChange" 'カレンダー変更時,届先変更時
+                        Case "WF_ButtonExtract" '検索ボタン押下時
                             GridViewInitialize()
+                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
+                            WF_ButtonFIRST_Click()
+                        Case "WF_ButtonLAST"            '最終頁ボタン押下
+                            WF_ButtonLAST_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
-                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
-                        Not WF_ButtonClick.Value = "WF_TODOKEChange" Then
+                        Not WF_ButtonClick.Value = "WF_ButtonExtract" Then
                         DisplayGrid()
                     End If
 
@@ -187,7 +186,7 @@ Public Class LNM0006TankaList
     Protected Sub createListBox()
         Me.WF_TODOKE.Items.Clear()
         Dim retTodokeList As New DropDownList
-        retTodokeList = LNM0006WRKINC.getDowpDownTodokeList(Master.ROLE_ORG)
+        retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TORINAME_S.Text)
         For index As Integer = 0 To retTodokeList.Items.Count - 1
             WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
         Next
@@ -223,20 +222,23 @@ Public Class LNM0006TankaList
                     Master.VIEWID = rightview2.GetViewId(Master.USERCAMP)
                 End If
                 Master.CreateXMLSaveFile()
+                WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
             '○ 検索画面からの遷移
             Case C_PREV_MAP_LIST.LNM0006S
                 Master.CreateXMLSaveFile()
-            '○ 登録画面からの遷移
-            Case C_PREV_MAP_LIST.LNM0006D
+                '有効開始日
+                If Not work.WF_SEL_STYMD_S.Text = "" Then
+                    WF_StYMD.Value = work.WF_SEL_STYMD_S.Text
+                Else
+                    WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
+                End If
+            '○ 登録・履歴画面からの遷移
+            Case C_PREV_MAP_LIST.LNM0006D, C_PREV_MAP_LIST.LNM0006H
                 Master.RecoverTable(LNM0006tbl, work.WF_SEL_INPTBL.Text)
-        End Select
+                Dim WW_YMD As String = Replace(work.WF_SEL_TARGETYMD_L.Text, "/", "")
+                WF_StYMD.Value = WW_YMD.Substring(0, 4) & "/" & WW_YMD.Substring(4, 2) & "/" & WW_YMD.Substring(6, 2)
 
-        '有効開始日
-        If Not work.WF_SEL_STYMD_S.Text = "" Then
-            WF_StYMD.Value = work.WF_SEL_STYMD_S.Text
-        Else
-            WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
-        End If
+        End Select
 
         '表示制御項目
         '情シス、高圧ガス以外の場合
@@ -337,22 +339,58 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.ORGNAME), '')                                     AS ORGNAME             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.KASANORGCODE), '')                                AS KASANORGCODE        ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.KASANORGNAME), '')                                AS KASANORGNAME        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.AVOCADOSHUKABASHO), '')                           AS AVOCADOSHUKABASHO   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.AVOCADOSHUKANAME), '')                            AS AVOCADOSHUKANAME    ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SHUKABASHO), '')                                  AS SHUKABASHO          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SHUKANAME), '')                                   AS SHUKANAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.AVOCADOTODOKECODE), '')                           AS AVOCADOTODOKECODE   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.AVOCADOTODOKENAME), '')                           AS AVOCADOTODOKENAME   ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TODOKECODE), '')                                  AS TODOKECODE          ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TODOKENAME), '')                                  AS TODOKENAME          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TANKNUMBER), '')                                  AS TANKNUMBER          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SHABAN), '')                                      AS SHABAN              ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNM0006.STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNM0006.ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.BRANCHCODE), '')                                  AS BRANCHCODE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TANKAKBN), '')                                    AS TANKAKBN            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.MEMO), '')                                        AS MEMO                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TANKA), '')                                       AS TANKA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.CALCKBN), '')                                     AS CALCKBN             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.ROUNDTRIP), '')                                   AS ROUNDTRIP           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.TOLLFEE), '')                                     AS TOLLFEE             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SYAGATA), '')                                     AS SYAGATA             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SYAGATANAME), '')                                 AS SYAGATANAME         ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SYAGOU), '')                                      AS SYAGOU              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SYABARA), '')                                     AS SYABARA             ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.SYUBETSU), '')                                    AS SYUBETSU            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.BIKOU1), '')                                      AS BIKOU1              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0006.BIKOU3), '')                                      AS BIKOU3              ")
+
+        '画面表示用
+        '単価区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRTANKAKBN        ")
+        '単価
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                  ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                         ")
+        SQLStr.AppendLine("     END AS SCRTANKA                                                                                ")
+        '往復距離
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(ROUNDTRIP), '') = '' THEN ''                                              ")
+        SQLStr.AppendLine("      ELSE  FORMAT(ROUNDTRIP,3)                                                                   ")
+        SQLStr.AppendLine("     END AS SCRROUNDTRIP                                                                            ")
+        '通行料
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TOLLFEE), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TOLLFEE,3)                                                                     ")
+        SQLStr.AppendLine("     END AS SCRTOLLFEE                                                                              ")
+        '車腹
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SYABARA), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SYABARA,3)                                                                     ")
+        SQLStr.AppendLine("     END AS SCRSYABARA                                                                              ")
+
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_TANKA LNM0006                                                                       ")
+        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
 
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
@@ -383,7 +421,7 @@ Public Class LNM0006TankaList
         'End If
         '取引先名称
         If Not String.IsNullOrEmpty(work.WF_SEL_TORINAME_S.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.TORINAME LIKE '%" & work.WF_SEL_TORINAME_S.Text & "%'                                                               ")
+            SQLStr.AppendLine(" AND  LNM0006.TORINAME COLLATE UTF8_UNICODE_CI LIKE '%" & work.WF_SEL_TORINAME_S.Text & "%'                                                               ")
         End If
 
         '部門コード
@@ -394,18 +432,22 @@ Public Class LNM0006TankaList
         If DateTime.TryParse(WF_StYMD.Value, dt) Then
             SQLStr.AppendLine(" AND  @STYMD BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD  ")
         End If
-        '届先コード
+        '実績届先コード
         If Not String.IsNullOrEmpty(WF_TODOKE.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.TODOKECODE = @TODOKECODE")
+            SQLStr.AppendLine(" AND  LNM0006.AVOCADOTODOKECODE = @AVOCADOTODOKECODE")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0006.TORICODE                                                           ")
         SQLStr.AppendLine("    ,LNM0006.ORGCODE                                                            ")
         SQLStr.AppendLine("    ,LNM0006.KASANORGCODE                                                       ")
-        SQLStr.AppendLine("    ,LNM0006.TODOKECODE                                                         ")
+        SQLStr.AppendLine("    ,LNM0006.AVOCADOSHUKABASHO                                                  ")
+        SQLStr.AppendLine("    ,LNM0006.AVOCADOTODOKECODE                                                  ")
+        SQLStr.AppendLine("    ,LNM0006.SHABAN                                                             ")
         SQLStr.AppendLine("    ,LNM0006.STYMD                                                              ")
         SQLStr.AppendLine("    ,LNM0006.BRANCHCODE                                                         ")
+        SQLStr.AppendLine("    ,LNM0006.SYAGATA                                                            ")
+        SQLStr.AppendLine("    ,LNM0006.SYABARA                                                            ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -429,10 +471,10 @@ Public Class LNM0006TankaList
                     Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
                     P_STYMD.Value = dt
                 End If
-                '届先コード
+                '実績届先コード
                 If Not String.IsNullOrEmpty(WF_TODOKE.Text) Then
-                    Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)
-                    P_TODOKECODE.Value = WF_TODOKE.Text
+                    Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)
+                    P_AVOCADOTODOKECODE.Value = WF_TODOKE.Text
                 End If
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -449,6 +491,13 @@ Public Class LNM0006TankaList
                 For Each LNM0006row As DataRow In LNM0006tbl.Rows
                     i += 1
                     LNM0006row("LINECNT") = i        'LINECNT
+
+                    Select Case LNM0006row("TANKAKBN").ToString
+                        Case "0" : LNM0006row("SCRTANKAKBN") = "通常単価"
+                        Case "1" : LNM0006row("SCRTANKAKBN") = "調整単価"
+                        Case Else : LNM0006row("SCRTANKAKBN") = ""
+                    End Select
+
                 Next
             End Using
 
@@ -474,36 +523,45 @@ Public Class LNM0006TankaList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
 
+        work.WF_SEL_TARGETYMD_L.Text = WF_StYMD.Value
+
         work.WF_SEL_LINECNT.Text = ""                                            '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)   '削除
 
         work.WF_SEL_TORICODE.Text = ""                                           '取引先コード
         work.WF_SEL_TORINAME.Text = ""                                           '取引先名称
 
-        '情シス、高圧ガス以外の場合
-        If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-            work.WF_SEL_ORGCODE.Text = Master.USER_ORG                               '部門コード
-            CODENAME_get("ORG", Master.USER_ORG, work.WF_SEL_ORGNAME.Text, WW_RtnSW) '部門名称
-        Else
-            work.WF_SEL_ORGCODE.Text = ""                                            '部門コード
-            work.WF_SEL_ORGNAME.Text = ""                                            '部門名称
-        End If
-        work.WF_SEL_KASANORGCODE.Text = ""                                       '加算先部門コード
-        work.WF_SEL_KASANORGNAME.Text = ""                                       '加算先部門名称
-        work.WF_SEL_TODOKECODE.Text = ""                                         '届先コード
-        work.WF_SEL_TODOKENAME.Text = ""                                         '届先名称
-        work.WF_SEL_STYMD.Text = ""                                              '有効開始日
-        'work.WF_SEL_ENDYMD.Text = LNM0006WRKINC.MAX_ENDYMD                       '有効終了日
-        work.WF_SEL_ENDYMD.Text = ""                                             '有効終了日
-        work.WF_SEL_BRANCHCODE.Text = ""                                         '枝番
-        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_TANKA.Text)    '単価
-        work.WF_SEL_SYAGATA.Text = ""                                            '車型
-        work.WF_SEL_SYAGOU.Text = ""                                             '車号
-        work.WF_SEL_SYABARA.Text = ""                                            '車腹
-        work.WF_SEL_SYUBETSU.Text = ""                                           '種別
-        work.WF_SEL_BIKOU1.Text = ""                                             '備考1
-        work.WF_SEL_BIKOU2.Text = ""                                             '備考2
-        work.WF_SEL_BIKOU3.Text = ""                                             '備考3
+        work.WF_SEL_ORGCODE.Text = ""                                            '部門コード
+        work.WF_SEL_ORGNAME.Text = ""                                            '部門名称
+
+        work.WF_SEL_KASANORGCODE.Text = ""                                           '加算先部門コード
+        work.WF_SEL_KASANORGNAME.Text = ""                                           '加算先部門名称
+        work.WF_SEL_AVOCADOSHUKABASHO.Text = ""                                      '実績出荷場所コード
+        work.WF_SEL_AVOCADOSHUKANAME.Text = ""                                       '実績出荷場所名称
+        work.WF_SEL_SHUKABASHO.Text = ""                                             '変換後出荷場所コード
+        work.WF_SEL_SHUKANAME.Text = ""                                              '変換後出荷場所名称
+        work.WF_SEL_AVOCADOTODOKECODE.Text = ""                                      '実績届先コード
+        work.WF_SEL_AVOCADOTODOKENAME.Text = ""                                      '実績届先名称
+        work.WF_SEL_TODOKECODE.Text = ""                                             '変換後届先コード
+        work.WF_SEL_TODOKENAME.Text = ""                                             '変換後届先名称
+        work.WF_SEL_TANKNUMBER.Text = ""                                             '陸事番号
+        work.WF_SEL_SHABAN.Text = ""                                                 '車番
+        work.WF_SEL_STYMD.Text = Date.Now.ToString("yyyy/MM/01")                     '有効開始日
+        work.WF_SEL_ENDYMD.Text = LNM0006WRKINC.MAX_ENDYMD                           '有効終了日
+        work.WF_SEL_BRANCHCODE.Text = "1"                                             '枝番
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_TANKAKBN.Text)     '単価区分
+
+        work.WF_SEL_MEMO.Text = ""                                                   '単価用途
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_TANKA.Text)        '単価
+        work.WF_SEL_CALCKBN.Text = ""                                                '計算区分
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_ROUNDTRIP.Text)    '往復距離
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_TOLLFEE.Text)      '通行料
+        work.WF_SEL_SYAGATA.Text = ""                                                '車型
+        work.WF_SEL_SYAGATANAME.Text = ""                                            '車型名
+        Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_SYABARA.Text)      '車腹
+        work.WF_SEL_BIKOU1.Text = ""                                                 '備考1
+        work.WF_SEL_BIKOU2.Text = ""                                                 '備考2
+        work.WF_SEL_BIKOU3.Text = ""                                                 '備考3
 
         work.WF_SEL_TIMESTAMP.Text = ""         　                               'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
@@ -688,31 +746,44 @@ Public Class LNM0006TankaList
             Exit Sub
         End Try
 
-        work.WF_SEL_LINECNT.Text = LNM0006tbl.Rows(WW_LineCNT)("LINECNT")            '選択行
+        work.WF_SEL_TARGETYMD_L.Text = WF_StYMD.Value
 
-        work.WF_SEL_TORICODE.Text = LNM0006tbl.Rows(WW_LineCNT)("TORICODE")          '取引先コード
-        work.WF_SEL_TORINAME.Text = LNM0006tbl.Rows(WW_LineCNT)("TORINAME")          '取引先名称
-        work.WF_SEL_ORGCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("ORGCODE")            '部門コード
-        work.WF_SEL_ORGNAME.Text = LNM0006tbl.Rows(WW_LineCNT)("ORGNAME")            '部門名称
-        work.WF_SEL_KASANORGCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("KASANORGCODE")  '加算先部門コード
-        work.WF_SEL_KASANORGNAME.Text = LNM0006tbl.Rows(WW_LineCNT)("KASANORGNAME")  '加算先部門名称
-        work.WF_SEL_TODOKECODE.Text = LNM0006tbl.Rows(WW_LineCNT)("TODOKECODE")      '届先コード
-        work.WF_SEL_TODOKENAME.Text = LNM0006tbl.Rows(WW_LineCNT)("TODOKENAME")      '届先名称
-        work.WF_SEL_STYMD.Text = LNM0006tbl.Rows(WW_LineCNT)("STYMD")                '有効開始日
-        work.WF_SEL_ENDYMD.Text = LNM0006tbl.Rows(WW_LineCNT)("ENDYMD")              '有効終了日
-        work.WF_SEL_BRANCHCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("BRANCHCODE")      '枝番
-        work.WF_SEL_TANKA.Text = LNM0006tbl.Rows(WW_LineCNT)("TANKA")                '単価
-        work.WF_SEL_SYAGATA.Text = LNM0006tbl.Rows(WW_LineCNT)("SYAGATA")            '車型
-        work.WF_SEL_SYAGOU.Text = LNM0006tbl.Rows(WW_LineCNT)("SYAGOU")              '車号
-        work.WF_SEL_SYABARA.Text = LNM0006tbl.Rows(WW_LineCNT)("SYABARA")            '車腹
-        work.WF_SEL_SYUBETSU.Text = LNM0006tbl.Rows(WW_LineCNT)("SYUBETSU")          '種別
-        work.WF_SEL_BIKOU1.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU1")              '備考1
-        work.WF_SEL_BIKOU2.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU2")              '備考2
-        work.WF_SEL_BIKOU3.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU3")              '備考3
+        work.WF_SEL_LINECNT.Text = LNM0006tbl.Rows(WW_LineCNT)("LINECNT")                           '選択行
 
-        work.WF_SEL_DELFLG.Text = LNM0006tbl.Rows(WW_LineCNT)("DELFLG")          '削除フラグ
-        work.WF_SEL_TIMESTAMP.Text = LNM0006tbl.Rows(WW_LineCNT)("UPDTIMSTP")    'タイムスタンプ
-        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
+        work.WF_SEL_TORICODE.Text = LNM0006tbl.Rows(WW_LineCNT)("TORICODE")                         '取引先コード
+        work.WF_SEL_TORINAME.Text = LNM0006tbl.Rows(WW_LineCNT)("TORINAME")                         '取引先名称
+        work.WF_SEL_ORGCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("ORGCODE")                           '部門コード
+        work.WF_SEL_ORGNAME.Text = LNM0006tbl.Rows(WW_LineCNT)("ORGNAME")                           '部門名称
+        work.WF_SEL_KASANORGCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("KASANORGCODE")                 '加算先部門コード
+        work.WF_SEL_KASANORGNAME.Text = LNM0006tbl.Rows(WW_LineCNT)("KASANORGNAME")                 '加算先部門名称
+        work.WF_SEL_AVOCADOSHUKABASHO.Text = LNM0006tbl.Rows(WW_LineCNT)("AVOCADOSHUKABASHO")       '実績出荷場所コード
+        work.WF_SEL_AVOCADOSHUKANAME.Text = LNM0006tbl.Rows(WW_LineCNT)("AVOCADOSHUKANAME")         '実績出荷場所名称
+        work.WF_SEL_SHUKABASHO.Text = LNM0006tbl.Rows(WW_LineCNT)("SHUKABASHO")                     '変換後出荷場所コード
+        work.WF_SEL_SHUKANAME.Text = LNM0006tbl.Rows(WW_LineCNT)("SHUKANAME")                       '変換後出荷場所名称
+        work.WF_SEL_AVOCADOTODOKECODE.Text = LNM0006tbl.Rows(WW_LineCNT)("AVOCADOTODOKECODE")       '実績届先コード
+        work.WF_SEL_AVOCADOTODOKENAME.Text = LNM0006tbl.Rows(WW_LineCNT)("AVOCADOTODOKENAME")       '実績届先名称
+        work.WF_SEL_TODOKECODE.Text = LNM0006tbl.Rows(WW_LineCNT)("TODOKECODE")                     '変換後届先コード
+        work.WF_SEL_TODOKENAME.Text = LNM0006tbl.Rows(WW_LineCNT)("TODOKENAME")                     '変換後届先名称
+        work.WF_SEL_TANKNUMBER.Text = LNM0006tbl.Rows(WW_LineCNT)("TANKNUMBER")                     '陸事番号
+        work.WF_SEL_SHABAN.Text = LNM0006tbl.Rows(WW_LineCNT)("SHABAN")                             '車番
+        work.WF_SEL_STYMD.Text = LNM0006tbl.Rows(WW_LineCNT)("STYMD")                               '有効開始日
+        work.WF_SEL_ENDYMD.Text = LNM0006tbl.Rows(WW_LineCNT)("ENDYMD")                             '有効終了日
+        work.WF_SEL_BRANCHCODE.Text = LNM0006tbl.Rows(WW_LineCNT)("BRANCHCODE")                     '枝番
+        work.WF_SEL_TANKAKBN.Text = LNM0006tbl.Rows(WW_LineCNT)("TANKAKBN")                         '単価区分
+        work.WF_SEL_MEMO.Text = LNM0006tbl.Rows(WW_LineCNT)("MEMO")                                 '単価用途
+        work.WF_SEL_TANKA.Text = LNM0006tbl.Rows(WW_LineCNT)("TANKA")                               '単価
+        work.WF_SEL_CALCKBN.Text = LNM0006tbl.Rows(WW_LineCNT)("CALCKBN")                           '計算区分
+        work.WF_SEL_ROUNDTRIP.Text = LNM0006tbl.Rows(WW_LineCNT)("ROUNDTRIP")                       '往復距離
+        work.WF_SEL_TOLLFEE.Text = LNM0006tbl.Rows(WW_LineCNT)("TOLLFEE")                           '通行料
+        work.WF_SEL_SYAGATA.Text = LNM0006tbl.Rows(WW_LineCNT)("SYAGATA")                           '車型
+        work.WF_SEL_SYAGATANAME.Text = LNM0006tbl.Rows(WW_LineCNT)("SYAGATANAME")                   '車型名
+        work.WF_SEL_SYABARA.Text = LNM0006tbl.Rows(WW_LineCNT)("SYABARA")                           '車腹
+        work.WF_SEL_BIKOU1.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU1")                             '備考1
+        work.WF_SEL_BIKOU2.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU2")                             '備考2
+        work.WF_SEL_BIKOU3.Text = LNM0006tbl.Rows(WW_LineCNT)("BIKOU3")                             '備考3
+        work.WF_SEL_DELFLG.Text = LNM0006tbl.Rows(WW_LineCNT)("DELFLG")                             '削除フラグ
+        work.WF_SEL_TIMESTAMP.Text = LNM0006tbl.Rows(WW_LineCNT)("UPDTIMSTP")                       'タイムスタンプ
+        work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                                                 '詳細画面更新メッセージ
 
         '○画面切替設定
         WF_BOXChange.Value = "detailbox"
@@ -730,7 +801,9 @@ Public Class LNM0006TankaList
             ' 排他チェック
             work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
                             work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text, work.WF_SEL_KASANORGCODE.Text,
-                            work.WF_SEL_TODOKECODE.Text, work.WF_SEL_STYMD.Text, work.WF_SEL_BRANCHCODE.Text)
+                          work.WF_SEL_AVOCADOSHUKABASHO.Text, work.WF_SEL_AVOCADOTODOKECODE.Text, work.WF_SEL_SHABAN.Text,
+                          work.WF_SEL_STYMD.Text, work.WF_SEL_BRANCHCODE.Text,
+                          work.WF_SEL_SYAGATA.Text, work.WF_SEL_SYABARA.Text)
         End Using
 
         If Not isNormal(WW_DBDataCheck) Then
@@ -828,9 +901,6 @@ Public Class LNM0006TankaList
         'シート名
         wb.ActiveSheet.Name = "入出力"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
@@ -840,8 +910,11 @@ Public Class LNM0006TankaList
         Dim WW_ENDROW As Integer = 0
 
         WW_STROW = WW_ACTIVEROW
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
         WW_ENDROW = WW_ACTIVEROW - 1
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         'プルダウンリスト作成
         SetPULLDOWNLIST(wb, WW_STROW, WW_ENDROW)
@@ -957,11 +1030,16 @@ Public Class LNM0006TankaList
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.TORICODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '取引先コード
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.ORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '部門コード
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.KASANORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '加算先部門コード
-        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '届先コード
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKABASHO).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実績出荷場所コード
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKECODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実績届先コード
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.SHABAN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車番
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '枝番
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車型
+        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '車腹
 
         '入力不要列網掛け
-        sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '枝番
+        'sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '枝番
         'sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '有効終了日
         sheet.Columns(LNM0006WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
 
@@ -1019,17 +1097,28 @@ Public Class LNM0006TankaList
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ORGNAME).Value = "部門名称"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = "（必須）加算先部門コード"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Value = "（必須）届先コード"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKENAME).Value = "届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKABASHO).Value = "（必須）実績出荷場所コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKANAME).Value = "実績出荷場所名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKABASHO).Value = "変換後出荷場所コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKANAME).Value = "変換後出荷場所名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKECODE).Value = "（必須）実績届先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKENAME).Value = "実績届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Value = "変換後届先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKENAME).Value = "変換後届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TANKNUMBER).Value = "陸事番号"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SHABAN).Value = "（必須）車番"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.STYMD).Value = "（必須）有効開始日"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Value = "有効終了日"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Value = "枝番"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Value = "（必須）枝番"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TANKAKBN).Value = "単価区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.MEMO).Value = "単価用途"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA).Value = "単価"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).Value = "車型"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.CALCKBN).Value = "計算区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ROUNDTRIP).Value = "往復距離"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TOLLFEE).Value = "通行料"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).Value = "（必須）車型"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = "車型名"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGOU).Value = "車号"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Value = "車腹"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYUBETSU).Value = "種別"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Value = "（必須）車腹"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU1).Value = "備考1"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU2).Value = "備考2"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
@@ -1057,7 +1146,7 @@ Public Class LNM0006TankaList
             '選択比較項目-発荷主コード
             sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).AddComment(WW_TEXT)
             With sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Comment.Shape
-                .Width = 150
+                .Width = 180
                 .Height = 30
             End With
 
@@ -1109,18 +1198,18 @@ Public Class LNM0006TankaList
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub SetCOLLOCKED(ByVal sheet As IWorksheet, ByVal WW_STROW As Integer, ByVal WW_ENDROW As Integer)
-        Dim WW_STRANGE As IRange
-        Dim WW_ENDRANGE As IRange
+        'Dim WW_STRANGE As IRange
+        'Dim WW_ENDRANGE As IRange
 
-        'シートの保護をかけるとリボンも操作できなくなるため
-        'データの入力規則で対応(該当セルの入力可能文字数を0にする)
+        ''シートの保護をかけるとリボンも操作できなくなるため
+        ''データの入力規則で対応(該当セルの入力可能文字数を0にする)
 
-        '枝番
-        WW_STRANGE = sheet.Cells(WW_STROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
-        WW_ENDRANGE = sheet.Cells(WW_ENDROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
-        With sheet.Range(WW_STRANGE.Address & ":" & WW_ENDRANGE.Address).Validation
-            .Add(type:=ValidationType.TextLength, validationOperator:=ValidationOperator.LessEqual, formula1:=0)
-        End With
+        ''枝番
+        'WW_STRANGE = sheet.Cells(WW_STROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
+        'WW_ENDRANGE = sheet.Cells(WW_ENDROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE)
+        'With sheet.Range(WW_STRANGE.Address & ":" & WW_ENDRANGE.Address).Validation
+        '    .Add(type:=ValidationType.TextLength, validationOperator:=ValidationOperator.LessEqual, formula1:=0)
+        'End With
 
     End Sub
 
@@ -1128,7 +1217,15 @@ Public Class LNM0006TankaList
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.000_);[Red](#,##0.000)"
 
         'Dim WW_DEPSTATION As String
 
@@ -1148,20 +1245,72 @@ Public Class LNM0006TankaList
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKABASHO).Value = Row("AVOCADOSHUKABASHO") '実績出荷場所コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKANAME).Value = Row("AVOCADOSHUKANAME") '実績出荷場所名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKABASHO).Value = Row("SHUKABASHO") '変換後出荷場所コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKANAME).Value = Row("SHUKANAME") '変換後出荷場所名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKECODE).Value = Row("AVOCADOTODOKECODE") '実績届先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKENAME).Value = Row("AVOCADOTODOKENAME") '実績届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '変換後届先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '変換後届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKNUMBER).Value = Row("TANKNUMBER") '陸事番号
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SHABAN).Value = Row("SHABAN") '車番
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Value = Row("BRANCHCODE") '枝番
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA).Value = Row("TANKA") '単価
+
+            '枝番
+            If Row("BRANCHCODE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Value = Row("BRANCHCODE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Value = CDbl(Row("BRANCHCODE"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKAKBN).Value = Row("TANKAKBN") '単価区分
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.MEMO).Value = Row("MEMO") '単価用途
+
+            '単価
+            If Row("TANKA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA).Value = Row("TANKA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.CALCKBN).Value = Row("CALCKBN") '計算区分
+
+            '往復距離
+            If Row("ROUNDTRIP") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.ROUNDTRIP).Value = Row("ROUNDTRIP")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.ROUNDTRIP).Value = CDbl(Row("ROUNDTRIP"))
+            End If
+
+            '通行料
+            If Row("TOLLFEE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TOLLFEE).Value = Row("TOLLFEE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TOLLFEE).Value = CDbl(Row("TOLLFEE"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGOU).Value = Row("SYAGOU") '車号
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYUBETSU).Value = Row("SYUBETSU") '種別
+
+            '車腹
+            If Row("SYABARA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Value = CDbl(Row("SYABARA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.BRANCHCODE).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.ROUNDTRIP).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.TOLLFEE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA).Style = DecStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -1315,8 +1464,11 @@ Public Class LNM0006TankaList
                     If Not Row("TORICODE") = "" And
                        Not Row("ORGCODE") = "" And
                        Not Row("KASANORGCODE") = "" And
-                       Not Row("TODOKECODE") = "" And
-                       Not Row("STYMD") = Date.MinValue Then
+                       Not Row("AVOCADOSHUKABASHO") = "" And
+                       Not Row("AVOCADOTODOKECODE") = "" And
+                       Not Row("SHABAN") = "" And
+                       Not Row("STYMD") = Date.MinValue And
+                       Not Row("SYAGATA") = "" Then
 
                         WF_AUTOENDYMD.Value = ""
 
@@ -1340,7 +1492,7 @@ Public Class LNM0006TankaList
                                     WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
                                     WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
-                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
+                                    '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                 Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                     'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
 
@@ -1382,37 +1534,37 @@ Public Class LNM0006TankaList
                     End If
 
                     Dim WW_MODIFYKBN As String = ""
-                    Dim WW_BEFDELFLG As String = ""
+                        Dim WW_BEFDELFLG As String = ""
 
-                    '変更チェック
-                    MASTEREXISTS(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
+                        '変更チェック
+                        MASTEREXISTS(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, WW_ErrSW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
 
-                    '変更がある場合履歴テーブルに変更前データを登録
-                    If WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.BEFDATA Then
-                        '履歴登録(変更前)
+                        '変更がある場合履歴テーブルに変更前データを登録
+                        If WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.BEFDATA Then
+                            '履歴登録(変更前)
+                            InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                            If Not isNormal(WW_ErrSW) Then
+                                Exit Sub
+                            End If
+                            '登録後変更区分を変更後にする
+                            WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.AFTDATA
+                        End If
+
+                        '登録、更新する
+                        InsUpdExcelData(SQLcon, Row, DATENOW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
+
+                        '履歴登録(新規・変更後)
                         InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
                         If Not isNormal(WW_ErrSW) Then
                             Exit Sub
                         End If
-                        '登録後変更区分を変更後にする
-                        WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.AFTDATA
                     End If
-
-                    '登録、更新する
-                    InsUpdExcelData(SQLcon, Row, DATENOW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
-
-                    '履歴登録(新規・変更後)
-                    InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
-                End If
             Next
 
             'エラーデータが存在した場合Rightboxを表示する
@@ -1564,8 +1716,11 @@ Public Class LNM0006TankaList
                     If Not Row("TORICODE") = "" And
                        Not Row("ORGCODE") = "" And
                        Not Row("KASANORGCODE") = "" And
-                       Not Row("TODOKECODE") = "" And
-                       Not Row("STYMD") = Date.MinValue Then
+                       Not Row("AVOCADOSHUKABASHO") = "" And
+                       Not Row("AVOCADOTODOKECODE") = "" And
+                       Not Row("SHABAN") = "" And
+                       Not Row("STYMD") = Date.MinValue And
+                       Not Row("SYAGATA") = "" Then
 
                         WF_AUTOENDYMD.Value = ""
 
@@ -1589,7 +1744,7 @@ Public Class LNM0006TankaList
                                     WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
                                 Case WW_BeforeMAXSTYMD = CDate(Row("STYMD")).ToString("yyyy/MM/dd") '同一の場合
                                     WF_AUTOENDYMD.Value = LNM0006WRKINC.MAX_ENDYMD
-                                '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
+                                    '更新前有効開始日 <　入力有効開始日(DBに登録されている有効開始日よりも登録しようとしている有効開始日が大きい場合)
                                 Case WW_BeforeMAXSTYMD < CDate(Row("STYMD")).ToString("yyyy/MM/dd")
                                     'DBに登録されている有効開始日の有効終了日を登録しようとしている有効開始日-1にする
 
@@ -1633,48 +1788,48 @@ Public Class LNM0006TankaList
                     Dim WW_MODIFYKBN As String = ""
                     Dim WW_BEFDELFLG As String = ""
 
-                    '変更チェック
-                    MASTEREXISTS(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
+                        '変更チェック
+                        MASTEREXISTS(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, WW_ErrSW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
 
-                    '変更がある場合履歴テーブルに変更前データを登録
-                    If WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.BEFDATA Then
-                        '履歴登録(変更前)
+                        '変更がある場合履歴テーブルに変更前データを登録
+                        If WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.BEFDATA Then
+                            '履歴登録(変更前)
+                            InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
+                            If Not isNormal(WW_ErrSW) Then
+                                Exit Sub
+                            End If
+                            '登録後変更区分を変更後にする
+                            WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.AFTDATA
+                        End If
+
+
+                        '件数カウント
+                        Select Case True
+                            Case Row("DELFLG") = "1" '削除の場合
+                                WW_UplDelCnt += 1
+                            Case WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.NEWDATA '新規の場合
+                                WW_UplInsCnt += 1
+                            Case Else
+                                WW_UplUpdCnt += 1
+                        End Select
+
+                        '登録、更新する
+                        InsUpdExcelData(SQLcon, Row, DATENOW)
+                        If Not isNormal(WW_ErrSW) Then
+                            Exit Sub
+                        End If
+
+                        '履歴登録(新規・変更後)
                         InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
                         If Not isNormal(WW_ErrSW) Then
                             Exit Sub
                         End If
-                        '登録後変更区分を変更後にする
-                        WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.AFTDATA
-                    End If
 
-
-                    '件数カウント
-                    Select Case True
-                        Case Row("DELFLG") = "1" '削除の場合
-                            WW_UplDelCnt += 1
-                        Case WW_MODIFYKBN = LNM0006WRKINC.MODIFYKBN.NEWDATA '新規の場合
-                            WW_UplInsCnt += 1
-                        Case Else
-                            WW_UplUpdCnt += 1
-                    End Select
-
-                    '登録、更新する
-                    InsUpdExcelData(SQLcon, Row, DATENOW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
-
-                    '履歴登録(新規・変更後)
-                    InsertHist(SQLcon, Row, WW_BEFDELFLG, WW_MODIFYKBN, DATENOW, WW_ErrSW)
-                    If Not isNormal(WW_ErrSW) Then
-                        Exit Sub
-                    End If
-
-                Else '同一データの場合
-                    WW_UplUnnecessaryCnt += 1
+                    Else '同一データの場合
+                        WW_UplUnnecessaryCnt += 1
                 End If
             Next
 
@@ -1725,21 +1880,33 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("        ,ORGNAME  ")
         SQLStr.AppendLine("        ,KASANORGCODE  ")
         SQLStr.AppendLine("        ,KASANORGNAME  ")
+        SQLStr.AppendLine("        ,AVOCADOSHUKABASHO  ")
+        SQLStr.AppendLine("        ,AVOCADOSHUKANAME  ")
+        SQLStr.AppendLine("        ,SHUKABASHO  ")
+        SQLStr.AppendLine("        ,SHUKANAME  ")
+        SQLStr.AppendLine("        ,AVOCADOTODOKECODE  ")
+        SQLStr.AppendLine("        ,AVOCADOTODOKENAME  ")
         SQLStr.AppendLine("        ,TODOKECODE  ")
         SQLStr.AppendLine("        ,TODOKENAME  ")
+        SQLStr.AppendLine("        ,TANKNUMBER  ")
+        SQLStr.AppendLine("        ,SHABAN  ")
         SQLStr.AppendLine("        ,STYMD  ")
         SQLStr.AppendLine("        ,ENDYMD  ")
         SQLStr.AppendLine("        ,BRANCHCODE  ")
+        SQLStr.AppendLine("        ,TANKAKBN  ")
+        SQLStr.AppendLine("        ,MEMO  ")
         SQLStr.AppendLine("        ,TANKA  ")
+        SQLStr.AppendLine("        ,CALCKBN  ")
+        SQLStr.AppendLine("        ,ROUNDTRIP  ")
+        SQLStr.AppendLine("        ,TOLLFEE  ")
         SQLStr.AppendLine("        ,SYAGATA  ")
-        SQLStr.AppendLine("        ,SYAGOU  ")
+        SQLStr.AppendLine("        ,SYAGATANAME  ")
         SQLStr.AppendLine("        ,SYABARA  ")
-        SQLStr.AppendLine("        ,SYUBETSU  ")
         SQLStr.AppendLine("        ,BIKOU1  ")
         SQLStr.AppendLine("        ,BIKOU2  ")
         SQLStr.AppendLine("        ,BIKOU3  ")
         SQLStr.AppendLine("        ,DELFLG  ")
-        SQLStr.AppendLine(" FROM LNG.LNM0006_TANKA ")
+        SQLStr.AppendLine(" FROM LNG.LNM0006_NEWTANKA ")
         SQLStr.AppendLine(" LIMIT 0 ")
 
         Try
@@ -1754,10 +1921,10 @@ Public Class LNM0006TankaList
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_TANKA SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_NEWTANKA SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0006_TANKA SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1846,18 +2013,82 @@ Public Class LNM0006TankaList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            '届先コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE))
-            WW_DATATYPE = DataTypeHT("TODOKECODE")
-            LNM0006Exceltblrow("TODOKECODE") = LNM0006WRKINC.DataConvert("届先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            '実績出荷場所コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKABASHO))
+            WW_DATATYPE = DataTypeHT("AVOCADOSHUKABASHO")
+            LNM0006Exceltblrow("AVOCADOSHUKABASHO") = LNM0006WRKINC.DataConvert("実績出荷場所コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            '届先名称
+            '実績出荷場所名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOSHUKANAME))
+            WW_DATATYPE = DataTypeHT("AVOCADOSHUKANAME")
+            LNM0006Exceltblrow("AVOCADOSHUKANAME") = LNM0006WRKINC.DataConvert("実績出荷場所名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '変換後出荷場所コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKABASHO))
+            WW_DATATYPE = DataTypeHT("SHUKABASHO")
+            LNM0006Exceltblrow("SHUKABASHO") = LNM0006WRKINC.DataConvert("変換後出荷場所コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '変換後出荷場所名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SHUKANAME))
+            WW_DATATYPE = DataTypeHT("SHUKANAME")
+            LNM0006Exceltblrow("SHUKANAME") = LNM0006WRKINC.DataConvert("変換後出荷場所名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '実績届先コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKECODE))
+            WW_DATATYPE = DataTypeHT("AVOCADOTODOKECODE")
+            LNM0006Exceltblrow("AVOCADOTODOKECODE") = LNM0006WRKINC.DataConvert("実績届先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '実績届先名称
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.AVOCADOTODOKENAME))
+            WW_DATATYPE = DataTypeHT("AVOCADOTODOKENAME")
+            LNM0006Exceltblrow("AVOCADOTODOKENAME") = LNM0006WRKINC.DataConvert("実績届先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '変換後届先コード
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKECODE))
+            WW_DATATYPE = DataTypeHT("TODOKECODE")
+            LNM0006Exceltblrow("TODOKECODE") = LNM0006WRKINC.DataConvert("変換後届先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '変換後届先名称
             WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TODOKENAME))
             WW_DATATYPE = DataTypeHT("TODOKENAME")
-            LNM0006Exceltblrow("TODOKENAME") = LNM0006WRKINC.DataConvert("届先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            LNM0006Exceltblrow("TODOKENAME") = LNM0006WRKINC.DataConvert("変換後届先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '陸事番号
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TANKNUMBER))
+            WW_DATATYPE = DataTypeHT("TANKNUMBER")
+            LNM0006Exceltblrow("TANKNUMBER") = LNM0006WRKINC.DataConvert("陸事番号", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '車番
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SHABAN))
+            WW_DATATYPE = DataTypeHT("SHABAN")
+            LNM0006Exceltblrow("SHABAN") = LNM0006WRKINC.DataConvert("車番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
@@ -1886,10 +2117,50 @@ Public Class LNM0006TankaList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
+            '単価区分
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TANKAKBN)), ",", "")
+            WW_DATATYPE = DataTypeHT("TANKAKBN")
+            LNM0006Exceltblrow("TANKAKBN") = LNM0006WRKINC.DataConvert("単価区分", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '単価用途
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.MEMO))
+            WW_DATATYPE = DataTypeHT("MEMO")
+            LNM0006Exceltblrow("MEMO") = LNM0006WRKINC.DataConvert("単価用途", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
             '単価
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TANKA)), ",", "")
             WW_DATATYPE = DataTypeHT("TANKA")
             LNM0006Exceltblrow("TANKA") = LNM0006WRKINC.DataConvert("単価", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '計算区分
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.CALCKBN))
+            WW_DATATYPE = DataTypeHT("CALCKBN")
+            LNM0006Exceltblrow("CALCKBN") = LNM0006WRKINC.DataConvert("計算区分", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '往復距離
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.ROUNDTRIP)), ",", "")
+            WW_DATATYPE = DataTypeHT("ROUNDTRIP")
+            LNM0006Exceltblrow("ROUNDTRIP") = LNM0006WRKINC.DataConvert("往復距離", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            If WW_RESULT = False Then
+                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                O_RTN = "ERR"
+            End If
+            '通行料
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.TOLLFEE)), ",", "")
+            WW_DATATYPE = DataTypeHT("TOLLFEE")
+            LNM0006Exceltblrow("TOLLFEE") = LNM0006WRKINC.DataConvert("通行料", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
@@ -1902,26 +2173,18 @@ Public Class LNM0006TankaList
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
-            '車号
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGOU))
-            WW_DATATYPE = DataTypeHT("SYAGOU")
-            LNM0006Exceltblrow("SYAGOU") = LNM0006WRKINC.DataConvert("車号", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+            '車型名
+            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATANAME))
+            WW_DATATYPE = DataTypeHT("SYAGATANAME")
+            LNM0006Exceltblrow("SYAGATANAME") = LNM0006WRKINC.DataConvert("車型名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
             End If
             '車腹
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SYABARA)), ",", "")
             WW_DATATYPE = DataTypeHT("SYABARA")
             LNM0006Exceltblrow("SYABARA") = LNM0006WRKINC.DataConvert("車腹", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '種別
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0006WRKINC.INOUTEXCELCOL.SYUBETSU))
-            WW_DATATYPE = DataTypeHT("SYUBETSU")
-            LNM0006Exceltblrow("SYUBETSU") = LNM0006WRKINC.DataConvert("種別", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
                 WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                 O_RTN = "ERR"
@@ -1976,7 +2239,7 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    SELECT")
         SQLStr.AppendLine("        TORICODE")
         SQLStr.AppendLine("    FROM")
-        SQLStr.AppendLine("        LNG.LNM0006_TANKA")
+        SQLStr.AppendLine("        LNG.LNM0006_NEWTANKA")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
@@ -1984,20 +2247,30 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
         SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKANAME, '')             = @AVOCADOSHUKANAME ")
+        SQLStr.AppendLine("    AND  COALESCE(SHUKABASHO, '')             = @SHUKABASHO ")
+        SQLStr.AppendLine("    AND  COALESCE(SHUKANAME, '')             = @SHUKANAME ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKENAME, '')             = @AVOCADOTODOKENAME ")
         SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
         SQLStr.AppendLine("    AND  COALESCE(TODOKENAME, '')             = @TODOKENAME ")
+        SQLStr.AppendLine("    AND  COALESCE(TANKNUMBER, '')             = @TANKNUMBER ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-
         If Not WW_ROW("ENDYMD") = Date.MinValue Then
             SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
         End If
-
-        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(TANKAKBN, '')             = @TANKAKBN ")
+        SQLStr.AppendLine("    AND  COALESCE(MEMO, '')             = @MEMO ")
         SQLStr.AppendLine("    AND  COALESCE(TANKA, '0')             = @TANKA ")
+        SQLStr.AppendLine("    AND  COALESCE(CALCKBN, '')             = @CALCKBN ")
+        SQLStr.AppendLine("    AND  COALESCE(ROUNDTRIP, '0')             = @ROUNDTRIP ")
+        SQLStr.AppendLine("    AND  COALESCE(TOLLFEE, '0')             = @TOLLFEE ")
         SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
-        SQLStr.AppendLine("    AND  COALESCE(SYAGOU, '')             = @SYAGOU ")
-        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '')             = @SYABARA ")
-        SQLStr.AppendLine("    AND  COALESCE(SYUBETSU, '')             = @SYUBETSU ")
+        SQLStr.AppendLine("    AND  COALESCE(SYAGATANAME, '')             = @SYAGATANAME ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
         SQLStr.AppendLine("    AND  COALESCE(BIKOU1, '')             = @BIKOU1 ")
         SQLStr.AppendLine("    AND  COALESCE(BIKOU2, '')             = @BIKOU2 ")
         SQLStr.AppendLine("    AND  COALESCE(BIKOU3, '')             = @BIKOU3 ")
@@ -2011,15 +2284,27 @@ Public Class LNM0006TankaList
                 Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                 Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
-                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOSHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKANAME", MySqlDbType.VarChar, 20)     '実績出荷場所名称
+                Dim P_SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar, 6)     '変換後出荷場所コード
+                Dim P_SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar, 20)     '変換後出荷場所名称
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_AVOCADOTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKENAME", MySqlDbType.VarChar, 20)     '実績届先名称
+                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '変換後届先コード
+                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '変換後届先名称
+                Dim P_TANKNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", MySqlDbType.VarChar, 20)     '陸事番号
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
+                Dim P_TANKAKBN As MySqlParameter = SQLcmd.Parameters.Add("@TANKAKBN", MySqlDbType.VarChar, 1)     '単価区分
+                Dim P_MEMO As MySqlParameter = SQLcmd.Parameters.Add("@MEMO", MySqlDbType.VarChar, 50)     '単価用途
                 Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal)         '単価
+                Dim P_CALCKBN As MySqlParameter = SQLcmd.Parameters.Add("@CALCKBN", MySqlDbType.VarChar, 2)     '計算区分
+                Dim P_ROUNDTRIP As MySqlParameter = SQLcmd.Parameters.Add("@ROUNDTRIP", MySqlDbType.Decimal, 5, 3)    '往復距離
+                Dim P_TOLLFEE As MySqlParameter = SQLcmd.Parameters.Add("@TOLLFEE", MySqlDbType.Decimal, 8, 3)        '通行料
                 Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
-                Dim P_SYAGOU As MySqlParameter = SQLcmd.Parameters.Add("@SYAGOU", MySqlDbType.VarChar, 3)     '車号
+                Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
                 Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                Dim P_SYUBETSU As MySqlParameter = SQLcmd.Parameters.Add("@SYUBETSU", MySqlDbType.VarChar, 20)     '種別
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
                 Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
@@ -2032,15 +2317,27 @@ Public Class LNM0006TankaList
                 P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
                 P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
                 P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '届先コード
-                P_TODOKENAME.Value = WW_ROW("TODOKENAME")           '届先名称
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO")           '実績出荷場所コード
+                P_AVOCADOSHUKANAME.Value = WW_ROW("AVOCADOSHUKANAME")           '実績出荷場所名称
+                P_SHUKABASHO.Value = WW_ROW("SHUKABASHO")           '変換後出荷場所コード
+                P_SHUKANAME.Value = WW_ROW("SHUKANAME")           '変換後出荷場所名称
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE")           '実績届先コード
+                P_AVOCADOTODOKENAME.Value = WW_ROW("AVOCADOTODOKENAME")           '実績届先名称
+                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '変換後届先コード
+                P_TODOKENAME.Value = WW_ROW("TODOKENAME")           '変換後届先名称
+                P_TANKNUMBER.Value = WW_ROW("TANKNUMBER")           '陸事番号
+                P_SHABAN.Value = WW_ROW("SHABAN")           '車番
                 P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
+                P_TANKAKBN.Value = WW_ROW("TANKAKBN")           '単価区分
+                P_MEMO.Value = WW_ROW("MEMO")           '単価用途
                 P_TANKA.Value = WW_ROW("TANKA")           '単価
+                P_CALCKBN.Value = WW_ROW("CALCKBN")           '計算区分
+                P_ROUNDTRIP.Value = WW_ROW("ROUNDTRIP")           '往復距離
+                P_TOLLFEE.Value = WW_ROW("TOLLFEE")           '通行料
                 P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
-                P_SYAGOU.Value = WW_ROW("SYAGOU")           '車号
+                P_SYAGATANAME.Value = WW_ROW("SYAGATANAME")           '車型名
                 P_SYABARA.Value = WW_ROW("SYABARA")           '車腹
-                P_SYUBETSU.Value = WW_ROW("SYUBETSU")           '種別
                 P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
                 P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
                 P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
@@ -2070,10 +2367,10 @@ Public Class LNM0006TankaList
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_TANKA SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_NEWTANKA SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0006_TANKA SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2097,9 +2394,11 @@ Public Class LNM0006TankaList
         If WW_ROW("TORICODE") = "" OrElse
             WW_ROW("ORGCODE") = "" OrElse
             WW_ROW("KASANORGCODE") = "" OrElse
-            WW_ROW("TODOKECODE") = "" OrElse
+            WW_ROW("AVOCADOSHUKABASHO") = "" OrElse
+            WW_ROW("AVOCADOTODOKECODE") = "" OrElse
+            WW_ROW("SHABAN") = "" OrElse
             WW_ROW("STYMD") = Date.MinValue OrElse
-            WW_ROW("BRANCHCODE") = "" Then
+            WW_ROW("SYAGATA") = "" Then
             Exit Function
         End If
 
@@ -2108,30 +2407,42 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    SELECT")
         SQLStr.AppendLine("        DELFLG")
         SQLStr.AppendLine("    FROM")
-        SQLStr.AppendLine("        LNG.LNM0006_TANKA")
+        SQLStr.AppendLine("        LNG.LNM0006_NEWTANKA")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
+                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
 
-                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '届先コード
-                P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
+                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -2154,10 +2465,10 @@ Public Class LNM0006TankaList
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_TANKA SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_NEWTANKA SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0006_TANKA SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2179,7 +2490,7 @@ Public Class LNM0006TankaList
         '○ 対象データ取得
         Dim SQLStr As New StringBuilder
         SQLStr.Append(" UPDATE                                      ")
-        SQLStr.Append("     LNG.LNM0006_TANKA                       ")
+        SQLStr.Append("     LNG.LNM0006_NEWTANKA                    ")
         SQLStr.Append(" SET                                         ")
         SQLStr.Append("     DELFLG               = '1'              ")
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
@@ -2190,29 +2501,41 @@ Public Class LNM0006TankaList
         SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.Append("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-        SQLStr.Append("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.Append("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
         SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.Append("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
+        SQLStr.Append("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.Append("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.Append("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
+                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
 
-                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '届先コード
-                P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
+                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
                 P_UPDYMD.Value = WW_DATENOW                '更新年月日
                 P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID                '更新端末
@@ -2244,7 +2567,7 @@ Public Class LNM0006TankaList
         WW_ErrSW = C_MESSAGE_NO.NORMAL
 
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine("  INSERT INTO LNG.LNM0006_TANKA")
+        SQLStr.AppendLine("  INSERT INTO LNG.LNM0006_NEWTANKA")
         SQLStr.AppendLine("   (  ")
         SQLStr.AppendLine("      TORICODE  ")
         SQLStr.AppendLine("     ,TORINAME  ")
@@ -2252,17 +2575,28 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("     ,ORGNAME  ")
         SQLStr.AppendLine("     ,KASANORGCODE  ")
         SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKABASHO  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKANAME  ")
+        SQLStr.AppendLine("     ,SHUKABASHO  ")
+        SQLStr.AppendLine("     ,SHUKANAME  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKECODE  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKENAME  ")
         SQLStr.AppendLine("     ,TODOKECODE  ")
         SQLStr.AppendLine("     ,TODOKENAME  ")
+        SQLStr.AppendLine("     ,TANKNUMBER  ")
+        SQLStr.AppendLine("     ,SHABAN  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,BRANCHCODE  ")
+        SQLStr.AppendLine("     ,TANKAKBN  ")
+        SQLStr.AppendLine("     ,MEMO  ")
         SQLStr.AppendLine("     ,TANKA  ")
+        SQLStr.AppendLine("     ,CALCKBN  ")
+        SQLStr.AppendLine("     ,ROUNDTRIP  ")
+        SQLStr.AppendLine("     ,TOLLFEE  ")
         SQLStr.AppendLine("     ,SYAGATA  ")
         SQLStr.AppendLine("     ,SYAGATANAME  ")
-        SQLStr.AppendLine("     ,SYAGOU  ")
         SQLStr.AppendLine("     ,SYABARA  ")
-        SQLStr.AppendLine("     ,SYUBETSU  ")
         SQLStr.AppendLine("     ,BIKOU1  ")
         SQLStr.AppendLine("     ,BIKOU2  ")
         SQLStr.AppendLine("     ,BIKOU3  ")
@@ -2280,17 +2614,28 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("     ,@ORGNAME  ")
         SQLStr.AppendLine("     ,@KASANORGCODE  ")
         SQLStr.AppendLine("     ,@KASANORGNAME  ")
+        SQLStr.AppendLine("     ,@AVOCADOSHUKABASHO  ")
+        SQLStr.AppendLine("     ,@AVOCADOSHUKANAME  ")
+        SQLStr.AppendLine("     ,@SHUKABASHO  ")
+        SQLStr.AppendLine("     ,@SHUKANAME  ")
+        SQLStr.AppendLine("     ,@AVOCADOTODOKECODE  ")
+        SQLStr.AppendLine("     ,@AVOCADOTODOKENAME  ")
         SQLStr.AppendLine("     ,@TODOKECODE  ")
         SQLStr.AppendLine("     ,@TODOKENAME  ")
+        SQLStr.AppendLine("     ,@TANKNUMBER  ")
+        SQLStr.AppendLine("     ,@SHABAN  ")
         SQLStr.AppendLine("     ,@STYMD  ")
         SQLStr.AppendLine("     ,@ENDYMD  ")
         SQLStr.AppendLine("     ,@BRANCHCODE  ")
+        SQLStr.AppendLine("     ,@TANKAKBN  ")
+        SQLStr.AppendLine("     ,@MEMO  ")
         SQLStr.AppendLine("     ,@TANKA  ")
+        SQLStr.AppendLine("     ,@CALCKBN  ")
+        SQLStr.AppendLine("     ,@ROUNDTRIP  ")
+        SQLStr.AppendLine("     ,@TOLLFEE  ")
         SQLStr.AppendLine("     ,@SYAGATA  ")
         SQLStr.AppendLine("     ,@SYAGATANAME  ")
-        SQLStr.AppendLine("     ,@SYAGOU  ")
         SQLStr.AppendLine("     ,@SYABARA  ")
-        SQLStr.AppendLine("     ,@SYUBETSU  ")
         SQLStr.AppendLine("     ,@BIKOU1  ")
         SQLStr.AppendLine("     ,@BIKOU2  ")
         SQLStr.AppendLine("     ,@BIKOU3  ")
@@ -2302,16 +2647,33 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("   )   ")
         SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
         SQLStr.AppendLine("      TORINAME =  @TORINAME")
+        SQLStr.AppendLine("     ,TORINAME =  @TORINAME")
+        SQLStr.AppendLine("     ,ORGCODE =  @ORGCODE")
         SQLStr.AppendLine("     ,ORGNAME =  @ORGNAME")
+        SQLStr.AppendLine("     ,KASANORGCODE =  @KASANORGCODE")
         SQLStr.AppendLine("     ,KASANORGNAME =  @KASANORGNAME")
+        SQLStr.AppendLine("     ,AVOCADOSHUKABASHO =  @AVOCADOSHUKABASHO")
+        SQLStr.AppendLine("     ,AVOCADOSHUKANAME =  @AVOCADOSHUKANAME")
+        SQLStr.AppendLine("     ,SHUKABASHO =  @SHUKABASHO")
+        SQLStr.AppendLine("     ,SHUKANAME =  @SHUKANAME")
+        SQLStr.AppendLine("     ,AVOCADOTODOKECODE =  @AVOCADOTODOKECODE")
+        SQLStr.AppendLine("     ,AVOCADOTODOKENAME =  @AVOCADOTODOKENAME")
+        SQLStr.AppendLine("     ,TODOKECODE =  @TODOKECODE")
         SQLStr.AppendLine("     ,TODOKENAME =  @TODOKENAME")
+        SQLStr.AppendLine("     ,TANKNUMBER =  @TANKNUMBER")
+        SQLStr.AppendLine("     ,SHABAN =  @SHABAN")
+        SQLStr.AppendLine("     ,STYMD =  @STYMD")
         SQLStr.AppendLine("     ,ENDYMD =  @ENDYMD")
+        SQLStr.AppendLine("     ,BRANCHCODE =  @BRANCHCODE")
+        SQLStr.AppendLine("     ,TANKAKBN =  @TANKAKBN")
+        SQLStr.AppendLine("     ,MEMO =  @MEMO")
         SQLStr.AppendLine("     ,TANKA =  @TANKA")
+        SQLStr.AppendLine("     ,CALCKBN =  @CALCKBN")
+        SQLStr.AppendLine("     ,ROUNDTRIP =  @ROUNDTRIP")
+        SQLStr.AppendLine("     ,TOLLFEE =  @TOLLFEE")
         SQLStr.AppendLine("     ,SYAGATA =  @SYAGATA")
         SQLStr.AppendLine("     ,SYAGATANAME =  @SYAGATANAME")
-        SQLStr.AppendLine("     ,SYAGOU =  @SYAGOU")
         SQLStr.AppendLine("     ,SYABARA =  @SYABARA")
-        SQLStr.AppendLine("     ,SYUBETSU =  @SYUBETSU")
         SQLStr.AppendLine("     ,BIKOU1 =  @BIKOU1")
         SQLStr.AppendLine("     ,BIKOU2 =  @BIKOU2")
         SQLStr.AppendLine("     ,BIKOU3 =  @BIKOU3")
@@ -2331,17 +2693,28 @@ Public Class LNM0006TankaList
                 Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                 Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
-                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOSHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKANAME", MySqlDbType.VarChar, 20)     '実績出荷場所名称
+                Dim P_SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar, 6)     '変換後出荷場所コード
+                Dim P_SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar, 20)     '変換後出荷場所名称
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_AVOCADOTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKENAME", MySqlDbType.VarChar, 20)     '実績届先名称
+                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '変換後届先コード
+                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '変換後届先名称
+                Dim P_TANKNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", MySqlDbType.VarChar, 20)     '陸事番号
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
-                Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal)     '単価
+                Dim P_TANKAKBN As MySqlParameter = SQLcmd.Parameters.Add("@TANKAKBN", MySqlDbType.VarChar, 1)     '単価区分
+                Dim P_MEMO As MySqlParameter = SQLcmd.Parameters.Add("@MEMO", MySqlDbType.VarChar, 50)     '単価用途
+                Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal)         '単価
+                Dim P_CALCKBN As MySqlParameter = SQLcmd.Parameters.Add("@CALCKBN", MySqlDbType.VarChar, 2)     '計算区分
+                Dim P_ROUNDTRIP As MySqlParameter = SQLcmd.Parameters.Add("@ROUNDTRIP", MySqlDbType.Decimal, 5, 3)    '往復距離
+                Dim P_TOLLFEE As MySqlParameter = SQLcmd.Parameters.Add("@TOLLFEE", MySqlDbType.Decimal, 8, 3)        '通行料
                 Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
                 Dim P_SYAGATANAME As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATANAME", MySqlDbType.VarChar, 50)     '車型名
-                Dim P_SYAGOU As MySqlParameter = SQLcmd.Parameters.Add("@SYAGOU", MySqlDbType.VarChar, 3)     '車号
                 Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
-                Dim P_SYUBETSU As MySqlParameter = SQLcmd.Parameters.Add("@SYUBETSU", MySqlDbType.VarChar, 20)     '種別
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
                 Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
@@ -2359,13 +2732,21 @@ Public Class LNM0006TankaList
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
                 P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
                 P_TORINAME.Value = WW_ROW("TORINAME")           '取引先名称
-                P_ORGCODE.Value = WW_ROW("ORGCODE")             '部門コード
-                P_ORGNAME.Value = WW_ROW("ORGNAME")             '部門名称
-                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")   '加算先部門コード
-                P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")   '加算先部門名称
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE")       '届先コード
-                P_TODOKENAME.Value = WW_ROW("TODOKENAME")       '届先名称
-                P_STYMD.Value = WW_ROW("STYMD")                 '有効開始日
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_ORGNAME.Value = WW_ROW("ORGNAME")           '部門名称
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
+                P_KASANORGNAME.Value = WW_ROW("KASANORGNAME")           '加算先部門名称
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO")           '実績出荷場所コード
+                P_AVOCADOSHUKANAME.Value = WW_ROW("AVOCADOSHUKANAME")           '実績出荷場所名称
+                P_SHUKABASHO.Value = WW_ROW("SHUKABASHO")           '変換後出荷場所コード
+                P_SHUKANAME.Value = WW_ROW("SHUKANAME")           '変換後出荷場所名称
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE")           '実績届先コード
+                P_AVOCADOTODOKENAME.Value = WW_ROW("AVOCADOTODOKENAME")           '実績届先名称
+                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '変換後届先コード
+                P_TODOKENAME.Value = WW_ROW("TODOKENAME")           '変換後届先名称
+                P_TANKNUMBER.Value = WW_ROW("TANKNUMBER")           '陸事番号
+                P_SHABAN.Value = WW_ROW("SHABAN")           '車番
+                P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
 
                 '有効終了日
                 If Not WW_ROW("ENDYMD") = Date.MinValue Then
@@ -2374,25 +2755,48 @@ Public Class LNM0006TankaList
                     P_ENDYMD.Value = WF_AUTOENDYMD.Value
                 End If
 
-                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")       '枝番
-                P_TANKA.Value = WW_ROW("TANKA")                 '単価
-                P_SYAGATA.Value = WW_ROW("SYAGATA")             '車型
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
+                P_TANKAKBN.Value = WW_ROW("TANKAKBN")           '単価区分
+                P_MEMO.Value = WW_ROW("MEMO")           '単価用途
 
+                '単価
+                If WW_ROW("TANKA").ToString = "" Then
+                    P_TANKA.Value = "0"
+                Else
+                    P_TANKA.Value = WW_ROW("TANKA")
+                End If
+
+                P_CALCKBN.Value = WW_ROW("CALCKBN")           '計算区分
+
+                '往復距離
+                If WW_ROW("ROUNDTRIP").ToString = "0" Or WW_ROW("ROUNDTRIP").ToString = "" Then
+                    P_ROUNDTRIP.Value = DBNull.Value
+                Else
+                    P_ROUNDTRIP.Value = WW_ROW("ROUNDTRIP")
+                End If
+
+                '通行料
+                If WW_ROW("TOLLFEE").ToString = "0" Or WW_ROW("TOLLFEE").ToString = "" Then
+                    P_TOLLFEE.Value = DBNull.Value
+                Else
+                    P_TOLLFEE.Value = WW_ROW("TOLLFEE")
+                End If
+
+                P_SYAGATA.Value = WW_ROW("SYAGATA")           '車型
                 Dim WW_SYAGATANAME As String = ""
                 CODENAME_get("SYAGATA", WW_ROW("SYAGATA"), WW_SYAGATANAME, WW_RtnSW)
                 P_SYAGATANAME.Value = WW_SYAGATANAME            '車型名
-                P_SYAGOU.Value = WW_ROW("SYAGOU")               '車号
 
-                If WW_ROW("SYABARA") = "0" Then
-                    P_SYABARA.Value = DBNull.Value
+                '車腹
+                If WW_ROW("SYABARA").ToString = "" Then
+                    P_SYABARA.Value = "0"
                 Else
-                    P_SYABARA.Value = WW_ROW("SYABARA")             '車腹
+                    P_SYABARA.Value = WW_ROW("SYABARA")
                 End If
 
-                P_SYUBETSU.Value = WW_ROW("SYUBETSU")           '種別
-                P_BIKOU1.Value = WW_ROW("BIKOU1")               '備考1
-                P_BIKOU2.Value = WW_ROW("BIKOU2")               '備考2
-                P_BIKOU3.Value = WW_ROW("BIKOU3")               '備考3
+                P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
+                P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
+                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
 
                 P_INITYMD.Value = WW_DATENOW                        '登録年月日
                 P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
@@ -2411,10 +2815,10 @@ Public Class LNM0006TankaList
             End Using
 
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_TANKA  INSERTUPDATE")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_NEWTANKA  INSERTUPDATE")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:" + "LNM0006_TANKA  INSERTUPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNM0006_NEWTANKA  INSERTUPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2463,7 +2867,7 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
 
-        ' 取引先コード(バリデーションチェック)
+        '取引先コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・取引先コードエラーです。"
@@ -2472,7 +2876,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 取引先名称(バリデーションチェック)
+        '取引先名称(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・取引先名称エラーです。"
@@ -2481,15 +2885,6 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        '' 部門コード(バリデーションチェック)
-        'Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        'If Not isNormal(WW_CS0024FCheckerr) Then
-        '    WW_CheckMES1 = "・部門コードエラーです。"
-        '    WW_CheckMES2 = WW_CS0024FCheckReport
-        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-        '    WW_LineErr = "ERR"
-        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        'End If
         ' 部門コード(バリデーションチェック）
         Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
@@ -2511,13 +2906,13 @@ Public Class LNM0006TankaList
                 End Using
             End If
         Else
-                WW_CheckMES1 = "・部門コードエラーです。"
-                WW_CheckMES2 = WW_CS0024FCheckReport
-                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
+            WW_CheckMES1 = "・部門コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 部門名称(バリデーションチェック)
+        '部門名称(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・部門名称エラーです。"
@@ -2526,7 +2921,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 加算先部門コード(バリデーションチェック)
+        '加算先部門コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・加算先部門コードエラーです。"
@@ -2535,7 +2930,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 加算先部門名称(バリデーションチェック)
+        '加算先部門名称(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・加算先部門名称エラーです。"
@@ -2544,19 +2939,91 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 届先コード(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "TODOKECODE", WW_ROW("TODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        '実績出荷場所コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "AVOCADOSHUKABASHO", WW_ROW("AVOCADOSHUKABASHO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・届先コードエラーです。"
+            WW_CheckMES1 = "・実績出荷場所コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 届先名称(バリデーションチェック)
+        '実績出荷場所名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "AVOCADOSHUKANAME", WW_ROW("AVOCADOSHUKANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・実績出荷場所名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '変換後出荷場所コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SHUKABASHO", WW_ROW("SHUKABASHO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・変換後出荷場所コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '変換後出荷場所名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SHUKANAME", WW_ROW("SHUKANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・変換後出荷場所名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '実績届先コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "AVOCADOTODOKECODE", WW_ROW("AVOCADOTODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・実績届先コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '実績届先名称(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "AVOCADOTODOKENAME", WW_ROW("AVOCADOTODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・実績届先名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '変換後届先コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TODOKECODE", WW_ROW("TODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・変換後届先コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '変換後届先名称(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TODOKENAME", WW_ROW("TODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・届先名称エラーです。"
+            WW_CheckMES1 = "・変換後届先名称エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '陸事番号(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TANKNUMBER", WW_ROW("TANKNUMBER"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・陸事番号エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '車番(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SHABAN", WW_ROW("SHABAN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・車番エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
             WW_LineErr = "ERR"
@@ -2573,18 +3040,25 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        '' 有効終了日(バリデーションチェック)
-        'Master.CheckField(Master.USERCAMP, "ENDYMD", WW_ROW("ENDYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        'If isNormal(WW_CS0024FCheckerr) Then
-        '    WW_ROW("ENDYMD") = CDate(WW_ROW("ENDYMD")).ToString("yyyy/MM/dd")
-        'Else
-        '    WW_CheckMES1 = "・有効終了日エラーです。"
-        '    WW_CheckMES2 = WW_CS0024FCheckReport
-        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-        '    WW_LineErr = "ERR"
-        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        'End If
-        ' 単価(バリデーションチェック)
+        '単価区分(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TANKAKBN", WW_ROW("TANKAKBN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・単価区分エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '単価用途(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "MEMO", WW_ROW("MEMO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・単価用途エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '単価(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TANKA", WW_ROW("TANKA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・単価エラーです。"
@@ -2593,7 +3067,34 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 車型(バリデーションチェック)
+        '計算区分(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "CALCKBN", WW_ROW("CALCKBN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・計算区分エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '往復距離(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "ROUNDTRIP", WW_ROW("ROUNDTRIP"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・往復距離エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '通行料(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "TOLLFEE", WW_ROW("TOLLFEE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・通行料エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '車型(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "SYAGATA", WW_ROW("SYAGATA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・車型エラーです。"
@@ -2602,16 +3103,16 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 車号(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "SYAGOU", WW_ROW("SYAGOU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        '車型名(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SYAGATANAME", WW_ROW("SYAGATANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・車号エラーです。"
+            WW_CheckMES1 = "・車型名エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 車腹(バリデーションチェック)
+        '車腹(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "SYABARA", WW_ROW("SYABARA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・車腹エラーです。"
@@ -2620,16 +3121,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 種別(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "SYUBETSU", WW_ROW("SYUBETSU"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・種別エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
-        ' 備考1(バリデーションチェック)
+        '備考1(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "BIKOU1", WW_ROW("BIKOU1"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・備考1エラーです。"
@@ -2638,7 +3130,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 備考2(バリデーションチェック)
+        '備考2(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "BIKOU2", WW_ROW("BIKOU2"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・備考2エラーです。"
@@ -2647,7 +3139,7 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 備考3(バリデーションチェック)
+        '備考3(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "BIKOU3", WW_ROW("BIKOU3"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・備考3エラーです。"
@@ -2656,18 +3148,6 @@ Public Class LNM0006TankaList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-
-        '' 日付大小チェック
-        'If Not String.IsNullOrEmpty(WW_ROW("STYMD")) AndAlso
-        '            Not String.IsNullOrEmpty(WW_ROW("ENDYMD")) Then
-        '    If CDate(WW_ROW("STYMD")) > CDate(WW_ROW("ENDYMD")) Then
-        '        WW_CheckMES1 = "・有効開始日＆有効終了日エラーです。"
-        '        WW_CheckMES2 = "日付大小入力エラー"
-        '        WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-        '        WW_LineErr = "ERR"
-        '        O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        '    End If
-        'End If
 
     End Sub
 
@@ -2712,30 +3192,42 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("        TORICODE")
         SQLStr.AppendLine("       ,DELFLG")
         SQLStr.AppendLine("    FROM")
-        SQLStr.AppendLine("        LNG.LNM0006_TANKA")
+        SQLStr.AppendLine("        LNG.LNM0006_NEWTANKA")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
-                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2)     '枝番
+                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
 
-                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE")           '加算先部門コード
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE")           '届先コード
-                P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
-                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE")           '枝番
+                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -2757,10 +3249,10 @@ Public Class LNM0006TankaList
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_TANKA SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0006_NEWTANKA SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0006_TANKA SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2787,7 +3279,7 @@ Public Class LNM0006TankaList
 
         '○ ＤＢ更新
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" INSERT INTO LNG.LNT0005_TANKAHIST ")
+        SQLStr.AppendLine(" INSERT INTO LNG.LNT0005_NEWTANKAHIST ")
         SQLStr.AppendLine("  (  ")
         SQLStr.AppendLine("      TORICODE  ")
         SQLStr.AppendLine("     ,TORINAME  ")
@@ -2795,16 +3287,28 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("     ,ORGNAME  ")
         SQLStr.AppendLine("     ,KASANORGCODE  ")
         SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKABASHO  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKANAME  ")
+        SQLStr.AppendLine("     ,SHUKABASHO  ")
+        SQLStr.AppendLine("     ,SHUKANAME  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKECODE  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKENAME  ")
         SQLStr.AppendLine("     ,TODOKECODE  ")
         SQLStr.AppendLine("     ,TODOKENAME  ")
+        SQLStr.AppendLine("     ,TANKNUMBER  ")
+        SQLStr.AppendLine("     ,SHABAN  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,BRANCHCODE  ")
+        SQLStr.AppendLine("     ,TANKAKBN  ")
+        SQLStr.AppendLine("     ,MEMO  ")
         SQLStr.AppendLine("     ,TANKA  ")
+        SQLStr.AppendLine("     ,CALCKBN  ")
+        SQLStr.AppendLine("     ,ROUNDTRIP  ")
+        SQLStr.AppendLine("     ,TOLLFEE  ")
         SQLStr.AppendLine("     ,SYAGATA  ")
-        SQLStr.AppendLine("     ,SYAGOU  ")
+        SQLStr.AppendLine("     ,SYAGATANAME  ")
         SQLStr.AppendLine("     ,SYABARA  ")
-        SQLStr.AppendLine("     ,SYUBETSU  ")
         SQLStr.AppendLine("     ,BIKOU1  ")
         SQLStr.AppendLine("     ,BIKOU2  ")
         SQLStr.AppendLine("     ,BIKOU3  ")
@@ -2825,16 +3329,28 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("     ,ORGNAME  ")
         SQLStr.AppendLine("     ,KASANORGCODE  ")
         SQLStr.AppendLine("     ,KASANORGNAME  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKABASHO  ")
+        SQLStr.AppendLine("     ,AVOCADOSHUKANAME  ")
+        SQLStr.AppendLine("     ,SHUKABASHO  ")
+        SQLStr.AppendLine("     ,SHUKANAME  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKECODE  ")
+        SQLStr.AppendLine("     ,AVOCADOTODOKENAME  ")
         SQLStr.AppendLine("     ,TODOKECODE  ")
         SQLStr.AppendLine("     ,TODOKENAME  ")
+        SQLStr.AppendLine("     ,TANKNUMBER  ")
+        SQLStr.AppendLine("     ,SHABAN  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,BRANCHCODE  ")
+        SQLStr.AppendLine("     ,TANKAKBN  ")
+        SQLStr.AppendLine("     ,MEMO  ")
         SQLStr.AppendLine("     ,TANKA  ")
+        SQLStr.AppendLine("     ,CALCKBN  ")
+        SQLStr.AppendLine("     ,ROUNDTRIP  ")
+        SQLStr.AppendLine("     ,TOLLFEE  ")
         SQLStr.AppendLine("     ,SYAGATA  ")
-        SQLStr.AppendLine("     ,SYAGOU  ")
+        SQLStr.AppendLine("     ,SYAGATANAME  ")
         SQLStr.AppendLine("     ,SYABARA  ")
-        SQLStr.AppendLine("     ,SYUBETSU  ")
         SQLStr.AppendLine("     ,BIKOU1  ")
         SQLStr.AppendLine("     ,BIKOU2  ")
         SQLStr.AppendLine("     ,BIKOU3  ")
@@ -2848,23 +3364,31 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
         SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
         SQLStr.AppendLine("  FROM   ")
-        SQLStr.AppendLine("        LNG.LNM0006_TANKA")
+        SQLStr.AppendLine("        LNG.LNM0006_NEWTANKA")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("       TORICODE  = @TORICODE                ")
-        SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                  ")
-        SQLStr.AppendLine("   AND KASANORGCODE  = @KASANORGCODE        ")
-        SQLStr.AppendLine("   AND TODOKECODE  = @TODOKECODE            ")
-        SQLStr.AppendLine("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.AppendLine("   AND BRANCHCODE  = @BRANCHCODE            ")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
+        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+        SQLStr.AppendLine("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.AppendLine("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6) '届先コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
 
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
@@ -2880,9 +3404,13 @@ Public Class LNM0006TankaList
                 P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
                 P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE") '届先コード
-                P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
 
                 '操作区分
                 '変更区分が新規の場合
@@ -2911,10 +3439,10 @@ Public Class LNM0006TankaList
 
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST  INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_NEWTANKAHIST  INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0005_TANKAHIST  INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0005_NEWTANKAHIST  INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -2942,7 +3470,7 @@ Public Class LNM0006TankaList
         '○ 対象データ更新
         Dim SQLStr As New StringBuilder
         SQLStr.Append(" UPDATE                                      ")
-        SQLStr.Append("     LNG.LNM0006_TANKA                       ")
+        SQLStr.Append("     LNG.LNM0006_NEWTANKA                    ")
         SQLStr.Append(" SET                                         ")
         SQLStr.Append("     ENDYMD               = @ENDYMD          ")
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
@@ -2950,22 +3478,31 @@ Public Class LNM0006TankaList
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
-        SQLStr.Append("       TORICODE  = @TORICODE                 ")
-        SQLStr.Append("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.Append("   AND KASANORGCODE  = @KASANORGCODE         ")
-        SQLStr.Append("   AND TODOKECODE  = @TODOKECODE             ")
-        SQLStr.Append("   AND COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
-        SQLStr.Append("   AND BRANCHCODE  = @BRANCHCODE             ")
+        SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.Append("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.Append("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
+        SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+        SQLStr.Append("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.Append("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.Append("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6) '届先コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                 Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
+
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
@@ -2974,11 +3511,15 @@ Public Class LNM0006TankaList
                 P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
                 P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
-                P_TODOKECODE.Value = WW_ROW("TODOKECODE") '届先コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
                 P_STYMD.Value = WW_ROW("STYMD") '有効開始日
-                'P_ENDYMD.Value = DateTime.Parse(WW_NEWSTYMD).AddDays(-1).ToString("yyyy/MM/dd") '有効終了日
                 P_ENDYMD.Value = WW_ROW("ENDYMD") '有効終了日
                 P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
+
                 P_UPDYMD.Value = WW_NOW                '更新年月日
                 P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID                '更新端末
@@ -2991,7 +3532,7 @@ Public Class LNM0006TankaList
             End Using
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0006_TANKA UPDATE"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA UPDATE"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
