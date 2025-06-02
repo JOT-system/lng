@@ -1772,7 +1772,7 @@ Public Class LNM0007KoteihiDetail
             '通年以外の場合
             If Not LNM0007INProw("SEASONKBN") = "0" Then
                 '季節料金判定開始月日(バリデーションチェック)
-                If Not LNM0007INProw("SEASONEND").ToString.Length = 4 OrElse DateTime.TryParse("2099/" &
+                If Not LNM0007INProw("SEASONSTART").ToString.Length = 4 OrElse DateTime.TryParse("2099/" &
                                   LNM0007INProw("SEASONSTART").ToString.Substring(0, 2) & "/" &
                                   LNM0007INProw("SEASONSTART").ToString.Substring(2, 2), dt) = False Then
                     WW_CheckMES1 = "・季節料金判定開始月日エラーです。"
