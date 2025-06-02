@@ -214,11 +214,11 @@ Public Class LNM0006TankaDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
-            If LNM0007WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+            If LNM0006WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
                 Dim WW_OrgPermitHt As New Hashtable
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()  ' DataBase接続
