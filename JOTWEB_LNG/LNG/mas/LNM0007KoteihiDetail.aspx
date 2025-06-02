@@ -100,7 +100,7 @@
                                 <span>
                                     <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先名称" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <asp:TextBox ID="WF_TORINAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" onBlur="ButtonClick('WF_TORIChange');" ></asp:TextBox>
-                                    <asp:TextBox ID="WF_TORICODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS"></asp:TextBox>
+                                    <asp:TextBox ID="WF_TORICODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
                                 </span>
                                 <a style="display:none;">
                                     <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" />
@@ -110,7 +110,7 @@
                             <p id="TYPE_B_LINE_7">
                                 <!-- 部門コード -->
                                 <span>
-                                    <asp:Label ID="WF_ORGCODE_L" runat="server" Text="部門名称" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:Label ID="WF_ORGCODE_L" runat="server" Text="担当部門名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ORGChange');" />
                                     <asp:TextBox ID="WF_ORGCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
                                 </span>
@@ -165,9 +165,9 @@
                              <p id="TYPE_E_LINE_17">
                                 <!-- 季節料金判定開始月日、季節料金判定終了月日 -->
                                 <span>
-                                    <asp:Label ID="WF_SEASONSTART_L" runat="server" Text="季節料金判定開始月日" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_SEASONSTART_L" runat="server" Text="季節料金判定開始月" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtSEASONSTART" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
-                                    <asp:Label ID="WF_SEASONEND_L" runat="server" Text="季節料金判定終了月日" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_SEASONEND_L" runat="server" Text="季節料金判定終了月" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtSEASONEND" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
                                 </span>
                             </p>
@@ -197,7 +197,7 @@
                             <p id="TYPE_H_LINE_23">
                                 <!-- 請求額 -->
                                 <span>
-                                    <asp:Label ID="WF_AMOUNT_L" runat="server" Text="請求額" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_AMOUNT_L" runat="server" Text="請求金額" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtAMOUNT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
                                     <asp:Label ID="TxtAMOUNT_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>

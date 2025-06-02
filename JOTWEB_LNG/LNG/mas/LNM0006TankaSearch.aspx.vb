@@ -503,7 +503,7 @@ Public Class LNM0006TankaSearch
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       ORGCODE AS ORGCODE                                                                            ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNM0006_TANKA                                                                                   ")
+        SQLStr.AppendLine("     LNM0006_NEWTANKA                                                                                   ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("      DELFLG = '0'                                                                                   ")
         If Not TxtTORIName.Text = "" Then

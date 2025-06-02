@@ -6,7 +6,7 @@
 ' 更新者 
 '
 ' 修正履歴 : 2024/12/16 新規作成
-'          : 
+'          : 2025/05/23 統合版に変更
 ''************************************************************
 Imports MySql.Data.MySqlClient
 Imports System.Drawing
@@ -267,20 +267,56 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(ORGNAME), '')                                     AS ORGNAME             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGCODE), '')                                AS KASANORGCODE        ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGNAME), '')                                AS KASANORGNAME        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(AVOCADOSHUKABASHO), '')                           AS AVOCADOSHUKABASHO   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(AVOCADOSHUKANAME), '')                            AS AVOCADOSHUKANAME    ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SHUKABASHO), '')                                  AS SHUKABASHO          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SHUKANAME), '')                                   AS SHUKANAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(AVOCADOTODOKECODE), '')                           AS AVOCADOTODOKECODE   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(AVOCADOTODOKENAME), '')                           AS AVOCADOTODOKENAME   ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKECODE), '')                                  AS TODOKECODE          ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKENAME), '')                                  AS TODOKENAME          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TANKNUMBER), '')                                  AS TANKNUMBER          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SHABAN), '')                                      AS SHABAN              ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '')                     AS STYMD               ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '')                    AS ENDYMD              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BRANCHCODE), '')                                  AS BRANCHCODE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TANKAKBN), '')                                    AS TANKAKBN            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(MEMO), '')                                        AS MEMO                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TANKA), '')                                       AS TANKA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(CALCKBN), '')                                     AS CALCKBN             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ROUNDTRIP), '')                                   AS ROUNDTRIP           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(TOLLFEE), '')                                     AS TOLLFEE             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATA), '')                                     AS SYAGATA             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGATANAME), '')                                 AS SYAGATANAME         ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(SYAGOU), '')                                      AS SYAGOU              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(SYABARA), '')                                     AS SYABARA             ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(SYUBETSU), '')                                    AS SYUBETSU            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU1), '')                                      AS BIKOU1              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
+
+        '画面表示用
+        '単価区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRTANKAKBN        ")
+        '単価
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                  ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                         ")
+        SQLStr.AppendLine("     END AS SCRTANKA                                                                                ")
+        '往復距離
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(ROUNDTRIP), '') = '' THEN ''                                              ")
+        SQLStr.AppendLine("      ELSE  FORMAT(ROUNDTRIP,3)                                                                     ")
+        SQLStr.AppendLine("     END AS SCRROUNDTRIP                                                                            ")
+        '通行料
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TOLLFEE), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TOLLFEE,3)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRTOLLFEE                                                                              ")
+        '車腹
+        SQLStr.AppendLine("   , CASE                                                                                           ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SYABARA), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SYABARA,3)                                                                       ")
+        SQLStr.AppendLine("     END AS SCRSYABARA                                                                              ")
+
         SQLStr.AppendLine("   , CASE                 ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
@@ -299,7 +335,7 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("   , DATE_FORMAT(MODIFYYMD, '%Y/%m/%d %T')                                     AS MODIFYYMD                 ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(MODIFYUSER), '')                                           AS MODIFYUSER                ")
         SQLStr.AppendLine(" FROM                                                                                                          ")
-        SQLStr.AppendLine("     LNG.LNT0005_TANKAHIST                                                                                     ")
+        SQLStr.AppendLine("     LNG.LNT0005_NEWTANKAHIST                                                                                     ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -316,9 +352,13 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("    ,TORICODE                                                           ")
         SQLStr.AppendLine("    ,ORGCODE                                                            ")
         SQLStr.AppendLine("    ,KASANORGCODE                                                       ")
-        SQLStr.AppendLine("    ,TODOKECODE                                                         ")
+        SQLStr.AppendLine("    ,AVOCADOSHUKABASHO                                                  ")
+        SQLStr.AppendLine("    ,AVOCADOTODOKECODE                                                  ")
+        SQLStr.AppendLine("    ,SHABAN                                                             ")
         SQLStr.AppendLine("    ,STYMD                                                              ")
         SQLStr.AppendLine("    ,BRANCHCODE                                                         ")
+        SQLStr.AppendLine("    ,SYAGATA                                                            ")
+        SQLStr.AppendLine("    ,SYABARA                                                            ")
         SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
         Try
@@ -353,6 +393,13 @@ Public Class LNM0006TankaHistory
                 For Each LNM0006row As DataRow In LNM0006tbl.Rows
                     i += 1
                     LNM0006row("LINECNT") = i        'LINECNT
+
+                    Select Case LNM0006row("TANKAKBN").ToString
+                        Case "0" : LNM0006row("SCRTANKAKBN") = "通常単価"
+                        Case "1" : LNM0006row("SCRTANKAKBN") = "調整単価"
+                        Case Else : LNM0006row("SCRTANKAKBN") = ""
+                    End Select
+
                 Next
             End Using
         Catch ex As Exception
@@ -380,7 +427,7 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'yyyy/MM') AS MODIFYYM ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%Y/%m') AS MODIFYYM ")
-        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_NEWTANKAHIST ")
         SQLStr.AppendLine(" ORDER BY MODIFYYM DESC ")
 
         Try
@@ -412,10 +459,10 @@ Public Class LNM0006TankaHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_NEWTANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_NEWTANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -436,7 +483,7 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'dd') AS MODIFYDD ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%d') AS MODIFYDD ")
-        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_NEWTANKAHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         'SQLStr.AppendLine("    FORMAT(MODIFYYMD, 'yyyy/MM')  = @MODIFYYM                                                         ")
         SQLStr.AppendLine("    DATE_FORMAT(MODIFYYMD, '%Y/%m')  = @MODIFYYM                                                         ")
@@ -466,10 +513,10 @@ Public Class LNM0006TankaHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_NEWTANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_NEWTANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -489,7 +536,7 @@ Public Class LNM0006TankaHistory
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT ")
         SQLStr.AppendLine("     MODIFYUSER ")
-        SQLStr.AppendLine(" FROM LNG.LNT0005_TANKAHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0005_NEWTANKAHIST ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -531,10 +578,10 @@ Public Class LNM0006TankaHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_TANKAHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0005_NEWTANKAHIST SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0005_TANKAHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0005_NEWTANKAHIST Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -718,15 +765,15 @@ Public Class LNM0006TankaHistory
         'シート名
         wb.ActiveSheet.Name = Left(WF_DDL_MODIFYYM.SelectedValue, 4) + "年" + Right(WF_DDL_MODIFYYM.SelectedValue, 2) + "月"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
         '明細設定
         Dim WW_ACTIVEROW As Integer = 3
-        SetDETAIL(wb.ActiveSheet, WW_ACTIVEROW)
+        SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         '明細の線を引く
         Dim WW_MAXRANGE As String = wb.ActiveSheet.Cells(WW_ACTIVEROW - 1, WW_MAXCOL).Address
@@ -812,7 +859,7 @@ Public Class LNM0006TankaHistory
         sheet.Rows.RowHeight = 15.75
         'フォント
         With sheet.Columns.Font
-            .Color = Color.FromArgb(0, 0, 0)
+            '.Color = Color.FromArgb(0, 0, 0)
             .Name = "Meiryo UI"
             .Size = 11
         End With
@@ -874,17 +921,28 @@ Public Class LNM0006TankaHistory
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGNAME).Value = "部門名称"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = "届先コード"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = "届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOSHUKABASHO).Value = "実績出荷場所コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOSHUKANAME).Value = "実績出荷場所名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SHUKABASHO).Value = "変換後出荷場所コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SHUKANAME).Value = "変換後出荷場所名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOTODOKECODE).Value = "実績届先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOTODOKENAME).Value = "実績届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = "変換後届先コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = "変換後届先名称"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKNUMBER).Value = "陸事番号"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SHABAN).Value = "車番"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = "枝番"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKAKBN).Value = "単価区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.MEMO).Value = "単価用途"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = "単価"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.CALCKBN).Value = "計算区分"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Value = "往復距離"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Value = "通行料"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATA).Value = "車型"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = "車型名"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGOU).Value = "車号"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = "車腹"
-        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SYUBETSU).Value = "種別"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU1).Value = "備考1"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU2).Value = "備考2"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU3).Value = "備考3"
@@ -895,8 +953,15 @@ Public Class LNM0006TankaHistory
     ''' 明細設定
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub SetDETAIL(ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
+    Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.000_);[Red](#,##0.000)"
 
         For Each Row As DataRow In LNM0006tbl.Rows
             '値
@@ -911,20 +976,72 @@ Public Class LNM0006TankaHistory
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOSHUKABASHO).Value = Row("AVOCADOSHUKABASHO") '実績出荷場所コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOSHUKANAME).Value = Row("AVOCADOSHUKANAME") '実績出荷場所名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SHUKABASHO).Value = Row("SHUKABASHO") '変換後出荷場所コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SHUKANAME).Value = Row("SHUKANAME") '変換後出荷場所名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOTODOKECODE).Value = Row("AVOCADOTODOKECODE") '実績届先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.AVOCADOTODOKENAME).Value = Row("AVOCADOTODOKENAME") '実績届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '変換後届先コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '変換後届先名称
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKNUMBER).Value = Row("TANKNUMBER") '陸事番号
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SHABAN).Value = Row("SHABAN") '車番
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = Row("BRANCHCODE") '枝番
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA") '単価
+
+            '枝番
+            If Row("BRANCHCODE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = Row("BRANCHCODE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Value = CDbl(Row("BRANCHCODE"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKAKBN).Value = Row("TANKAKBN") '単価区分
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.MEMO).Value = Row("MEMO") '単価用途
+
+            '単価
+            If Row("TANKA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
+            End If
+
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.CALCKBN).Value = Row("CALCKBN") '計算区分
+
+            '往復距離
+            If Row("ROUNDTRIP") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Value = Row("ROUNDTRIP")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Value = CDbl(Row("ROUNDTRIP"))
+            End If
+
+            '通行料
+            If Row("TOLLFEE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Value = Row("TOLLFEE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Value = CDbl(Row("TOLLFEE"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYAGOU).Value = Row("SYAGOU") '車号
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
-            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYUBETSU).Value = Row("SYUBETSU") '種別
+
+            '車腹
+            If Row("SYABARA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = Row("SYABARA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Value = CDbl(Row("SYABARA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.BRANCHCODE).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Style = DecStyle
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0006WRKINC.MODIFYKBN.AFTDATA Then
@@ -950,7 +1067,7 @@ Public Class LNM0006TankaHistory
         '開始列から最大列まで変更前後の値を確認
         For index As Integer = WW_STCOL To WW_MAXCOL
             '変更前と変更後が不一致の場合
-            If Not sheet.Cells(WW_ACTIVEROW - 1, index).Value = sheet.Cells(WW_ACTIVEROW, index).Value Then
+            If Not Convert.ToString(sheet.Cells(WW_ACTIVEROW - 1, index).Value) = Convert.ToString(sheet.Cells(WW_ACTIVEROW, index).Value) Then
 
                 '変更後の背景色を塗りつぶし
                 sheet.Cells(WW_ACTIVEROW, index).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_MODIFY)

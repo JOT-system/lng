@@ -186,104 +186,407 @@ p {
     width: 30em !important;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] {
-    min-width: 500px;
+#detailkeybox p[id^=TYPE_], #detailkeybox div[id^=TYPE_] {
+    min-width: 500px !important;
     display: flex;
     box-sizing: border-box;
     flex-wrap: wrap;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
+
 /* ************************** */
 /* 単票入力欄の列定義         */
 /* ************************** */
 /* 1項目(名称 文言 列幅) */
-#detailkeybox p[id^=TANKA_LINE_] > span {
-    display: inline-block;
-    margin-bottom: 8px;
+#SetItemBox div[id^=TYPE_] > .divSelectItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-#detailkeybox p[id^=TANKA_LINE_]:last-of-type > span {
-    margin-bottom: 0;
-}
-
-/* 項目名欄(n行目の入力欄の1,4,7,10・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(1) {
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox div[id^=TYPE_A] > span {
     display: inline-block;
-    width: 10em;
+    width: 8em;
     font-weight: bold;
 }
-/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(2) {
+
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(1) {
     display: inline-block;
-    width: 11em;
+    width: 7.8em;
+    font-weight: bold;
 }
-/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(3) {
-        display: inline-block;
-        width: 5.5em;
-    }
-    #detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(4) {
-        display: inline-block;
-        width: 10em;
-        font-weight: bold;
-    }
-/* 入力欄(n行目の入力欄の2,5,8,11・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(5) {
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(2) {
     display: inline-block;
-    width: 11em;
+    width: 180px;
 }
-/* 名称欄(n行目の入力欄の3,6,9,12・・・列に適用するスタイル) */
-#detailkeybox p[id^=TANKA_LINE_] > span > :nth-child(6) {
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(3) {
     display: inline-block;
-    width: 15.5em;
+    width: 5.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(4) {
+    display: inline-block;
+    width: 180px;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(1) {
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(1) {
     display: inline-block;
-    width: 10em;
+    width: 7.8em;
+    font-weight: bold;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(2) {
+
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left:20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(1) {
+    display: inline-block;
+    width: 3.8em;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(2) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+
+#detailkeybox p[id^=TYPE_H] {
+    padding-bottom: 0px !important;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+    margin-left: 4.4em;
+}
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(2) {
+    display: inline-block;
+    width: 12.2em;
+}
+
+#detailkeybox p[id^=TYPE_I] {
+    padding-top: 0px !important;
+}
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+    margin-left: 4.4em;
+}
+
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(2) {
+    display: inline-block;
+    width: 12.2em;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(1) {
+    display: inline-block;
+    width: 3.8em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(2) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_L] {
+    padding-bottom: 0px !important;
+}
+
+    #detailkeybox p[id^=TYPE_L] > span > :nth-child(1) {
+        display: inline-block;
+        width: 9.8em;
+        font-weight: bold;
+        margin-left: 4.4em;
+    }
+
+    #detailkeybox p[id^=TYPE_L] > span > :nth-child(2) {
+        display: inline-block;
+        width: 12.2em;
+    }
+
+#detailkeybox p[id^=TYPE_M] {
+    padding-top: 0px !important;
+}
+
+    #detailkeybox p[id^=TYPE_M] > span > :nth-child(1) {
+        display: inline-block;
+        width: 9.8em;
+        font-weight: bold;
+        margin-left: 4.4em;
+    }
+
+    #detailkeybox p[id^=TYPE_M] > span > :nth-child(2) {
+        display: inline-block;
+        width: 12.2em;
+    }
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(2) {
+    display: inline-block;
+    width: 9.7em;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left:1.1em;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(4) {
+    display: inline-block;
+    width: 9.7em;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(5) {
+    display: inline-block;
+    margin-left: 1.1em;
+    width: 2.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(6) {
+    display: inline-block;
+    width: 5.7em;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(7) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(3) {
+    display: inline-block;
+    width: 2.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(4) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(5) {
+    display: inline-block;
+    width: 20.7em;
+}
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(3) {
+    display: inline-block;
+    width: 2.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(4) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(5) {
+    display: inline-block;
+    width: 19.4em;
+}
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox div[id^=TYPE_R] > span {
+    display: inline-block;
+    width: 8em;
+    font-weight: bold;
+}
+
+
+#detailkeybox div[id^=TYPE_R] > :nth-child(3) {
     display: inline-block;
     width: 11.5em;
-}
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(3) {
-    display: inline-block;
-    width: 5.5em;
-}
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(4) {
-    display: inline-block;
-    width: 10em;
+    margin-left:0.8em;
     font-weight: bold;
 }
-#detailkeybox p[id^=TANKA_LINE_] > span.magnifier > :nth-child(5) {
-    display: inline-block;
-    width: 11em;
+#detailkeybox div[id^=TYPE_R] > :nth-child(4) {
+    width: 13.8em;
 }
 
+#detailkeybox p[id^=TYPE_S] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
 
-#TxtSelLineCNT, #TxtDelFlg, #TxtCampCode, #TxtTORICODE, #TxtORGCODE, #TxtKASANORGCODE, #TxtTODOKECODE, #TxtTANKA {
+#detailkeybox p[id^=TYPE_S] > span > :nth-child(2) {
+    display: inline-block;
+    width: 4.0em;
+}
+
+#detailkeybox p[id^=TYPE_T] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_T] > span > :nth-child(2) {
+    display: inline-block;
+    width: 34.5em;
+}
+
+.WF_RADIO {
+    display: inline-block;
+}
+
+.WF_RADIO input {
+    display: none;
+}
+
+.WF_RADIO label {
+    text-decoration: none;
+    padding: 2px 16px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+    background-color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+    border-radius: 6px;
+    margin-right: 15px;
+    border-color: #5B9BD5;
+    width: 120px;
+}
+
+.WF_RADIO input:checked + label {
+    background-color: #F7BDA4;
+    border-color: #ED7D31;
+}
+
+.WF_RADIO2 {
+    display: inline-block;
+}
+
+    .WF_RADIO2 input {
+        display: none;
+    }
+
+    .WF_RADIO2 label {
+        text-decoration: none;
+        padding: 2px 16px;
+        line-height: 23px;
+        text-align: center;
+        color: #333;
+        border: solid 1px #cfcfcf;
+        background-color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        outline: none;
+        border-radius: 6px;
+        margin-right: 10px;
+        border-color: #5B9BD5;
+        width: 70px;
+    }
+
+    .WF_RADIO2 input:checked + label {
+        background-color: #F7BDA4;
+        border-color: #ED7D31;
+    }
+
+#TxtBRANCHCODE, #TxtKOTEIHIM, #TxtTANKA, #TxtROUNDTRIP, #TxtTOLLFEE, #TxtSYABARA {
     text-align: right !important;
 }
 
-#detailkeybox p[id^=TANKA_LINE_] > span > b {
+#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT {
+    background-color: #F2F2F2;
+}
+
+/* 中央寄せの箱 */
+.actionButtonBox .centerSide {
+    box-sizing: border-box;
+    margin-left: 150px;
+}
+
+#WF_ButtonUPDATE, #WF_ButtonCANCEL {
+    width: 200px !important;
+    height: 50px !important;
+}
+
+#WF_ButtonCANCEL {
+    margin-left: 100px !important;
+}
+
+#WF_SHUKA_CHANGE::after, #WF_TODOKE_CHANGE::after, #WF_MEMO_L::after {
+    content: "";
+    background-image: url(../img/help.png);
     display: inline-block;
-    width: 190px !important;
-}
-
-#TANKA_LINE_ENDYMD_ANNOTATION {
-    padding-left: 400px;
-}
-
-#WF_ENDYMD_L {
-    margin-left: -16px;
-}
-
-.ddlSelectControl {
-    height: 30px;
-    width: 175px !important;
-    font-size: 12pt;
-    padding: 2px;
-}
-
-#WF_TANKA_TEXT{
-    font-weight:bold;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-left: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
 }

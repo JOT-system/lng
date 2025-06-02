@@ -43,7 +43,7 @@
                     <div class="Operation">
                             <div class="actionButtonBox">
                                 <div class="rightSide">
-                                    <input type="button" id="WF_ButtonUPDATE" class="btn-sticky btn-action" value="更新" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                                    <%--<input type="button" id="WF_ButtonUPDATE" class="btn-sticky btn-action" value="更新" onclick="ButtonClick('WF_ButtonUPDATE');" />--%>
                                     <input type="button" id="WF_ButtonCLEAR" class="btn-sticky" value="戻る"  onclick="ButtonClick('WF_ButtonCLEAR');" />
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                                 <asp:Label ID="WF_MAPID_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                             </span>
 
-                            <p id="TANKA_LINE_1">
+                            <p id="KEY_LINE_1" style="display:none;">
                                 <!-- 選択No -->
                                 <span>
                                     <asp:Label ID="WF_SEL_LINECNT_L" runat="server" Text="選択No" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -65,82 +65,22 @@
                                     <%--<asp:Label ID="LblSelLineCNT" runat="server" CssClass="WF_TEXT"></asp:Label>--%>
                                 </span>
                             </p>
-                            <p id="TANKA_LINE_2">
-                                <span class="ef magnifier">
-                                    <!-- 削除フラグ -->
-                                    <asp:Label ID="WF_DELFLG_L" runat="server" Text="削除" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:DropDownList ID="ddlDELFLG" runat="server" CssClass="ddlSelectControl">
-                                        <asp:ListItem Text="有効" Value="0"></asp:ListItem>
-                                        <asp:ListItem Text="削除" Value="1"></asp:ListItem>
-                                    </asp:DropDownList>
-                                    <a  style="display:none;">
-                                    <!-- 会社コード -->
-                                    <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
-                                    <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    </a>
-                                </span>
+                            <div id="TYPE_A_LINE_1">
+                                <!-- 削除フラグ -->
+                                <asp:Label ID="WF_DELFLG_L" runat="server" Text="有効/無効" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                <asp:RadioButtonList ID="RadioDELFLG" runat="server" RepeatDirection="Horizontal" CssClass="WF_RADIO">
+                                <asp:ListItem Value="0">有効</asp:ListItem>
+                                <asp:ListItem Value="1">無効(削除)</asp:ListItem>
+                                </asp:RadioButtonList>
+                            </div>
+                            <a  style="display:none;">
+                            <!-- 会社コード -->
+                            <asp:Label ID="WF_CAMPCODE_L" runat="server" Text="会社コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                            <asp:TextBox ID="TxtCampCode" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                            <asp:Label ID="LblCampCodeName" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                            </a>
 
-
-                            </p>
-                            <p id="TANKA_LINE_3">
-                                <span class="ef magnifier">
-                                    <!-- 取引先コード -->
-                                    <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <%--<asp:TextBox ID="TxtTORICODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>--%>
-                                    <a class="ef" id="WF_TORI" ondblclick="Field_DBclick('TxtTORICODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTORICODE');">
-                                        <asp:TextBox ID="TxtTORICODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
-                                    </a>
-                                    <asp:Label ID="WF_TORICODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    <!-- 取引先名称 -->
-                                    <asp:Label ID="WF_TORINAME_L" runat="server" Text="取引先名称" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtTORINAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
-                                    <asp:Label ID="WF_TORINAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="TANKA_LINE_4">
-                                <span class="ef magnifier">
-                                    <!-- 部門コード -->
-                                    <asp:Label ID="WF_ORGCODE_L" runat="server" Text="部門コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:DropDownList ID="ddlSelectORG" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl" onchange="ButtonClick('WF_ORGChange');"/>
-                                </span>
-                            </p>
-                            <p id="TANKA_LINE_5">
-                                <span class="ef magnifier">
-                                    <!-- 加算先部門コード -->
-                                    <asp:Label ID="WF_KASANORGCODE_L" runat="server" Text="加算先部門コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <%--<asp:TextBox ID="TxtKASANORGCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>--%>
-                                    <a class="ef" id="WF_KASANORG" ondblclick="Field_DBclick('TxtKASANORGCODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtKASANORGCODE');">
-                                        <asp:TextBox ID="TxtKASANORGCODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="10"></asp:TextBox>
-                                    </a>
-                                    <asp:Label ID="WF_KASANORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    <!-- 加算先部門名称 -->
-                                    <asp:Label ID="WF_KASANORGNAME_L" runat="server" Text="加算先部門名称" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtKASANORGNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                                 <asp:Label ID="WF_KASANORGNAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-
-                            <p id="TANKA_LINE_6">
-                                <span class="ef magnifier">
-                                    <!-- 届先コード -->
-                                    <asp:Label ID="WF_TODOKECODE_L" runat="server" Text="届先コード" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <%--<asp:TextBox ID="TxtTODOKECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>--%>
-                                    <a class="ef" id="WF_TODOKE" ondblclick="Field_DBclick('TxtTODOKECODE', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtTODOKECODE');">
-                                        <asp:TextBox ID="TxtTODOKECODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="6"></asp:TextBox>
-                                    </a>
-                                    <asp:Label ID="WF_TODOKECODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    <!-- 届先名称 -->
-                                    <asp:Label ID="WF_TODOKENAME_L" runat="server" Text="届先名称" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtTODOKENAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                                    <asp:Label ID="WF_TODOKENAME_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-
-                            <p id="TANKA_LINE_ENDYMD_ANNOTATION">
-                                <asp:Label ID="Label32" runat="server" Text="※有効終了日が未入力の場合は「2099/12/31」が設定されます。" CssClass="WF_TEXT_LEFT" style="color:red"></asp:Label>
-                            </p>
-                            <p id="TANKA_LINE_7">
+                            <p id="TYPE_B_LINE_1">
                                 <span class="ef">
                                     <!-- 有効開始日 -->
                                     <asp:Label ID="WF_STYMD_L" runat="server" Text="有効開始日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
@@ -152,7 +92,6 @@
                                             </span>
                                         </b>
                                     </b>
-                                    <asp:Label ID="WF_STYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                     <!-- 有効終了日 -->
                                     <asp:Label ID="WF_ENDYMD_L" runat="server" Text="有効終了日" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <b class="calendararea">
@@ -163,60 +102,189 @@
                                             </span>
                                         </b>
                                     </b>
-                                    <asp:Label ID="WF_ENDYMD_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
-                            <p id="TANKA_LINE_8">
-                                <span class="ef">
+                            <p id="TYPE_C_LINE_1">
+                                <!-- 取引先コード -->
+                                <span>
+                                    <asp:Label ID="WF_TORICODE_L" runat="server" Text="取引先名称" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:TextBox ID="WF_TORINAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" onBlur="ButtonClick('WF_TORIChange');" ></asp:TextBox>
+                                    <asp:TextBox ID="WF_TORICODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
+                                </span>
+                                <a style="display:none;">
+                                    <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" />
+                                    <datalist id="WF_TORI_DL" runat="server"></datalist>
+                                </a>
+                            </p>
+                            <p id="TYPE_C_LINE_2">
+                                <!-- 部門コード -->
+                                <span>
+                                    <asp:Label ID="Label1" runat="server" Text="担当部門名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ORGChange');" />
+                                    <asp:TextBox ID="WF_ORGCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_3">
+                                <!-- 加算先部門コード -->
+                                <span>
+                                    <asp:Label ID="WF_KASANORGCODE_L" runat="server" Text="加算先部門名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:DropDownList ID="WF_KASANORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_KASANORGChange');" />
+                                    <asp:TextBox ID="WF_KASANORGCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_4">
+                                <!-- 出荷場所 -->
+                                <span>
+                                    <asp:Label ID="WF_AVOCADOSHUKABASHO_L" runat="server" Text="出荷場所名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:TextBox ID="WF_AVOCADOSHUKANAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20" onBlur="ButtonClick('WF_AVOCADOSHUKAChange');" ></asp:TextBox>
+                                    <asp:TextBox ID="WF_AVOCADOSHUKABASHO_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                </span>
+                                <a style="display:none;">
+                                    <asp:DropDownList ID="WF_AVOCADOSHUKA" runat="server" class="form-select rounded-0" />
+                                    <datalist id="WF_AVOCADOSHUKA_DL" runat="server"></datalist>
+                                </a>
+                            </p>
+                            <p id="TYPE_G_LINE_1">
+                                <span>
+                                    <input type="checkbox" id="WF_SHUKACHANGE"  onchange="ChkShukaChange();" />
+                                    <asp:Label ID="WF_SHUKA_CHANGE" runat="server" Text="輸送費明細上でマスタとは異なる出荷場所名を使用している場合" CssClass="WF_TEXT_LEFT"></asp:Label>
+
+                                </span>
+                            </p>
+                            <div id="ShukaChangeArea" style="display:none;">
+                                <p id="TYPE_H_LINE_1">
+                                    <!-- 変換後出荷場所名 -->
+                                    <span>
+                                        <asp:Label ID="WF_SHUKANAME_L" runat="server" Text="変換後出荷場所名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:TextBox ID="TxtSHUKANAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                                    </span>
+                                </p>
+                                <p id="TYPE_I_LINE_1">
+                                    <!-- 変換後出荷コード -->
+                                    <span>
+                                        <asp:Label ID="WF_SHUKABASHO_L" runat="server" Text="変換後出荷コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:TextBox ID="TxtSHUKABASHO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    </span>
+                                </p>
+                            </div>
+                            <p id="TYPE_J_LINE_1">
+                                <span>
+                                    <asp:Label ID="WF_AVOCADOTODOKECODE_L" runat="server" Text="届先名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:TextBox ID="WF_AVOCADOTODOKENAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20" onBlur="ButtonClick('WF_AVOCADOTODOKEChange');" ></asp:TextBox>
+                                    <asp:TextBox ID="WF_AVOCADOTODOKECODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                </span>
+                                <a style="display:none;">
+                                    <asp:DropDownList ID="WF_AVOCADOTODOKE" runat="server" class="form-select rounded-0" />
+                                    <datalist id="WF_AVOCADOTODOKE_DL" runat="server"></datalist>
+                                </a>
+                            </p>
+                            <p id="TYPE_K_LINE_1">
+                                <span>
+                                    <input type="checkbox" id="WF_TODOKECHANGE"  onchange="ChkTodokeChange();" />
+                                    <asp:Label ID="WF_TODOKE_CHANGE" runat="server" Text="輸送費明細上でマスタとは異なる届先名を使用している場合" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+                            <div id="TodokeChangeArea" style="display:none;">
+                                <p id="TYPE_L_LINE_1">
+                                    <!-- 変換後届先名 -->
+                                    <span>
+                                        <asp:Label ID="WF_TODOKENAME_L" runat="server" Text="変換後届先名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:TextBox ID="TxtTODOKENAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                                    </span>
+                                </p>
+                                <p id="TYPE_M_LINE_1">
+                                    <!-- 変換後届先コード -->
+                                    <span>
+                                        <asp:Label ID="WF_TODOKECODE_L" runat="server" Text="変換後届先コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:TextBox ID="TxtTODOKECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    </span>
+                                </p>
+                            </div>
+                            <p id="TYPE_N_LINE_1">
+                                <span>
+                                    <!-- 陸事番号 -->
+                                    <asp:Label ID="WF_TANKNUMBER_L" runat="server" Text="陸事番号" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtTANKNUMBER" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                                    <!-- 車番 -->
+                                    <asp:Label ID="WF_SHABAN_L" runat="server" Text="業務車番" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtSHABAN" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
+                                    <!-- 車腹 -->
+                                    <asp:Label ID="WF_SYABARA_L" runat="server" Text="車腹" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtSYABARA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
+                                    <asp:Label ID="WF_SYABARA_TEXT" runat="server" Text="ｔ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+                            <p id="TYPE_O_LINE_1">
+                                <span>
+                                    <!-- 車型 -->
+                                    <asp:Label ID="WF_SYAGATA_L" runat="server" Text="車型名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:DropDownList ID="WF_SYAGATA" runat="server" class="form-select rounded-0" onchange="f_syagata()">
+                                        <asp:ListItem Text="" Value=""></asp:ListItem>
+                                        <asp:ListItem Text="単車" Value="1"></asp:ListItem>
+                                        <asp:ListItem Text="トレーラ" Value="2"></asp:ListItem>
+                                    </asp:DropDownList>
+                                    <asp:Label ID="WF_SYAGATA_CODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+                                </span>
+                            </p>
+                            <p id="TYPE_P_LINE_1">
+                                <span>
                                     <!-- 単価 -->
                                     <asp:Label ID="WF_TANKA_L" runat="server" Text="単価" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtTANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="5"></asp:TextBox>
                                     <asp:Label ID="WF_TANKA_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 計算区分 -->
+                                    <asp:Label ID="WF_CALCKBN_L" runat="server" Text="計算区分" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="ddlSelectCALCKBN" runat="server" class="form-select rounded-0"/>
+                                </span>
+                            </p>
+                            <p id="TYPE_Q_LINE_1">
+                                <span>
+                                    <!-- 往復距離 -->
+                                    <asp:Label ID="WF_ROUNDTRIP_L" runat="server" Text="往復距離" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtROUNDTRIP" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="7"></asp:TextBox>
+                                    <asp:Label ID="WF_ROUNDTRIP_TEXT" runat="server" Text="Km" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 通行料 -->
+                                    <asp:Label ID="WF_TOLLFEE_L" runat="server" Text="通行料" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtTOLLFEE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
+                                    <asp:Label ID="WF_TOLLFEE_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+                            <div id="TYPE_R_LINE_1">
+                                <!-- 単価区分 -->
+                                <asp:Label ID="WF_TANKAKBN_L" runat="server" Text="単価区分" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                <asp:RadioButtonList ID="RadioTANKAKBN" runat="server" RepeatDirection="Horizontal" CssClass="WF_RADIO2">
+                                <asp:ListItem Value="0">通常</asp:ListItem>
+                                <asp:ListItem Value="1">調整</asp:ListItem>
+                                </asp:RadioButtonList>
+                                <!-- 単価用途 -->
+                                <asp:Label ID="WF_MEMO_L" runat="server" Text="単価用途" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                <asp:TextBox ID="TxtMEMO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
+                            </div>
+                            <p id="TYPE_S_LINE_1">
+                                <span>
                                     <!-- 枝番 -->
-                                    <a  style="display:none;">
                                     <asp:Label ID="WF_BRANCHCODE_L" runat="server" Text="枝番" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBRANCHCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
-                                    <asp:Label ID="WF_BRANCHCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    </a>
                                 </span>
                             </p>
-                            <p id="TANKA_LINE_9">
-                                <span class="ef">
-                                    <!-- 車型 -->
-                                    <asp:Label ID="WF_SYAGATA_L" runat="server" Text="車型" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:DropDownList ID="ddlSelectSYAGATA" runat="server" ClientIDMode="Predictable" CssClass="ddlSelectControl"/>
-                                    <asp:Label ID="WF_SYAGATA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    <!-- 車号 -->
-                                    <asp:Label ID="WF_SYAGOU_L" runat="server" Text="車号" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtSYAGOU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="3"></asp:TextBox>
-                                    <asp:Label ID="WF_SYAGOU_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="TANKA_LINE_10">
-                                <span class="ef">
-                                    <!-- 車腹 -->
-                                    <asp:Label ID="WF_SYABARA_L" runat="server" Text="車腹" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtSYABARA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10"></asp:TextBox>
-                                    <asp:Label ID="WF_SYABARA_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                    <!-- 種別 -->
-                                    <asp:Label ID="WF_SYUBETSU_L" runat="server" Text="種別" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtSYUBETSU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="20"></asp:TextBox>
-                                    <asp:Label ID="WF_SYUBETSU_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
-                                </span>
-                            </p>
-                            <p id="TANKA_LINE_11">
-                                <span class="ef">
+                            <p id="TYPE_T_LINE_1">
+                                <span>
                                     <!-- 備考1 -->
                                     <asp:Label ID="WF_BIKOU1_L" runat="server" Text="備考1" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU1" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                     <asp:Label ID="WF_BIKOU1_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
+
+                                </span>
+                            </p>
+                            <p id="TYPE_T_LINE_2">
+                                <span>
                                     <!-- 備考2 -->
                                     <asp:Label ID="WF_BIKOU2_L" runat="server" Text="備考2" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU2" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                     <asp:Label ID="WF_BIKOU2_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
-                            <p id="TANKA_LINE_12">
+                            <p id="TYPE_T_LINE_3">
                                 <span class="ef">
                                     <!-- 備考3 -->
                                     <asp:Label ID="WF_BIKOU3_L" runat="server" Text="備考3" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -224,6 +292,15 @@
                                     <asp:Label ID="WF_BIKOU3_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
+
+                            <div class="Operation">
+                                    <div class="actionButtonBox">
+                                        <div class="centerSide">
+                                            <input type="button" id="WF_ButtonUPDATE" class="btn-sticky btn-action" value="更新" onclick="ButtonClick('WF_ButtonUPDATE');" />
+                                            <input type="button" id="WF_ButtonCANCEL" class="btn-sticky" value="キャンセル"  onclick="ButtonClick('WF_ButtonCLEAR');" />
+                                        </div>
+                                    </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -238,21 +315,11 @@
     <!-- Work レイアウト -->
     <MSINC:wrklist ID="work" runat="server" />
 
-    <!-- multiSelect レイアウト -->
-    <!-- 取引先コード単一選択 -->
-    <MSINC:multiselect runat="server" id="mspToriCodeSingle" />
-    <!-- 加算先部門コード単一選択 -->
-    <MSINC:multiselect runat="server" id="mspKasanOrgCodeSingle" />
-    <!-- 届先コード単一選択 -->
-    <MSINC:multiselect runat="server" id="mspTodokeCodeSingle" />
-
     <!-- イベント用 -->
     <div style="display:none;">
 
         <!-- 入力不可制御項目 -->
         <input id="DisabledKeyItem" runat="server" value="" type="text" />
-        <input id="DisabledKeyOrgCount" runat="server" value="" type="text" />
-        <input id="DisabledKeyToriCount" runat="server" value="" type="text" />
         <!-- 表示制御項目 -->
         <input id="VisibleKeyOrgCode" runat="server" value="" type="text" />
 
@@ -291,6 +358,25 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 自動作成した有効終了日 -->
         <input id="WF_AUTOENDYMD" runat="server" value="" type="text" />
+        <!-- 出荷場所チェックボックス状態 -->
+        <input id="WF_SHUKACHKSTATUS" runat="server" value="" type="text" />
+        <!-- 届先場所チェックボックス状態 -->
+        <input id="WF_TODOKECHKSTATUS" runat="server" value="" type="text" />
+        <!-- 値保持 -->
+        <%--<input id="WF_STYMD_SAVE" runat="server" value="" type="text" />--%>
+        <input id="WF_TORINAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_TORICODE_TEXT_SAVE" runat="server" value="" type="text" />
+        <input id="WF_ORG_SAVE" runat="server" value="" type="text" />
+        <input id="WF_KASANORG_SAVE" runat="server" value="" type="text" />
+        <input id="WF_AVOCADOSHUKANAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_AVOCADOSHUKABASHO_TEXT_SAVE" runat="server" value="" type="text" />
+        <input id="WF_AVOCADOTODOKENAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_AVOCADOTODOKECODE_TEXT_SAVE" runat="server" value="" type="text" />
+        <input id="WF_SHABAN_SAVE" runat="server" value="" type="text" />
+        <input id="WF_BRANCHCODE_SAVE" runat="server" value="" type="text" />
+        <input id="WF_SYAGATA_SAVE" runat="server" value="" type="text" />
+        <input id="WF_SYABARA_SAVE" runat="server" value="" type="text" />
+
     </div>
  
 </asp:Content>

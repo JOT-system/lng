@@ -365,6 +365,11 @@ Public Class LNM0007KoteihiList
         '画面表示用
         '季節料金判定区分
         SQLStr.AppendLine("   , ''                                                                       AS SCRSEASONKBN        ")
+        '車腹
+        SQLStr.AppendLine("   , CASE                                                                                            ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SYABARA), '') = '' THEN ''                                                 ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SYABARA,3)                                                                        ")
+        SQLStr.AppendLine("     END AS SCRSYABARA                                                                               ")
         '固定費(月額)
         SQLStr.AppendLine("   , CASE                                                                                            ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN ''                                                ")
@@ -857,9 +862,6 @@ Public Class LNM0007KoteihiList
         'シート名
         wb.ActiveSheet.Name = "入出力"
 
-        'シート全体設定
-        SetALL(wb.ActiveSheet)
-
         '行幅設定
         SetROWSHEIGHT(wb.ActiveSheet)
 
@@ -871,6 +873,9 @@ Public Class LNM0007KoteihiList
         WW_STROW = WW_ACTIVEROW
         SetDETAIL(wb, wb.ActiveSheet, WW_ACTIVEROW)
         WW_ENDROW = WW_ACTIVEROW - 1
+
+        'シート全体設定
+        SetALL(wb.ActiveSheet)
 
         'プルダウンリスト作成
         SetPULLDOWNLIST(wb, WW_STROW, WW_ENDROW)
@@ -1154,9 +1159,13 @@ Public Class LNM0007KoteihiList
     ''' <remarks></remarks>
     Public Sub SetDETAIL(ByVal wb As Workbook, ByVal sheet As IWorksheet, ByRef WW_ACTIVEROW As Integer)
 
-        '数値書式
-        Dim NumStyle As IStyle = wb.Styles.Add("NumStyle")
-        NumStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+        '数値書式(整数)
+        Dim IntStyle As IStyle = wb.Styles.Add("IntStyle")
+        IntStyle.NumberFormat = "#,##0_);[Red](#,##0)"
+
+        '数値書式(小数点含む)
+        Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
+        DecStyle.NumberFormat = "#,##0.000_);[Red](#,##0.000)"
 
         'Dim WW_DEPSTATION As String
 
@@ -1181,7 +1190,14 @@ Public Class LNM0007KoteihiList
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.RIKUBAN).Value = Row("RIKUBAN") '陸事番号
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATA).Value = Row("SYAGATA") '車型
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Value = Row("SYAGATANAME") '車型名
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA") '車腹
+
+            '車腹
+            If Row("SYABARA") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = Row("SYABARA")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Value = CDbl(Row("SYABARA"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN).Value = Row("SEASONKBN") '季節料金判定区分
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONSTART).Value = Row("SEASONSTART") '季節料金判定開始月日
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SEASONEND).Value = Row("SEASONEND") '季節料金判定終了月日
@@ -1200,7 +1216,12 @@ Public Class LNM0007KoteihiList
                 sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Value = CDbl(Row("KOTEIHID"))
             End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = Row("KAISU") '回数
+            '回数
+            If Row("KAISU") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = Row("KAISU")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = CDbl(Row("KAISU"))
+            End If
 
             '減額費用
             If Row("GENGAKU") = "" Then
@@ -1221,10 +1242,12 @@ Public Class LNM0007KoteihiList
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
 
             '金額を数値形式に変更
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Style = NumStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Style = NumStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Style = IntStyle
 
             WW_ACTIVEROW += 1
         Next
@@ -1813,7 +1836,7 @@ Public Class LNM0007KoteihiList
             '    O_RTN = "ERR"
             'End If
             '車腹
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA)), ",", "")
             WW_DATATYPE = DataTypeHT("SYABARA")
             LNM0007Exceltblrow("SYABARA") = LNM0007WRKINC.DataConvert("車腹", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1861,7 +1884,7 @@ Public Class LNM0007KoteihiList
                 O_RTN = "ERR"
             End If
             '回数
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU))
+            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU)), ",", "")
             WW_DATATYPE = DataTypeHT("KAISU")
             LNM0007Exceltblrow("KAISU") = LNM0007WRKINC.DataConvert("回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
