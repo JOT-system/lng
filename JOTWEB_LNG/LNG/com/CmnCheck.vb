@@ -911,7 +911,7 @@ Public Class CmnCheck
         '〇(シーエナジー)届先出荷場所車庫マスタ設定(3XX)
         For Each CenergyTodokerow As DataRow In dtCenergyTodoke.Select("KEYCODE01<>''", "KEYCODE01")
             If CenergyTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
-            Dim condition As String = String.Format("TODOKECODE='{0}'", CenergyTodokerow("KEYCODE01"))
+            Dim condition As String = String.Format("TODOKECODE='{0}'", CenergyTodokerow("KEYCODE01").ToString().Replace(" ", ""))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "3" Then Continue For
                 Try
@@ -923,6 +923,23 @@ Public Class CmnCheck
                 End Try
             Next
         Next
+        '〇(シーエナジー)統合版単価マスタ設定(出荷場所)
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0110600000), "TODOKECODE")
+            If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "3" Then Continue For
+            Dim condition As String = ""
+            condition &= String.Format(" KASANORGCODE='{0}' ", LNT0001tblrow("KASANCODEORDERORG").ToString())
+            condition &= String.Format(" AND AVOCADOSHUKABASHO='{0}' ", LNT0001tblrow("SHUKABASHO").ToString())
+            condition &= String.Format(" AND TODOKECODE='{0}' ", LNT0001tblrow("TODOKECODE").ToString())
+            condition &= String.Format(" AND SYAGOU='{0}' ", LNT0001tblrow("GYOMUTANKNUM").ToString())
+            For Each LNT0001Tanktblrow As DataRow In LNT0001Tanktbl.Select(condition)
+                Try
+                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = LNT0001Tanktblrow("SHUKABASHO").ToString()
+                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = LNT0001Tanktblrow("SHUKANAME").ToString()
+                Catch ex As Exception
+                End Try
+            Next
+        Next
+
 
         '〇業務車番(6XX)取得用
         For Each CenergyElNessTankrow As DataRow In dtCenergyElNessTank.Select("KEYCODE04<>''", "KEYCODE04")
@@ -935,7 +952,7 @@ Public Class CmnCheck
         '〇(エルネス)届先出荷場所車庫マスタ設定(6XX)
         For Each ElNessTodokerow As DataRow In dtElNessTodoke.Select("KEYCODE01<>''", "KEYCODE01")
             If ElNessTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
-            Dim condition As String = String.Format("TODOKECODE='{0}'", ElNessTodokerow("KEYCODE01"))
+            Dim condition As String = String.Format("TODOKECODE='{0}'", ElNessTodokerow("KEYCODE01").ToString().Replace(" ", ""))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "6" Then Continue For
                 Try
@@ -943,6 +960,22 @@ Public Class CmnCheck
                     LNT0001tblrow("CENERGYELNESS_SHUKANAME") = ElNessTodokerow("KEYCODE08").ToString()
                     LNT0001tblrow("CENERGYELNESS_TODOKECODE") = ElNessTodokerow("KEYCODE03").ToString()
                     LNT0001tblrow("CENERGYELNESS_TODOKENAME") = ElNessTodokerow("KEYCODE04").ToString()
+                Catch ex As Exception
+                End Try
+            Next
+        Next
+        '〇(エルネス)統合版単価マスタ設定(出荷場所)
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(String.Format("TORICODE='{0}'", BaseDllConst.CONST_TORICODE_0238900000), "TODOKECODE")
+            If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "6" Then Continue For
+            Dim condition As String = ""
+            condition &= String.Format(" KASANORGCODE='{0}' ", LNT0001tblrow("KASANCODEORDERORG").ToString())
+            condition &= String.Format(" AND AVOCADOSHUKABASHO='{0}' ", LNT0001tblrow("SHUKABASHO").ToString())
+            condition &= String.Format(" AND TODOKECODE='{0}' ", LNT0001tblrow("TODOKECODE").ToString())
+            condition &= String.Format(" AND SYAGOU='{0}' ", LNT0001tblrow("GYOMUTANKNUM").ToString())
+            For Each LNT0001Tanktblrow As DataRow In LNT0001Tanktbl.Select(condition)
+                Try
+                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = LNT0001Tanktblrow("SHUKABASHO").ToString()
+                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = LNT0001Tanktblrow("SHUKANAME").ToString()
                 Catch ex As Exception
                 End Try
             Next
