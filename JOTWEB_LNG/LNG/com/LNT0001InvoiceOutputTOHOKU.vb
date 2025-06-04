@@ -23,6 +23,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
     Private ShaSheetData As DataTable
     Private TankaData As DataTable
     Private TuiSheetData As DataTable
+    Private HolidayRate As DataTable
     Private KaisuuData As DataTable
     Private TaishoYm As String = ""
     Private TaishoYYYY As String = ""
@@ -40,7 +41,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
     Private PrintTotalRowIdx As Int32 = 0                                   '合計位置（行）      ※初期値：0
     Private PrintSuuRowIdx As Int32 = 25                                    '数量位置（行）      ※初期値：24
     Private PrintHaiRowIdx As Int32 = 6                                     '配送先位置（行）    ※初期値：6
-    Private PrintShaRowIdx As Int32 = 12                                    '車号位置（行）      ※初期値：12
+    Private PrintShaRowIdx As Int32 = 2                                     '車号位置（行）      ※初期値：12
     Private PrintTankaRowIdx As Int32 = 17                                  '単価位置（行）      ※初期値：17
     Private PrintaddsheetFlg As Boolean = False                             'シート追加フラグ　  ※初期値：False
     Private TodokeCodeCHGFlg As Boolean = False                             '届先変更フラグ    　※初期値：False
@@ -134,8 +135,10 @@ Public Class LNT0001InvoiceOutputTOHOKU
                 TuiSheetData = GetTuiSheetData(SQLcon)
                 '車号シート情報データ取得
                 ShaSheetData = GetShaSheetData(SQLcon)
-                '単価データ取得
+                '統合版単価マスタ取得
                 TankaData = GetTankaData(SQLcon)
+                '休日割増単価マスタ取得
+                HolidayRate = GetHolidayRate(SQLcon)
 
             End Using
 
@@ -163,6 +166,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
         Dim FirstFLG As String = "1"
         Dim DataExist As String = "0"
         Dim NichiCount As Integer = 0
+        Dim TuiCount As Integer = 0
         Dim srcRange As IRange = Nothing
         Dim destRange As IRange = Nothing
 
@@ -186,13 +190,27 @@ Public Class LNT0001InvoiceOutputTOHOKU
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Rows(CInt(TuiSheetRowData("NICHIYOUROW")) - 1).Hidden = False
                 End If
 
+                '車両別追加料金（2名入替乗務）
+                If Val(Convert.ToString(TuiSheetRowData("SPTANKA"))) > 0 Then
+                    'Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("C" & TuiSheetRowData("IREKAEROW").ToString).NumberFormat = "#,##0_ ""円"""
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("C" & Convert.ToString(TuiSheetRowData("IREKAEROW"))).Value = TuiSheetRowData("SPTANKA")
+                    If Val(Convert.ToString(TuiSheetRowData("SPKAISU"))) > 0 Then
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("D" & TuiSheetRowData("IREKAEROW").ToString).Value = Convert.ToString(TuiSheetRowData("SPKAISU"))
+                    End If
+                    TuiCount += Convert.ToInt32(TuiSheetRowData("SPKAISU"))
+                End If
+
+                '日曜日割増運賃
+                'Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("C" & TuiSheetRowData("NICHIYOUROW").ToString).NumberFormat = "#,##0""円"""
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("C" & Convert.ToString(TuiSheetRowData("NICHIYOUROW"))).Value = HolidayRate.Rows(0)("TANKA")
                 If Convert.ToString(TuiSheetRowData("NICHIYOUCNT")) <> "0" Then
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("D" & TuiSheetRowData("NICHIYOUROW").ToString).Value = Convert.ToString(TuiSheetRowData("NICHIYOUCNT"))
                     NichiCount += Convert.ToInt32(TuiSheetRowData("NICHIYOUCNT"))
                 End If
 
-                Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("D63").Value = NichiCount
             Next
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("D32").Value = TuiCount.ToString("0")
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("D63").Value = NichiCount
 
             '***** 追加料金・日曜日料金シート作成 TODO処理 ここまで *****
 
@@ -211,6 +229,13 @@ Public Class LNT0001InvoiceOutputTOHOKU
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(CInt(ShaSheetRowData("KAGAMIROW")) - 1).Hidden = False
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & ShaSheetRowData("KAGAMIROW").ToString).Value = Convert.ToString(ShaSheetRowData("SHEETNAME"))
                 End If
+                If Convert.ToString(ShaSheetRowData("EXISTFLG")) = "1" Then
+                    WW_SheetNo = CInt(ShaSheetRowData("SHEETNO"))
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Visible = Visibility.Visible
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(ShaSheetRowData("SHEETNAME"))
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("I8").Value = ShaSheetRowData("KOTEIHIM")
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("I9").Value = ShaSheetRowData("KOTEIHID")
+                End If
             Next
 
             '***** 車号別シート作成 TODO処理 ここまで *****
@@ -221,7 +246,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
                 If Convert.ToString(HaiSheetRowData("SHEETDISPLAY")) = "1" AndAlso Convert.ToString(HaiSheetRowData("EXISTFLG")) = "1" Then
                     WW_SheetNo = CInt(HaiSheetRowData("SHEETNO"))
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Visible = Visibility.Visible
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(HaiSheetRowData("SHEETNAME"))
+                    'Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(HaiSheetRowData("SHEETNAME"))
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A9").Value = Convert.ToString(HaiSheetRowData("SHEETNAME"))
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B11").Value = Convert.ToString(HaiSheetRowData("TODOKENAME"))
 
@@ -233,6 +258,13 @@ Public Class LNT0001InvoiceOutputTOHOKU
                             For i As Integer = 0 To OutPutRowData.Length - 1
                                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" & PrintTankaRowIdx.ToString).Value = OutPutRowData(i)("SHABAN")
                                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" & PrintTankaRowIdx.ToString).Value = OutPutRowData(i)("TANKA")
+                                If OutPutRowData(i)("CALCKBN").ToString = "トン" Then
+                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" & PrintTankaRowIdx.ToString).Formula = "=ROUND(E" & Me.PrintTankaRowIdx.ToString() & "*" & "F" & Me.PrintTankaRowIdx.ToString() & ",0)"
+                                ElseIf OutPutRowData(i)("CALCKBN").ToString = "回" Then
+                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" & PrintTankaRowIdx.ToString).Formula = "=ROUND(E" & Me.PrintTankaRowIdx.ToString() & "*" & "D" & Me.PrintTankaRowIdx.ToString() & ",0)"
+                                Else
+                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" & PrintTankaRowIdx.ToString).Formula = "=ROUND(E" & Me.PrintTankaRowIdx.ToString() & "*" & "D" & Me.PrintTankaRowIdx.ToString() & ",0)"
+                                End If
                                 PrintTankaRowIdx += 1
                             Next
                         End If
@@ -558,6 +590,8 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= "         ELSE '0'"
         SQLStr &= "     END EXISTFLG"
         SQLStr &= "    ,A01.KEYCODE02"
+        SQLStr &= "    ,A03.KOTEIHIM"
+        SQLStr &= "    ,A03.KOTEIHID"
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0005_CONVERT A01 "
@@ -578,6 +612,19 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= "       A01.GYOMUTANKNUM "
         SQLStr &= " )A02 "
         SQLStr &= " ON A02.GYOMUTANKNUM = A01.KEYCODE01 "
+        SQLStr &= " LEFT JOIN("
+        SQLStr &= "     SELECT "
+        SQLStr &= "         A01.SYABAN AS SYABAN"
+        SQLStr &= "        ,A01.KOTEIHIM AS KOTEIHIM"
+        SQLStr &= "        ,A01.KOTEIHID AS KOTEIHID"
+        SQLStr &= "     FROM LNG.LNM0007_FIXED A01 "
+        SQLStr &= "     WHERE "
+        SQLStr &= String.Format("          A01.TORICODE = '{0}' ", "0175400000")
+        SQLStr &= String.Format("      AND A01.ORGCODE IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format("      AND A01.TARGETYM = '{0}' ", TaishoYm.Replace("/", ""))
+        SQLStr &= String.Format("      AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= " )A03 "
+        SQLStr &= " ON A03.SYABAN = A01.KEYCODE01 "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -628,6 +675,8 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= "     END EXISTFLG"
         SQLStr &= "    ,IFNULL(A02.NICHIYOUCNT,0) AS NICHIYOUCNT "
         SQLStr &= "    ,A01.KEYCODE02"
+        SQLStr &= "    ,CAST(A04.TANKA AS SIGNED) AS SPTANKA"
+        SQLStr &= "    ,CAST(A04.QTY  AS SIGNED) AS SPKAISU"
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0005_CONVERT A01 "
@@ -668,6 +717,20 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= "       A01.GYOMUTANKNUM "
         SQLStr &= " )A03 "
         SQLStr &= " ON A03.GYOMUTANKNUM = A01.KEYCODE01 "
+        SQLStr &= " LEFT JOIN("
+        SQLStr &= "     SELECT "
+        SQLStr &= "         A01.DETAILID AS DETAILID"
+        SQLStr &= "        ,A01.DETAILNAME AS DETAILNAME"
+        SQLStr &= "        ,A01.TANKA AS TANKA"
+        SQLStr &= "        ,A01.QUANTITY AS QTY"
+        SQLStr &= "     FROM LNG.LNM0014_SPRATE A01 "
+        SQLStr &= "     WHERE "
+        SQLStr &= String.Format("          A01.TARGETYM = '{0}' ", TaishoYm.Replace("/", ""))
+        SQLStr &= String.Format("      AND A01.TORICODE = '{0}' ", "0175400000")
+        SQLStr &= String.Format("      AND A01.ORGCODE IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format("      AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= " )A04 "
+        SQLStr &= " ON A04.DETAILNAME = A01.VALUE01 "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -698,7 +761,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
     End Function
 
     ''' <summary>
-    ''' 単価データ取得
+    ''' 統合版単価マスタ取得
     ''' </summary>
     Private Function GetTankaData(ByVal SQLcon As MySqlConnection) As DataTable
 
@@ -707,11 +770,12 @@ Public Class LNT0001InvoiceOutputTOHOKU
         Dim SQLStr As String = ""
         '-- SELECT
         SQLStr &= " SELECT "
-        SQLStr &= "   A01.SHABAN"
-        SQLStr &= " , A01.TANKA "
-        SQLStr &= " , A01.AVOCADOTODOKECODE "
-        SQLStr &= " , A01.AVOCADOSHUKABASHO "
-        SQLStr &= " , A01.BRANCHCODE "
+        SQLStr &= "   A01.SHABAN            AS SHABAN"
+        SQLStr &= " , A01.TANKA             AS TANKA"
+        SQLStr &= " , A01.AVOCADOTODOKECODE AS TODOKECODE"
+        SQLStr &= " , A01.AVOCADOSHUKABASHO AS SHUKABASHO"
+        SQLStr &= " , A01.BRANCHCODE        AS BRANCHCODE"
+        SQLStr &= " , A01.CALCKBN           AS CALCKBN"
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0006_NEWTANKA A01 "
@@ -723,6 +787,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= String.Format(" AND A01.STYMD  <= '{0}' ", TaishoYm & "/01")
         SQLStr &= String.Format(" AND A01.ENDYMD >= '{0}' ", TaishoYm & "/01")
         SQLStr &= String.Format(" AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= " ORDER BY LEFT(A01.SHABAN,1) DESC, A01.SHABAN "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -742,64 +807,43 @@ Public Class LNT0001InvoiceOutputTOHOKU
 
         Return dt
     End Function
-
     ''' <summary>
-    ''' 固定費マスタ更新
+    ''' 休日祝日割増単価マスタ取得
     ''' </summary>
-    Private Sub UpdKoteihi(ByVal SQLcon As MySqlConnection, ByVal Row As DataRow)
+    Private Function GetHolidayRate(ByVal SQLcon As MySqlConnection) As DataTable
 
-        Dim WW_DATE As Date = Date.Now
+        Dim dt As New DataTable
 
-        '○ 対象データ更新
-        Dim SQLStr As New StringBuilder
-        SQLStr.Append(" UPDATE                                      ")
-        SQLStr.Append("     LNG.LNM0009_TNGKOTEIHI                  ")
-        SQLStr.Append(" SET                                         ")
-        SQLStr.Append("     KAISU               = @KAISU            ")
-        SQLStr.Append("   , KINGAKU             = @KINGAKU          ")
-        SQLStr.Append("   , UPDYMD              = @UPDYMD           ")
-        SQLStr.Append("   , UPDUSER             = @UPDUSER          ")
-        SQLStr.Append("   , UPDTERMID           = @UPDTERMID        ")
-        SQLStr.Append("   , UPDPGID             = @UPDPGID          ")
-        SQLStr.Append(" WHERE                                       ")
-        SQLStr.Append("       TAISHOYM  = @TAISHOYM                 ")
-        SQLStr.Append("   AND SYABAN    = @SYABAN                   ")
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "   A01.RANGECODE"
+        SQLStr &= " , A01.TANKA "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0017_HOLIDAYRATE A01 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     A01.TORICODE = '{0}' ", "0175400000")
 
         Try
-            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TAISHOYM As MySqlParameter = SQLcmd.Parameters.Add("@TAISHOYM", MySqlDbType.Decimal, 6)    '対象年月
-                Dim P_SYABAN As MySqlParameter = SQLcmd.Parameters.Add("@SYABAN", MySqlDbType.VarChar, 20)       '車番
-                Dim P_KAISU As MySqlParameter = SQLcmd.Parameters.Add("@KAISU", MySqlDbType.Decimal, 3)          '使用回数
-                Dim P_KINGAKU As MySqlParameter = SQLcmd.Parameters.Add("@KINGAKU", MySqlDbType.Decimal, 8)      '金額
-                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)          '更新年月日
-                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
-                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20) '更新端末
-                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-                P_TAISHOYM.Value = TaishoYm.Replace("/", "")  '対象年月
-                P_SYABAN.Value = Row("SYABAN")                '車番
-                P_KAISU.Value = Row("KAISU")                  '使用回数
-                P_KINGAKU.Value = Row("GOUKEI")               '金額
-                P_UPDYMD.Value = WW_DATE                      '更新年月日
-                P_UPDUSER.Value = USERID                      '更新ユーザーＩＤ
-                P_UPDTERMID.Value = USERTERMID                '更新端末
-                P_UPDPGID.Value = "LNT0001InvoiceOutputTNG"   '更新プログラムＩＤ
-
-                '登録
-                SQLcmd.CommandTimeout = 300
-                SQLcmd.ExecuteNonQuery()
+                    '○ テーブル検索結果をテーブル格納
+                    dt.Load(SQLdr)
+                End Using
             End Using
         Catch ex As Exception
-
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0001 UPDATE"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-            Exit Sub
+            Throw '呼び出し元の例外にスロー
         End Try
 
-    End Sub
+        Return dt
+    End Function
 
 End Class
