@@ -774,7 +774,6 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= " , A01.KOTEIHIM - IFNULL(A01.KOTEIHID,0) * IFNULL(A02.KAISU,0) AS GOUKEI "
 
         '-- FROM
-        'SQLStr &= " FROM LNG.LNM0009_TNGKOTEIHI A01 "
         SQLStr &= " FROM LNG.LNM0007_FIXED A01 "
 
         '-- LEFT JOIN
@@ -783,7 +782,6 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= "               DATE_FORMAT(A12.TODOKEDATE, '%Y/%m/01') as TODOKEDATE"
         SQLStr &= "              ,A11.SYABAN     as SYABAN"
         SQLStr &= "              ,COUNT(A12.TORICODE) AS KAISU "
-        'SQLStr &= "           FROM LNG.LNM0009_TNGKOTEIHI A11 "
         SQLStr &= "           FROM LNG.LNM0007_FIXED A11 "
         SQLStr &= "           INNER JOIN LNG.LNT0001_ZISSEKI A12 "
         SQLStr &= "               ON A12.TORICODE = '0175400000' "
@@ -792,26 +790,22 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= "               AND A12.ZISSEKI <> 0 "
         SQLStr &= "               AND A12.DELFLG = '0' "
         SQLStr &= "           WHERE "
-        'SQLStr &= String.Format("     A11.STYMD   <= '{0}' ", TaishoYm & "/01")
-        'SQLStr &= String.Format(" AND A11.ENDYMD  >= '{0}' ", TaishoYm & "/01")
-        SQLStr &= String.Format("     A11.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
+        SQLStr &= String.Format("     A11.TORICODE  = '{0}' ", "0175400000")
+        SQLStr &= String.Format(" AND A11.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
         SQLStr &= "               AND A11.DELFLG   = '0' "
         SQLStr &= "           GROUP BY "
         SQLStr &= "               DATE_FORMAT(A12.TODOKEDATE, '%Y/%m/01') "
         SQLStr &= "              ,A11.SYABAN "
         SQLStr &= "           ) A02 "
-        'SQLStr &= "           ON  A02.TODOKEDATE  >= A01.STYMD "
-        'SQLStr &= "           AND A02.TODOKEDATE  <= A01.ENDYMD "
         SQLStr &= String.Format(" ON A02.TODOKEDATE >= '{0}' ", TaishoYm & "/01")
         SQLStr &= String.Format("AND A02.TODOKEDATE <= '{0}' ", Date.Parse(TaishoYm + "/" + "01").AddDays(-(Date.Parse(TaishoYm + "/" + "01").Day - 1)).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd"))
         SQLStr &= "              AND A02.SYABAN      = A01.SYABAN "
 
         '-- WHERE
         SQLStr &= " WHERE "
-        'SQLStr &= String.Format("     A01.STYMD   <= '{0}' ", TaishoYm & "/01")
-        'SQLStr &= String.Format(" AND A01.ENDYMD  >= '{0}' ", TaishoYm & "/01")
-        SQLStr &= String.Format("     A01.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
-        SQLStr &= String.Format(" AND A01.DELFLG  <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format("     A01.TORICODE  = '{0}' ", "0175400000")
+        SQLStr &= String.Format(" AND A01.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
+        SQLStr &= String.Format(" AND A01.DELFLG   <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
