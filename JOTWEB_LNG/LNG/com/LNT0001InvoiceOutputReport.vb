@@ -336,10 +336,10 @@ Public Class LNT0001InvoiceOutputReport
 
                 '★水島営業所の場合([コカ・コーラボトラーズジャパン株式会社]独自対応)
                 '-- [t数]設定
-                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='13.200'", "G", "H", WW_SheetNoCocacola)
-                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='13.500'", "E", "F", WW_SheetNoCocacola)
-                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='14.000'", "I", "J", WW_SheetNoCocacola)
-                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA='12.300'", "C", "D", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA=13.200", "G", "H", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA=13.500", "E", "F", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA=14.000", "I", "J", WW_SheetNoCocacola)
+                EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND SYABARA=12.300", "C", "D", WW_SheetNoCocacola)
                 '-- [不積対応分]設定
                 EditDetailAreaCocacola(BaseDllConst.CONST_TODOKECODE_005509, "AND (ZISSEKI_FUZUMIFLG='TRUE' OR BRANCHCODE=2) ", "K", "L", WW_SheetNoCocacola, tyoseiFlg:=True)
 
