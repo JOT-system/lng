@@ -790,7 +790,7 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= "               AND A12.ZISSEKI <> 0 "
         SQLStr &= "               AND A12.DELFLG = '0' "
         SQLStr &= "           WHERE "
-        SQLStr &= String.Format("     A11.TORICODE  = '{0}' ", "0175400000")
+        SQLStr &= String.Format("     A11.TORICODE  = '{0}' ", "0175300000")
         SQLStr &= String.Format(" AND A11.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
         SQLStr &= "               AND A11.DELFLG   = '0' "
         SQLStr &= "           GROUP BY "
@@ -803,7 +803,7 @@ Public Class LNT0001InvoiceOutputTNG
 
         '-- WHERE
         SQLStr &= " WHERE "
-        SQLStr &= String.Format("     A01.TORICODE  = '{0}' ", "0175400000")
+        SQLStr &= String.Format("     A01.TORICODE  = '{0}' ", "0175300000")
         SQLStr &= String.Format(" AND A01.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
         SQLStr &= String.Format(" AND A01.DELFLG   <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
