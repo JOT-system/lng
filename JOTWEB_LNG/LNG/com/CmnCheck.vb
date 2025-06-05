@@ -436,7 +436,7 @@ Public Class CmnCheck
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
-            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl, I_SEKIYU_HONSHU_FLG:=True)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
             CMNPTS.SelectSKFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
             'CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)

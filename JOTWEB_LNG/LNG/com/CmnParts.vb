@@ -269,7 +269,7 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectNEWTANKAMaster(ByVal SQLcon As MySqlConnection,
                                     ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable,
-                                    Optional ByVal I_TODOKECODE As String = Nothing)
+                                    Optional ByVal I_TODOKECODE As String = Nothing, Optional ByVal I_SEKIYU_HONSHU_FLG As Boolean = False)
         If IsNothing(O_dtTANKAMas) Then
             O_dtTANKAMas = New DataTable
         End If
@@ -340,6 +340,11 @@ Public Class CmnParts
             SQLStr &= String.Format(" AND LNM0005.CLASS IN ('{0}','{1}') ", I_CLASS, "ELNESS_TODOKE")
             SQLStr &= " AND LNM0005.CLASSNAME = LNM0006.TORICODE "
             SQLStr &= " AND LNM0005.KEYCODE03 = LNM0006.TODOKECODE "
+            'ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 AndAlso I_SEKIYU_HONSHU_FLG = True Then
+            '    '★取引先コードが「石油資源開発(本州)」の場合
+            '    SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            '    SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
+            '    SQLStr &= " AND LNM0005.KEYCODE04 = LNM0006.KASANORGCODE "
         Else
             SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
             SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
@@ -840,7 +845,8 @@ Public Class CmnParts
         SQLStr &= "    END AS KOTEICHI_GYOMUNOSUB "
         SQLStr &= "  , LNM0005.VALUE18          AS KOTEICHI_YOKOCELL "
         SQLStr &= "  , (4 + CAST(LNM0005_TODOKE.KEYCODE03 AS SIGNED)) - 1 AS SET_CELL "
-        SQLStr &= "  , LPAD(LNM0005.KEYCODE09, 2, '0') AS BRANCHCODE "
+        SQLStr &= "  , LPAD(IF(LNM0005.KEYCODE09='','1',LNM0005.KEYCODE09), 2, '0') AS BRANCHCODE "
+        'SQLStr &= "  , LPAD(LNM0005.KEYCODE09, 2, '0') AS BRANCHCODE "
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
@@ -932,13 +938,7 @@ Public Class CmnParts
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") <> "01" _
-                    AndAlso dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("BRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                Else
+                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
                     dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
                     dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                     dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
@@ -955,20 +955,12 @@ Public Class CmnParts
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") <> "01" _
-                    AndAlso dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                Else
+                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
                     dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
                     dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                     dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                     dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
                 End If
-
-
             Next
         Next
 
@@ -982,24 +974,18 @@ Public Class CmnParts
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") <> "01" _
-                    AndAlso dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                Else
+                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
                     dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
                     dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                     dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                     dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
                 End If
-
             Next
         Next
         '-- ★秋田(宿泊有)
-        conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
-        conditionSub &= String.Format("AND BIKOU1='{0}' ", arrAkitaSyaban(0))
+        'conditionSub = String.Format("GRPNO='2' AND (ORGCODE='{0}' OR ORGCODE='{1}') ", BaseDllConst.CONST_ORDERORGCODE_021502, BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub = String.Format("GRPNO='2' AND AVOCADOSHUKABASHO='{0}' ", "005690")
+        conditionSub &= String.Format("AND MEMO='{0}' ", arrAkitaSyaban(0))
         For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
             Dim condition As String = "GRPNO='3' "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
@@ -1007,14 +993,16 @@ Public Class CmnParts
             condition &= "AND KOTEICHI_GYOMUNOSUB ='01' "
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                dtSKKOTEICHIMasrow("BRANCHCODE") = "01"
+                dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                 dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                 dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
             Next
         Next
         '-- ★秋田(宿泊無)
-        conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
-        conditionSub &= String.Format("AND BIKOU1='{0}' ", arrAkitaSyaban(1))
+        'conditionSub = String.Format("GRPNO='2' AND (ORGCODE='{0}' OR ORGCODE='{1}') ", BaseDllConst.CONST_ORDERORGCODE_021502, BaseDllConst.CONST_ORDERORGCODE_020601)
+        'conditionSub &= String.Format("AND MEMO='{0}' ", arrAkitaSyaban(1))
+        conditionSub = String.Format("GRPNO='2' AND AVOCADOSHUKABASHO='{0}' ", "005690")
+        conditionSub &= String.Format("AND MEMO='{0}' ", "")
         For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
             Dim condition As String = "GRPNO='3' "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
@@ -1022,10 +1010,9 @@ Public Class CmnParts
             condition &= "AND KOTEICHI_GYOMUNOSUB ='02' "
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                dtSKKOTEICHIMasrow("BRANCHCODE") = "01"
+                dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                 dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                 dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-
             Next
         Next
 
@@ -1037,19 +1024,12 @@ Public Class CmnParts
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") <> "01" _
-                    AndAlso dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                Else
+                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
                     dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
                     dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                     dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                     dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
                 End If
-
             Next
         Next
 
