@@ -570,7 +570,6 @@ Public Class CS0054KintoneApi
         Public Property 業務指示2 As NormalStruct
         Public Property 業務指示3 As NormalStruct
         Public Property 荷主備考 As NormalStruct
-        'Public Property 最大積載量 As NormalStruct           '2025/06/05 追加
         Public Property 業務車番選択 As NormalStruct
         Public Property 出荷部署名 As NormalStruct
         Public Property 出荷部署コード As NormalStruct
@@ -702,11 +701,12 @@ Public Class CS0054KintoneApi
         Public Property JX形式オーダー更新キー As NormalStruct
         Public Property JX形式オーダーファイル名 As NormalStruct
         Public Property JX形式オーダールート番号 As NormalStruct
-        'Public Property JX形式オーダー先頭届先名称 As NormalStruct              '2025/06/05 追加
+        Public Property JX形式オーダー先頭届先名称 As NormalStruct              '2025/06/05 追加
         '東ガスのみの項目
         Public Property 回転数 As NormalStruct
         Public Property L配更新キー As NormalStruct
         Public Property はこぶわ更新キー As NormalStruct
+        Public Property 最大積載量 As NormalStruct           '2025/06/05 追加
     End Class
     ''' <summary>
     ''' KintoneAPIの返却データ（東ガスのみの項目）を格納
@@ -716,6 +716,7 @@ Public Class CS0054KintoneApi
         Public Property 回転数 As NormalStruct
         Public Property L配更新キー As NormalStruct
         Public Property はこぶわ更新キー As NormalStruct
+        Public Property 最大積載量 As NormalStruct
     End Class
     ''' <summary>
     ''' KintoneAPIの返却データ（品名テーブル）を格納
