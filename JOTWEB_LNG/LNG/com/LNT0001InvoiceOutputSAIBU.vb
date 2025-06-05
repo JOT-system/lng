@@ -164,39 +164,40 @@ Public Class LNT0001InvoiceOutputSAIBU
         '届先毎グルーピングして数量をサマリー（LINQを使う）
         'エコア以外
         Dim query = From row In InputData.AsEnumerable()
-                    Where row.Field(Of String)("TODOKECODE") <> TODOKE_003769
-                    Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+                    Group row By TODOKECODE = row.Field(Of String)("TODOKECODE"), BRANCHCODE = row.Field(Of String)("BRANCHCODE") Into Group
                     Select New With {
                             .TODOKECODE = TODOKECODE,
+                            .BRANCHCODE = BRANCHCODE,
                             .DAISU = Group.Count(),
                             .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
                         }
         'エコア１回転
-        Dim query01 = From row In InputData.AsEnumerable()
-                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-                            row.Field(Of UInt64)("TRIP_REP").ToString = "1"
-                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-                      Select New With {
-                            .TODOKECODE = TODOKECODE,
-                            .DAISU = Group.Count(),
-                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-                        }
+        'Dim query01 = From row In InputData.AsEnumerable()
+        '              Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
+        '                    row.Field(Of UInt64)("TRIP_REP").ToString = "1"
+        '              Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+        '              Select New With {
+        '                    .TODOKECODE = TODOKECODE,
+        '                    .DAISU = Group.Count(),
+        '                    .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
+        '                }
         'エコア２回転
-        Dim query02 = From row In InputData.AsEnumerable()
-                      Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-                            row.Field(Of UInt64)("TRIP_REP").ToString = "2"
-                      Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-                      Select New With {
-                            .TODOKECODE = TODOKECODE,
-                            .DAISU = Group.Count(),
-                            .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-                        }
+        'Dim query02 = From row In InputData.AsEnumerable()
+        '              Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
+        '                    row.Field(Of UInt64)("TRIP_REP").ToString = "2"
+        '              Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
+        '              Select New With {
+        '                    .TODOKECODE = TODOKECODE,
+        '                    .DAISU = Group.Count(),
+        '                    .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
+        '                }
 
         PrintData = New DataTable
         PrintData.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
         PrintData.Columns.Add("TODOKECODE", Type.GetType("System.String"))
         PrintData.Columns.Add("TODOKECLASS", Type.GetType("System.String"))
         PrintData.Columns.Add("TODOKENAME", Type.GetType("System.String"))
+        PrintData.Columns.Add("BRANCHCODE", Type.GetType("System.Decimal"))
         PrintData.Columns.Add("TANKA", Type.GetType("System.Int32"))
         PrintData.Columns.Add("DAISU", Type.GetType("System.Int32"))
         PrintData.Columns.Add("ZISSEKI", Type.GetType("System.Decimal"))
@@ -241,7 +242,8 @@ Public Class LNT0001InvoiceOutputSAIBU
         'エコア以外
         For Each result In query
             For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = result.TODOKECODE Then
+                If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
+                   prtRow("TODOKECLASS").ToString = result.BRANCHCODE Then
                     prtRow("TANKA") = 0
                     prtRow("DAISU") = result.DAISU
                     prtRow("ZISSEKI") = result.ZISSEKI
@@ -250,29 +252,29 @@ Public Class LNT0001InvoiceOutputSAIBU
             Next
         Next
         'エコア１回転
-        For Each result In query01
-            For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
-                   prtRow("TODOKECLASS").ToString = "1" Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
+        'For Each result In query01
+        '    For Each prtRow As DataRow In PrintData.Rows
+        '        If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
+        '           prtRow("TODOKECLASS").ToString = "1" Then
+        '            prtRow("TANKA") = 0
+        '            prtRow("DAISU") = result.DAISU
+        '            prtRow("ZISSEKI") = result.ZISSEKI
+        '            Exit For
+        '        End If
+        '    Next
+        'Next
         'エコア２回転
-        For Each result In query02
-            For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
-                   prtRow("TODOKECLASS").ToString = "2" Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
+        'For Each result In query02
+        '    For Each prtRow As DataRow In PrintData.Rows
+        '        If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
+        '           prtRow("TODOKECLASS").ToString = "2" Then
+        '            prtRow("TANKA") = 0
+        '            prtRow("DAISU") = result.DAISU
+        '            prtRow("ZISSEKI") = result.ZISSEKI
+        '            Exit For
+        '        End If
+        '    Next
+        'Next
 
         '単価設定
         For Each result As DataRow In LNT0001Tanktbl.Rows
@@ -530,9 +532,7 @@ Public Class LNT0001InvoiceOutputSAIBU
     ''' 固定費マスタTBL検索
     ''' </summary>
     Public Sub SelectKOTEIHIMaster(ByVal SQLcon As MySqlConnection,
-                                   ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtKOTEIHIMas As DataTable,
-                                   Optional ByVal I_CLASS As String = Nothing,
-                                   Optional ByVal I_RIKUBAN As String = Nothing)
+                                   ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByRef O_dtKOTEIHIMas As DataTable)
         If IsNothing(O_dtKOTEIHIMas) Then
             O_dtKOTEIHIMas = New DataTable
         End If
@@ -567,34 +567,12 @@ Public Class LNT0001InvoiceOutputSAIBU
         SQLStr &= "   ,LNM0007.BIKOU1 "
         SQLStr &= "   ,LNM0007.BIKOU2 "
         SQLStr &= "   ,LNM0007.BIKOU3 "
-        If Not IsNothing(I_CLASS) Then
-            SQLStr &= "   ,LNM0005.VALUE08 AS KOTEIHI_CELLNUM "
-        End If
-
-        '-- FROM
         SQLStr &= " FROM LNG.LNM0007_FIXED LNM0007 "
-        If Not IsNothing(I_CLASS) Then
-            SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
-            SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0007.RIKUBAN "
-        End If
-
-        '-- WHERE
         SQLStr &= " WHERE "
         SQLStr &= String.Format("     LNM0007.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
         SQLStr &= String.Format(" AND LNM0007.TORICODE = '{0}' ", I_TORICODE)
         SQLStr &= String.Format(" AND LNM0007.ORGCODE = '{0}' ", I_ORGCODE)
         SQLStr &= String.Format(" AND LNM0007.TARGETYM = '{0}' ", I_TAISHOYM.Replace("/", ""))
-        '★陸事番号が指定されている場合
-        If Not IsNothing(I_RIKUBAN) Then
-            SQLStr &= String.Format(" AND LNM0007.RIKUBAN = '{0}' ", I_RIKUBAN)
-        End If
-
-        '-- ORDER BY
-        If Not IsNothing(I_CLASS) Then
-            SQLStr &= " ORDER BY CAST(LNM0005.VALUE08 AS SIGNED) "
-        End If
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
