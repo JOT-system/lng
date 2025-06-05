@@ -1973,7 +1973,7 @@ Public Class LNT0001ZissekiIntake
                         Else
                             ROTATION.Value = 0  '回転数
                         End If
-                        UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ
+                        'UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ      2025/06/05 削除
                         SHUKKINTIME.Value = updRow("出勤時間")  '出勤時間
                         STAFFSLCT.Value = updRow("乗務員選択")   '乗務員選択
                         STAFFNAME.Value = updRow("氏名_乗務員")  '氏名_乗務員
