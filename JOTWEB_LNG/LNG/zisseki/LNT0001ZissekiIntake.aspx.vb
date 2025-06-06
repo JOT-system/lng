@@ -1040,6 +1040,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , GYOUMUSIZI2						        " _
                 & "     , GYOUMUSIZI3						        " _
                 & "     , NINUSHIBIKOU						        " _
+                & "     , MAXCAPACITY						        " _
                 & "     , GYOMUSYABAN						        " _
                 & "     , SHIPORGNAME						        " _
                 & "     , SHIPORG						            " _
@@ -1167,6 +1168,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , JXORDUPDKEY						        " _
                 & "     , JXORDFILE						            " _
                 & "     , JXORDROUTE						        " _
+                & "     , JXORDTODOKENAME						    " _
                 & "     , BRANCHCODE						        " _
                 & "     , UPDATEUSER						        " _
                 & "     , CREATEUSER						        " _
@@ -1255,6 +1257,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @GYOUMUSIZI2						        " _
                 & "     , @GYOUMUSIZI3						        " _
                 & "     , @NINUSHIBIKOU						        " _
+                & "     , @MAXCAPACITY						        " _
                 & "     , @GYOMUSYABAN						        " _
                 & "     , @SHIPORGNAME						        " _
                 & "     , @SHIPORG						            " _
@@ -1382,6 +1385,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @JXORDUPDKEY						        " _
                 & "     , @JXORDFILE						        " _
                 & "     , @JXORDROUTE						        " _
+                & "     , @JXORDTODOKENAME					        " _
                 & "     , @BRANCHCODE						        " _
                 & "     , @UPDATEUSER						        " _
                 & "     , @CREATEUSER						        " _
@@ -1470,6 +1474,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , GYOUMUSIZI2 = @GYOUMUSIZI2				" _
                 & "     , GYOUMUSIZI3 = @GYOUMUSIZI3				" _
                 & "     , NINUSHIBIKOU = @NINUSHIBIKOU				" _
+                & "     , MAXCAPACITY = @MAXCAPACITY				" _
                 & "     , GYOMUSYABAN = @GYOMUSYABAN				" _
                 & "     , SHIPORGNAME = @SHIPORGNAME				" _
                 & "     , SHIPORG = @SHIPORG						" _
@@ -1597,6 +1602,8 @@ Public Class LNT0001ZissekiIntake
                 & "     , JXORDUPDKEY = @JXORDUPDKEY				" _
                 & "     , JXORDFILE = @JXORDFILE				    " _
                 & "     , JXORDROUTE = @JXORDROUTE				    " _
+                & "     , JXORDTODOKENAME = @JXORDTODOKENAME	    " _
+                & "     , BRANCHCODE = CASE WHEN BRANCHCODE <> '1' THEN BRANCHCODE ELSE @BRANCHCODE END    " _
                 & "     , UPDATEUSER = @UPDATEUSER					" _
                 & "     , CREATEUSER = @CREATEUSER					" _
                 & "     , UPDATEYMD = @UPDATEYMD					" _
@@ -1683,6 +1690,7 @@ Public Class LNT0001ZissekiIntake
                     Dim GYOUMUSIZI2 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI2", MySqlDbType.VarChar)  '業務指示2
                     Dim GYOUMUSIZI3 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI3", MySqlDbType.VarChar)  '業務指示3
                     Dim NINUSHIBIKOU As MySqlParameter = SQLcmd.Parameters.Add("@NINUSHIBIKOU", MySqlDbType.VarChar)    '荷主備考
+                    Dim MAXCAPACITY As MySqlParameter = SQLcmd.Parameters.Add("@MAXCAPACITY", MySqlDbType.VarChar)    '最大積載量
                     Dim GYOMUSYABAN As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUSYABAN", MySqlDbType.VarChar)  '業務車番選択
                     Dim SHIPORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORGNAME", MySqlDbType.VarChar)  '出荷部署名
                     Dim SHIPORG As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORG", MySqlDbType.VarChar)  '出荷部署コード
@@ -1810,6 +1818,7 @@ Public Class LNT0001ZissekiIntake
                     Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
                     Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
                     Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
+                    Dim JXORDTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@JXORDTODOKENAME", MySqlDbType.VarChar)    'JX形式オーダー先頭届先名称
                     Dim BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar)    '枝番
                     Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
                     Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
@@ -1933,7 +1942,12 @@ Public Class LNT0001ZissekiIntake
                         GYOUMUSIZI1.Value = updRow("業務指示1") '業務指示1
                         GYOUMUSIZI2.Value = updRow("業務指示2") '業務指示2
                         GYOUMUSIZI3.Value = updRow("業務指示3") '業務指示3
-                        NINUSHIBIKOU.Value = updRow("荷主備考") '荷主備考
+                        If iTbl.Columns.Contains("荷主備考") Then
+                            NINUSHIBIKOU.Value = updRow("荷主備考") '荷主備考
+                        Else
+                            NINUSHIBIKOU.Value = ""    '荷主備考
+                        End If
+                        MAXCAPACITY.Value = updRow("最大積載量") '最大積載量
                         GYOMUSYABAN.Value = updRow("業務車番選択")    '業務車番選択
                         SHIPORGNAME.Value = updRow("出荷部署名") '出荷部署名
                         SHIPORG.Value = updRow("出荷部署コード")   '出荷部署コード
@@ -2116,6 +2130,11 @@ Public Class LNT0001ZissekiIntake
                             JXORDROUTE.Value = updRow("JX形式オーダールート番号")   'JX形式オーダールート番号
                         Else
                             JXORDROUTE.Value = ""   'JX形式オーダールート番号
+                        End If
+                        If iTbl.Columns.Contains("JX形式オーダー先頭届先名称") Then
+                            JXORDTODOKENAME.Value = updRow("JX形式オーダー先頭届先名称")   'JX形式オーダー先頭届先名称
+                        Else
+                            JXORDTODOKENAME.Value = ""   'JX形式オーダー先頭届先名称
                         End If
                         BRANCHCODE.Value = "1"    '枝番
                         UPDATEUSER.Value = updRow("更新者")    '更新者

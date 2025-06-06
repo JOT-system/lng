@@ -229,7 +229,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(CInt(ShaSheetRowData("KAGAMIROW")) - 1).Hidden = False
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & ShaSheetRowData("KAGAMIROW").ToString).Value = Convert.ToString(ShaSheetRowData("SHEETNAME"))
                 End If
-                If Convert.ToString(ShaSheetRowData("EXISTFLG")) = "1" Then
+                If Convert.ToString(ShaSheetRowData("SHEETDISPLAY")) = "1" Then
                     WW_SheetNo = CInt(ShaSheetRowData("SHEETNO"))
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Visible = Visibility.Visible
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(ShaSheetRowData("SHEETNAME"))
