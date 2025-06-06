@@ -524,6 +524,7 @@
     <Compile Include="LNG\com\EntryOrderData.vb" />
     <Compile Include="LNG\com\EntrySeisanFData.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputCENERGY_ELNESS.vb" />
+    <Compile Include="LNG\com\LNT0001InvoiceOutputHOKAIDOLng.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputSAIBU.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputReport.vb" />
     <Compile Include="LNG\com\LNT0001InvoiceOutputSEKIYUSIGEN.vb" />

@@ -1314,7 +1314,8 @@ Public Class LNT0002TranStatusList
         End If
 
         '石油資源開発(北海道)石狩
-        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 _
+            AndAlso WF_TORIORG.Items(WF_TORI.SelectedIndex).Text = BaseDllConst.CONST_TORICODE_0132800000 Then
             '〇(帳票)項目チェック処理(石油資源開発(北海道))
             Dim dcIshikari As New Dictionary(Of String, String)
             'WW_ReportCheckSekiyuSigenHokaido(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcIshikari)
@@ -1363,6 +1364,12 @@ Public Class LNT0002TranStatusList
             ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
 
             Exit Sub
+
+        End If
+
+        '北海道ＬＮＧ
+        If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 _
+            AndAlso WF_TORIORG.Items(WF_TORI.SelectedIndex).Text = BaseDllConst.CONST_TORICODE_0239900000 Then
 
         End If
 
