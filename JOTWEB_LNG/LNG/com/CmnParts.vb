@@ -1017,7 +1017,7 @@ Public Class CmnParts
         Next
 
         '-- 〇新潟
-        conditionSub = String.Format("GRPNO ='1' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_021502)
+        conditionSub = String.Format("GRPNO ='1' AND ORGCODE='{0}' AND AVOCADOSHUKABASHO<>'{1}' ", BaseDllConst.CONST_ORDERORGCODE_021502, "005690")
         For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
             Dim condition As String = "GRPNO IN ('1','2') "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
