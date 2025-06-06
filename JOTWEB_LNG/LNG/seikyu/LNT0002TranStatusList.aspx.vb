@@ -782,6 +782,8 @@ Public Class LNT0002TranStatusList
         work.WF_SEL_TORICODE.Text = Me.WF_TORIORG.SelectedItem.Text
         '〇部署コード
         work.WF_SEL_ORGCODE.Text = Me.WF_TORIORG.SelectedValue
+        '〇部署コード(画面)
+        work.WF_SEL_ORGCODE_MAP.Text = Me.WF_TORI.Items(WW_ROW("LINECNT")).Value
 
         Dim WW_URL As String = ""
         work.GetURL("LNT0001AJ", WW_URL)

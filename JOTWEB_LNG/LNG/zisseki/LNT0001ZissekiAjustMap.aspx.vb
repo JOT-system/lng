@@ -276,7 +276,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
         LNT0001tbl.Clear()
 
         Dim SQLStr As String = CMNPTS.SelectZissekiSQL(work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                                                       WF_TODOKE:=WF_TODOKE, WF_TANKNUMBER:=WF_TANKNUMBER, WF_GYOMUTANKNO:=WF_GYOMUTANKNO)
+                                                       WF_TODOKE:=WF_TODOKE, WF_TANKNUMBER:=WF_TANKNUMBER, WF_GYOMUTANKNO:=WF_GYOMUTANKNO, WF_TORIORG_MAP:=work.WF_SEL_ORGCODE_MAP.Text)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)

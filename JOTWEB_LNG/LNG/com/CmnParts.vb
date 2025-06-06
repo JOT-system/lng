@@ -2272,7 +2272,8 @@ Public Class CmnParts
     Public Function SelectZissekiSQL(ByVal WF_TORI As String, ByVal WF_TORIORG As String,
                                      Optional ByVal WF_TODOKE As String = Nothing,
                                      Optional ByVal WF_TANKNUMBER As String = Nothing,
-                                     Optional ByVal WF_GYOMUTANKNO As String = Nothing) As String
+                                     Optional ByVal WF_GYOMUTANKNO As String = Nothing,
+                                     Optional ByVal WF_TORIORG_MAP As String = Nothing) As String
         Dim SQLStr As String =
               " Select                                                                            " _
             & "      1                                                    AS 'SELECT'             " _
@@ -2502,7 +2503,7 @@ Public Class CmnParts
             & " AND LT1.ZISSEKI <> 0                                                "
 
         '〇シーエナジー
-        If WF_TORI = CONST_ORDERORGCODE_022302 + "01" Then
+        If WF_TORI = BaseDllConst.CONST_TORICODE_0110600000 Then
             '★北陸エルネスも含める
             SQLStr &= String.Format(" AND LT1.TORICODE IN (@P5, '{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
         Else
@@ -2511,13 +2512,13 @@ Public Class CmnParts
         SQLStr &= " AND LT1.ORDERORGCODE in (" & WF_TORIORG & ")"
 
         '〇西日本支店車庫
-        If WF_TORI = CONST_ORDERORGCODE_022702 + "01" Then
+        If WF_TORIORG_MAP = CONST_ORDERORGCODE_022702 + "01" Then
             '★[Daigas泉北]選択時
             SQLStr &= String.Format(" AND LT1.TODOKECODE <> '{0}' ", BaseDllConst.CONST_TODOKECODE_001640)
-        ElseIf WF_TORI = CONST_ORDERORGCODE_022702 + "02" Then
+        ElseIf WF_TORIORG_MAP = CONST_ORDERORGCODE_022702 + "02" Then
             '★[Daigas新宮]選択時
             SQLStr &= String.Format(" AND LT1.TODOKECODE = '{0}' ", BaseDllConst.CONST_TODOKECODE_001640)
-        ElseIf WF_TORI = CONST_ORDERORGCODE_022702 + "03" Then
+        ElseIf WF_TORIORG_MAP = CONST_ORDERORGCODE_022702 + "03" Then
             '★[エスケイ産業]選択時
             SQLStr &= String.Format(" AND LT1.TODOKECODE = '{0}' ", BaseDllConst.CONST_TODOKECODE_004559)
         End If

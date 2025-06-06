@@ -95,6 +95,15 @@ Partial Public Class LNT0002WRKINC
     Public WithEvents WF_SEL_ORGNAME As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
+    '''WF_SEL_ORGCODE_MAP コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_ORGCODE_MAP As Global.System.Web.UI.WebControls.TextBox
+
+    '''<summary>
     '''WF_SEL_CONTROLTYPE コントロール。
     '''</summary>
     '''<remarks>
@@ -102,7 +111,7 @@ Partial Public Class LNT0002WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CONTROLTYPE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TIMESTAMP コントロール。
     '''</summary>
