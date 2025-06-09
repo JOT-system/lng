@@ -26,6 +26,9 @@ window.onload = function () {
     if (VisibleKeyOrgCode == "") {
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
     }
+
+    //削除行灰色表示
+    f_DeleteRowGray()
 }
 
 /**
@@ -131,3 +134,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+// ○削除行を灰色表示
+function f_DeleteRowGray() {
+    var objTable = document.getElementById("pnlListArea_DR").children[0];
+    var Col = {
+        DELFLG: 34 //削除フラグ
+    };
+
+    for (var i = 0; i < objTable.rows.length; i++) {
+        //削除行の場合
+        if (objTable.rows[i].cells[Col.DELFLG].innerHTML == "1") {
+            objTable.rows[i].style.backgroundColor = "gray";
+        }
+    }
+}

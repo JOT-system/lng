@@ -30,8 +30,8 @@ Public Class LNM0014SprateList
     ''' <summary>
     ''' 定数
     ''' </summary>
-    Private Const CONST_DISPROWCOUNT As Integer = 16                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
+    Private Const CONST_DISPROWCOUNT As Integer = 19                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 19                 'マウススクロール時稼働行数
 
     '〇 帳票用
     Private Const CONST_COLOR_HATCHING_REQUIRED As String = "#FFFF00" '入力必須網掛け色
@@ -78,21 +78,20 @@ Public Class LNM0014SprateList
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          '追加ボタン押下
+                            InputSave()
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonHISTORY"         '変更履歴ボタン押下
+                            InputSave()
                             WF_ButtonHISTORY_Click()
                         Case "WF_ButtonDOWNLOAD"        'ダウンロードボタン押下
                             WF_EXCELPDF(LNM0014WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNM0014WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND", "LNM0014S" '戻るボタン押下 （LNM0014S、パンくずより）
+                        Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
+                            InputSave()
                             WF_Grid_DBClick()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
                             GridViewInitialize()
@@ -100,15 +99,18 @@ Public Class LNM0014SprateList
                             WF_ButtonDEBUG_Click()
                         Case "WF_ButtonExtract" '検索ボタン押下時
                             GridViewInitialize()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
+                        Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
+                            Me.WF_ButtonPAGE_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
-                        Not WF_ButtonClick.Value = "WF_ButtonExtract" Then
+                        Not WF_ButtonClick.Value = "WF_ButtonExtract" And
+                        Not WF_ButtonClick.Value = "WF_ButtonPAGE" And
+                        Not WF_ButtonClick.Value = "WF_ButtonFIRST" And
+                        Not WF_ButtonClick.Value = "WF_ButtonPREVIOUS" And
+                        Not WF_ButtonClick.Value = "WF_ButtonNEXT" And
+                        Not WF_ButtonClick.Value = "WF_ButtonLAST" Then
                         DisplayGrid()
                     End If
 
@@ -172,8 +174,15 @@ Public Class LNM0014SprateList
         '○ 画面の値設定
         WW_MAPValueSet()
 
-        '○ GridView初期設定
-        GridViewInitialize()
+        Select Case Context.Handler.ToString().ToUpper()
+            '○ 登録・履歴画面からの遷移
+            Case C_PREV_MAP_LIST.LNM0014D, C_PREV_MAP_LIST.LNM0014H
+                '○ GridView復元
+                GridViewRestore()
+            Case Else
+                '○ GridView初期設定
+                GridViewInitialize()
+        End Select
 
         '〇 更新画面からの遷移もしくは、アップロード完了の場合、更新完了メッセージを出力
         If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
@@ -244,9 +253,20 @@ Public Class LNM0014SprateList
 
             ' 登録画面からの遷移
             Master.RecoverTable(LNM0014tbl, work.WF_SEL_INPTBL.Text)
-
             Dim WW_YM As String = Replace(work.WF_SEL_TARGETYM_L.Text, "/", "")
             WF_TaishoYm.Value = WW_YM.Substring(0, 4) & "/" & WW_YM.Substring(4, 2)
+            '荷主
+            WF_TORI.SelectedValue = work.WF_SEL_TORI_L.Text
+            '部門
+            WF_ORG.SelectedValue = work.WF_SEL_ORG_L.Text
+            '届先
+            WF_TODOKE.SelectedValue = work.WF_SEL_TODOKE_L.Text
+            '出荷地
+            WF_DEPARTURE.SelectedValue = work.WF_SEL_DEPARTURE_L.Text
+            '削除済みデータ表示状態
+            ChkDelDataFlg.Checked = work.WF_SEL_CHKDELDATAFLG_L.Text
+            '入力ページ
+            TxtPageNo.Text = work.WF_SEL_INPUTPAGE_L.Text
         Else
             ' サブメニューからの画面遷移
             ' メニューからの画面遷移
@@ -305,6 +325,12 @@ Public Class LNM0014SprateList
         '〇 一覧の件数を取得
         Me.ListCount.Text = "件数：" + LNM0014tbl.Rows.Count.ToString()
 
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = "1"
+
+        '〇 最終ページ
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNM0014tbl.Rows.Count) / CONST_DISPROWCOUNT)
+
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(LNM0014tbl)
         Dim WW_RowFilterCMD As New StringBuilder
@@ -331,6 +357,90 @@ Public Class LNM0014SprateList
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' GridView復元
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewRestore()
+
+        '○ 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            ' DataBase接続
+            SQLcon.Open()
+            MAPDataGet(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNM0014tbl)
+
+        '〇 一覧の件数を取得
+        Me.ListCount.Text = "件数：" + LNM0014tbl.Rows.Count.ToString()
+
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = work.WF_SEL_NOWPAGECNT_L.Text
+
+        '〇 最終ページ
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNM0014tbl.Rows.Count) / CONST_DISPROWCOUNT)
+
+        '○ 一覧表示データ編集(性能対策)
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim intPage As Integer = 0
+        intPage = CInt(work.WF_SEL_NOWPAGECNT_L.Text)
+        If intPage = 1 Then
+            WW_GridPosition = 1
+        Else
+            WW_GridPosition = (intPage - 1) * CONST_SCROLLCOUNT + 1
+        End If
+
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNM0006row As DataRow In LNM0014tbl.Rows
+            If LNM0006row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNM0006row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        Dim TBLview As DataView = New DataView(LNM0014tbl)
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        'Dim WW_RowFilterCMD As New StringBuilder
+        'WW_RowFilterCMD.Append("LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT)
+
+        'TBLview.RowFilter = WW_RowFilterCMD.ToString
+
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+        If Not isNormal(CS0013ProfView.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+            Exit Sub
+        End If
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -462,6 +572,13 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                            ")
         SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                                   ")
 
+        '表示フラグ
+        SQLStr.AppendLine("   , ''                                                                       AS SCRDISPLAYFLG        ")
+        '鑑分けフラグ
+        SQLStr.AppendLine("   , ''                                                                       AS SCRASSESSMENTFLG     ")
+        '明細区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRMEISAICATEGORYID  ")
+
         SQLStr.AppendLine(" FROM                                                                                                ")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                       ")
 
@@ -479,7 +596,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("      LNM0014.DELFLG = '0'                                                                       ")
+        SQLStr.AppendLine("     '0' = '0'                                                                                       ")
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim Itype As Integer
@@ -507,6 +624,11 @@ Public Class LNM0014SprateList
         '出荷地
         If Not String.IsNullOrEmpty(WF_DEPARTURE.SelectedValue) Then
             SQLStr.AppendLine(" AND  LNM0014.DEPARTURE = @DEPARTURE                                        ")
+        End If
+
+        '削除フラグ
+        If Not ChkDelDataFlg.Checked Then
+            SQLStr.AppendLine(" AND  LNM0014.DELFLG = '0'                                                  ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -566,6 +688,28 @@ Public Class LNM0014SprateList
                 For Each LNM0014row As DataRow In LNM0014tbl.Rows
                     i += 1
                     LNM0014row("LINECNT") = i        'LINECNT
+
+                    '表示フラグ
+                    Select Case LNM0014row("DISPLAYFLG").ToString
+                        Case "0" : LNM0014row("SCRDISPLAYFLG") = "表示しない"
+                        Case "1" : LNM0014row("SCRDISPLAYFLG") = "表示する"
+                        Case Else : LNM0014row("SCRDISPLAYFLG") = ""
+                    End Select
+
+                    '鑑分けフラグ
+                    Select Case LNM0014row("ASSESSMENTFLG").ToString
+                        Case "0" : LNM0014row("SCRASSESSMENTFLG") = "鑑分けしない"
+                        Case "1" : LNM0014row("SCRASSESSMENTFLG") = "鑑分けする"
+                        Case Else : LNM0014row("SCRASSESSMENTFLG") = ""
+                    End Select
+
+                    '明細区分
+                    Select Case LNM0014row("MEISAICATEGORYID").ToString
+                        Case "1" : LNM0014row("SCRMEISAICATEGORYID") = "請求追加明細(特別料金)"
+                        Case "2" : LNM0014row("SCRMEISAICATEGORYID") = "サーチャージ"
+                        Case Else : LNM0014row("SCRMEISAICATEGORYID") = ""
+                    End Select
+
                 Next
             End Using
 
@@ -590,8 +734,6 @@ Public Class LNM0014SprateList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
-
-        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
 
         work.WF_SEL_LINECNT.Text = ""                                                   '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)          '削除
@@ -669,7 +811,6 @@ Public Class LNM0014SprateList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
-        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
         Server.Transfer("~/LNG/mas/LNM0014SprateHistory.aspx")
     End Sub
 
@@ -749,6 +890,13 @@ Public Class LNM0014SprateList
         TBLview.Dispose()
         TBLview = Nothing
 
+        '〇 表示中ページ
+        If WF_GridPosition.Text = "1" Then
+            Me.WF_NOWPAGECNT.Text = "1"
+        Else
+            Me.WF_NOWPAGECNT.Text = (CInt(WF_GridPosition.Text) - 1) / CONST_DISPROWCOUNT + 1
+        End If
+
     End Sub
 
     ''' <summary>
@@ -794,6 +942,89 @@ Public Class LNM0014SprateList
 
     End Sub
 
+    ''' <summary>
+    ''' ページボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub WF_ButtonPAGE_Click()
+
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim intLineNo As Integer = 0
+        Dim intPage As Integer = 0
+
+        Select Case WF_ButtonClick.Value
+            Case "WF_ButtonPAGE"            '指定ページボタン押下
+                intPage = CInt(Me.TxtPageNo.Text.PadLeft(5, "0"c))
+                If intPage < 1 Then
+                    intPage = 1
+                End If
+            Case "WF_ButtonFIRST"           '先頭ページボタン押下
+                intPage = 1
+            Case "WF_ButtonPREVIOUS"        '前ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage > 1 Then
+                    intPage += -1
+                End If
+            Case "WF_ButtonNEXT"            '次ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage < CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage += 1
+                End If
+            Case "WF_ButtonLAST"            '最終ページボタン押下
+                intPage = CInt(Me.WF_TOTALPAGECNT.Text)
+        End Select
+
+        Me.WF_NOWPAGECNT.Text = intPage.ToString
+        If intPage = 1 Then
+            WW_GridPosition = 1
+        Else
+            WW_GridPosition = (intPage - 1) * CONST_SCROLLCOUNT + 1
+        End If
+
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNM0014row As DataRow In LNM0014tbl.Rows
+            If LNM0014row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNM0014row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(LNM0014tbl)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
@@ -804,6 +1035,19 @@ Public Class LNM0014SprateList
     Public Sub WW_CreateXMLSaveFile()
         work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
+
+    End Sub
+
+    '入力状態を保持する
+    Protected Sub InputSave()
+        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value '対象日
+        work.WF_SEL_TORI_L.Text = WF_TORI.SelectedValue '荷主
+        work.WF_SEL_ORG_L.Text = WF_ORG.SelectedValue '部門
+        work.WF_SEL_TODOKE_L.Text = WF_TODOKE.SelectedValue ' 届先
+        work.WF_SEL_DEPARTURE_L.Text = WF_DEPARTURE.SelectedValue '出荷地
+        work.WF_SEL_CHKDELDATAFLG_L.Text = ChkDelDataFlg.Checked '削除済みデータ表示状態
+        work.WF_SEL_INPUTPAGE_L.Text = TxtPageNo.Text '入力ページ
+        work.WF_SEL_NOWPAGECNT_L.Text = WF_NOWPAGECNT.Text
 
     End Sub
 
@@ -828,7 +1072,39 @@ Public Class LNM0014SprateList
             Exit Sub
         End Try
 
-        work.WF_SEL_TARGETYM_L.Text = WF_TaishoYm.Value
+        'ダブルクリックした行が削除行の場合、遷移せずに削除フラグだけ有効にする
+        If LNM0014tbl.Rows(WW_LineCNT)("DELFLG") = C_DELETE_FLG.DELETE Then
+            Dim WW_ROW As DataRow
+            WW_ROW = LNM0014tbl.Rows(WW_LineCNT)
+            Dim DATENOW As Date = Date.Now
+            Dim WW_UPDTIMSTP As Date
+
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                ' DataBase接続
+                SQLcon.Open()
+
+                '履歴登録(変更前)
+                InsertHist(SQLcon, WW_ROW, C_DELETE_FLG.ALIVE, LNM0014WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                '削除フラグ有効化
+                DelflgValid(SQLcon, WW_ROW, DATENOW, WW_UPDTIMSTP)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                '履歴登録(変更後)
+                InsertHist(SQLcon, WW_ROW, C_DELETE_FLG.DELETE, LNM0014WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                LNM0014tbl.Rows(WW_LineCNT)("DELFLG") = C_DELETE_FLG.ALIVE
+                LNM0014tbl.Rows(WW_LineCNT)("UPDTIMSTP") = WW_UPDTIMSTP
+                Master.SaveTable(LNM0014tbl)
+                Master.Output(C_MESSAGE_NO.DELETE_ROW_ACTIVATION, C_MESSAGE_TYPE.NOR, needsPopUp:=True)
+            End Using
+            Exit Sub
+        End If
 
         work.WF_SEL_LINECNT.Text = LNM0014tbl.Rows(WW_LineCNT)("LINECNT")            '選択行
 
@@ -898,6 +1174,125 @@ Public Class LNM0014SprateList
         '○ 登録画面ページへ遷移
         Master.TransitionPage(Master.USERCAMP)
 
+    End Sub
+
+    ''' <summary>
+    ''' 削除フラグ有効化
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="WW_ROW"></param>
+    ''' <remarks></remarks>
+    Public Sub DelflgValid(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByVal WW_NOW As Date, ByRef WW_UPDTIMSTP As Date)
+
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ 対象データ更新
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" UPDATE                                      ")
+        SQLStr.Append("     LNG.LNM0014_SPRATE                      ")
+        SQLStr.Append(" SET                                         ")
+        SQLStr.Append("     DELFLG               = '0'              ")
+        SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
+        SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
+        SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
+        SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
+        SQLStr.Append(" WHERE                                       ")
+        SQLStr.Append("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.Append("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.Append("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        SQLStr.Append("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_GROUPID.Value = WW_ROW("GROUPID")           'グループID
+                P_DETAILID.Value = WW_ROW("DETAILID")           '明細ID
+                P_UPDYMD.Value = WW_NOW             '更新年月日
+                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+
+                '登録
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014L UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+        'タイムスタンプ取得
+        '○ 対象データ取得
+        Dim SQLStrTimStp = New StringBuilder
+        SQLStrTimStp.AppendLine(" SELECT                                                ")
+        SQLStrTimStp.AppendLine("    UPDTIMSTP                                          ")
+        SQLStrTimStp.AppendLine(" FROM                                                  ")
+        SQLStrTimStp.AppendLine("     LNG.LNM0014_SPRATE                                ")
+        SQLStrTimStp.AppendLine(" WHERE                                                 ")
+        SQLStrTimStp.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStrTimStp.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStrTimStp.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStrTimStp.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        SQLStrTimStp.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStrTimStp.ToString, SQLcon)
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+
+                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+                P_GROUPID.Value = WW_ROW("GROUPID")           'グループID
+                P_DETAILID.Value = WW_ROW("DETAILID")           '明細ID
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    If WW_Tbl.Rows.Count >= 1 Then
+                        WW_UPDTIMSTP = WW_Tbl.Rows(0)("UPDTIMSTP").ToString
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>
@@ -1203,6 +1598,7 @@ Public Class LNM0014SprateList
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
 
         Dim WW_TEXT As String = ""
+        Dim WW_TEXTLIST = New StringBuilder
         Dim WW_CNT As Integer = 0
         Dim WW_HT As New Hashtable
 
@@ -1219,6 +1615,39 @@ Public Class LNM0014SprateList
                     .Height = CONST_HEIGHT_PER_ROW * WW_CNT
                 End With
             End If
+
+            '表示フラグ
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("0:表示しない")
+            WW_TEXTLIST.AppendLine("1:表示する")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG).Comment.Shape
+                .Width = 100
+                .Height = 30
+            End With
+
+            '鑑分けフラグ
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("0:鑑分けしない")
+            WW_TEXTLIST.AppendLine("1:鑑分けする")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG).Comment.Shape
+                .Width = 100
+                .Height = 30
+            End With
+
+            '明細区分
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("1:請求追加明細(特別料金)")
+            WW_TEXTLIST.AppendLine("2:サーチャージ")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.MEISAICATEGORYID).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0014WRKINC.INOUTEXCELCOL.MEISAICATEGORYID).Comment.Shape
+                .Width = 150
+                .Height = 30
+            End With
 
         End Using
 

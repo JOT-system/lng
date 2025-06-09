@@ -68,22 +68,85 @@ Partial Public Class LNM0007KoteihiList
     Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_ButtonFIRST コントロール。
+    '''WF_ORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_ButtonLAST コントロール。
+    '''WF_SEASON コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents WF_SEASON As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_SHABAN_FROM コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHABAN_FROM As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SHABAN_TO コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SHABAN_TO As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''ChkDelDataFlg コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents ChkDelDataFlg As Global.System.Web.UI.WebControls.CheckBox
+    
+    '''<summary>
+    '''TxtPageNo コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtPageNo As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_NOWPAGECNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_NOWPAGECNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_NOWPAGESLASH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_NOWPAGESLASH As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TOTALPAGECNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TOTALPAGECNT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''pnlListArea コントロール。

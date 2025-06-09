@@ -230,7 +230,7 @@
                                 <span>
                                     <!-- 単価 -->
                                     <asp:Label ID="WF_TANKA_L" runat="server" Text="単価" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtTANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="5"></asp:TextBox>
+                                    <asp:TextBox ID="TxtTANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="7"></asp:TextBox>
                                     <asp:Label ID="WF_TANKA_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <!-- 計算区分 -->
                                     <asp:Label ID="WF_CALCKBN_L" runat="server" Text="計算区分" CssClass="WF_TEXT_LEFT"></asp:Label>

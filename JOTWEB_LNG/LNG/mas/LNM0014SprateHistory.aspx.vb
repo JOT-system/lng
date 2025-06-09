@@ -358,6 +358,13 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                            ")
         SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                                   ")
 
+        '表示フラグ
+        SQLStr.AppendLine("   , ''                                                                       AS SCRDISPLAYFLG        ")
+        '鑑分けフラグ
+        SQLStr.AppendLine("   , ''                                                                       AS SCRASSESSMENTFLG     ")
+        '明細区分
+        SQLStr.AppendLine("   , ''                                                                       AS SCRMEISAICATEGORYID  ")
+
         SQLStr.AppendLine("   , Case                 ")
         SQLStr.AppendLine("      When COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='3' THEN '変更後 更新' ")
@@ -429,6 +436,28 @@ Public Class LNM0014SprateHistory
                 For Each LNM0014row As DataRow In LNM0014tbl.Rows
                     i += 1
                     LNM0014row("LINECNT") = i        'LINECNT
+
+                    '表示フラグ
+                    Select Case LNM0014row("DISPLAYFLG").ToString
+                        Case "0" : LNM0014row("SCRDISPLAYFLG") = "表示しない"
+                        Case "1" : LNM0014row("SCRDISPLAYFLG") = "表示する"
+                        Case Else : LNM0014row("SCRDISPLAYFLG") = ""
+                    End Select
+
+                    '鑑分けフラグ
+                    Select Case LNM0014row("ASSESSMENTFLG").ToString
+                        Case "0" : LNM0014row("SCRASSESSMENTFLG") = "鑑分けしない"
+                        Case "1" : LNM0014row("SCRASSESSMENTFLG") = "鑑分けする"
+                        Case Else : LNM0014row("SCRASSESSMENTFLG") = ""
+                    End Select
+
+                    '明細区分
+                    Select Case LNM0014row("MEISAICATEGORYID").ToString
+                        Case "1" : LNM0014row("SCRMEISAICATEGORYID") = "請求追加明細(特別料金)"
+                        Case "2" : LNM0014row("SCRMEISAICATEGORYID") = "サーチャージ"
+                        Case Else : LNM0014row("SCRMEISAICATEGORYID") = ""
+                    End Select
+
                 Next
             End Using
         Catch ex As Exception

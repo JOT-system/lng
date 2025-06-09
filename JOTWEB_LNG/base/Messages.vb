@@ -428,6 +428,11 @@ Public Module Messages
         ''' </summary>
         Public Const OIL_FREE_MESSAGE As String = "20138"
 
+        ''' <summary>
+        ''' 削除行有効化メッセージ
+        ''' </summary>
+        Public Const DELETE_ROW_ACTIVATION As String = "20139"
+
 #Region "コンテナ向け"
 
         ''' <summary>

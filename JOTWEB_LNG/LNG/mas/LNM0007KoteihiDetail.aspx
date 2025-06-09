@@ -165,9 +165,9 @@
                              <p id="TYPE_E_LINE_17">
                                 <!-- 季節料金判定開始月日、季節料金判定終了月日 -->
                                 <span>
-                                    <asp:Label ID="WF_SEASONSTART_L" runat="server" Text="季節料金判定開始月" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_SEASONSTART_L" runat="server" Text="季節料金判定開始月日<br>(MMDD形式)" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtSEASONSTART" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
-                                    <asp:Label ID="WF_SEASONEND_L" runat="server" Text="季節料金判定終了月" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_SEASONEND_L" runat="server" Text="季節料金判定終了月日<br>(MMDD形式)" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtSEASONEND" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="4"></asp:TextBox>
                                 </span>
                             </p>
