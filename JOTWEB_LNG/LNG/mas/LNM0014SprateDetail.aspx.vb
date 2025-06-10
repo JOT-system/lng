@@ -2338,7 +2338,7 @@ Public Class LNM0014SprateDetail
             End If
 
             ' 排他チェック
-            If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE.Text) Then
+            If Not String.IsNullOrEmpty(work.WF_SEL_GROUPID.Text) Then
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     ' DataBase接続
                     SQLcon.Open()
