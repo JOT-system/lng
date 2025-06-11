@@ -403,6 +403,7 @@ Public Class CS0054KintoneApi
 
         '返却用テーブル（カラム）作成
         ioTbl.Columns.Add("LINECNT", GetType(String)) 'ダウンロードするのに必要なためとりあえず...
+        ioTbl.Columns.Add("OUTTBL", GetType(String)) '出力先テーブル（OK：LNT0001_ZISSEKI,NG:LNT0028_NGZISSEKI)
         ioTbl.Columns.Add("TORICODE_AVOCADO", GetType(String)) '取引先（アボカドコード）
         Dim properties = GetType(AvocadoRec).GetProperties()
         For Each prop In properties
