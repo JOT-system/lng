@@ -21,19 +21,16 @@ window.onload = function () {
 
     //表示判断キー
     const VisibleKeyOrgCode = document.getElementById('VisibleKeyOrgCode').value;
-    const VisibleKeyTohokuOrgCode = document.getElementById('VisibleKeyTohokuOrgCode').value;
 
     //情シス、高圧ガス以外の場合
     if (VisibleKeyOrgCode == "") {
         //変更履歴を非表示にする
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
-        //    //東北支店以外の場合
-        //if (VisibleKeyTohokuOrgCode == "") {
-        //    //SK固定費タブ、TNG固定費タブを非表示にする
-        //    document.getElementById('WF_ButtonTNGKOTEIHI').style.display = "none";
-        //    document.getElementById('WF_ButtonSKKOTEIHI').style.display = "none";
-        //}
     }
+
+    //削除行灰色表示
+    f_DeleteRowGray()
+
 }
 
 /**
@@ -155,31 +152,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// ○削除行を灰色表示
+function f_DeleteRowGray() {
+    var objTable = document.getElementById("pnlListArea_DR").children[0];
+    var Col = {
+        DELFLG: 23 //削除フラグ
+    };
+
+    for (var i = 0; i < objTable.rows.length; i++) {
+        //削除行の場合
+        if (objTable.rows[i].cells[Col.DELFLG].innerHTML == "1") {
+            objTable.rows[i].style.backgroundColor = "gray";
+        }
+    }
+}
 
 
-
-/**
- * タブボタン押下時処理
- */
-//function f_TabBtnClick() {
-//    var VisibleKeyControlTable = document.getElementById('VisibleKeyControlTable').value;
-//    var WF_ButtonKOTEIHI = document.getElementById('WF_ButtonKOTEIHI'); //固定費ボタン
-//    var WF_ButtonSKKOTEIHI = document.getElementById('WF_ButtonSKKOTEIHI'); //TNG固定費ボタン
-//    var WF_ButtonTNGKOTEIHI = document.getElementById('WF_ButtonTNGKOTEIHI'); //SK固定費ボタン
-
-//    WF_ButtonKOTEIHI.style.background = "#D9D9D9";
-//    WF_ButtonSKKOTEIHI.style.background = "#D9D9D9";
-//    WF_ButtonTNGKOTEIHI.style.background = "#D9D9D9";
-
-//    switch (VisibleKeyControlTable) {
-//        case "LNM0007L": //固定費マスタ
-//            WF_ButtonKOTEIHI.style.background = "#FFFFFF";
-//            break;
-//        case "LNM0007LSK": //SK固定費マスタ
-//            WF_ButtonSKKOTEIHI.style.background = "#FFFFFF";
-//            break;
-//        case "LNM0007LTNG": //TNG固定費マスタ
-//            WF_ButtonTNGKOTEIHI.style.background = "#FFFFFF";
-//            break;
-//    }
-//}

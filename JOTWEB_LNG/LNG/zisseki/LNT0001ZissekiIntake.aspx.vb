@@ -18,12 +18,15 @@ Public Class LNT0001ZissekiIntake
 
     '○ 検索結果格納Table
     Private LNT0003tbl As DataTable                                  '一覧（実績取込履歴）格納用テーブル
+    Private LNT0028tbl As DataTable                                  '実績不良データ格納用テーブル
 
     ''' <summary>
     ''' 定数
     ''' </summary>
     Private Const CONST_DISPROWCOUNT As Integer = 16                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
+    Private Const CONST_LNT0001 As String = "LNG.LNT0001_ZISSEKI"   '実績テーブル
+    Private Const CONST_LNT0028 As String = "LNG.LNT0028_NGZISSEKI" '実績不良テーブル
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0007CheckAuthority As New CS0007CheckAuthority        '更新権限チェック
@@ -66,6 +69,8 @@ Public Class LNT0001ZissekiIntake
                             WF_KintoneGetRecodes_Click()
                         Case "WF_ButtonZero"， "btnCommonConfirmYes"            '実績数量ゼロボタンクリック
                             WF_ButtonZero_Click()
+                        Case "WF_ButtonNgPrint"         '実績不良データボタンクリック
+                            WF_ButtonNgPrint_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FiledDBClick()
                         Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
@@ -493,6 +498,364 @@ Public Class LNT0001ZissekiIntake
     End Sub
 
     ''' <summary>
+    ''' アボカド不良データﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonNgPrint_Click()
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            ' 画面選択された荷主を取得
+            SelectTori()
+
+            '荷主選択チェック
+            If Me.WF_TORIhdn.Value = "" Then
+                Master.Output(C_MESSAGE_NO.CTN_INPUT_ERR, C_MESSAGE_TYPE.ERR, "荷主", "", True)
+                Exit Sub
+            End If
+
+            ' 画面表示データを取得
+            NgPrintDataGet(SQLcon)
+
+            'データ存在チェック
+            If LNT0028tbl.Rows.Count = 0 Then
+                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, "不良データは存在しません", "", True)
+                Exit Sub
+            End If
+        End Using
+
+        '固定費マスタ（荷主別チェックする項目を取得）
+        Dim ChkTbl As DataTable = GetFixvale()
+
+        '○ 画面表示データ保存
+        CS0030REPORT.CAMPCODE = Master.USERCAMP                 '会社コード
+        CS0030REPORT.PROFID = Master.PROF_REPORT                'プロファイルID
+        CS0030REPORT.MAPID = Master.MAPID                       '画面ID
+        CS0030REPORT.REPORTID = rightviewR.GetReportId()        '帳票ID
+        CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
+        CS0030REPORT.TBLDATA = LNT0028tbl                       'データ参照  Table
+        CS0030REPORT.CHKTBL = ChkTbl                            '荷主別チェック項目  Table
+        CS0030REPORT.CS0030REPORT()
+        If Not isNormal(CS0030REPORT.ERR) Then
+            If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ERR, needsPopUp:=True)
+            Else
+                Master.Output(CS0030REPORT.ERR, C_MESSAGE_TYPE.ABORT, "CS0030REPORT", needsPopUp:=True)
+            End If
+            Exit Sub
+        End If
+
+        '○ 別画面でExcelを表示
+        WF_PrintURL.Value = CS0030REPORT.URL
+        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+    End Sub
+
+    ''' <summary>
+    ''' 不良データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub NgPrintDataGet(ByVal SQLcon As MySqlConnection)
+
+        If IsNothing(LNT0028tbl) Then
+            LNT0028tbl = New DataTable
+        End If
+
+        If LNT0028tbl.Columns.Count <> 0 Then
+            LNT0028tbl.Columns.Clear()
+        End If
+
+        LNT0028tbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを荷主マスタから取得する
+        Dim SQLStr As String =
+              " Select                                                                              " _
+            & "      1                                                    AS 'SELECT'               " _
+            & "     ,0                                                    AS HIDDEN                 " _
+            & "     ,0                                                    AS LINECNT                " _
+            & "     ,''                                                   AS OPERATION              " _
+            & "     ,coalesce(LT28.RECONO, '')                             AS RECONO			        " _
+            & "     ,coalesce(LT28.LOADUNLOTYPE, '')                       AS LOADUNLOTYPE		    " _
+            & "     ,coalesce(LT28.STACKINGTYPE, '')                       AS STACKINGTYPE		    " _
+            & "     ,coalesce(LT28.HSETID, '')                             AS HSETID			        " _
+            & "     ,coalesce(LT28.ORDERORGSELECT, '')                     AS ORDERORGSELECT	        " _
+            & "     ,coalesce(LT28.ORDERORGNAME, '')                       AS ORDERORGNAME		    " _
+            & "     ,coalesce(LT28.ORDERORGCODE, '')                       AS ORDERORGCODE		    " _
+            & "     ,coalesce(LT28.ORDERORGNAMES, '')                      AS ORDERORGNAMES	        " _
+            & "     ,coalesce(LT28.KASANAMEORDERORG, '')                   AS KASANAMEORDERORG	    " _
+            & "     ,coalesce(LT28.KASANCODEORDERORG, '')                  AS KASANCODEORDERORG	    " _
+            & "     ,coalesce(LT28.KASANAMESORDERORG, '')                  AS KASANAMESORDERORG	    " _
+            & "     ,coalesce(LT28.ORDERORG, '')                           AS ORDERORG				" _
+            & "     ,coalesce(LT28.KASANORDERORG, '')                      AS KASANORDERORG		    " _
+            & "     ,coalesce(LT28.PRODUCTSLCT, '')                        AS PRODUCTSLCT			" _
+            & "     ,coalesce(LT28.PRODUCTSYOSAI, '')                      AS PRODUCTSYOSAI		    " _
+            & "     ,coalesce(LT28.PRODUCT2NAME, '')                       AS PRODUCT2NAME			" _
+            & "     ,coalesce(LT28.PRODUCT2, '')                           AS PRODUCT2				" _
+            & "     ,coalesce(LT28.PRODUCT1NAME, '')                       AS PRODUCT1NAME			" _
+            & "     ,coalesce(LT28.PRODUCT1, '')                           AS PRODUCT1				" _
+            & "     ,coalesce(LT28.OILNAME, '')                            AS OILNAME				" _
+            & "     ,coalesce(LT28.OILTYPE, '')                            AS OILTYPE				" _
+            & "     ,coalesce(LT28.TODOKESLCT, '')                         AS TODOKESLCT			    " _
+            & "     ,coalesce(LT28.TODOKECODE, '')                         AS TODOKECODE			    " _
+            & "     ,coalesce(LT28.TODOKENAME, '')                         AS TODOKENAME			    " _
+            & "     ,coalesce(LT28.TODOKENAMES, '')                        AS TODOKENAMES			" _
+            & "     ,coalesce(LT28.TORICODE, '')                           AS TORICODE				" _
+            & "     ,coalesce(LT28.TORINAME, '')                           AS TORINAME				" _
+            & "     ,coalesce(LT28.TODOKEADDR, '')                         AS TODOKEADDR			    " _
+            & "     ,coalesce(LT28.TODOKETEL, '')                          AS TODOKETEL			    " _
+            & "     ,coalesce(LT28.TODOKEMAP, '')                          AS TODOKEMAP			    " _
+            & "     ,coalesce(LT28.TODOKEIDO, '')                          AS TODOKEIDO			    " _
+            & "     ,coalesce(LT28.TODOKEKEIDO, '')                        AS TODOKEKEIDO			" _
+            & "     ,coalesce(LT28.TODOKEBIKO1, '')                        AS TODOKEBIKO1			" _
+            & "     ,coalesce(LT28.TODOKEBIKO2, '')                        AS TODOKEBIKO2			" _
+            & "     ,coalesce(LT28.TODOKEBIKO3, '')                        AS TODOKEBIKO3			" _
+            & "     ,coalesce(LT28.TODOKECOLOR1, '')                       AS TODOKECOLOR1			" _
+            & "     ,coalesce(LT28.TODOKECOLOR2, '')                       AS TODOKECOLOR2			" _
+            & "     ,coalesce(LT28.TODOKECOLOR3, '')                       AS TODOKECOLOR3			" _
+            & "     ,coalesce(LT28.SHUKASLCT, '')                          AS SHUKASLCT			    " _
+            & "     ,coalesce(LT28.SHUKABASHO, '')                         AS SHUKABASHO			    " _
+            & "     ,coalesce(LT28.SHUKANAME, '')                          AS SHUKANAME			    " _
+            & "     ,coalesce(LT28.SHUKANAMES, '')                         AS SHUKANAMES			    " _
+            & "     ,coalesce(LT28.SHUKATORICODE, '')                      AS SHUKATORICODE		    " _
+            & "     ,coalesce(LT28.SHUKATORINAME, '')                      AS SHUKATORINAME		    " _
+            & "     ,coalesce(LT28.SHUKAADDR, '')                          AS SHUKAADDR			    " _
+            & "     ,coalesce(LT28.SHUKAADDRTEL, '')                       AS SHUKAADDRTEL			" _
+            & "     ,coalesce(LT28.SHUKAMAP, '')                           AS SHUKAMAP				" _
+            & "     ,coalesce(LT28.SHUKAIDO, '')                           AS SHUKAIDO				" _
+            & "     ,coalesce(LT28.SHUKAKEIDO, '')                         AS SHUKAKEIDO			    " _
+            & "     ,coalesce(LT28.SHUKABIKOU1, '')                        AS SHUKABIKOU1			" _
+            & "     ,coalesce(LT28.SHUKABIKOU2, '')                        AS SHUKABIKOU2			" _
+            & "     ,coalesce(LT28.SHUKABIKOU3, '')                        AS SHUKABIKOU3			" _
+            & "     ,coalesce(LT28.SHUKACOLOR1, '')                        AS SHUKACOLOR1			" _
+            & "     ,coalesce(LT28.SHUKACOLOR2, '')                        AS SHUKACOLOR2			" _
+            & "     ,coalesce(LT28.SHUKACOLOR3, '')                        AS SHUKACOLOR3			" _
+            & "     ,coalesce(LT28.SHUKADATE, '')                          AS SHUKADATE			    " _
+            & "     ,coalesce(LT28.LOADTIME, '')                           AS LOADTIME				" _
+            & "     ,coalesce(LT28.LOADTIMEIN, '')                         AS LOADTIMEIN			    " _
+            & "     ,coalesce(LT28.LOADTIMES, '')                          AS LOADTIMES			    " _
+            & "     ,coalesce(LT28.TODOKEDATE, '')                         AS TODOKEDATE			    " _
+            & "     ,coalesce(LT28.SHITEITIME, '')                         AS SHITEITIME			    " _
+            & "     ,coalesce(LT28.SHITEITIMEIN, '')                       AS SHITEITIMEIN			" _
+            & "     ,coalesce(LT28.SHITEITIMES, '')                        AS SHITEITIMES			" _
+            & "     ,coalesce(LT28.ZYUTYU, '')                             AS ZYUTYU				    " _
+            & "     ,coalesce(LT28.ZISSEKI, '')                            AS ZISSEKI				" _
+            & "     ,coalesce(LT28.TANNI, '')                              AS TANNI				    " _
+            & "     ,coalesce(LT28.GYOUMUSIZI1, '')                        AS GYOUMUSIZI1			" _
+            & "     ,coalesce(LT28.GYOUMUSIZI2, '')                        AS GYOUMUSIZI2			" _
+            & "     ,coalesce(LT28.GYOUMUSIZI3, '')                        AS GYOUMUSIZI3			" _
+            & "     ,coalesce(LT28.NINUSHIBIKOU, '')                       AS NINUSHIBIKOU			" _
+            & "     ,coalesce(LT28.GYOMUSYABAN, '')                        AS GYOMUSYABAN			" _
+            & "     ,coalesce(LT28.SHIPORGNAME, '')                        AS SHIPORGNAME			" _
+            & "     ,coalesce(LT28.SHIPORG, '')                            AS SHIPORG				" _
+            & "     ,coalesce(LT28.SHIPORGNAMES, '')                       AS SHIPORGNAMES			" _
+            & "     ,coalesce(LT28.KASANSHIPORGNAME, '')                   AS KASANSHIPORGNAME	    " _
+            & "     ,coalesce(LT28.KASANSHIPORG, '')                       AS KASANSHIPORG			" _
+            & "     ,coalesce(LT28.KASANSHIPORGNAMES, '')                  AS KASANSHIPORGNAMES	    " _
+            & "     ,coalesce(LT28.TANKNUM, '')                            AS TANKNUM				" _
+            & "     ,coalesce(LT28.TANKNUMBER, '')                         AS TANKNUMBER			    " _
+            & "     ,coalesce(LT28.SYAGATA, '')                            AS SYAGATA				" _
+            & "     ,coalesce(LT28.SYABARA, '')                            AS SYABARA				" _
+            & "     ,coalesce(LT28.NINUSHINAME, '')                        AS NINUSHINAME			" _
+            & "     ,coalesce(LT28.CONTYPE, '')                            AS CONTYPE				" _
+            & "     ,coalesce(LT28.PRO1SYARYOU, '')                        AS PRO1SYARYOU			" _
+            & "     ,coalesce(LT28.TANKMEMO, '')                           AS TANKMEMO				" _
+            & "     ,coalesce(LT28.TANKBIKOU1, '')                         AS TANKBIKOU1			    " _
+            & "     ,coalesce(LT28.TANKBIKOU2, '')                         AS TANKBIKOU2			    " _
+            & "     ,coalesce(LT28.TANKBIKOU3, '')                         AS TANKBIKOU3			    " _
+            & "     ,coalesce(LT28.TRACTORNUM, '')                         AS TRACTORNUM			    " _
+            & "     ,coalesce(LT28.TRACTORNUMBER, '')                      AS TRACTORNUMBER		    " _
+            & "     ,coalesce(LT28.TRIP, '')                               AS TRIP					" _
+            & "     ,coalesce(LT28.DRP, '')                                AS DRP					" _
+            & "     ,coalesce(LT28.UNKOUMEMO, '')                          AS UNKOUMEMO			    " _
+            & "     ,coalesce(LT28.SHUKKINTIME, '')                        AS SHUKKINTIME			" _
+            & "     ,coalesce(LT28.STAFFSLCT, '')                          AS STAFFSLCT			    " _
+            & "     ,coalesce(LT28.STAFFNAME, '')                          AS STAFFNAME			    " _
+            & "     ,coalesce(LT28.STAFFCODE, '')                          AS STAFFCODE			    " _
+            & "     ,coalesce(LT28.SUBSTAFFSLCT, '')                       AS SUBSTAFFSLCT			" _
+            & "     ,coalesce(LT28.SUBSTAFFNAME, '')                       AS SUBSTAFFNAME			" _
+            & "     ,coalesce(LT28.SUBSTAFFNUM, '')                        AS SUBSTAFFNUM			" _
+            & "     ,coalesce(LT28.CALENDERMEMO1, '')                      AS CALENDERMEMO1		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO2, '')                      AS CALENDERMEMO2		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO3, '')                      AS CALENDERMEMO3		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO4, '')                      AS CALENDERMEMO4		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO5, '')                      AS CALENDERMEMO5		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO6, '')                      AS CALENDERMEMO6		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO7, '')                      AS CALENDERMEMO7		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO8, '')                      AS CALENDERMEMO8		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO9, '')                      AS CALENDERMEMO9		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO10, '')                     AS CALENDERMEMO10		    " _
+            & "     ,coalesce(LT28.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM			" _
+            & "     ,coalesce(LT28.YOUSYA, '')                             AS YOUSYA				    " _
+            & "     ,coalesce(LT28.RECOTITLE, '')                          AS RECOTITLE			    " _
+            & "     ,coalesce(LT28.SHUKODATE, '')                          AS SHUKODATE			    " _
+            & "     ,coalesce(LT28.KIKODATE, '')                           AS KIKODATE				" _
+            & "     ,coalesce(LT28.KIKOTIME, '')                           AS KIKOTIME				" _
+            & "     ,coalesce(LT28.CREWBIKOU1, '')                         AS CREWBIKOU1			    " _
+            & "     ,coalesce(LT28.CREWBIKOU2, '')                         AS CREWBIKOU2			    " _
+            & "     ,coalesce(LT28.SUBCREWBIKOU1, '')                      AS SUBCREWBIKOU1		    " _
+            & "     ,coalesce(LT28.SUBCREWBIKOU2, '')                      AS SUBCREWBIKOU2		    " _
+            & "     ,coalesce(LT28.SUBSHUKKINTIME, '')                     AS SUBSHUKKINTIME		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO11, '')                     AS CALENDERMEMO11		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO12, '')                     AS CALENDERMEMO12		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO13, '')                     AS CALENDERMEMO13		    " _
+            & "     ,coalesce(LT28.SYABARATANNI, '')                       AS SYABARATANNI			" _
+            & "     ,coalesce(LT28.TAIKINTIME, '')                         AS TAIKINTIME			    " _
+            & "     ,coalesce(LT28.SUBTIKINTIME, '')                       AS SUBTIKINTIME			" _
+            & "     ,coalesce(LT28.KVTITLE, '')                            AS KVTITLE				" _
+            & "     ,coalesce(LT28.KVZYUTYU, '')                           AS KVZYUTYU				" _
+            & "     ,coalesce(LT28.KVZISSEKI, '')                          AS KVZISSEKI			    " _
+            & "     ,coalesce(LT28.KVCREW, '')                             AS KVCREW				    " _
+            & "     ,coalesce(LT28.CREWCODE, '')                           AS CREWCODE				" _
+            & "     ,coalesce(LT28.SUBCREWCODE, '')                        AS SUBCREWCODE			" _
+            & "     ,coalesce(LT28.KVSUBCREW, '')                          AS KVSUBCREW			    " _
+            & "     ,coalesce(LT28.ORDERHENKO, '')                         AS ORDERHENKO			    " _
+            & "     ,coalesce(LT28.RIKUUNKYOKU, '')                        AS RIKUUNKYOKU			" _
+            & "     ,coalesce(LT28.BUNRUINUMBER, '')                       AS BUNRUINUMBER			" _
+            & "     ,coalesce(LT28.HIRAGANA, '')                           AS HIRAGANA				" _
+            & "     ,coalesce(LT28.ITIRENNUM, '')                          AS ITIRENNUM			    " _
+            & "     ,coalesce(LT28.TRACTER1, '')                           AS TRACTER1				" _
+            & "     ,coalesce(LT28.TRACTER2, '')                           AS TRACTER2				" _
+            & "     ,coalesce(LT28.TRACTER3, '')                           AS TRACTER3				" _
+            & "     ,coalesce(LT28.TRACTER4, '')                           AS TRACTER4				" _
+            & "     ,coalesce(LT28.TRACTER5, '')                           AS TRACTER5				" _
+            & "     ,coalesce(LT28.TRACTER6, '')                           AS TRACTER6				" _
+            & "     ,coalesce(LT28.TRACTER7, '')                           AS TRACTER7				" _
+            & "     ,coalesce(LT28.HAISYAHUKA, '')                         AS HAISYAHUKA			    " _
+            & "     ,coalesce(LT28.HYOZIZYUNT, '')                         AS HYOZIZYUNT			    " _
+            & "     ,coalesce(LT28.HYOZIZYUNH, '')                         AS HYOZIZYUNH			    " _
+            & "     ,coalesce(LT28.HONTRACTER1, '')                        AS HONTRACTER1			" _
+            & "     ,coalesce(LT28.HONTRACTER2, '')                        AS HONTRACTER2			" _
+            & "     ,coalesce(LT28.HONTRACTER3, '')                        AS HONTRACTER3			" _
+            & "     ,coalesce(LT28.HONTRACTER4, '')                        AS HONTRACTER4			" _
+            & "     ,coalesce(LT28.HONTRACTER5, '')                        AS HONTRACTER5			" _
+            & "     ,coalesce(LT28.HONTRACTER6, '')                        AS HONTRACTER6			" _
+            & "     ,coalesce(LT28.HONTRACTER7, '')                        AS HONTRACTER7			" _
+            & "     ,coalesce(LT28.HONTRACTER8, '')                        AS HONTRACTER8			" _
+            & "     ,coalesce(LT28.HONTRACTER9, '')                        AS HONTRACTER9			" _
+            & "     ,coalesce(LT28.HONTRACTER10, '')                       AS HONTRACTER10			" _
+            & "     ,coalesce(LT28.HONTRACTER11, '')                       AS HONTRACTER11			" _
+            & "     ,coalesce(LT28.HONTRACTER12, '')                       AS HONTRACTER12			" _
+            & "     ,coalesce(LT28.HONTRACTER13, '')                       AS HONTRACTER13			" _
+            & "     ,coalesce(LT28.HONTRACTER14, '')                       AS HONTRACTER14			" _
+            & "     ,coalesce(LT28.HONTRACTER15, '')                       AS HONTRACTER15			" _
+            & "     ,coalesce(LT28.HONTRACTER16, '')                       AS HONTRACTER16			" _
+            & "     ,coalesce(LT28.HONTRACTER17, '')                       AS HONTRACTER17			" _
+            & "     ,coalesce(LT28.HONTRACTER18, '')                       AS HONTRACTER18			" _
+            & "     ,coalesce(LT28.HONTRACTER19, '')                       AS HONTRACTER19			" _
+            & "     ,coalesce(LT28.HONTRACTER20, '')                       AS HONTRACTER20			" _
+            & "     ,coalesce(LT28.HONTRACTER21, '')                       AS HONTRACTER21			" _
+            & "     ,coalesce(LT28.HONTRACTER22, '')                       AS HONTRACTER22			" _
+            & "     ,coalesce(LT28.HONTRACTER23, '')                       AS HONTRACTER23			" _
+            & "     ,coalesce(LT28.HONTRACTER24, '')                       AS HONTRACTER24			" _
+            & "     ,coalesce(LT28.HONTRACTER25, '')                       AS HONTRACTER25			" _
+            & "     ,coalesce(LT28.CALENDERMEMO14, '')                     AS CALENDERMEMO14		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO15, '')                     AS CALENDERMEMO15		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO16, '')                     AS CALENDERMEMO16		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO17, '')                     AS CALENDERMEMO17		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO18, '')                     AS CALENDERMEMO18		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO19, '')                     AS CALENDERMEMO19		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO20, '')                     AS CALENDERMEMO20		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO21 , '')                    AS CALENDERMEMO21		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO22, '')                     AS CALENDERMEMO22		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO23, '')                     AS CALENDERMEMO23		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO24, '')                     AS CALENDERMEMO24		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO25, '')                     AS CALENDERMEMO25		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO26, '')                     AS CALENDERMEMO26		    " _
+            & "     ,coalesce(LT28.CALENDERMEMO27, '')                     AS CALENDERMEMO27		    " _
+            & "     ,coalesce(LT28.UPDATEUSER, '')                         AS UPDATEUSER			    " _
+            & "     ,coalesce(LT28.CREATEUSER, '')                         AS CREATEUSER			    " _
+            & "     ,coalesce(LT28.UPDATEYMD, '')                          AS UPDATEYMD			    " _
+            & "     ,coalesce(LT28.CREATEYMD, '')                          AS CREATEYMD			    " _
+            & "     ,coalesce(LT28.DELFLG, '')                             AS DELFLG				    " _
+            & "     ,coalesce(LT28.INITYMD, '')                            AS INITYMD				" _
+            & "     ,coalesce(LT28.INITUSER, '')                           AS INITUSER				" _
+            & "     ,coalesce(LT28.INITTERMID, '')                         AS INITTERMID			    " _
+            & "     ,coalesce(LT28.INITPGID, '')                           AS INITPGID				" _
+            & "     ,coalesce(LT28.UPDYMD, '')                             AS UPDYMD				    " _
+            & "     ,coalesce(LT28.UPDUSER, '')                            AS UPDUSER				" _
+            & "     ,coalesce(LT28.UPDTERMID, '')                          AS UPDTERMID			    " _
+            & "     ,coalesce(LT28.UPDPGID, '')                            AS UPDPGID				" _
+            & "     ,coalesce(LT28.RECEIVEYMD, '')                         AS RECEIVEYMD			    " _
+            & "     ,coalesce(LT28.UPDTIMSTP, '')                          AS UPDTIMSTP			    " _
+            & " FROM                                                                                " _
+            & "     LNG.LNT0028_NGZISSEKI LT28                                                       " _
+            & " WHERE                                                                               " _
+            & "     date_format(LT28.TODOKEDATE, '%Y/%m/%d') >= @P1                                  " _
+            & " AND date_format(LT28.TODOKEDATE, '%Y/%m/%d') <= @P2                                  " _
+
+        '○ 条件指定で指定されたものでSQLで可能なものを追加する
+        ' 取引先
+        If WF_TORIhdn.Value <> "" Then
+            SQLStr += " AND LT28.TORICODE in (" & WF_TORIhdn.Value & ")"
+        End If
+
+        '部署
+        Dim ApiInfo = work.GetAvocadoInfo(Master.USERCAMP, Master.ROLE_ORG, WF_TORIhdn.Value)
+        If ApiInfo.Count > 0 Then
+            SQLStr += " AND LT28.ORDERORG in ("
+            For j As Integer = 0 To ApiInfo.Count - 1
+                SQLStr += "'"
+                SQLStr += ApiInfo(j).Org
+                SQLStr += "'"
+                If j < ApiInfo.Count - 1 Then
+                    SQLStr += ","
+                Else
+                    SQLStr += ")"
+                End If
+            Next
+        End If
+
+        SQLStr += " AND LT28.DELFLG = '0'                                                " _
+                & " ORDER BY                                                            " _
+                & "     LT28.ORDERORG, LT28.TORICODE, LT28.SHUKADATE, LT28.TODOKEDATE, LT28.STAFFCODE  "
+
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Dim PARA1 As MySqlParameter = SQLcmd.Parameters.Add("@P1", MySqlDbType.Date)  '届日FROM
+                Dim PARA2 As MySqlParameter = SQLcmd.Parameters.Add("@P2", MySqlDbType.Date)  '届日TO
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    PARA1.Value = WF_TaishoYm.Value & "/01"
+                    PARA2.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                Else
+                    PARA1.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    PARA2.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
+                End If
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNT0028tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    LNT0028tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each LNT0028row As DataRow In LNT0028tbl.Rows
+                    i += 1
+                    LNT0028row("LINECNT") = i        'LINECNT
+                Next
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0028 SELECT")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNT0028 Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' フィールドダブルクリック時処理
     ''' </summary>
     ''' <remarks></remarks>
@@ -783,6 +1146,9 @@ Public Class LNT0001ZissekiIntake
                     LNT0001tbl = CS0054KintoneApi.GetRecords()
 
                     If LNT0001tbl.Rows.Count > 0 Then
+                        'アボカドデータチェック（荷主別）
+                        ZissekiCheck(LNT0001tbl)
+
                         '実績テーブル、実績履歴テーブル更新（アボカドデータ保存）
                         ZissekiUpdate(ApiInfo(i).Org, WF_TORIhdn.Value, LNT0001tbl, WW_ErrSW)
                         If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
@@ -811,6 +1177,10 @@ Public Class LNT0001ZissekiIntake
             'アボカドデータ保存（念のため調査用にダウンロードできるようにする）
             Master.SaveTable(LNT0001tbl_SV, work.WF_SEL_INPTBL.Text)
 
+            Dim Cnt As Integer = 0
+            Dim Msg1 As String = ""
+            Dim Msg2 As String = ""
+            Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
             '実績数量=未入力の存在確認（数量=0は、AVOCADOではキャンセルオーダーはCS0054KintoneApiで既に読み飛ばし）
             Dim dv As New DataView(LNT0001tbl_SV)
             dv.RowFilter = "積置区分 <> '積置' and 実績数量 = ''"
@@ -824,10 +1194,6 @@ Public Class LNT0001ZissekiIntake
                         }
 
                 ' 結果を表示
-                Dim Cnt As Integer = 0
-                Dim Msg1 As String = ""
-                Dim Msg2 As String = ""
-                Dim sp As String = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 Msg1 += "実績数量=0のデータが存在します。画面表示しますか"
                 Msg1 += "<BR>対象年月：" & Me.WF_TaishoYm.Value
                 For Each result In query
@@ -844,8 +1210,37 @@ Public Class LNT0001ZissekiIntake
                         End If
                     End If
                 Next
-                '実績数量ゼロありメッセージ出力
-                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True, "", True, "btnCommonConfirmYes")
+            End If
+
+            dv.RowFilter = "OUTTBL = '" & CONST_LNT0028 & "'"
+            If dv.Count > 0 Then
+                ' LINQを使用してグループ化とカウントを取得
+                Dim query = From row In dv.ToTable().AsEnumerable()
+                            Group row By toricode = row.Field(Of String)("届先取引先コード") Into Group
+                            Select New With {
+                            .toricode = toricode,
+                            .Count = Group.Count()
+                        }
+
+                ' 結果を表示
+                If Cnt > 0 Then
+                    Msg1 += "<BR><BR>"
+                    Msg1 += sp & "不良データが存在します。"
+                    Msg1 += "<BR>" & sp & "対象年月：" & Me.WF_TaishoYm.Value
+                Else
+                    Msg1 += "不良データが存在します。"
+                    Msg1 += "<BR>" & "対象年月：" & Me.WF_TaishoYm.Value
+                End If
+                For Each result In query
+                    If result.Count > 0 Then
+                        Dim tori = WF_TORI.Items.FindByValue(result.toricode)
+                        Msg1 += "<BR>" & sp & "荷主：" & tori.Text
+                    End If
+                Next
+
+                '実績数量ゼロあり＆不良データありメッセージ出力
+                'Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True, "", True, "btnCommonConfirmYes")
+                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True)
                 Exit Sub
             End If
 
@@ -880,6 +1275,109 @@ Public Class LNT0001ZissekiIntake
     End Sub
 
     ''' <summary>
+    ''' 固定値マスタ取得
+    ''' </summary>
+    Private Function GetFixvale() As DataTable
+
+        Dim dt As New DataTable
+
+        Dim SQLStr As String = ""
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+
+            ' DataBase接続
+            SQLcon.Open()
+            '-- SELECT
+            SQLStr &= " SELECT "
+            SQLStr &= " S6.CAMPCODE"
+            SQLStr &= ",S6.CLASS"
+            SQLStr &= ",S6.KEYCODE"
+            SQLStr &= ",S6.STYMD"
+            SQLStr &= ",S6.ENDYMD"
+            SQLStr &= ",S6.VALUE1"
+            SQLStr &= ",S6.VALUE2"
+            SQLStr &= ",S6.VALUE3"
+            SQLStr &= ",S6.VALUE4"
+            SQLStr &= ",S6.VALUE5"
+            SQLStr &= ",S6.VALUE6"
+            SQLStr &= ",S6.VALUE7"
+            SQLStr &= ",S6.VALUE8"
+            SQLStr &= ",S6.VALUE9"
+            SQLStr &= ",S6.VALUE10"
+            SQLStr &= ",S6.VALUE11"
+            SQLStr &= ",S6.VALUE12"
+            SQLStr &= ",S6.VALUE13"
+            SQLStr &= ",S6.VALUE14"
+            SQLStr &= ",S6.VALUE15"
+            SQLStr &= ",S6.VALUE16"
+            SQLStr &= ",S6.VALUE17"
+            SQLStr &= ",S6.VALUE18"
+            SQLStr &= ",S6.VALUE19"
+            SQLStr &= ",S6.VALUE20"
+            SQLStr &= ",S6.NAMES"
+            SQLStr &= ",S6.NAMEL"
+            SQLStr &= ",S6.SYSTEMKEYFLG"
+
+            '-- FROM
+            SQLStr &= " FROM COM.LNS0006_FIXVALUE S6 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     S6.CAMPCODE = '{0}' ", Master.USERCAMP)
+            SQLStr &= String.Format(" AND S6.CLASS    = '{0}' ", "AVOCADOITEMCHK")
+            SQLStr &= String.Format(" AND S6.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+
+            Try
+                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+                    End Using
+                End Using
+            Catch ex As Exception
+                Throw '呼び出し元の例外にスロー
+            End Try
+        End Using
+
+        Return dt
+    End Function
+
+
+
+    ''' <summary>
+    ''' アボカドデータチェック（荷主別）
+    ''' </summary>
+    Private Sub ZissekiCheck(ByVal iTbl As DataTable)
+
+        '固定費マスタ（荷主別チェックする項目を取得）
+        Dim ChkTbl As DataTable = GetFixvale()
+
+        For Each DataRow As DataRow In iTbl.Rows
+            '実績テーブルへの出力指示
+            DataRow("OUTTBL") = CONST_LNT0001
+
+            For Each ChkRow As DataRow In ChkTbl.Select("KEYCODE ='" & DataRow("届先取引先コード") & "'")
+                For i As Integer = 1 To 20
+                    'VALUNE1～20に値が存在する分、処理する
+                    Dim ValueStr As String = "VALUE" & i
+                    If String.IsNullOrEmpty(ChkRow(ValueStr)) Then
+                        Exit For
+                    End If
+                    If String.IsNullOrEmpty(DataRow(ChkRow(ValueStr))) Then
+                        'チェック項目がNGの場合、実績不良テーブルへの出力指示
+                        DataRow("OUTTBL") = CONST_LNT0028
+                    End If
+                Next
+            Next
+        Next
+
+    End Sub
+
+    ''' <summary>
     ''' 実績テーブル更新
     ''' </summary>
     Private Sub ZissekiUpdate(ByVal iOrg As String, ByVal iTori As String, ByVal iTbl As DataTable, ByRef oResult As String)
@@ -894,16 +1392,19 @@ Public Class LNT0001ZissekiIntake
         Dim WW_DateNow As DateTime = Date.Now
         Dim repTori As String = "('" & iTori.Replace(",", "','") & "')"
 
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
 
             ' DataBase接続
             SQLcon.Open()
             'WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
 
             '○ DB更新SQL(実績テーブル)
-            '一旦すべて削除
-            Dim SQLStr As String =
-                  " UPDATE LNG.LNT0001_ZISSEKI                                      " _
+            Dim SQLStr As String = ""
+            Dim TblNames As String() = {CONST_LNT0001, CONST_LNT0028}
+            For Each TblName In TblNames
+                '一旦すべて削除
+                SQLStr =
+                    String.Format(" UPDATE {0} ", TblName) _
                 & " SET                                                             " _
                 & "     DELFLG      = @DELFLG                                       " _
                 & "   , UPDYMD      = @UPDYMD                                       " _
@@ -912,62 +1413,62 @@ Public Class LNT0001ZissekiIntake
                 & "   , UPDPGID     = @UPDPGID                                      " _
                 & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
                 & " WHERE                                                           " _
-                & "     ORDERORGCODE = @ORDERORGCODE                                " _
+                & "     ORDERORG = @ORDERORG                                        " _
                 & " AND TORICODE in " & repTori _
                 & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
                 & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
-            Try
-                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                    ' DB更新用パラメータ(ユーザーパスワードマスタ)
-                    Dim ORDERORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGCODE", MySqlDbType.VarChar)        '営業所コード
-                    Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                '取引先コード
-                    Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                 '削除フラグ
-                    Dim YMDFROM As MySqlParameter = SQLcmd.Parameters.Add("@YMDFROM", MySqlDbType.DateTime)                 '年月日FROM
-                    Dim YMDTO As MySqlParameter = SQLcmd.Parameters.Add("@YMDTO", MySqlDbType.DateTime)                     '年月日TO
-                    Dim UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)                   '更新年月日
-                    Dim UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)              '更新ユーザーＩＤ
-                    Dim UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)          '更新端末
-                    Dim UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)              '更新プログラムＩＤ
-                    Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)           '集信日時
+                Try
+                    Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                        ' DB更新用パラメータ(ユーザーパスワードマスタ)
+                        Dim ORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORG", MySqlDbType.VarChar)                '営業所コード
+                        Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                '取引先コード
+                        Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                 '削除フラグ
+                        Dim YMDFROM As MySqlParameter = SQLcmd.Parameters.Add("@YMDFROM", MySqlDbType.DateTime)                 '年月日FROM
+                        Dim YMDTO As MySqlParameter = SQLcmd.Parameters.Add("@YMDTO", MySqlDbType.DateTime)                     '年月日TO
+                        Dim UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)                   '更新年月日
+                        Dim UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)              '更新ユーザーＩＤ
+                        Dim UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)          '更新端末
+                        Dim UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)              '更新プログラムＩＤ
+                        Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)           '集信日時
 
-                    ' DB更新
+                        ' DB更新
 
-                    ' DB更新
-                    ORDERORGCODE.Value = iOrg                                               '営業所コード
-                    TORICODE.Value = iTori                                                  '取引先コード
-                    DELFLG.Value = C_DELETE_FLG.DELETE                                      '削除フラグ（削除）
-                    If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
-                        YMDFROM.Value = WF_TaishoYm.Value & "/01"
-                        YMDTO.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
-                    End If
-                    UPDYMD.Value = WW_DateNow                                               '更新年月日
-                    UPDUSER.Value = Master.USERID                                           '更新ユーザーＩＤ
-                    UPDTERMID.Value = Master.USERTERMID                                     '更新端末
-                    UPDPGID.Value = Me.GetType().BaseType.Name                              '更新プログラムＩＤ
-                    RECEIVEYMD.Value = C_DEFAULT_YMD                                        '集信日時
+                        ' DB更新
+                        ORDERORG.Value = iOrg                                                   '営業所コード
+                        TORICODE.Value = iTori                                                  '取引先コード
+                        DELFLG.Value = C_DELETE_FLG.DELETE                                      '削除フラグ（削除）
+                        If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                            YMDFROM.Value = WF_TaishoYm.Value & "/01"
+                            YMDTO.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
+                        End If
+                        UPDYMD.Value = WW_DateNow                                               '更新年月日
+                        UPDUSER.Value = Master.USERID                                           '更新ユーザーＩＤ
+                        UPDTERMID.Value = Master.USERTERMID                                     '更新端末
+                        UPDPGID.Value = Me.GetType().BaseType.Name                              '更新プログラムＩＤ
+                        RECEIVEYMD.Value = C_DEFAULT_YMD                                        '集信日時
 
-                    SQLcmd.CommandTimeout = 300
-                    SQLcmd.ExecuteNonQuery()
+                        SQLcmd.CommandTimeout = 300
+                        SQLcmd.ExecuteNonQuery()
 
-                End Using
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
+                    End Using
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
-                CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                CS0011LOGWrite.INFPOSI = "DB:LNT0001_ZISSEKI UPDATE(DELETE)"
-                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWrite.TEXT = ex.ToString()
-                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = String.Format("DB:{0} UPDATE(DELETE)", TblName)
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = ex.ToString()
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                oResult = C_MESSAGE_NO.DB_ERROR
-                Exit Sub
-            End Try
+                    oResult = C_MESSAGE_NO.DB_ERROR
+                    Exit Sub
+                End Try
 
-            '○ DB更新SQL(ユーザーマスタ)
-            SQLStr =
-                  "     INSERT INTO LNG.LNT0001_ZISSEKI             " _
+                '○ DB更新SQL(ユーザーマスタ)
+                SQLStr =
+                  String.Format("     INSERT INTO {0}     ", TblName) _
                 & "      (RECONO						            " _
                 & "     , LOADUNLOTYPE						        " _
                 & "     , STACKINGTYPE						        " _
@@ -1615,568 +2116,569 @@ Public Class LNT0001ZissekiIntake
                 & "     , UPDPGID = @UPDPGID						" _
                 & "     , RECEIVEYMD = @RECEIVEYMD					"
 
-            Try
-                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
-                    ' DB更新用パラメータ
-                    Dim RECONO As MySqlParameter = SQLcmd.Parameters.Add("@RECONO", MySqlDbType.VarChar)    'レコード番号
-                    Dim LOADUNLOTYPE As MySqlParameter = SQLcmd.Parameters.Add("@LOADUNLOTYPE", MySqlDbType.VarChar)    '積込荷卸区分
-                    Dim STACKINGTYPE As MySqlParameter = SQLcmd.Parameters.Add("@STACKINGTYPE", MySqlDbType.VarChar)    '積置区分
-                    Dim HSETID As MySqlParameter = SQLcmd.Parameters.Add("@HSETID", MySqlDbType.VarChar)    '配送セットID
-                    Dim ORDERORGSELECT As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGSELECT", MySqlDbType.VarChar)    '受注受付部署選択
-                    Dim ORDERORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGNAME", MySqlDbType.VarChar)    '受注受付部署名
-                    Dim ORDERORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGCODE", MySqlDbType.VarChar)    '受注受付部署コード
-                    Dim ORDERORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGNAMES", MySqlDbType.VarChar)  '受注受付部署略名
-                    Dim KASANAMEORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANAMEORDERORG", MySqlDbType.VarChar)    '加算先部署名_受注受付部署
-                    Dim KASANCODEORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANCODEORDERORG", MySqlDbType.VarChar)  '加算先部署コード_受注受付部署
-                    Dim KASANAMESORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANAMESORDERORG", MySqlDbType.VarChar)  '加算先部署略名_受注受付部署
-                    Dim ORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORG", MySqlDbType.VarChar)    '受注受付部署
-                    Dim KASANORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANORDERORG", MySqlDbType.VarChar)  '加算先受注受付部署
-                    Dim PRODUCTSLCT As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCTSLCT", MySqlDbType.VarChar)  '品名選択
-                    Dim PRODUCTSYOSAI As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCTSYOSAI", MySqlDbType.VarChar)  '品名詳細
-                    Dim PRODUCT2NAME As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT2NAME", MySqlDbType.VarChar)    '品名2名
-                    Dim PRODUCT2 As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT2", MySqlDbType.VarChar)    '品名2コード
-                    Dim PRODUCT1NAME As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT1NAME", MySqlDbType.VarChar)    '品名1名
-                    Dim PRODUCT1 As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT1", MySqlDbType.VarChar)    '品名1コード
-                    Dim OILNAME As MySqlParameter = SQLcmd.Parameters.Add("@OILNAME", MySqlDbType.VarChar)  '油種名
-                    Dim OILTYPE As MySqlParameter = SQLcmd.Parameters.Add("@OILTYPE", MySqlDbType.VarChar)  '油種コード
-                    Dim TODOKESLCT As MySqlParameter = SQLcmd.Parameters.Add("@TODOKESLCT", MySqlDbType.VarChar)    '届先選択
-                    Dim TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar)    '届先コード
-                    Dim TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar)    '届先名称
-                    Dim TODOKENAMES As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAMES", MySqlDbType.VarChar)  '届先略名
-                    Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)    '届先取引先コード
-                    Dim TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)    '届先取引先名称
-                    Dim TORICODE_AVOCADO As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE_AVOCADO", MySqlDbType.VarChar)    '届先取引先コード_アボカド
-                    Dim TODOKEADDR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEADDR", MySqlDbType.VarChar)    '届先住所
-                    Dim TODOKETEL As MySqlParameter = SQLcmd.Parameters.Add("@TODOKETEL", MySqlDbType.VarChar)  '届先電話番号
-                    Dim TODOKEMAP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEMAP", MySqlDbType.VarChar)  '届先Googleマップ
-                    Dim TODOKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEIDO", MySqlDbType.VarChar)  '届先緯度
-                    Dim TODOKEKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEKEIDO", MySqlDbType.VarChar)  '届先経度
-                    Dim TODOKEBIKO1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO1", MySqlDbType.VarChar)  '届先備考1
-                    Dim TODOKEBIKO2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO2", MySqlDbType.VarChar)  '届先備考2
-                    Dim TODOKEBIKO3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO3", MySqlDbType.VarChar)  '届先備考3
-                    Dim TODOKECOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR1", MySqlDbType.VarChar)    '届先カラーコード_背景色
-                    Dim TODOKECOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR2", MySqlDbType.VarChar)    '届先カラーコード_境界色
-                    Dim TODOKECOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR3", MySqlDbType.VarChar)    '届先カラーコード_文字色
-                    Dim SHUKASLCT As MySqlParameter = SQLcmd.Parameters.Add("@SHUKASLCT", MySqlDbType.VarChar)  '出荷場所選択
-                    Dim SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar)    '出荷場所コード
-                    Dim SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar)  '出荷場所名称
-                    Dim SHUKANAMES As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAMES", MySqlDbType.VarChar)    '出荷場所略名
-                    Dim SHUKATORICODE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORICODE", MySqlDbType.VarChar)  '出荷場所取引先コード
-                    Dim SHUKATORINAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORINAME", MySqlDbType.VarChar)  '出荷場所取引先名称
-                    Dim SHUKAADDR As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDR", MySqlDbType.VarChar)  '出荷場所住所
-                    Dim SHUKAADDRTEL As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDRTEL", MySqlDbType.VarChar)    '出荷場所電話番号
-                    Dim SHUKAMAP As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAMAP", MySqlDbType.VarChar)    '出荷場所Googleマップ
-                    Dim SHUKAIDO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAIDO", MySqlDbType.VarChar)    '出荷場所緯度
-                    Dim SHUKAKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAKEIDO", MySqlDbType.VarChar)    '出荷場所経度
-                    Dim SHUKABIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU1", MySqlDbType.VarChar)  '出荷場所備考1
-                    Dim SHUKABIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU2", MySqlDbType.VarChar)  '出荷場所備考2
-                    Dim SHUKABIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU3", MySqlDbType.VarChar)  '出荷場所備考3
-                    Dim SHUKACOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR1", MySqlDbType.VarChar)  '出荷場所カラーコード_背景色
-                    Dim SHUKACOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR2", MySqlDbType.VarChar)  '出荷場所カラーコード_境界色
-                    Dim SHUKACOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR3", MySqlDbType.VarChar)  '出荷場所カラーコード_文字色
-                    Dim REQUIREDTIME As MySqlParameter = SQLcmd.Parameters.Add("@REQUIREDTIME", MySqlDbType.VarChar)  '標準所要時間
-                    Dim SHUKADATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE", MySqlDbType.Date) '出荷日
-                    Dim LOADTIME As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIME", MySqlDbType.VarChar)   '積込時間
-                    Dim LOADTIMEIN As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIMEIN", MySqlDbType.VarChar)    '積込時間手入力
-                    Dim LOADTIMES As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIMES", MySqlDbType.VarChar)  '積込時間_画面表示用
-                    Dim TODOKEDATE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE", MySqlDbType.Date)   '届日
-                    Dim SHITEITIME As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIME", MySqlDbType.VarChar)   '指定時間
-                    Dim SHITEITIMEIN As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIMEIN", MySqlDbType.VarChar)    '指定時間手入力
-                    Dim SHITEITIMES As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIMES", MySqlDbType.VarChar)  '指定時間_画面表示用
-                    Dim ZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@ZYUTYU", MySqlDbType.Decimal)    '受注数量
-                    Dim ZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@ZISSEKI", MySqlDbType.Decimal)  '実績数量
-                    Dim TANNI As MySqlParameter = SQLcmd.Parameters.Add("@TANNI", MySqlDbType.VarChar)  '数量単位
-                    Dim GYOUMUSIZI1 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI1", MySqlDbType.VarChar)  '業務指示1
-                    Dim GYOUMUSIZI2 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI2", MySqlDbType.VarChar)  '業務指示2
-                    Dim GYOUMUSIZI3 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI3", MySqlDbType.VarChar)  '業務指示3
-                    Dim NINUSHIBIKOU As MySqlParameter = SQLcmd.Parameters.Add("@NINUSHIBIKOU", MySqlDbType.VarChar)    '荷主備考
-                    Dim MAXCAPACITY As MySqlParameter = SQLcmd.Parameters.Add("@MAXCAPACITY", MySqlDbType.VarChar)    '最大積載量
-                    Dim GYOMUSYABAN As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUSYABAN", MySqlDbType.VarChar)  '業務車番選択
-                    Dim SHIPORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORGNAME", MySqlDbType.VarChar)  '出荷部署名
-                    Dim SHIPORG As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORG", MySqlDbType.VarChar)  '出荷部署コード
-                    Dim SHIPORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORGNAMES", MySqlDbType.VarChar)    '出荷部署略名
-                    Dim KASANSHIPORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORGNAME", MySqlDbType.VarChar)    '加算先出荷部署名
-                    Dim KASANSHIPORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORG", MySqlDbType.VarChar)    '加算先出荷部署コード
-                    Dim KASANSHIPORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORGNAMES", MySqlDbType.VarChar)  '加算先出荷部署略名
-                    Dim TANKNUM As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUM", MySqlDbType.VarChar)  '統一車番
-                    Dim TANKNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", MySqlDbType.VarChar)    '陸事番号
-                    Dim SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar)  '車型
-                    Dim SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.VarChar)    '車腹
-                    Dim NINUSHINAME As MySqlParameter = SQLcmd.Parameters.Add("@NINUSHINAME", MySqlDbType.VarChar)  '荷主名
-                    Dim CONTYPE As MySqlParameter = SQLcmd.Parameters.Add("@CONTYPE", MySqlDbType.VarChar)  '契約区分
-                    Dim PRO1SYARYOU As MySqlParameter = SQLcmd.Parameters.Add("@PRO1SYARYOU", MySqlDbType.VarChar)  '品名1名_車両
-                    Dim TANKMEMO As MySqlParameter = SQLcmd.Parameters.Add("@TANKMEMO", MySqlDbType.VarChar)    '車両メモ
-                    Dim TANKBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU1", MySqlDbType.VarChar)    '車両備考1
-                    Dim TANKBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU2", MySqlDbType.VarChar)    '車両備考2
-                    Dim TANKBIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU3", MySqlDbType.VarChar)    '車両備考3
-                    Dim TRACTORNUM As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUM", MySqlDbType.VarChar)    '統一車番_トラクタ
-                    Dim TRACTORNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUMBER", MySqlDbType.VarChar)  '陸事番号_トラクタ
-                    Dim TRIP As MySqlParameter = SQLcmd.Parameters.Add("@TRIP", MySqlDbType.Int16)  'トリップ
-                    Dim DRP As MySqlParameter = SQLcmd.Parameters.Add("@DRP", MySqlDbType.Int16)    'ドロップ
-                    Dim ROTATION As MySqlParameter = SQLcmd.Parameters.Add("@ROTATION", MySqlDbType.Int16)    '回転数
-                    Dim UNKOUMEMO As MySqlParameter = SQLcmd.Parameters.Add("@UNKOUMEMO", MySqlDbType.VarChar)  '当日前後運行メモ
-                    Dim SHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKKINTIME", MySqlDbType.VarChar) '出勤時間
-                    Dim STAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@STAFFSLCT", MySqlDbType.VarChar)  '乗務員選択
-                    Dim STAFFNAME As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAME", MySqlDbType.VarChar)  '氏名_乗務員
-                    Dim STAFFCODE As MySqlParameter = SQLcmd.Parameters.Add("@STAFFCODE", MySqlDbType.VarChar)  '社員番号_乗務員
-                    Dim SUBSTAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFSLCT", MySqlDbType.VarChar)    '副乗務員選択
-                    Dim SUBSTAFFNAME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNAME", MySqlDbType.VarChar)    '氏名_副乗務員
-                    Dim SUBSTAFFNUM As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNUM", MySqlDbType.VarChar)  '社員番号_副乗務員
-                    Dim CALENDERMEMO1 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO1", MySqlDbType.VarChar)  'カレンダー画面メモ表示[ON]
-                    Dim CALENDERMEMO2 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO2", MySqlDbType.VarChar)  '業務車番選択_カレンダー画面メモ
-                    Dim CALENDERMEMO3 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO3", MySqlDbType.VarChar)  '開始日_カレンダー画面メモ
-                    Dim CALENDERMEMO4 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO4", MySqlDbType.VarChar)  '終了日_カレンダー画面メモ
-                    Dim CALENDERMEMO5 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO5", MySqlDbType.VarChar)  '背景色_カレンダー画面メモ
-                    Dim CALENDERMEMO6 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO6", MySqlDbType.VarChar)  '境界色_カレンダー画面メモ
-                    Dim CALENDERMEMO7 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO7", MySqlDbType.VarChar)  '文字色_カレンダー画面メモ
-                    Dim CALENDERMEMO8 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO8", MySqlDbType.VarChar)  '表示内容_カレンダー画面メモ
-                    Dim CALENDERMEMO9 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO9", MySqlDbType.VarChar)  '業務車番_カレンダー画面メモ
-                    Dim CALENDERMEMO10 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO10", MySqlDbType.VarChar)    '表示用終了日_カレンダー画面メモ
-                    Dim GYOMUTANKNUM As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUTANKNUM", MySqlDbType.VarChar)    '業務車番
-                    Dim YOUSYA As MySqlParameter = SQLcmd.Parameters.Add("@YOUSYA", MySqlDbType.VarChar)    '用車先
-                    Dim RECOTITLE As MySqlParameter = SQLcmd.Parameters.Add("@RECOTITLE", MySqlDbType.VarChar)  'レコードタイトル用
-                    Dim SHUKODATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKODATE", MySqlDbType.Date)   '出庫日
-                    Dim KIKODATE As MySqlParameter = SQLcmd.Parameters.Add("@KIKODATE", MySqlDbType.Date)   '帰庫日
-                    Dim KIKOTIME As MySqlParameter = SQLcmd.Parameters.Add("@KIKOTIME", MySqlDbType.VarChar)   '帰庫時間
-                    Dim CREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU1", MySqlDbType.VarChar)    '乗務員備考1
-                    Dim CREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU2", MySqlDbType.VarChar)    '乗務員備考2
-                    Dim SUBCREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU1", MySqlDbType.VarChar)  '副乗務員備考1
-                    Dim SUBCREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU2", MySqlDbType.VarChar)  '副乗務員備考2
-                    Dim SUBSHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSHUKKINTIME", MySqlDbType.VarChar)   '出勤時間_副乗務員
-                    Dim CALENDERMEMO11 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO11", MySqlDbType.VarChar)    '乗務員選択_カレンダー画面メモ
-                    Dim CALENDERMEMO12 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO12", MySqlDbType.VarChar)    '社員番号_カレンダー画面メモ
-                    Dim CALENDERMEMO13 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO13", MySqlDbType.VarChar)    '内容詳細_カレンダー画面メモ
-                    Dim SYABARATANNI As MySqlParameter = SQLcmd.Parameters.Add("@SYABARATANNI", MySqlDbType.VarChar)    '車腹単位
-                    Dim TAIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@TAIKINTIME", MySqlDbType.VarChar)   '退勤時間
-                    Dim SUBTIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBTIKINTIME", MySqlDbType.VarChar)   '退勤時間_副乗務員
-                    Dim KVTITLE As MySqlParameter = SQLcmd.Parameters.Add("@KVTITLE", MySqlDbType.VarChar)  'kViewer用タイトル
-                    Dim KVZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@KVZYUTYU", MySqlDbType.VarChar)    'kViewer用受注数量
-                    Dim KVZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@KVZISSEKI", MySqlDbType.VarChar)  'kViewer用実績数量
-                    Dim KVCREW As MySqlParameter = SQLcmd.Parameters.Add("@KVCREW", MySqlDbType.VarChar)    'kViewer用乗務員情報
-                    Dim CREWCODE As MySqlParameter = SQLcmd.Parameters.Add("@CREWCODE", MySqlDbType.VarChar)    '乗務員コード_乗務員
-                    Dim SUBCREWCODE As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWCODE", MySqlDbType.VarChar)  '乗務員コード_副乗務員
-                    Dim KVSUBCREW As MySqlParameter = SQLcmd.Parameters.Add("@KVSUBCREW", MySqlDbType.VarChar)  'kViewer用副乗務員情報
-                    Dim ORDERHENKO As MySqlParameter = SQLcmd.Parameters.Add("@ORDERHENKO", MySqlDbType.VarChar)    'オーダー変更・削除
-                    Dim RIKUUNKYOKU As MySqlParameter = SQLcmd.Parameters.Add("@RIKUUNKYOKU", MySqlDbType.VarChar)  '陸運局
-                    Dim BUNRUINUMBER As MySqlParameter = SQLcmd.Parameters.Add("@BUNRUINUMBER", MySqlDbType.VarChar)    '分類番号
-                    Dim HIRAGANA As MySqlParameter = SQLcmd.Parameters.Add("@HIRAGANA", MySqlDbType.VarChar)    'ひらがな
-                    Dim ITIRENNUM As MySqlParameter = SQLcmd.Parameters.Add("@ITIRENNUM", MySqlDbType.VarChar)  '一連指定番号
-                    Dim TRACTER1 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER1", MySqlDbType.VarChar)    '陸運局_トラクタ
-                    Dim TRACTER2 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER2", MySqlDbType.VarChar)    '分類番号_トラクタ
-                    Dim TRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER3", MySqlDbType.VarChar)    'ひらがな_トラクタ
-                    Dim TRACTER4 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER4", MySqlDbType.VarChar)    '一連指定番号_トラクタ
-                    Dim TRACTER5 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER5", MySqlDbType.VarChar)    '車両備考1_トラクタ
-                    Dim TRACTER6 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER6", MySqlDbType.VarChar)    '車両備考2_トラクタ
-                    Dim TRACTER7 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER7", MySqlDbType.VarChar)    '車両備考3_トラクタ
-                    Dim HAISYAHUKA As MySqlParameter = SQLcmd.Parameters.Add("@HAISYAHUKA", MySqlDbType.VarChar)    '配車・配乗不可[不可]
-                    Dim HYOZIZYUNT As MySqlParameter = SQLcmd.Parameters.Add("@HYOZIZYUNT", MySqlDbType.VarChar)    '表示順_届先
-                    Dim HYOZIZYUNH As MySqlParameter = SQLcmd.Parameters.Add("@HYOZIZYUNH", MySqlDbType.VarChar)    '表示順_配車
-                    Dim HONTRACTER1 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER1", MySqlDbType.VarChar)  '本トラクタ選択
-                    Dim HONTRACTER2 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER2", MySqlDbType.VarChar)  '出荷部署名_本トラクタ
-                    Dim HONTRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER3", MySqlDbType.VarChar)  '業務車番_本トラクタ
-                    Dim HONTRACTER4 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER4", MySqlDbType.VarChar)  '出荷部署コード_本トラクタ
-                    Dim HONTRACTER5 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER5", MySqlDbType.VarChar)  '出荷部署略名_本トラクタ
-                    Dim HONTRACTER6 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER6", MySqlDbType.VarChar)  '加算先出荷部署略名_本トラクタ
-                    Dim HONTRACTER7 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER7", MySqlDbType.VarChar)  '加算先出荷部署コード_本トラクタ
-                    Dim HONTRACTER8 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER8", MySqlDbType.VarChar)  '加算先出荷部署名_本トラクタ
-                    Dim HONTRACTER9 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER9", MySqlDbType.VarChar)  '用車先_本トラクタ
-                    Dim HONTRACTER10 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER10", MySqlDbType.VarChar)    '統一車番_本トラクタ
-                    Dim HONTRACTER11 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER11", MySqlDbType.VarChar)    '陸事番号_本トラクタ
-                    Dim HONTRACTER12 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER12", MySqlDbType.VarChar)    '車型_本トラクタ
-                    Dim HONTRACTER13 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER13", MySqlDbType.VarChar)    '車腹_本トラクタ
-                    Dim HONTRACTER14 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER14", MySqlDbType.VarChar)    '車腹単位_本トラクタ
-                    Dim HONTRACTER15 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER15", MySqlDbType.VarChar)    '陸運局_本トラクタ
-                    Dim HONTRACTER16 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER16", MySqlDbType.VarChar)    '分類番号_本トラクタ
-                    Dim HONTRACTER17 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER17", MySqlDbType.VarChar)    'ひらがな_本トラクタ
-                    Dim HONTRACTER18 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER18", MySqlDbType.VarChar)    '一連指定番号_本トラクタ
-                    Dim HONTRACTER19 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER19", MySqlDbType.VarChar)    '荷主名_本トラクタ
-                    Dim HONTRACTER20 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER20", MySqlDbType.VarChar)    '契約区分_本トラクタ
-                    Dim HONTRACTER21 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER21", MySqlDbType.VarChar)    '品名1名_車両_本トラクタ
-                    Dim HONTRACTER22 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER22", MySqlDbType.VarChar)    '車両メモ_本トラクタ
-                    Dim HONTRACTER23 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER23", MySqlDbType.VarChar)    '車両備考1_本トラクタ
-                    Dim HONTRACTER24 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER24", MySqlDbType.VarChar)    '車両備考2_本トラクタ
-                    Dim HONTRACTER25 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER25", MySqlDbType.VarChar)    '車両備考3_本トラクタ
-                    Dim CALENDERMEMO14 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO14", MySqlDbType.VarChar)    '用車先_カレンダー画面メモ
-                    Dim CALENDERMEMO15 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO15", MySqlDbType.VarChar)    '車型_カレンダー画面メモ
-                    Dim CALENDERMEMO16 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO16", MySqlDbType.VarChar)    '陸事番号_カレンダー画面メモ
-                    Dim CALENDERMEMO17 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO17", MySqlDbType.VarChar)    '車腹_カレンダー画面メモ
-                    Dim CALENDERMEMO18 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO18", MySqlDbType.VarChar)    '車腹単位_カレンダー画面メモ
-                    Dim CALENDERMEMO19 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO19", MySqlDbType.VarChar)    '陸運局_カレンダー画面メモ
-                    Dim CALENDERMEMO20 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO20", MySqlDbType.VarChar)    '分類番号_カレンダー画面メモ
-                    Dim CALENDERMEMO21 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO21", MySqlDbType.VarChar)    'ひらがな_カレンダー画面メモ
-                    Dim CALENDERMEMO22 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO22", MySqlDbType.VarChar)    '一連指定番号_カレンダー画面メモ
-                    Dim CALENDERMEMO23 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO23", MySqlDbType.VarChar)    '陸事番号_トラクタ_カレンダー画面メモ
-                    Dim CALENDERMEMO24 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO24", MySqlDbType.VarChar)    '陸運局_トラクタ_カレンダー画面メモ
-                    Dim CALENDERMEMO25 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO25", MySqlDbType.VarChar)    '分類番号_トラクタ_カレンダー画面メモ
-                    Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらがな_トラクタ_カレンダー画面メモ
-                    Dim CALENDERMEMO27 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO27", MySqlDbType.VarChar)    '一連指定番号_トラクタ_カレンダー画面メモ
-                    Dim ORDSTDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDSTDATE", MySqlDbType.Date)   'オーダー開始日
-                    Dim ORDENDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDENDATE", MySqlDbType.Date)   'オーダー終了日
-                    Dim OPENENDATE As MySqlParameter = SQLcmd.Parameters.Add("@OPENENDATE", MySqlDbType.Date)   '表示用オーダー終了日
-                    Dim LUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@LUPDKEY", MySqlDbType.VarChar)    'L配更新キー
-                    Dim HUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@HUPDKEY", MySqlDbType.VarChar)    'はこぶわ更新キー
-                    Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
-                    Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
-                    Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
-                    Dim JXORDTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@JXORDTODOKENAME", MySqlDbType.VarChar)    'JX形式オーダー先頭届先名称
-                    Dim BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar)    '枝番
-                    Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
-                    Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
-                    Dim UPDATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEYMD", MySqlDbType.DateTime) '更新日時
-                    Dim CREATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@CREATEYMD", MySqlDbType.DateTime) '作成日時
-                    Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)    '削除フラグ
-                    Dim INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime) '登録年月日
-                    Dim INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar)    '登録ユーザーＩＤ
-                    Dim INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar)    '登録端末
-                    Dim INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar)    '登録プログラムＩＤ
-                    Dim UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)   '更新年月日
-                    Dim UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar)  '更新ユーザーＩＤ
-                    Dim UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar)  '更新端末
-                    Dim UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar)  '更新プログラムＩＤ
-                    Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)   '集信日時
+                Try
+                    Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                        ' DB更新用パラメータ
+                        Dim RECONO As MySqlParameter = SQLcmd.Parameters.Add("@RECONO", MySqlDbType.VarChar)    'レコード番号
+                        Dim LOADUNLOTYPE As MySqlParameter = SQLcmd.Parameters.Add("@LOADUNLOTYPE", MySqlDbType.VarChar)    '積込荷卸区分
+                        Dim STACKINGTYPE As MySqlParameter = SQLcmd.Parameters.Add("@STACKINGTYPE", MySqlDbType.VarChar)    '積置区分
+                        Dim HSETID As MySqlParameter = SQLcmd.Parameters.Add("@HSETID", MySqlDbType.VarChar)    '配送セットID
+                        Dim ORDERORGSELECT As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGSELECT", MySqlDbType.VarChar)    '受注受付部署選択
+                        Dim ORDERORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGNAME", MySqlDbType.VarChar)    '受注受付部署名
+                        Dim ORDERORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGCODE", MySqlDbType.VarChar)    '受注受付部署コード
+                        Dim ORDERORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORGNAMES", MySqlDbType.VarChar)  '受注受付部署略名
+                        Dim KASANAMEORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANAMEORDERORG", MySqlDbType.VarChar)    '加算先部署名_受注受付部署
+                        Dim KASANCODEORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANCODEORDERORG", MySqlDbType.VarChar)  '加算先部署コード_受注受付部署
+                        Dim KASANAMESORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANAMESORDERORG", MySqlDbType.VarChar)  '加算先部署略名_受注受付部署
+                        Dim ORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@ORDERORG", MySqlDbType.VarChar)    '受注受付部署
+                        Dim KASANORDERORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANORDERORG", MySqlDbType.VarChar)  '加算先受注受付部署
+                        Dim PRODUCTSLCT As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCTSLCT", MySqlDbType.VarChar)  '品名選択
+                        Dim PRODUCTSYOSAI As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCTSYOSAI", MySqlDbType.VarChar)  '品名詳細
+                        Dim PRODUCT2NAME As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT2NAME", MySqlDbType.VarChar)    '品名2名
+                        Dim PRODUCT2 As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT2", MySqlDbType.VarChar)    '品名2コード
+                        Dim PRODUCT1NAME As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT1NAME", MySqlDbType.VarChar)    '品名1名
+                        Dim PRODUCT1 As MySqlParameter = SQLcmd.Parameters.Add("@PRODUCT1", MySqlDbType.VarChar)    '品名1コード
+                        Dim OILNAME As MySqlParameter = SQLcmd.Parameters.Add("@OILNAME", MySqlDbType.VarChar)  '油種名
+                        Dim OILTYPE As MySqlParameter = SQLcmd.Parameters.Add("@OILTYPE", MySqlDbType.VarChar)  '油種コード
+                        Dim TODOKESLCT As MySqlParameter = SQLcmd.Parameters.Add("@TODOKESLCT", MySqlDbType.VarChar)    '届先選択
+                        Dim TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar)    '届先コード
+                        Dim TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar)    '届先名称
+                        Dim TODOKENAMES As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAMES", MySqlDbType.VarChar)  '届先略名
+                        Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)    '届先取引先コード
+                        Dim TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)    '届先取引先名称
+                        Dim TORICODE_AVOCADO As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE_AVOCADO", MySqlDbType.VarChar)    '届先取引先コード_アボカド
+                        Dim TODOKEADDR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEADDR", MySqlDbType.VarChar)    '届先住所
+                        Dim TODOKETEL As MySqlParameter = SQLcmd.Parameters.Add("@TODOKETEL", MySqlDbType.VarChar)  '届先電話番号
+                        Dim TODOKEMAP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEMAP", MySqlDbType.VarChar)  '届先Googleマップ
+                        Dim TODOKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEIDO", MySqlDbType.VarChar)  '届先緯度
+                        Dim TODOKEKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEKEIDO", MySqlDbType.VarChar)  '届先経度
+                        Dim TODOKEBIKO1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO1", MySqlDbType.VarChar)  '届先備考1
+                        Dim TODOKEBIKO2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO2", MySqlDbType.VarChar)  '届先備考2
+                        Dim TODOKEBIKO3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO3", MySqlDbType.VarChar)  '届先備考3
+                        Dim TODOKECOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR1", MySqlDbType.VarChar)    '届先カラーコード_背景色
+                        Dim TODOKECOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR2", MySqlDbType.VarChar)    '届先カラーコード_境界色
+                        Dim TODOKECOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR3", MySqlDbType.VarChar)    '届先カラーコード_文字色
+                        Dim SHUKASLCT As MySqlParameter = SQLcmd.Parameters.Add("@SHUKASLCT", MySqlDbType.VarChar)  '出荷場所選択
+                        Dim SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar)    '出荷場所コード
+                        Dim SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar)  '出荷場所名称
+                        Dim SHUKANAMES As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAMES", MySqlDbType.VarChar)    '出荷場所略名
+                        Dim SHUKATORICODE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORICODE", MySqlDbType.VarChar)  '出荷場所取引先コード
+                        Dim SHUKATORINAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORINAME", MySqlDbType.VarChar)  '出荷場所取引先名称
+                        Dim SHUKAADDR As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDR", MySqlDbType.VarChar)  '出荷場所住所
+                        Dim SHUKAADDRTEL As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDRTEL", MySqlDbType.VarChar)    '出荷場所電話番号
+                        Dim SHUKAMAP As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAMAP", MySqlDbType.VarChar)    '出荷場所Googleマップ
+                        Dim SHUKAIDO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAIDO", MySqlDbType.VarChar)    '出荷場所緯度
+                        Dim SHUKAKEIDO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAKEIDO", MySqlDbType.VarChar)    '出荷場所経度
+                        Dim SHUKABIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU1", MySqlDbType.VarChar)  '出荷場所備考1
+                        Dim SHUKABIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU2", MySqlDbType.VarChar)  '出荷場所備考2
+                        Dim SHUKABIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU3", MySqlDbType.VarChar)  '出荷場所備考3
+                        Dim SHUKACOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR1", MySqlDbType.VarChar)  '出荷場所カラーコード_背景色
+                        Dim SHUKACOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR2", MySqlDbType.VarChar)  '出荷場所カラーコード_境界色
+                        Dim SHUKACOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR3", MySqlDbType.VarChar)  '出荷場所カラーコード_文字色
+                        Dim REQUIREDTIME As MySqlParameter = SQLcmd.Parameters.Add("@REQUIREDTIME", MySqlDbType.VarChar)  '標準所要時間
+                        Dim SHUKADATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE", MySqlDbType.Date) '出荷日
+                        Dim LOADTIME As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIME", MySqlDbType.VarChar)   '積込時間
+                        Dim LOADTIMEIN As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIMEIN", MySqlDbType.VarChar)    '積込時間手入力
+                        Dim LOADTIMES As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIMES", MySqlDbType.VarChar)  '積込時間_画面表示用
+                        Dim TODOKEDATE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE", MySqlDbType.Date)   '届日
+                        Dim SHITEITIME As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIME", MySqlDbType.VarChar)   '指定時間
+                        Dim SHITEITIMEIN As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIMEIN", MySqlDbType.VarChar)    '指定時間手入力
+                        Dim SHITEITIMES As MySqlParameter = SQLcmd.Parameters.Add("@SHITEITIMES", MySqlDbType.VarChar)  '指定時間_画面表示用
+                        Dim ZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@ZYUTYU", MySqlDbType.Decimal)    '受注数量
+                        Dim ZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@ZISSEKI", MySqlDbType.Decimal)  '実績数量
+                        Dim TANNI As MySqlParameter = SQLcmd.Parameters.Add("@TANNI", MySqlDbType.VarChar)  '数量単位
+                        Dim GYOUMUSIZI1 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI1", MySqlDbType.VarChar)  '業務指示1
+                        Dim GYOUMUSIZI2 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI2", MySqlDbType.VarChar)  '業務指示2
+                        Dim GYOUMUSIZI3 As MySqlParameter = SQLcmd.Parameters.Add("@GYOUMUSIZI3", MySqlDbType.VarChar)  '業務指示3
+                        Dim NINUSHIBIKOU As MySqlParameter = SQLcmd.Parameters.Add("@NINUSHIBIKOU", MySqlDbType.VarChar)    '荷主備考
+                        Dim MAXCAPACITY As MySqlParameter = SQLcmd.Parameters.Add("@MAXCAPACITY", MySqlDbType.VarChar)    '最大積載量
+                        Dim GYOMUSYABAN As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUSYABAN", MySqlDbType.VarChar)  '業務車番選択
+                        Dim SHIPORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORGNAME", MySqlDbType.VarChar)  '出荷部署名
+                        Dim SHIPORG As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORG", MySqlDbType.VarChar)  '出荷部署コード
+                        Dim SHIPORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@SHIPORGNAMES", MySqlDbType.VarChar)    '出荷部署略名
+                        Dim KASANSHIPORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORGNAME", MySqlDbType.VarChar)    '加算先出荷部署名
+                        Dim KASANSHIPORG As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORG", MySqlDbType.VarChar)    '加算先出荷部署コード
+                        Dim KASANSHIPORGNAMES As MySqlParameter = SQLcmd.Parameters.Add("@KASANSHIPORGNAMES", MySqlDbType.VarChar)  '加算先出荷部署略名
+                        Dim TANKNUM As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUM", MySqlDbType.VarChar)  '統一車番
+                        Dim TANKNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TANKNUMBER", MySqlDbType.VarChar)    '陸事番号
+                        Dim SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar)  '車型
+                        Dim SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.VarChar)    '車腹
+                        Dim NINUSHINAME As MySqlParameter = SQLcmd.Parameters.Add("@NINUSHINAME", MySqlDbType.VarChar)  '荷主名
+                        Dim CONTYPE As MySqlParameter = SQLcmd.Parameters.Add("@CONTYPE", MySqlDbType.VarChar)  '契約区分
+                        Dim PRO1SYARYOU As MySqlParameter = SQLcmd.Parameters.Add("@PRO1SYARYOU", MySqlDbType.VarChar)  '品名1名_車両
+                        Dim TANKMEMO As MySqlParameter = SQLcmd.Parameters.Add("@TANKMEMO", MySqlDbType.VarChar)    '車両メモ
+                        Dim TANKBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU1", MySqlDbType.VarChar)    '車両備考1
+                        Dim TANKBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU2", MySqlDbType.VarChar)    '車両備考2
+                        Dim TANKBIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@TANKBIKOU3", MySqlDbType.VarChar)    '車両備考3
+                        Dim TRACTORNUM As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUM", MySqlDbType.VarChar)    '統一車番_トラクタ
+                        Dim TRACTORNUMBER As MySqlParameter = SQLcmd.Parameters.Add("@TRACTORNUMBER", MySqlDbType.VarChar)  '陸事番号_トラクタ
+                        Dim TRIP As MySqlParameter = SQLcmd.Parameters.Add("@TRIP", MySqlDbType.Int16)  'トリップ
+                        Dim DRP As MySqlParameter = SQLcmd.Parameters.Add("@DRP", MySqlDbType.Int16)    'ドロップ
+                        Dim ROTATION As MySqlParameter = SQLcmd.Parameters.Add("@ROTATION", MySqlDbType.Int16)    '回転数
+                        Dim UNKOUMEMO As MySqlParameter = SQLcmd.Parameters.Add("@UNKOUMEMO", MySqlDbType.VarChar)  '当日前後運行メモ
+                        Dim SHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKKINTIME", MySqlDbType.VarChar) '出勤時間
+                        Dim STAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@STAFFSLCT", MySqlDbType.VarChar)  '乗務員選択
+                        Dim STAFFNAME As MySqlParameter = SQLcmd.Parameters.Add("@STAFFNAME", MySqlDbType.VarChar)  '氏名_乗務員
+                        Dim STAFFCODE As MySqlParameter = SQLcmd.Parameters.Add("@STAFFCODE", MySqlDbType.VarChar)  '社員番号_乗務員
+                        Dim SUBSTAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFSLCT", MySqlDbType.VarChar)    '副乗務員選択
+                        Dim SUBSTAFFNAME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNAME", MySqlDbType.VarChar)    '氏名_副乗務員
+                        Dim SUBSTAFFNUM As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNUM", MySqlDbType.VarChar)  '社員番号_副乗務員
+                        Dim CALENDERMEMO1 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO1", MySqlDbType.VarChar)  'カレンダー画面メモ表示[ON]
+                        Dim CALENDERMEMO2 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO2", MySqlDbType.VarChar)  '業務車番選択_カレンダー画面メモ
+                        Dim CALENDERMEMO3 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO3", MySqlDbType.VarChar)  '開始日_カレンダー画面メモ
+                        Dim CALENDERMEMO4 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO4", MySqlDbType.VarChar)  '終了日_カレンダー画面メモ
+                        Dim CALENDERMEMO5 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO5", MySqlDbType.VarChar)  '背景色_カレンダー画面メモ
+                        Dim CALENDERMEMO6 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO6", MySqlDbType.VarChar)  '境界色_カレンダー画面メモ
+                        Dim CALENDERMEMO7 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO7", MySqlDbType.VarChar)  '文字色_カレンダー画面メモ
+                        Dim CALENDERMEMO8 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO8", MySqlDbType.VarChar)  '表示内容_カレンダー画面メモ
+                        Dim CALENDERMEMO9 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO9", MySqlDbType.VarChar)  '業務車番_カレンダー画面メモ
+                        Dim CALENDERMEMO10 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO10", MySqlDbType.VarChar)    '表示用終了日_カレンダー画面メモ
+                        Dim GYOMUTANKNUM As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUTANKNUM", MySqlDbType.VarChar)    '業務車番
+                        Dim YOUSYA As MySqlParameter = SQLcmd.Parameters.Add("@YOUSYA", MySqlDbType.VarChar)    '用車先
+                        Dim RECOTITLE As MySqlParameter = SQLcmd.Parameters.Add("@RECOTITLE", MySqlDbType.VarChar)  'レコードタイトル用
+                        Dim SHUKODATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKODATE", MySqlDbType.Date)   '出庫日
+                        Dim KIKODATE As MySqlParameter = SQLcmd.Parameters.Add("@KIKODATE", MySqlDbType.Date)   '帰庫日
+                        Dim KIKOTIME As MySqlParameter = SQLcmd.Parameters.Add("@KIKOTIME", MySqlDbType.VarChar)   '帰庫時間
+                        Dim CREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU1", MySqlDbType.VarChar)    '乗務員備考1
+                        Dim CREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU2", MySqlDbType.VarChar)    '乗務員備考2
+                        Dim SUBCREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU1", MySqlDbType.VarChar)  '副乗務員備考1
+                        Dim SUBCREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU2", MySqlDbType.VarChar)  '副乗務員備考2
+                        Dim SUBSHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSHUKKINTIME", MySqlDbType.VarChar)   '出勤時間_副乗務員
+                        Dim CALENDERMEMO11 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO11", MySqlDbType.VarChar)    '乗務員選択_カレンダー画面メモ
+                        Dim CALENDERMEMO12 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO12", MySqlDbType.VarChar)    '社員番号_カレンダー画面メモ
+                        Dim CALENDERMEMO13 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO13", MySqlDbType.VarChar)    '内容詳細_カレンダー画面メモ
+                        Dim SYABARATANNI As MySqlParameter = SQLcmd.Parameters.Add("@SYABARATANNI", MySqlDbType.VarChar)    '車腹単位
+                        Dim TAIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@TAIKINTIME", MySqlDbType.VarChar)   '退勤時間
+                        Dim SUBTIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBTIKINTIME", MySqlDbType.VarChar)   '退勤時間_副乗務員
+                        Dim KVTITLE As MySqlParameter = SQLcmd.Parameters.Add("@KVTITLE", MySqlDbType.VarChar)  'kViewer用タイトル
+                        Dim KVZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@KVZYUTYU", MySqlDbType.VarChar)    'kViewer用受注数量
+                        Dim KVZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@KVZISSEKI", MySqlDbType.VarChar)  'kViewer用実績数量
+                        Dim KVCREW As MySqlParameter = SQLcmd.Parameters.Add("@KVCREW", MySqlDbType.VarChar)    'kViewer用乗務員情報
+                        Dim CREWCODE As MySqlParameter = SQLcmd.Parameters.Add("@CREWCODE", MySqlDbType.VarChar)    '乗務員コード_乗務員
+                        Dim SUBCREWCODE As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWCODE", MySqlDbType.VarChar)  '乗務員コード_副乗務員
+                        Dim KVSUBCREW As MySqlParameter = SQLcmd.Parameters.Add("@KVSUBCREW", MySqlDbType.VarChar)  'kViewer用副乗務員情報
+                        Dim ORDERHENKO As MySqlParameter = SQLcmd.Parameters.Add("@ORDERHENKO", MySqlDbType.VarChar)    'オーダー変更・削除
+                        Dim RIKUUNKYOKU As MySqlParameter = SQLcmd.Parameters.Add("@RIKUUNKYOKU", MySqlDbType.VarChar)  '陸運局
+                        Dim BUNRUINUMBER As MySqlParameter = SQLcmd.Parameters.Add("@BUNRUINUMBER", MySqlDbType.VarChar)    '分類番号
+                        Dim HIRAGANA As MySqlParameter = SQLcmd.Parameters.Add("@HIRAGANA", MySqlDbType.VarChar)    'ひらがな
+                        Dim ITIRENNUM As MySqlParameter = SQLcmd.Parameters.Add("@ITIRENNUM", MySqlDbType.VarChar)  '一連指定番号
+                        Dim TRACTER1 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER1", MySqlDbType.VarChar)    '陸運局_トラクタ
+                        Dim TRACTER2 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER2", MySqlDbType.VarChar)    '分類番号_トラクタ
+                        Dim TRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER3", MySqlDbType.VarChar)    'ひらがな_トラクタ
+                        Dim TRACTER4 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER4", MySqlDbType.VarChar)    '一連指定番号_トラクタ
+                        Dim TRACTER5 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER5", MySqlDbType.VarChar)    '車両備考1_トラクタ
+                        Dim TRACTER6 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER6", MySqlDbType.VarChar)    '車両備考2_トラクタ
+                        Dim TRACTER7 As MySqlParameter = SQLcmd.Parameters.Add("@TRACTER7", MySqlDbType.VarChar)    '車両備考3_トラクタ
+                        Dim HAISYAHUKA As MySqlParameter = SQLcmd.Parameters.Add("@HAISYAHUKA", MySqlDbType.VarChar)    '配車・配乗不可[不可]
+                        Dim HYOZIZYUNT As MySqlParameter = SQLcmd.Parameters.Add("@HYOZIZYUNT", MySqlDbType.VarChar)    '表示順_届先
+                        Dim HYOZIZYUNH As MySqlParameter = SQLcmd.Parameters.Add("@HYOZIZYUNH", MySqlDbType.VarChar)    '表示順_配車
+                        Dim HONTRACTER1 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER1", MySqlDbType.VarChar)  '本トラクタ選択
+                        Dim HONTRACTER2 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER2", MySqlDbType.VarChar)  '出荷部署名_本トラクタ
+                        Dim HONTRACTER3 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER3", MySqlDbType.VarChar)  '業務車番_本トラクタ
+                        Dim HONTRACTER4 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER4", MySqlDbType.VarChar)  '出荷部署コード_本トラクタ
+                        Dim HONTRACTER5 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER5", MySqlDbType.VarChar)  '出荷部署略名_本トラクタ
+                        Dim HONTRACTER6 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER6", MySqlDbType.VarChar)  '加算先出荷部署略名_本トラクタ
+                        Dim HONTRACTER7 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER7", MySqlDbType.VarChar)  '加算先出荷部署コード_本トラクタ
+                        Dim HONTRACTER8 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER8", MySqlDbType.VarChar)  '加算先出荷部署名_本トラクタ
+                        Dim HONTRACTER9 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER9", MySqlDbType.VarChar)  '用車先_本トラクタ
+                        Dim HONTRACTER10 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER10", MySqlDbType.VarChar)    '統一車番_本トラクタ
+                        Dim HONTRACTER11 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER11", MySqlDbType.VarChar)    '陸事番号_本トラクタ
+                        Dim HONTRACTER12 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER12", MySqlDbType.VarChar)    '車型_本トラクタ
+                        Dim HONTRACTER13 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER13", MySqlDbType.VarChar)    '車腹_本トラクタ
+                        Dim HONTRACTER14 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER14", MySqlDbType.VarChar)    '車腹単位_本トラクタ
+                        Dim HONTRACTER15 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER15", MySqlDbType.VarChar)    '陸運局_本トラクタ
+                        Dim HONTRACTER16 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER16", MySqlDbType.VarChar)    '分類番号_本トラクタ
+                        Dim HONTRACTER17 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER17", MySqlDbType.VarChar)    'ひらがな_本トラクタ
+                        Dim HONTRACTER18 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER18", MySqlDbType.VarChar)    '一連指定番号_本トラクタ
+                        Dim HONTRACTER19 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER19", MySqlDbType.VarChar)    '荷主名_本トラクタ
+                        Dim HONTRACTER20 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER20", MySqlDbType.VarChar)    '契約区分_本トラクタ
+                        Dim HONTRACTER21 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER21", MySqlDbType.VarChar)    '品名1名_車両_本トラクタ
+                        Dim HONTRACTER22 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER22", MySqlDbType.VarChar)    '車両メモ_本トラクタ
+                        Dim HONTRACTER23 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER23", MySqlDbType.VarChar)    '車両備考1_本トラクタ
+                        Dim HONTRACTER24 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER24", MySqlDbType.VarChar)    '車両備考2_本トラクタ
+                        Dim HONTRACTER25 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER25", MySqlDbType.VarChar)    '車両備考3_本トラクタ
+                        Dim CALENDERMEMO14 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO14", MySqlDbType.VarChar)    '用車先_カレンダー画面メモ
+                        Dim CALENDERMEMO15 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO15", MySqlDbType.VarChar)    '車型_カレンダー画面メモ
+                        Dim CALENDERMEMO16 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO16", MySqlDbType.VarChar)    '陸事番号_カレンダー画面メモ
+                        Dim CALENDERMEMO17 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO17", MySqlDbType.VarChar)    '車腹_カレンダー画面メモ
+                        Dim CALENDERMEMO18 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO18", MySqlDbType.VarChar)    '車腹単位_カレンダー画面メモ
+                        Dim CALENDERMEMO19 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO19", MySqlDbType.VarChar)    '陸運局_カレンダー画面メモ
+                        Dim CALENDERMEMO20 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO20", MySqlDbType.VarChar)    '分類番号_カレンダー画面メモ
+                        Dim CALENDERMEMO21 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO21", MySqlDbType.VarChar)    'ひらがな_カレンダー画面メモ
+                        Dim CALENDERMEMO22 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO22", MySqlDbType.VarChar)    '一連指定番号_カレンダー画面メモ
+                        Dim CALENDERMEMO23 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO23", MySqlDbType.VarChar)    '陸事番号_トラクタ_カレンダー画面メモ
+                        Dim CALENDERMEMO24 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO24", MySqlDbType.VarChar)    '陸運局_トラクタ_カレンダー画面メモ
+                        Dim CALENDERMEMO25 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO25", MySqlDbType.VarChar)    '分類番号_トラクタ_カレンダー画面メモ
+                        Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらがな_トラクタ_カレンダー画面メモ
+                        Dim CALENDERMEMO27 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO27", MySqlDbType.VarChar)    '一連指定番号_トラクタ_カレンダー画面メモ
+                        Dim ORDSTDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDSTDATE", MySqlDbType.Date)   'オーダー開始日
+                        Dim ORDENDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDENDATE", MySqlDbType.Date)   'オーダー終了日
+                        Dim OPENENDATE As MySqlParameter = SQLcmd.Parameters.Add("@OPENENDATE", MySqlDbType.Date)   '表示用オーダー終了日
+                        Dim LUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@LUPDKEY", MySqlDbType.VarChar)    'L配更新キー
+                        Dim HUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@HUPDKEY", MySqlDbType.VarChar)    'はこぶわ更新キー
+                        Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
+                        Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
+                        Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
+                        Dim JXORDTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@JXORDTODOKENAME", MySqlDbType.VarChar)    'JX形式オーダー先頭届先名称
+                        Dim BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar)    '枝番
+                        Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
+                        Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
+                        Dim UPDATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEYMD", MySqlDbType.DateTime) '更新日時
+                        Dim CREATEYMD As MySqlParameter = SQLcmd.Parameters.Add("@CREATEYMD", MySqlDbType.DateTime) '作成日時
+                        Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)    '削除フラグ
+                        Dim INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime) '登録年月日
+                        Dim INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar)    '登録ユーザーＩＤ
+                        Dim INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar)    '登録端末
+                        Dim INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar)    '登録プログラムＩＤ
+                        Dim UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)   '更新年月日
+                        Dim UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar)  '更新ユーザーＩＤ
+                        Dim UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar)  '更新端末
+                        Dim UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar)  '更新プログラムＩＤ
+                        Dim RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)   '集信日時
 
-                    For Each updRow As DataRow In iTbl.Rows
+                        '前処理でチェックした出力先と同じテーブルに出力する
+                        For Each updRow As DataRow In iTbl.Select("OUTTBL='" & TblName & "'")
+                            SaveRecordNo = updRow("レコード番号")
+                            SaveTori = updRow("届先取引先コード")
+                            SaveToriName = updRow("届先取引先名称")
+                            SaveOrg = updRow("受注受付部署コード")
+                            SaveOrgName = updRow("受注受付部署名")
 
-                        SaveRecordNo = updRow("レコード番号")
-                        SaveTori = updRow("届先取引先コード")
-                        SaveToriName = updRow("届先取引先名称")
-                        SaveOrg = updRow("受注受付部署コード")
-                        SaveOrgName = updRow("受注受付部署名")
-
-                        RECONO.Value = updRow("レコード番号") 'レコード番号
-                        LOADUNLOTYPE.Value = updRow("積込荷卸区分")   '積込荷卸区分
-                        STACKINGTYPE.Value = updRow("積置区分") '積置区分
-                        HSETID.Value = updRow("配送セットID")    '配送セットID
-                        ORDERORGSELECT.Value = updRow("受注受付部署選択")   '受注受付部署選択
-                        ORDERORGNAME.Value = updRow("受注受付部署名")  '受注受付部署名
-                        ORDERORGCODE.Value = updRow("受注受付部署コード")    '受注受付部署コード
-                        ORDERORGNAMES.Value = updRow("受注受付部署略名")    '受注受付部署略名
-                        KASANAMEORDERORG.Value = updRow("加算先部署名_受注受付部署")    '加算先部署名_受注受付部署
-                        KASANCODEORDERORG.Value = updRow("加算先部署コード_受注受付部署") '加算先部署コード_受注受付部署
-                        KASANAMESORDERORG.Value = updRow("加算先部署略名_受注受付部署")  '加算先部署略名_受注受付部署
-                        ORDERORG.Value = updRow("受注受付部署")   '受注受付部署
-                        KASANORDERORG.Value = updRow("加算先受注受付部署")   '加算先受注受付部署
-                        PRODUCTSLCT.Value = updRow("品名選択")  '品名選択
-                        PRODUCTSYOSAI.Value = updRow("品名詳細")    '品名詳細
-                        PRODUCT2NAME.Value = updRow("品名2名") '品名2名
-                        PRODUCT2.Value = updRow("品名2コード")   '品名2コード
-                        PRODUCT1NAME.Value = updRow("品名1名") '品名1名
-                        PRODUCT1.Value = updRow("品名1コード")   '品名1コード
-                        OILNAME.Value = updRow("油種名")   '油種名
-                        OILTYPE.Value = updRow("油種コード") '油種コード
-                        TODOKESLCT.Value = updRow("届先選択")   '届先選択
-                        TODOKECODE.Value = updRow("届先コード")  '届先コード
-                        TODOKENAME.Value = updRow("届先名称")   '届先名称
-                        TODOKENAMES.Value = updRow("届先略名")  '届先略名
-                        TORICODE.Value = updRow("届先取引先コード") '届先取引先コード（先頭5桁＋"00000"に編集済）
-                        TORINAME.Value = updRow("届先取引先名称")  '届先取引先名称
-                        TORICODE_AVOCADO.Value = updRow("TORICODE_AVOCADO") '届先取引先コード（アボカドコードをそのまま）
-                        TODOKEADDR.Value = updRow("届先住所")   '届先住所
-                        TODOKETEL.Value = updRow("届先電話番号")  '届先電話番号
-                        If updRow("届先緯度") = "" AndAlso updRow("届先経度") = "" Then
-                            TODOKEMAP.Value = updRow("届先Googleマップ")  '届先Googleマップ
-                        Else
-                            TODOKEMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("届先緯度"), updRow("届先経度"))  '届先Googleマップ
-                        End If
-                        TODOKEIDO.Value = updRow("届先緯度")    '届先緯度
-                        TODOKEKEIDO.Value = updRow("届先経度")  '届先経度
-                        TODOKEBIKO1.Value = updRow("届先備考1") '届先備考1
-                        TODOKEBIKO2.Value = updRow("届先備考2") '届先備考2
-                        TODOKEBIKO3.Value = updRow("届先備考3") '届先備考3
-                        TODOKECOLOR1.Value = updRow("届先カラーコード_背景色") '届先カラーコード_背景色
-                        TODOKECOLOR2.Value = updRow("届先カラーコード_境界色") '届先カラーコード_境界色
-                        TODOKECOLOR3.Value = updRow("届先カラーコード_文字色") '届先カラーコード_文字色
-                        SHUKASLCT.Value = updRow("出荷場所選択")  '出荷場所選択
-                        SHUKABASHO.Value = updRow("出荷場所コード")    '出荷場所コード
-                        SHUKANAME.Value = updRow("出荷場所名称")  '出荷場所名称
-                        SHUKANAMES.Value = updRow("出荷場所略名") '出荷場所略名
-                        SHUKATORICODE.Value = updRow("出荷場所取引先コード")  '出荷場所取引先コード
-                        SHUKATORINAME.Value = updRow("出荷場所取引先名称")   '出荷場所取引先名称
-                        SHUKAADDR.Value = updRow("出荷場所住所")  '出荷場所住所
-                        SHUKAADDRTEL.Value = updRow("出荷場所電話番号") '出荷場所電話番号
-                        If updRow("出荷場所緯度") = "" AndAlso updRow("出荷場所経度") = "" Then
-                            SHUKAMAP.Value = updRow("出荷場所Googleマップ")    '出荷場所Googleマップ
-                        Else
-                            SHUKAMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("出荷場所緯度"), updRow("出荷場所経度"))  '出荷場所Googleマップ
-                        End If
-                        SHUKAIDO.Value = updRow("出荷場所緯度")   '出荷場所緯度
-                        SHUKAKEIDO.Value = updRow("出荷場所経度") '出荷場所経度
-                        SHUKABIKOU1.Value = updRow("出荷場所備考1")   '出荷場所備考1
-                        SHUKABIKOU2.Value = updRow("出荷場所備考2")   '出荷場所備考2
-                        SHUKABIKOU3.Value = updRow("出荷場所備考3")   '出荷場所備考3
-                        SHUKACOLOR1.Value = updRow("出荷場所カラーコード_背景色")    '出荷場所カラーコード_背景色
-                        SHUKACOLOR2.Value = updRow("出荷場所カラーコード_境界色")    '出荷場所カラーコード_境界色
-                        SHUKACOLOR3.Value = updRow("出荷場所カラーコード_文字色")    '出荷場所カラーコード_文字色
-                        If iTbl.Columns.Contains("標準所要時間") Then
-                            REQUIREDTIME.Value = updRow("標準所要時間") '標準所要時間
-                        Else
-                            REQUIREDTIME.Value = "" '標準所要時間
-                        End If
-                        If String.IsNullOrEmpty(updRow("出荷日")) Then
-                            SHUKADATE.Value = DBNull.Value    '出荷日
-                        Else
-                            SHUKADATE.Value = updRow("出荷日") '出荷日
-                        End If
-                        LOADTIME.Value = updRow("積込時間") '積込時間
-                        LOADTIMEIN.Value = updRow("積込時間手入力")    '積込時間手入力
-                        LOADTIMES.Value = updRow("積込時間_画面表示用")  '積込時間_画面表示用
-                        If String.IsNullOrEmpty(updRow("届日")) Then
-                            TODOKEDATE.Value = DBNull.Value '届日
-                        Else
-                            TODOKEDATE.Value = updRow("届日") '届日
-                        End If
-                        SHITEITIME.Value = updRow("指定時間")   '指定時間
-                        SHITEITIMEIN.Value = updRow("指定時間手入力")  '指定時間手入力
-                        SHITEITIMES.Value = updRow("指定時間_画面表示用")    '指定時間_画面表示用
-                        If String.IsNullOrEmpty(updRow("受注数量")) Then
-                            ZYUTYU.Value = 0   '受注数量
-                        Else
-                            ZYUTYU.Value = updRow("受注数量")   '受注数量
-                        End If
-                        If String.IsNullOrEmpty(updRow("実績数量")) Then
-                            ZISSEKI.Value = 0  '実績数量
-                        Else
-                            ZISSEKI.Value = updRow("実績数量")  '実績数量
-                        End If
-                        TANNI.Value = updRow("数量単位")    '数量単位
-                        GYOUMUSIZI1.Value = updRow("業務指示1") '業務指示1
-                        GYOUMUSIZI2.Value = updRow("業務指示2") '業務指示2
-                        GYOUMUSIZI3.Value = updRow("業務指示3") '業務指示3
-                        If iTbl.Columns.Contains("荷主備考") Then
-                            NINUSHIBIKOU.Value = updRow("荷主備考") '荷主備考
-                        Else
-                            NINUSHIBIKOU.Value = ""    '荷主備考
-                        End If
-                        MAXCAPACITY.Value = updRow("最大積載量") '最大積載量
-                        GYOMUSYABAN.Value = updRow("業務車番選択")    '業務車番選択
-                        SHIPORGNAME.Value = updRow("出荷部署名") '出荷部署名
-                        SHIPORG.Value = updRow("出荷部署コード")   '出荷部署コード
-                        SHIPORGNAMES.Value = updRow("出荷部署略名")   '出荷部署略名
-                        KASANSHIPORGNAME.Value = updRow("加算先出荷部署名") '加算先出荷部署名
-                        KASANSHIPORG.Value = updRow("加算先出荷部署コード")   '加算先出荷部署コード
-                        KASANSHIPORGNAMES.Value = updRow("加算先出荷部署略名")   '加算先出荷部署略名
-                        TANKNUM.Value = updRow("統一車番")  '統一車番
-                        TANKNUMBER.Value = updRow("陸事番号")   '陸事番号
-                        SYAGATA.Value = updRow("車型")    '車型
-                        SYABARA.Value = updRow("車腹")    '車腹
-                        NINUSHINAME.Value = updRow("荷主名")   '荷主名
-                        CONTYPE.Value = updRow("契約区分")  '契約区分
-                        PRO1SYARYOU.Value = updRow("品名1名_車両")   '品名1名_車両
-                        TANKMEMO.Value = updRow("車両メモ") '車両メモ
-                        TANKBIKOU1.Value = updRow("車両備考1")  '車両備考1
-                        TANKBIKOU2.Value = updRow("車両備考2")  '車両備考2
-                        TANKBIKOU3.Value = updRow("車両備考3")  '車両備考3
-                        TRACTORNUM.Value = updRow("統一車番_トラクタ")  '統一車番_トラクタ
-                        TRACTORNUMBER.Value = updRow("陸事番号_トラクタ")   '陸事番号_トラクタ
-                        If String.IsNullOrEmpty(updRow("トリップ")) Then
-                            TRIP.Value = 0 'トリップ
-                        Else
-                            TRIP.Value = updRow("トリップ") 'トリップ
-                        End If
-                        If String.IsNullOrEmpty(updRow("ドロップ")) Then
-                            DRP.Value = 0  'ドロップ
-                        Else
-                            DRP.Value = updRow("ドロップ")  'ドロップ
-                        End If
-                        If iTbl.Columns.Contains("回転数") Then
-                            If String.IsNullOrEmpty(updRow("回転数")) Then
-                                ROTATION.Value = 0  '回転数
+                            RECONO.Value = updRow("レコード番号") 'レコード番号
+                            LOADUNLOTYPE.Value = updRow("積込荷卸区分")   '積込荷卸区分
+                            STACKINGTYPE.Value = updRow("積置区分") '積置区分
+                            HSETID.Value = updRow("配送セットID")    '配送セットID
+                            ORDERORGSELECT.Value = updRow("受注受付部署選択")   '受注受付部署選択
+                            ORDERORGNAME.Value = updRow("受注受付部署名")  '受注受付部署名
+                            ORDERORGCODE.Value = updRow("受注受付部署コード")    '受注受付部署コード
+                            ORDERORGNAMES.Value = updRow("受注受付部署略名")    '受注受付部署略名
+                            KASANAMEORDERORG.Value = updRow("加算先部署名_受注受付部署")    '加算先部署名_受注受付部署
+                            KASANCODEORDERORG.Value = updRow("加算先部署コード_受注受付部署") '加算先部署コード_受注受付部署
+                            KASANAMESORDERORG.Value = updRow("加算先部署略名_受注受付部署")  '加算先部署略名_受注受付部署
+                            ORDERORG.Value = updRow("受注受付部署")   '受注受付部署
+                            KASANORDERORG.Value = updRow("加算先受注受付部署")   '加算先受注受付部署
+                            PRODUCTSLCT.Value = updRow("品名選択")  '品名選択
+                            PRODUCTSYOSAI.Value = updRow("品名詳細")    '品名詳細
+                            PRODUCT2NAME.Value = updRow("品名2名") '品名2名
+                            PRODUCT2.Value = updRow("品名2コード")   '品名2コード
+                            PRODUCT1NAME.Value = updRow("品名1名") '品名1名
+                            PRODUCT1.Value = updRow("品名1コード")   '品名1コード
+                            OILNAME.Value = updRow("油種名")   '油種名
+                            OILTYPE.Value = updRow("油種コード") '油種コード
+                            TODOKESLCT.Value = updRow("届先選択")   '届先選択
+                            TODOKECODE.Value = updRow("届先コード")  '届先コード
+                            TODOKENAME.Value = updRow("届先名称")   '届先名称
+                            TODOKENAMES.Value = updRow("届先略名")  '届先略名
+                            TORICODE.Value = updRow("届先取引先コード") '届先取引先コード（先頭5桁＋"00000"に編集済）
+                            TORINAME.Value = updRow("届先取引先名称")  '届先取引先名称
+                            TORICODE_AVOCADO.Value = updRow("TORICODE_AVOCADO") '届先取引先コード（アボカドコードをそのまま）
+                            TODOKEADDR.Value = updRow("届先住所")   '届先住所
+                            TODOKETEL.Value = updRow("届先電話番号")  '届先電話番号
+                            If updRow("届先緯度") = "" AndAlso updRow("届先経度") = "" Then
+                                TODOKEMAP.Value = updRow("届先Googleマップ")  '届先Googleマップ
                             Else
-                                ROTATION.Value = updRow("回転数")  '回転数
+                                TODOKEMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("届先緯度"), updRow("届先経度"))  '届先Googleマップ
                             End If
-                        Else
-                            ROTATION.Value = 0  '回転数
-                        End If
-                        'UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ      2025/06/05 削除
-                        SHUKKINTIME.Value = updRow("出勤時間")  '出勤時間
-                        STAFFSLCT.Value = updRow("乗務員選択")   '乗務員選択
-                        STAFFNAME.Value = updRow("氏名_乗務員")  '氏名_乗務員
-                        STAFFCODE.Value = updRow("社員番号_乗務員")    '社員番号_乗務員
-                        SUBSTAFFSLCT.Value = updRow("副乗務員選択")   '副乗務員選択
-                        SUBSTAFFNAME.Value = updRow("氏名_副乗務員")  '氏名_副乗務員
-                        SUBSTAFFNUM.Value = updRow("社員番号_副乗務員") '社員番号_副乗務員
-                        CALENDERMEMO1.Value = updRow("カレンダー画面メモ表示") 'カレンダー画面メモ表示
-                        CALENDERMEMO2.Value = updRow("業務車番選択_カレンダー画面メモ")    '業務車番選択_カレンダー画面メモ
-                        CALENDERMEMO3.Value = updRow("開始日_カレンダー画面メモ")   '開始日_カレンダー画面メモ
-                        CALENDERMEMO4.Value = updRow("終了日_カレンダー画面メモ")   '終了日_カレンダー画面メモ
-                        CALENDERMEMO5.Value = updRow("背景色_カレンダー画面メモ")   '背景色_カレンダー画面メモ
-                        CALENDERMEMO6.Value = updRow("境界色_カレンダー画面メモ")   '境界色_カレンダー画面メモ
-                        CALENDERMEMO7.Value = updRow("文字色_カレンダー画面メモ")   '文字色_カレンダー画面メモ
-                        CALENDERMEMO8.Value = updRow("表示内容_カレンダー画面メモ")  '表示内容_カレンダー画面メモ
-                        CALENDERMEMO9.Value = updRow("業務車番_カレンダー画面メモ")  '業務車番_カレンダー画面メモ
-                        CALENDERMEMO10.Value = updRow("表示用終了日_カレンダー画面メモ")   '表示用終了日_カレンダー画面メモ
-                        GYOMUTANKNUM.Value = updRow("業務車番") '業務車番
-                        YOUSYA.Value = updRow("用車先")    '用車先
-                        RECOTITLE.Value = updRow("レコードタイトル用")   'レコードタイトル用
-                        If String.IsNullOrEmpty(updRow("出庫日")) Then
-                            SHUKODATE.Value = DBNull.Value '出庫日
-                        Else
-                            SHUKODATE.Value = updRow("出庫日") '出庫日
-                        End If
-                        If String.IsNullOrEmpty(updRow("帰庫日")) Then
-                            KIKODATE.Value = DBNull.Value  '帰庫日
-                        Else
-                            KIKODATE.Value = updRow("帰庫日")  '帰庫日
-                        End If
-                        KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
-                        CREWBIKOU1.Value = updRow("乗務員備考1") '乗務員備考1
-                        CREWBIKOU2.Value = updRow("乗務員備考2") '乗務員備考2
-                        SUBCREWBIKOU1.Value = updRow("副乗務員備考1") '副乗務員備考1
-                        SUBCREWBIKOU2.Value = updRow("副乗務員備考2") '副乗務員備考2
-                        SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
-                        CALENDERMEMO11.Value = updRow("乗務員選択_カレンダー画面メモ")    '乗務員選択_カレンダー画面メモ
-                        CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
-                        CALENDERMEMO13.Value = updRow("内容詳細_カレンダー画面メモ") '内容詳細_カレンダー画面メモ
-                        SYABARATANNI.Value = updRow("車腹単位") '車腹単位
-                        TAIKINTIME.Value = updRow("退勤時間")   '退勤時間
-                        SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員
-                        KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル
-                        KVZYUTYU.Value = updRow("kViewer用受注数量") 'kViewer用受注数量
-                        KVZISSEKI.Value = updRow("kViewer用実績数量")    'kViewer用実績数量
-                        KVCREW.Value = updRow("kViewer用乗務員情報")  'kViewer用乗務員情報
-                        CREWCODE.Value = updRow("乗務員コード_乗務員")   '乗務員コード_乗務員
-                        SUBCREWCODE.Value = updRow("乗務員コード_副乗務員")   '乗務員コード_副乗務員
-                        KVSUBCREW.Value = updRow("kViewer用副乗務員情報")  'kViewer用副乗務員情報
-                        ORDERHENKO.Value = updRow("オーダー変更削除")  'オーダー変更・削除
-                        RIKUUNKYOKU.Value = updRow("陸運局")   '陸運局
-                        BUNRUINUMBER.Value = updRow("分類番号") '分類番号
-                        HIRAGANA.Value = updRow("ひらがな") 'ひらがな
-                        ITIRENNUM.Value = updRow("一連指定番号")  '一連指定番号
-                        TRACTER1.Value = updRow("陸運局_トラクタ") '陸運局_トラクタ
-                        TRACTER2.Value = updRow("分類番号_トラクタ")    '分類番号_トラクタ
-                        TRACTER3.Value = updRow("ひらがな_トラクタ")    'ひらがな_トラクタ
-                        TRACTER4.Value = updRow("一連指定番号_トラクタ")  '一連指定番号_トラクタ
-                        TRACTER5.Value = updRow("車両備考1_トラクタ")   '車両備考1_トラクタ
-                        TRACTER6.Value = updRow("車両備考2_トラクタ")   '車両備考2_トラクタ
-                        TRACTER7.Value = updRow("車両備考3_トラクタ")   '車両備考3_トラクタ
-                        HAISYAHUKA.Value = updRow("配車配乗不可")    '配車・配乗不可[不可]
-                        HYOZIZYUNT.Value = updRow("表示順_届先") '表示順_届先
-                        HYOZIZYUNH.Value = updRow("表示順_配車") '表示順_配車
-                        HONTRACTER1.Value = updRow("本トラクタ選択")   '本トラクタ選択
-                        HONTRACTER2.Value = updRow("出荷部署名_本トラクタ")   '出荷部署名_本トラクタ
-                        HONTRACTER3.Value = updRow("業務車番_本トラクタ")    '業務車番_本トラクタ
-                        HONTRACTER4.Value = updRow("出荷部署コード_本トラクタ") '出荷部署コード_本トラクタ
-                        HONTRACTER5.Value = updRow("出荷部署略名_本トラクタ")  '出荷部署略名_本トラクタ
-                        HONTRACTER6.Value = updRow("加算先出荷部署略名_本トラクタ")   '加算先出荷部署略名_本トラクタ
-                        HONTRACTER7.Value = updRow("加算先出荷部署コード_本トラクタ")  '加算先出荷部署コード_本トラクタ
-                        HONTRACTER8.Value = updRow("加算先出荷部署名_本トラクタ")    '加算先出荷部署名_本トラクタ
-                        HONTRACTER9.Value = updRow("用車先_本トラクタ") '用車先_本トラクタ
-                        HONTRACTER10.Value = updRow("統一車番_本トラクタ")   '統一車番_本トラクタ
-                        HONTRACTER11.Value = updRow("陸事番号_本トラクタ")   '陸事番号_本トラクタ
-                        HONTRACTER12.Value = updRow("車型_本トラクタ") '車型_本トラクタ
-                        HONTRACTER13.Value = updRow("車腹_本トラクタ") '車腹_本トラクタ
-                        HONTRACTER14.Value = updRow("車腹単位_本トラクタ")   '車腹単位_本トラクタ
-                        HONTRACTER15.Value = updRow("陸運局_本トラクタ")    '陸運局_本トラクタ
-                        HONTRACTER16.Value = updRow("分類番号_本トラクタ")   '分類番号_本トラクタ
-                        HONTRACTER17.Value = updRow("ひらがな_本トラクタ")   'ひらがな_本トラクタ
-                        HONTRACTER18.Value = updRow("一連指定番号_本トラクタ") '一連指定番号_本トラクタ
-                        HONTRACTER19.Value = updRow("荷主名_本トラクタ")    '荷主名_本トラクタ
-                        HONTRACTER20.Value = updRow("契約区分_本トラクタ")   '契約区分_本トラクタ
-                        HONTRACTER21.Value = updRow("品名1名_車両_本トラクタ")    '品名1名_車両_本トラクタ
-                        HONTRACTER22.Value = updRow("車両メモ_本トラクタ")   '車両メモ_本トラクタ
-                        HONTRACTER23.Value = updRow("車両備考1_本トラクタ")  '車両備考1_本トラクタ
-                        HONTRACTER24.Value = updRow("車両備考2_本トラクタ")  '車両備考2_本トラクタ
-                        HONTRACTER25.Value = updRow("車両備考3_本トラクタ")  '車両備考3_本トラクタ
-                        CALENDERMEMO14.Value = updRow("用車先_カレンダー画面メモ")  '用車先_カレンダー画面メモ
-                        CALENDERMEMO15.Value = updRow("車型_カレンダー画面メモ")   '車型_カレンダー画面メモ
-                        CALENDERMEMO16.Value = updRow("陸事番号_カレンダー画面メモ") '陸事番号_カレンダー画面メモ
-                        CALENDERMEMO17.Value = updRow("車腹_カレンダー画面メモ")   '車腹_カレンダー画面メモ
-                        CALENDERMEMO18.Value = updRow("車腹単位_カレンダー画面メモ") '車腹単位_カレンダー画面メモ
-                        CALENDERMEMO19.Value = updRow("陸運局_カレンダー画面メモ")  '陸運局_カレンダー画面メモ
-                        CALENDERMEMO20.Value = updRow("分類番号_カレンダー画面メモ") '分類番号_カレンダー画面メモ
-                        CALENDERMEMO21.Value = updRow("ひらがな_カレンダー画面メモ") 'ひらがな_カレンダー画面メモ
-                        CALENDERMEMO22.Value = updRow("一連指定番号_カレンダー画面メモ")   '一連指定番号_カレンダー画面メモ
-                        CALENDERMEMO23.Value = updRow("陸事番号_トラクタ_カレンダー画面メモ")    '陸事番号_トラクタ_カレンダー画面メモ
-                        CALENDERMEMO24.Value = updRow("陸運局_トラクタ_カレンダー画面メモ") '陸運局_トラクタ_カレンダー画面メモ
-                        CALENDERMEMO25.Value = updRow("分類番号_トラクタ_カレンダー画面メモ")    '分類番号_トラクタ_カレンダー画面メモ
-                        CALENDERMEMO26.Value = updRow("ひらがな_トラクタ_カレンダー画面メモ")    'ひらがな_トラクタ_カレンダー画面メモ
-                        CALENDERMEMO27.Value = updRow("一連指定番号_トラクタ_カレンダー画面メモ")  '一連指定番号_トラクタ_カレンダー画面メモ
-                        If String.IsNullOrEmpty(updRow("オーダー開始日")) Then
-                            ORDSTDATE.Value = DBNull.Value 'オーダー開始日
-                        Else
-                            ORDSTDATE.Value = updRow("オーダー開始日") 'オーダー開始日
-                        End If
-                        If String.IsNullOrEmpty(updRow("オーダー終了日")) Then
-                            ORDENDATE.Value = DBNull.Value 'オーダー終了日
-                        Else
-                            ORDENDATE.Value = updRow("オーダー終了日") 'オーダー終了日
-                        End If
-                        If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
-                            OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
-                        Else
-                            OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
-                        End If
-                        If iTbl.Columns.Contains("L配更新キー") Then
-                            LUPDKEY.Value = updRow("L配更新キー")    'L配更新キー
-                        Else
-                            LUPDKEY.Value = ""    'L配更新キー
-                        End If
-                        If iTbl.Columns.Contains("はこぶわ更新キー") Then
-                            HUPDKEY.Value = updRow("はこぶわ更新キー")    'はこぶわ更新キー
-                        Else
-                            HUPDKEY.Value = ""    'はこぶわ更新キー
-                        End If
-                        If iTbl.Columns.Contains("JX形式オーダー更新キー") Then
-                            JXORDUPDKEY.Value = updRow("JX形式オーダー更新キー")    'JX形式オーダー更新キー
-                        Else
-                            JXORDUPDKEY.Value = ""    'JX形式オーダー更新キー
-                        End If
-                        If iTbl.Columns.Contains("JX形式オーダーファイル名") Then
-                            JXORDFILE.Value = updRow("JX形式オーダーファイル名")    'JX形式オーダーファイル名
-                        Else
-                            JXORDFILE.Value = ""    'JX形式オーダーファイル名
-                        End If
-                        If iTbl.Columns.Contains("JX形式オーダールート番号") Then
-                            JXORDROUTE.Value = updRow("JX形式オーダールート番号")   'JX形式オーダールート番号
-                        Else
-                            JXORDROUTE.Value = ""   'JX形式オーダールート番号
-                        End If
-                        If iTbl.Columns.Contains("JX形式オーダー先頭届先名称") Then
-                            JXORDTODOKENAME.Value = updRow("JX形式オーダー先頭届先名称")   'JX形式オーダー先頭届先名称
-                        Else
-                            JXORDTODOKENAME.Value = ""   'JX形式オーダー先頭届先名称
-                        End If
-                        BRANCHCODE.Value = "1"    '枝番
-                        UPDATEUSER.Value = updRow("更新者")    '更新者
-                        CREATEUSER.Value = updRow("作成者")    '作成者
-                        If String.IsNullOrEmpty(updRow("更新日時")) Then
-                            UPDATEYMD.Value = DBNull.Value    '更新日時
-                        Else
-                            UPDATEYMD.Value = updRow("更新日時")    '更新日時
-                        End If
-                        If String.IsNullOrEmpty(updRow("作成日時")) Then
-                            CREATEYMD.Value = DBNull.Value    '作成日時
-                        Else
-                            CREATEYMD.Value = updRow("作成日時")    '作成日時
-                        End If
-                        DELFLG.Value = C_DELETE_FLG.ALIVE  '削除フラグ
-                        INITYMD.Value = WW_DateNow                                      '登録年月日
-                        INITUSER.Value = Master.USERID                                   '登録ユーザーＩＤ
-                        INITTERMID.Value = Master.USERTERMID                               '登録端末
-                        INITPGID.Value = Me.GetType().BaseType.Name                      '登録プログラムＩＤ
-                        UPDYMD.Value = WW_DateNow                                      '更新年月日
-                        UPDUSER.Value = Master.USERID                                   '更新ユーザーＩＤ
-                        UPDTERMID.Value = Master.USERTERMID                               '更新端末
-                        UPDPGID.Value = Me.GetType().BaseType.Name                      '更新プログラムＩＤ
-                        RECEIVEYMD.Value = C_DEFAULT_YMD                                   '集信日時
+                            TODOKEIDO.Value = updRow("届先緯度")    '届先緯度
+                            TODOKEKEIDO.Value = updRow("届先経度")  '届先経度
+                            TODOKEBIKO1.Value = updRow("届先備考1") '届先備考1
+                            TODOKEBIKO2.Value = updRow("届先備考2") '届先備考2
+                            TODOKEBIKO3.Value = updRow("届先備考3") '届先備考3
+                            TODOKECOLOR1.Value = updRow("届先カラーコード_背景色") '届先カラーコード_背景色
+                            TODOKECOLOR2.Value = updRow("届先カラーコード_境界色") '届先カラーコード_境界色
+                            TODOKECOLOR3.Value = updRow("届先カラーコード_文字色") '届先カラーコード_文字色
+                            SHUKASLCT.Value = updRow("出荷場所選択")  '出荷場所選択
+                            SHUKABASHO.Value = updRow("出荷場所コード")    '出荷場所コード
+                            SHUKANAME.Value = updRow("出荷場所名称")  '出荷場所名称
+                            SHUKANAMES.Value = updRow("出荷場所略名") '出荷場所略名
+                            SHUKATORICODE.Value = updRow("出荷場所取引先コード")  '出荷場所取引先コード
+                            SHUKATORINAME.Value = updRow("出荷場所取引先名称")   '出荷場所取引先名称
+                            SHUKAADDR.Value = updRow("出荷場所住所")  '出荷場所住所
+                            SHUKAADDRTEL.Value = updRow("出荷場所電話番号") '出荷場所電話番号
+                            If updRow("出荷場所緯度") = "" AndAlso updRow("出荷場所経度") = "" Then
+                                SHUKAMAP.Value = updRow("出荷場所Googleマップ")    '出荷場所Googleマップ
+                            Else
+                                SHUKAMAP.Value = String.Format("https://www.google.com/maps?q={0},{1}", updRow("出荷場所緯度"), updRow("出荷場所経度"))  '出荷場所Googleマップ
+                            End If
+                            SHUKAIDO.Value = updRow("出荷場所緯度")   '出荷場所緯度
+                            SHUKAKEIDO.Value = updRow("出荷場所経度") '出荷場所経度
+                            SHUKABIKOU1.Value = updRow("出荷場所備考1")   '出荷場所備考1
+                            SHUKABIKOU2.Value = updRow("出荷場所備考2")   '出荷場所備考2
+                            SHUKABIKOU3.Value = updRow("出荷場所備考3")   '出荷場所備考3
+                            SHUKACOLOR1.Value = updRow("出荷場所カラーコード_背景色")    '出荷場所カラーコード_背景色
+                            SHUKACOLOR2.Value = updRow("出荷場所カラーコード_境界色")    '出荷場所カラーコード_境界色
+                            SHUKACOLOR3.Value = updRow("出荷場所カラーコード_文字色")    '出荷場所カラーコード_文字色
+                            If iTbl.Columns.Contains("標準所要時間") Then
+                                REQUIREDTIME.Value = updRow("標準所要時間") '標準所要時間
+                            Else
+                                REQUIREDTIME.Value = "" '標準所要時間
+                            End If
+                            If String.IsNullOrEmpty(updRow("出荷日")) Then
+                                SHUKADATE.Value = DBNull.Value    '出荷日
+                            Else
+                                SHUKADATE.Value = updRow("出荷日") '出荷日
+                            End If
+                            LOADTIME.Value = updRow("積込時間") '積込時間
+                            LOADTIMEIN.Value = updRow("積込時間手入力")    '積込時間手入力
+                            LOADTIMES.Value = updRow("積込時間_画面表示用")  '積込時間_画面表示用
+                            If String.IsNullOrEmpty(updRow("届日")) Then
+                                TODOKEDATE.Value = DBNull.Value '届日
+                            Else
+                                TODOKEDATE.Value = updRow("届日") '届日
+                            End If
+                            SHITEITIME.Value = updRow("指定時間")   '指定時間
+                            SHITEITIMEIN.Value = updRow("指定時間手入力")  '指定時間手入力
+                            SHITEITIMES.Value = updRow("指定時間_画面表示用")    '指定時間_画面表示用
+                            If String.IsNullOrEmpty(updRow("受注数量")) Then
+                                ZYUTYU.Value = 0   '受注数量
+                            Else
+                                ZYUTYU.Value = updRow("受注数量")   '受注数量
+                            End If
+                            If String.IsNullOrEmpty(updRow("実績数量")) Then
+                                ZISSEKI.Value = 0  '実績数量
+                            Else
+                                ZISSEKI.Value = updRow("実績数量")  '実績数量
+                            End If
+                            TANNI.Value = updRow("数量単位")    '数量単位
+                            GYOUMUSIZI1.Value = updRow("業務指示1") '業務指示1
+                            GYOUMUSIZI2.Value = updRow("業務指示2") '業務指示2
+                            GYOUMUSIZI3.Value = updRow("業務指示3") '業務指示3
+                            If iTbl.Columns.Contains("荷主備考") Then
+                                NINUSHIBIKOU.Value = updRow("荷主備考") '荷主備考
+                            Else
+                                NINUSHIBIKOU.Value = ""    '荷主備考
+                            End If
+                            MAXCAPACITY.Value = updRow("最大積載量") '最大積載量
+                            GYOMUSYABAN.Value = updRow("業務車番選択")    '業務車番選択
+                            SHIPORGNAME.Value = updRow("出荷部署名") '出荷部署名
+                            SHIPORG.Value = updRow("出荷部署コード")   '出荷部署コード
+                            SHIPORGNAMES.Value = updRow("出荷部署略名")   '出荷部署略名
+                            KASANSHIPORGNAME.Value = updRow("加算先出荷部署名") '加算先出荷部署名
+                            KASANSHIPORG.Value = updRow("加算先出荷部署コード")   '加算先出荷部署コード
+                            KASANSHIPORGNAMES.Value = updRow("加算先出荷部署略名")   '加算先出荷部署略名
+                            TANKNUM.Value = updRow("統一車番")  '統一車番
+                            TANKNUMBER.Value = updRow("陸事番号")   '陸事番号
+                            SYAGATA.Value = updRow("車型")    '車型
+                            SYABARA.Value = updRow("車腹")    '車腹
+                            NINUSHINAME.Value = updRow("荷主名")   '荷主名
+                            CONTYPE.Value = updRow("契約区分")  '契約区分
+                            PRO1SYARYOU.Value = updRow("品名1名_車両")   '品名1名_車両
+                            TANKMEMO.Value = updRow("車両メモ") '車両メモ
+                            TANKBIKOU1.Value = updRow("車両備考1")  '車両備考1
+                            TANKBIKOU2.Value = updRow("車両備考2")  '車両備考2
+                            TANKBIKOU3.Value = updRow("車両備考3")  '車両備考3
+                            TRACTORNUM.Value = updRow("統一車番_トラクタ")  '統一車番_トラクタ
+                            TRACTORNUMBER.Value = updRow("陸事番号_トラクタ")   '陸事番号_トラクタ
+                            If String.IsNullOrEmpty(updRow("トリップ")) Then
+                                TRIP.Value = 0 'トリップ
+                            Else
+                                TRIP.Value = updRow("トリップ") 'トリップ
+                            End If
+                            If String.IsNullOrEmpty(updRow("ドロップ")) Then
+                                DRP.Value = 0  'ドロップ
+                            Else
+                                DRP.Value = updRow("ドロップ")  'ドロップ
+                            End If
+                            If iTbl.Columns.Contains("回転数") Then
+                                If String.IsNullOrEmpty(updRow("回転数")) Then
+                                    ROTATION.Value = 0  '回転数
+                                Else
+                                    ROTATION.Value = updRow("回転数")  '回転数
+                                End If
+                            Else
+                                ROTATION.Value = 0  '回転数
+                            End If
+                            'UNKOUMEMO.Value = updRow("当日前後運行メモ")    '当日前後運行メモ      2025/06/05 削除
+                            SHUKKINTIME.Value = updRow("出勤時間")  '出勤時間
+                            STAFFSLCT.Value = updRow("乗務員選択")   '乗務員選択
+                            STAFFNAME.Value = updRow("氏名_乗務員")  '氏名_乗務員
+                            STAFFCODE.Value = updRow("社員番号_乗務員")    '社員番号_乗務員
+                            SUBSTAFFSLCT.Value = updRow("副乗務員選択")   '副乗務員選択
+                            SUBSTAFFNAME.Value = updRow("氏名_副乗務員")  '氏名_副乗務員
+                            SUBSTAFFNUM.Value = updRow("社員番号_副乗務員") '社員番号_副乗務員
+                            CALENDERMEMO1.Value = updRow("カレンダー画面メモ表示") 'カレンダー画面メモ表示
+                            CALENDERMEMO2.Value = updRow("業務車番選択_カレンダー画面メモ")    '業務車番選択_カレンダー画面メモ
+                            CALENDERMEMO3.Value = updRow("開始日_カレンダー画面メモ")   '開始日_カレンダー画面メモ
+                            CALENDERMEMO4.Value = updRow("終了日_カレンダー画面メモ")   '終了日_カレンダー画面メモ
+                            CALENDERMEMO5.Value = updRow("背景色_カレンダー画面メモ")   '背景色_カレンダー画面メモ
+                            CALENDERMEMO6.Value = updRow("境界色_カレンダー画面メモ")   '境界色_カレンダー画面メモ
+                            CALENDERMEMO7.Value = updRow("文字色_カレンダー画面メモ")   '文字色_カレンダー画面メモ
+                            CALENDERMEMO8.Value = updRow("表示内容_カレンダー画面メモ")  '表示内容_カレンダー画面メモ
+                            CALENDERMEMO9.Value = updRow("業務車番_カレンダー画面メモ")  '業務車番_カレンダー画面メモ
+                            CALENDERMEMO10.Value = updRow("表示用終了日_カレンダー画面メモ")   '表示用終了日_カレンダー画面メモ
+                            GYOMUTANKNUM.Value = updRow("業務車番") '業務車番
+                            YOUSYA.Value = updRow("用車先")    '用車先
+                            RECOTITLE.Value = updRow("レコードタイトル用")   'レコードタイトル用
+                            If String.IsNullOrEmpty(updRow("出庫日")) Then
+                                SHUKODATE.Value = DBNull.Value '出庫日
+                            Else
+                                SHUKODATE.Value = updRow("出庫日") '出庫日
+                            End If
+                            If String.IsNullOrEmpty(updRow("帰庫日")) Then
+                                KIKODATE.Value = DBNull.Value  '帰庫日
+                            Else
+                                KIKODATE.Value = updRow("帰庫日")  '帰庫日
+                            End If
+                            KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
+                            CREWBIKOU1.Value = updRow("乗務員備考1") '乗務員備考1
+                            CREWBIKOU2.Value = updRow("乗務員備考2") '乗務員備考2
+                            SUBCREWBIKOU1.Value = updRow("副乗務員備考1") '副乗務員備考1
+                            SUBCREWBIKOU2.Value = updRow("副乗務員備考2") '副乗務員備考2
+                            SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
+                            CALENDERMEMO11.Value = updRow("乗務員選択_カレンダー画面メモ")    '乗務員選択_カレンダー画面メモ
+                            CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
+                            CALENDERMEMO13.Value = updRow("内容詳細_カレンダー画面メモ") '内容詳細_カレンダー画面メモ
+                            SYABARATANNI.Value = updRow("車腹単位") '車腹単位
+                            TAIKINTIME.Value = updRow("退勤時間")   '退勤時間
+                            SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員
+                            KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル
+                            KVZYUTYU.Value = updRow("kViewer用受注数量") 'kViewer用受注数量
+                            KVZISSEKI.Value = updRow("kViewer用実績数量")    'kViewer用実績数量
+                            KVCREW.Value = updRow("kViewer用乗務員情報")  'kViewer用乗務員情報
+                            CREWCODE.Value = updRow("乗務員コード_乗務員")   '乗務員コード_乗務員
+                            SUBCREWCODE.Value = updRow("乗務員コード_副乗務員")   '乗務員コード_副乗務員
+                            KVSUBCREW.Value = updRow("kViewer用副乗務員情報")  'kViewer用副乗務員情報
+                            ORDERHENKO.Value = updRow("オーダー変更削除")  'オーダー変更・削除
+                            RIKUUNKYOKU.Value = updRow("陸運局")   '陸運局
+                            BUNRUINUMBER.Value = updRow("分類番号") '分類番号
+                            HIRAGANA.Value = updRow("ひらがな") 'ひらがな
+                            ITIRENNUM.Value = updRow("一連指定番号")  '一連指定番号
+                            TRACTER1.Value = updRow("陸運局_トラクタ") '陸運局_トラクタ
+                            TRACTER2.Value = updRow("分類番号_トラクタ")    '分類番号_トラクタ
+                            TRACTER3.Value = updRow("ひらがな_トラクタ")    'ひらがな_トラクタ
+                            TRACTER4.Value = updRow("一連指定番号_トラクタ")  '一連指定番号_トラクタ
+                            TRACTER5.Value = updRow("車両備考1_トラクタ")   '車両備考1_トラクタ
+                            TRACTER6.Value = updRow("車両備考2_トラクタ")   '車両備考2_トラクタ
+                            TRACTER7.Value = updRow("車両備考3_トラクタ")   '車両備考3_トラクタ
+                            HAISYAHUKA.Value = updRow("配車配乗不可")    '配車・配乗不可[不可]
+                            HYOZIZYUNT.Value = updRow("表示順_届先") '表示順_届先
+                            HYOZIZYUNH.Value = updRow("表示順_配車") '表示順_配車
+                            HONTRACTER1.Value = updRow("本トラクタ選択")   '本トラクタ選択
+                            HONTRACTER2.Value = updRow("出荷部署名_本トラクタ")   '出荷部署名_本トラクタ
+                            HONTRACTER3.Value = updRow("業務車番_本トラクタ")    '業務車番_本トラクタ
+                            HONTRACTER4.Value = updRow("出荷部署コード_本トラクタ") '出荷部署コード_本トラクタ
+                            HONTRACTER5.Value = updRow("出荷部署略名_本トラクタ")  '出荷部署略名_本トラクタ
+                            HONTRACTER6.Value = updRow("加算先出荷部署略名_本トラクタ")   '加算先出荷部署略名_本トラクタ
+                            HONTRACTER7.Value = updRow("加算先出荷部署コード_本トラクタ")  '加算先出荷部署コード_本トラクタ
+                            HONTRACTER8.Value = updRow("加算先出荷部署名_本トラクタ")    '加算先出荷部署名_本トラクタ
+                            HONTRACTER9.Value = updRow("用車先_本トラクタ") '用車先_本トラクタ
+                            HONTRACTER10.Value = updRow("統一車番_本トラクタ")   '統一車番_本トラクタ
+                            HONTRACTER11.Value = updRow("陸事番号_本トラクタ")   '陸事番号_本トラクタ
+                            HONTRACTER12.Value = updRow("車型_本トラクタ") '車型_本トラクタ
+                            HONTRACTER13.Value = updRow("車腹_本トラクタ") '車腹_本トラクタ
+                            HONTRACTER14.Value = updRow("車腹単位_本トラクタ")   '車腹単位_本トラクタ
+                            HONTRACTER15.Value = updRow("陸運局_本トラクタ")    '陸運局_本トラクタ
+                            HONTRACTER16.Value = updRow("分類番号_本トラクタ")   '分類番号_本トラクタ
+                            HONTRACTER17.Value = updRow("ひらがな_本トラクタ")   'ひらがな_本トラクタ
+                            HONTRACTER18.Value = updRow("一連指定番号_本トラクタ") '一連指定番号_本トラクタ
+                            HONTRACTER19.Value = updRow("荷主名_本トラクタ")    '荷主名_本トラクタ
+                            HONTRACTER20.Value = updRow("契約区分_本トラクタ")   '契約区分_本トラクタ
+                            HONTRACTER21.Value = updRow("品名1名_車両_本トラクタ")    '品名1名_車両_本トラクタ
+                            HONTRACTER22.Value = updRow("車両メモ_本トラクタ")   '車両メモ_本トラクタ
+                            HONTRACTER23.Value = updRow("車両備考1_本トラクタ")  '車両備考1_本トラクタ
+                            HONTRACTER24.Value = updRow("車両備考2_本トラクタ")  '車両備考2_本トラクタ
+                            HONTRACTER25.Value = updRow("車両備考3_本トラクタ")  '車両備考3_本トラクタ
+                            CALENDERMEMO14.Value = updRow("用車先_カレンダー画面メモ")  '用車先_カレンダー画面メモ
+                            CALENDERMEMO15.Value = updRow("車型_カレンダー画面メモ")   '車型_カレンダー画面メモ
+                            CALENDERMEMO16.Value = updRow("陸事番号_カレンダー画面メモ") '陸事番号_カレンダー画面メモ
+                            CALENDERMEMO17.Value = updRow("車腹_カレンダー画面メモ")   '車腹_カレンダー画面メモ
+                            CALENDERMEMO18.Value = updRow("車腹単位_カレンダー画面メモ") '車腹単位_カレンダー画面メモ
+                            CALENDERMEMO19.Value = updRow("陸運局_カレンダー画面メモ")  '陸運局_カレンダー画面メモ
+                            CALENDERMEMO20.Value = updRow("分類番号_カレンダー画面メモ") '分類番号_カレンダー画面メモ
+                            CALENDERMEMO21.Value = updRow("ひらがな_カレンダー画面メモ") 'ひらがな_カレンダー画面メモ
+                            CALENDERMEMO22.Value = updRow("一連指定番号_カレンダー画面メモ")   '一連指定番号_カレンダー画面メモ
+                            CALENDERMEMO23.Value = updRow("陸事番号_トラクタ_カレンダー画面メモ")    '陸事番号_トラクタ_カレンダー画面メモ
+                            CALENDERMEMO24.Value = updRow("陸運局_トラクタ_カレンダー画面メモ") '陸運局_トラクタ_カレンダー画面メモ
+                            CALENDERMEMO25.Value = updRow("分類番号_トラクタ_カレンダー画面メモ")    '分類番号_トラクタ_カレンダー画面メモ
+                            CALENDERMEMO26.Value = updRow("ひらがな_トラクタ_カレンダー画面メモ")    'ひらがな_トラクタ_カレンダー画面メモ
+                            CALENDERMEMO27.Value = updRow("一連指定番号_トラクタ_カレンダー画面メモ")  '一連指定番号_トラクタ_カレンダー画面メモ
+                            If String.IsNullOrEmpty(updRow("オーダー開始日")) Then
+                                ORDSTDATE.Value = DBNull.Value 'オーダー開始日
+                            Else
+                                ORDSTDATE.Value = updRow("オーダー開始日") 'オーダー開始日
+                            End If
+                            If String.IsNullOrEmpty(updRow("オーダー終了日")) Then
+                                ORDENDATE.Value = DBNull.Value 'オーダー終了日
+                            Else
+                                ORDENDATE.Value = updRow("オーダー終了日") 'オーダー終了日
+                            End If
+                            If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
+                                OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
+                            Else
+                                OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
+                            End If
+                            If iTbl.Columns.Contains("L配更新キー") Then
+                                LUPDKEY.Value = updRow("L配更新キー")    'L配更新キー
+                            Else
+                                LUPDKEY.Value = ""    'L配更新キー
+                            End If
+                            If iTbl.Columns.Contains("はこぶわ更新キー") Then
+                                HUPDKEY.Value = updRow("はこぶわ更新キー")    'はこぶわ更新キー
+                            Else
+                                HUPDKEY.Value = ""    'はこぶわ更新キー
+                            End If
+                            If iTbl.Columns.Contains("JX形式オーダー更新キー") Then
+                                JXORDUPDKEY.Value = updRow("JX形式オーダー更新キー")    'JX形式オーダー更新キー
+                            Else
+                                JXORDUPDKEY.Value = ""    'JX形式オーダー更新キー
+                            End If
+                            If iTbl.Columns.Contains("JX形式オーダーファイル名") Then
+                                JXORDFILE.Value = updRow("JX形式オーダーファイル名")    'JX形式オーダーファイル名
+                            Else
+                                JXORDFILE.Value = ""    'JX形式オーダーファイル名
+                            End If
+                            If iTbl.Columns.Contains("JX形式オーダールート番号") Then
+                                JXORDROUTE.Value = updRow("JX形式オーダールート番号")   'JX形式オーダールート番号
+                            Else
+                                JXORDROUTE.Value = ""   'JX形式オーダールート番号
+                            End If
+                            If iTbl.Columns.Contains("JX形式オーダー先頭届先名称") Then
+                                JXORDTODOKENAME.Value = updRow("JX形式オーダー先頭届先名称")   'JX形式オーダー先頭届先名称
+                            Else
+                                JXORDTODOKENAME.Value = ""   'JX形式オーダー先頭届先名称
+                            End If
+                            BRANCHCODE.Value = "1"    '枝番
+                            UPDATEUSER.Value = updRow("更新者")    '更新者
+                            CREATEUSER.Value = updRow("作成者")    '作成者
+                            If String.IsNullOrEmpty(updRow("更新日時")) Then
+                                UPDATEYMD.Value = DBNull.Value    '更新日時
+                            Else
+                                UPDATEYMD.Value = updRow("更新日時")    '更新日時
+                            End If
+                            If String.IsNullOrEmpty(updRow("作成日時")) Then
+                                CREATEYMD.Value = DBNull.Value    '作成日時
+                            Else
+                                CREATEYMD.Value = updRow("作成日時")    '作成日時
+                            End If
+                            DELFLG.Value = C_DELETE_FLG.ALIVE  '削除フラグ
+                            INITYMD.Value = WW_DateNow                                      '登録年月日
+                            INITUSER.Value = Master.USERID                                   '登録ユーザーＩＤ
+                            INITTERMID.Value = Master.USERTERMID                               '登録端末
+                            INITPGID.Value = Me.GetType().BaseType.Name                      '登録プログラムＩＤ
+                            UPDYMD.Value = WW_DateNow                                      '更新年月日
+                            UPDUSER.Value = Master.USERID                                   '更新ユーザーＩＤ
+                            UPDTERMID.Value = Master.USERTERMID                               '更新端末
+                            UPDPGID.Value = Me.GetType().BaseType.Name                      '更新プログラムＩＤ
+                            RECEIVEYMD.Value = C_DEFAULT_YMD                                   '集信日時
 
-                        SQLcmd.CommandTimeout = 300
-                        SQLcmd.ExecuteNonQuery()
-                    Next
-                End Using
-            Catch ex As Exception
-                Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
+                            SQLcmd.CommandTimeout = 300
+                            SQLcmd.ExecuteNonQuery()
+                        Next
+                    End Using
+                Catch ex As Exception
+                    Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい", "", True)
 
-                CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-                CS0011LOGWrite.INFPOSI = "DB:LNT0001 UPDATE_INSERT"
-                CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-                CS0011LOGWrite.TEXT = "（レコード番号：" & SaveRecordNo & " 営業所：" & SaveOrg & "）" & ex.ToString()
-                CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-                CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+                    CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+                    CS0011LOGWrite.INFPOSI = String.Format("DB:{0} UPDATE_INSERT", TblName)
+                    CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+                    CS0011LOGWrite.TEXT = "（レコード番号：" & SaveRecordNo & " 営業所：" & SaveOrg & "）" & ex.ToString()
+                    CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+                    CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
 
-                oResult = C_MESSAGE_NO.DB_ERROR
-                Exit Sub
-            End Try
+                    oResult = C_MESSAGE_NO.DB_ERROR
+                    Exit Sub
+                End Try
+            Next
 
             '○ DB更新SQL(実績取込履歴)
             SQLStr =
@@ -2326,7 +2828,6 @@ Public Class LNT0001ZissekiIntake
         End Using
 
     End Sub
-
     ''' <summary>
     ''' 輸送費テーブル更新
     ''' </summary>

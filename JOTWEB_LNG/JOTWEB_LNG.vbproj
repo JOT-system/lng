@@ -317,7 +317,6 @@
     <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaList.aspx" />
-    <Content Include="LNG\mas\LNM0006TankaSearch.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiDetail.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiHistory.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiList.aspx" />
@@ -630,13 +629,6 @@
     </Compile>
     <Compile Include="LNG\mas\LNM0006TankaList.aspx.vb">
       <DependentUpon>LNM0006TankaList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0006TankaSearch.aspx.designer.vb">
-      <DependentUpon>LNM0006TankaSearch.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LNG\mas\LNM0006TankaSearch.aspx.vb">
-      <DependentUpon>LNM0006TankaSearch.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNM0007KoteihiDetail.aspx.designer.vb">

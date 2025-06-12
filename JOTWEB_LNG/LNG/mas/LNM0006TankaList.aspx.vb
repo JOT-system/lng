@@ -30,8 +30,8 @@ Public Class LNM0006TankaList
     ''' <summary>
     ''' 定数
     ''' </summary>
-    Private Const CONST_DISPROWCOUNT As Integer = 16                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
+    Private Const CONST_DISPROWCOUNT As Integer = 19                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 19                 'マウススクロール時稼働行数
 
     '〇 帳票用
     Private Const CONST_COLOR_HATCHING_REQUIRED As String = "#FFFF00" '入力必須網掛け色
@@ -70,6 +70,7 @@ Public Class LNM0006TankaList
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
 
         Try
+
             If IsPostBack Then
                 '○ 各ボタン押下処理
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
@@ -78,16 +79,19 @@ Public Class LNM0006TankaList
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"          '追加ボタン押下
+                            InputSave()
                             WF_ButtonINSERT_Click()
                         Case "WF_ButtonHISTORY"         '変更履歴ボタン押下
+                            InputSave()
                             WF_ButtonHISTORY_Click()
                         Case "WF_ButtonDOWNLOAD"        'ダウンロードボタン押下
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND", "LNM0006S" '戻るボタン押下 （LNM0006S、パンくずより）
+                        Case "WF_ButtonEND" '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
+                            InputSave()
                             WF_Grid_DBClick()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
@@ -96,15 +100,27 @@ Public Class LNM0006TankaList
                             WF_ButtonDEBUG_Click()
                         Case "WF_ButtonExtract" '検索ボタン押下時
                             GridViewInitialize()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
+                        Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
+                            Me.WF_ButtonPAGE_Click()
+                        Case "WF_TORIChange" '荷主チェンジ
+                            Me.WF_TODOKE.Items.Clear()
+                            If Not WF_TORI.SelectedValue = "" Then
+                                Dim retTodokeList As New DropDownList
+                                retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_TORI.SelectedValue)
+                                For index As Integer = 0 To retTodokeList.Items.Count - 1
+                                    WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+                                Next
+                            End If
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
-                        Not WF_ButtonClick.Value = "WF_ButtonExtract" Then
+                        Not WF_ButtonClick.Value = "WF_ButtonExtract" And
+                        Not WF_ButtonClick.Value = "WF_ButtonPAGE" And
+                        Not WF_ButtonClick.Value = "WF_ButtonFIRST" And
+                        Not WF_ButtonClick.Value = "WF_ButtonPREVIOUS" And
+                        Not WF_ButtonClick.Value = "WF_ButtonNEXT" And
+                        Not WF_ButtonClick.Value = "WF_ButtonLAST" Then
                         DisplayGrid()
                     End If
 
@@ -168,8 +184,15 @@ Public Class LNM0006TankaList
         '○ 画面の値設定
         WW_MAPValueSet()
 
-        '○ GridView初期設定
-        GridViewInitialize()
+        Select Case Context.Handler.ToString().ToUpper()
+            '○ 登録・履歴画面からの遷移
+            Case C_PREV_MAP_LIST.LNM0006D, C_PREV_MAP_LIST.LNM0006H
+                '○ GridView復元
+                GridViewRestore()
+            Case Else
+                '○ GridView初期設定
+                GridViewInitialize()
+        End Select
 
         '〇 更新画面からの遷移もしくは、アップロード完了の場合、更新完了メッセージを出力
         If Not String.IsNullOrEmpty(work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text) Then
@@ -184,12 +207,30 @@ Public Class LNM0006TankaList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub createListBox()
-        Me.WF_TODOKE.Items.Clear()
-        Dim retTodokeList As New DropDownList
-        retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TORINAME_S.Text)
-        For index As Integer = 0 To retTodokeList.Items.Count - 1
-            WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+        '荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
+
+        '部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+
+        '出荷地
+        Me.WF_DEPARTURE.Items.Clear()
+        Dim retDepartureList As New DropDownList
+        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG)
+        For index As Integer = 0 To retDepartureList.Items.Count - 1
+            WF_DEPARTURE.Items.Add(New ListItem(retDepartureList.Items(index).Text, retDepartureList.Items(index).Value))
+        Next
+
     End Sub
 
     ''' <summary>
@@ -205,9 +246,31 @@ Public Class LNM0006TankaList
         'ElseIf Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNM0006D Then
         '    Master.RecoverTable(LNM0006tbl, work.WF_SEL_INPTBL.Text)
         'End If
+
         Select Case Context.Handler.ToString().ToUpper()
-            '○ MENUからの遷移
-            Case C_PREV_MAP_LIST.MENU
+            '○ 登録・履歴画面からの遷移
+            Case C_PREV_MAP_LIST.LNM0006D, C_PREV_MAP_LIST.LNM0006H
+                Master.RecoverTable(LNM0006tbl, work.WF_SEL_INPTBL.Text)
+                '対象日
+                Dim WW_YMD As String = Replace(work.WF_SEL_TARGETYMD_L.Text, "/", "")
+                WF_StYMD.Value = WW_YMD.Substring(0, 4) & "/" & WW_YMD.Substring(4, 2) & "/" & WW_YMD.Substring(6, 2)
+                '荷主
+                WF_TORI.SelectedValue = work.WF_SEL_TORI_L.Text
+                '部門
+                WF_ORG.SelectedValue = work.WF_SEL_ORG_L.Text
+                '届先
+                RestoreSelectTodoke()
+                '出荷地
+                WF_DEPARTURE.SelectedValue = work.WF_SEL_DEPARTURE_L.Text
+                '車番
+                WF_SHABAN_FROM.Text = work.WF_SEL_SHABAN_FROM_L.Text
+                WF_SHABAN_TO.Text = work.WF_SEL_SHABAN_TO_L.Text
+                '削除済みデータ表示状態
+                ChkDelDataFlg.Checked = work.WF_SEL_CHKDELDATAFLG_L.Text
+                '入力ページ
+                TxtPageNo.Text = work.WF_SEL_INPUTPAGE_L.Text
+                '○ MENUからの遷移
+            Case Else
                 If String.IsNullOrEmpty(Master.VIEWID) Then
                     rightview2.MAPIDS = LNM0006WRKINC.MAPIDS
                     rightview2.MAPID = LNM0006WRKINC.MAPIDL
@@ -223,21 +286,6 @@ Public Class LNM0006TankaList
                 End If
                 Master.CreateXMLSaveFile()
                 WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
-            '○ 検索画面からの遷移
-            Case C_PREV_MAP_LIST.LNM0006S
-                Master.CreateXMLSaveFile()
-                '有効開始日
-                If Not work.WF_SEL_STYMD_S.Text = "" Then
-                    WF_StYMD.Value = work.WF_SEL_STYMD_S.Text
-                Else
-                    WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
-                End If
-            '○ 登録・履歴画面からの遷移
-            Case C_PREV_MAP_LIST.LNM0006D, C_PREV_MAP_LIST.LNM0006H
-                Master.RecoverTable(LNM0006tbl, work.WF_SEL_INPTBL.Text)
-                Dim WW_YMD As String = Replace(work.WF_SEL_TARGETYMD_L.Text, "/", "")
-                WF_StYMD.Value = WW_YMD.Substring(0, 4) & "/" & WW_YMD.Substring(4, 2) & "/" & WW_YMD.Substring(6, 2)
-
         End Select
 
         '表示制御項目
@@ -247,6 +295,10 @@ Public Class LNM0006TankaList
         Else
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
+
+        ' 車番(From)・車番(To)を入力するテキストボックスは数値(0～9)のみ可能とする。
+        Me.WF_SHABAN_FROM.Attributes("onkeyPress") = "CheckNum()"
+        Me.WF_SHABAN_TO.Attributes("onkeyPress") = "CheckNum()"
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -272,6 +324,12 @@ Public Class LNM0006TankaList
 
         '〇 一覧の件数を取得
         Me.ListCount.Text = "件数：" + LNM0006tbl.Rows.Count.ToString()
+
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = "1"
+
+        '〇 最終ページ
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNM0006tbl.Rows.Count) / CONST_DISPROWCOUNT)
 
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(LNM0006tbl)
@@ -299,6 +357,90 @@ Public Class LNM0006TankaList
 
         '○ 先頭行に合わせる
         WF_GridPosition.Text = "1"
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' GridView復元
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub GridViewRestore()
+
+        '○ 画面表示データ取得
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            ' DataBase接続
+            SQLcon.Open()
+            MAPDataGet(SQLcon)
+        End Using
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNM0006tbl)
+
+        '〇 一覧の件数を取得
+        Me.ListCount.Text = "件数：" + LNM0006tbl.Rows.Count.ToString()
+
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = work.WF_SEL_NOWPAGECNT_L.Text
+
+        '〇 最終ページ
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNM0006tbl.Rows.Count) / CONST_DISPROWCOUNT)
+
+        '○ 一覧表示データ編集(性能対策)
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim intPage As Integer = 0
+        intPage = CInt(work.WF_SEL_NOWPAGECNT_L.Text)
+        If intPage = 1 Then
+            WW_GridPosition = 1
+        Else
+            WW_GridPosition = (intPage - 1) * CONST_SCROLLCOUNT + 1
+        End If
+
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNM0006row As DataRow In LNM0006tbl.Rows
+            If LNM0006row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNM0006row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        Dim TBLview As DataView = New DataView(LNM0006tbl)
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        'Dim WW_RowFilterCMD As New StringBuilder
+        'WW_RowFilterCMD.Append("LINECNT >= 1 and LINECNT <= " & CONST_DISPROWCOUNT)
+
+        'TBLview.RowFilter = WW_RowFilterCMD.ToString
+
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+        If Not isNormal(CS0013ProfView.ERR) Then
+            Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "一覧設定エラー")
+            Exit Sub
+        End If
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
 
         TBLview.Dispose()
         TBLview = Nothing
@@ -406,35 +548,46 @@ Public Class LNM0006TankaList
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     '0' = '0'                                                                                        ")
+        SQLStr.AppendLine("     '0' = '0'                                                                                       ")
 
         '○ 条件指定で指定されたものでSQLで可能なものを追加する
         Dim dt As DateTime
 
-        '削除フラグ
-        If Not work.WF_SEL_DELFLG_S.Text = "1" Then
-            SQLStr.AppendLine(" AND  LNM0006.DELFLG = '0'                                                                       ")
-        End If
-        ''取引先コード
-        'If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
-        '    SQLStr.AppendLine(" AND  LNM0006.TORICODE = @TORICODE                                                               ")
-        'End If
-        '取引先名称
-        If Not String.IsNullOrEmpty(work.WF_SEL_TORINAME_S.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.TORINAME COLLATE UTF8_UNICODE_CI LIKE '%" & work.WF_SEL_TORINAME_S.Text & "%'                                                               ")
-        End If
-
-        '部門コード
-        If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE_S.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.ORGCODE = @ORGCODE                                                                       ")
-        End If
         '有効開始日
         If DateTime.TryParse(WF_StYMD.Value, dt) Then
             SQLStr.AppendLine(" AND  @STYMD BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD  ")
         End If
-        '実績届先コード
-        If Not String.IsNullOrEmpty(WF_TODOKE.Text) Then
-            SQLStr.AppendLine(" AND  LNM0006.AVOCADOTODOKECODE = @AVOCADOTODOKECODE")
+        '取引先コード
+        If Not WF_TORI.SelectedValue = "" Then
+            SQLStr.AppendLine(" AND  LNM0006.TORICODE = @TORICODE                                                               ")
+        End If
+        '部門コード
+        If Not WF_ORG.SelectedValue = "" Then
+            SQLStr.AppendLine(" AND  LNM0006.ORGCODE = @ORGCODE                                                                       ")
+        End If
+        ' 実績届先
+        SelectTodoke()
+        If Not WF_TODOKEhdn.Value = "" Then
+            SQLStr.AppendLine(" AND LNM0006.AVOCADOTODOKECODE in (" & WF_TODOKEhdn.Value & ")")
+        End If
+        '実績出荷場所
+        If Not WF_DEPARTURE.SelectedValue = "" Then
+            SQLStr.AppendLine(" AND  LNM0006.AVOCADOSHUKABASHO = @AVOCADOSHUKABASHO                                          ")
+        End If
+        '車番
+        Select Case True
+            Case Not Trim(WF_SHABAN_FROM.Text) = "" And Not Trim(WF_SHABAN_TO.Text) = ""
+                SQLStr.AppendLine(" AND  CONVERT(COALESCE(RTRIM(LNM0006.SHABAN), '0') , DECIMAL) BETWEEN @SHABAN_FROM AND @SHABAN_TO  ")
+            Case Not Trim(WF_SHABAN_FROM.Text) = ""
+                SQLStr.AppendLine(" AND  LNM0006.SHABAN = @SHABAN_FROM ")
+            Case Not Trim(WF_SHABAN_TO.Text) = ""
+                SQLStr.AppendLine(" AND  LNM0006.SHABAN = @SHABAN_TO ")
+            Case Else
+        End Select
+
+        '削除フラグ
+        If Not ChkDelDataFlg.Checked Then
+            SQLStr.AppendLine(" AND  LNM0006.DELFLG = '0'                                                                       ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -455,27 +608,41 @@ Public Class LNM0006TankaList
                 Dim P_ROLE As MySqlParameter = SQLcmd.Parameters.Add("@ROLE", MySqlDbType.VarChar, 20)
                 P_ROLE.Value = Master.ROLE_ORG
 
-                ''取引先コード
-                'If Not String.IsNullOrEmpty(work.WF_SEL_TORICODE_S.Text) Then
-                '    Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
-                '    P_TORICODE.Value = work.WF_SEL_TORICODE_S.Text
-                'End If
-
-                '部門コード
-                If Not String.IsNullOrEmpty(work.WF_SEL_ORGCODE_S.Text) Then
-                    Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)
-                    P_ORGCODE.Value = work.WF_SEL_ORGCODE_S.Text
-                End If
                 '有効開始日
                 If DateTime.TryParse(WF_StYMD.Value, dt) Then
                     Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)
                     P_STYMD.Value = dt
                 End If
-                '実績届先コード
-                If Not String.IsNullOrEmpty(WF_TODOKE.Text) Then
-                    Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)
-                    P_AVOCADOTODOKECODE.Value = WF_TODOKE.Text
+                '取引先コード
+                If Not WF_TORI.SelectedValue = "" Then
+                    Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)
+                    P_TORICODE.Value = WF_TORI.SelectedValue
                 End If
+                '部門コード
+                If Not WF_ORG.SelectedValue = "" Then
+                    Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)
+                    P_ORGCODE.Value = WF_ORG.SelectedValue
+                End If
+                '実績出荷場所
+                If Not WF_DEPARTURE.SelectedValue = "" Then
+                    Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)
+                    P_AVOCADOSHUKABASHO.Value = WF_DEPARTURE.SelectedValue
+                End If
+                '車番
+                Select Case True
+                    Case Not Trim(WF_SHABAN_FROM.Text) = "" And Not Trim(WF_SHABAN_TO.Text) = ""
+                        Dim P_SHABAN_FROM As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN_FROM", MySqlDbType.Decimal, 20)
+                        Dim P_SHABAN_TO As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN_TO", MySqlDbType.Decimal, 20)
+                        P_SHABAN_FROM.Value = CDbl(WF_SHABAN_FROM.Text)
+                        P_SHABAN_TO.Value = CDbl(WF_SHABAN_TO.Text)
+                    Case Not Trim(WF_SHABAN_FROM.Text) = ""
+                        Dim P_SHABAN_FROM As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN_FROM", MySqlDbType.VarChar, 20)
+                        P_SHABAN_FROM.Value = WF_SHABAN_FROM.Text
+                    Case Not Trim(WF_SHABAN_TO.Text) = ""
+                        Dim P_SHABAN_TO As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN_TO", MySqlDbType.VarChar, 20)
+                        P_SHABAN_TO.Value = WF_SHABAN_TO.Text
+                    Case Else
+                End Select
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     '○ フィールド名とフィールドの型を取得
@@ -522,8 +689,6 @@ Public Class LNM0006TankaList
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonINSERT_Click()
-
-        work.WF_SEL_TARGETYMD_L.Text = WF_StYMD.Value
 
         work.WF_SEL_LINECNT.Text = ""                                            '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)   '削除
@@ -667,6 +832,13 @@ Public Class LNM0006TankaList
         TBLview.Dispose()
         TBLview = Nothing
 
+        '〇 表示中ページ
+        If WF_GridPosition.Text = "1" Then
+            Me.WF_NOWPAGECNT.Text = "1"
+        Else
+            Me.WF_NOWPAGECNT.Text = (CInt(WF_GridPosition.Text) - 1) / CONST_DISPROWCOUNT + 1
+        End If
+
     End Sub
 
     ''' <summary>
@@ -712,6 +884,89 @@ Public Class LNM0006TankaList
 
     End Sub
 
+    ''' <summary>
+    ''' ページボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub WF_ButtonPAGE_Click()
+
+        Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim intLineNo As Integer = 0
+        Dim intPage As Integer = 0
+
+        Select Case WF_ButtonClick.Value
+            Case "WF_ButtonPAGE"            '指定ページボタン押下
+                intPage = CInt(Me.TxtPageNo.Text.PadLeft(5, "0"c))
+                If intPage < 1 Then
+                    intPage = 1
+                End If
+            Case "WF_ButtonFIRST"           '先頭ページボタン押下
+                intPage = 1
+            Case "WF_ButtonPREVIOUS"        '前ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage > 1 Then
+                    intPage += -1
+                End If
+            Case "WF_ButtonNEXT"            '次ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage < CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage += 1
+                End If
+            Case "WF_ButtonLAST"            '最終ページボタン押下
+                intPage = CInt(Me.WF_TOTALPAGECNT.Text)
+        End Select
+
+        Me.WF_NOWPAGECNT.Text = intPage.ToString
+        If intPage = 1 Then
+            WW_GridPosition = 1
+        Else
+            WW_GridPosition = (intPage - 1) * CONST_SCROLLCOUNT + 1
+        End If
+
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNM0006row As DataRow In LNM0006tbl.Rows
+            If LNM0006row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNM0006row("SELECT") = WW_DataCNT
+            End If
+        Next
+
+        '○ 画面(GridView)表示
+        Dim TBLview As DataView = New DataView(LNM0006tbl)
+
+        '○ ソート
+        TBLview.Sort = "LINECNT"
+        TBLview.RowFilter = "HIDDEN = 0 and SELECT >= " & WW_GridPosition.ToString() & " and SELECT < " & (WW_GridPosition + CONST_DISPROWCOUNT).ToString()
+
+        '○ 一覧作成
+        CS0013ProfView.CAMPCODE = Master.USERCAMP
+        CS0013ProfView.PROFID = Master.PROF_VIEW
+        CS0013ProfView.MAPID = Master.MAPID
+        CS0013ProfView.VARI = Master.VIEWID
+        CS0013ProfView.SRCDATA = TBLview.ToTable
+        CS0013ProfView.TBLOBJ = pnlListArea
+        CS0013ProfView.SCROLLTYPE = CS0013ProfView.SCROLLTYPE_ENUM.Both
+        CS0013ProfView.LEVENT = "ondblclick"
+        CS0013ProfView.LFUNC = "ListDbClick"
+        CS0013ProfView.TITLEOPT = True
+        CS0013ProfView.HIDEOPERATIONOPT = True
+        CS0013ProfView.CS0013ProfView()
+
+        '○ クリア
+        If TBLview.Count = 0 Then
+            WF_GridPosition.Text = "1"
+        Else
+            WF_GridPosition.Text = TBLview.Item(0)("SELECT")
+        End If
+
+        TBLview.Dispose()
+        TBLview = Nothing
+
+    End Sub
+
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
     ' ******************************************************************************
@@ -723,6 +978,81 @@ Public Class LNM0006TankaList
         work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INPTBL.txt"
 
+    End Sub
+
+    '入力状態を保持する
+    Protected Sub InputSave()
+        work.WF_SEL_TARGETYMD_L.Text = WF_StYMD.Value '対象日
+        work.WF_SEL_TORI_L.Text = WF_TORI.SelectedValue '荷主
+        work.WF_SEL_ORG_L.Text = WF_ORG.SelectedValue '部門
+        ' 届先
+        SelectTodoke()
+        work.WF_SEL_TODOKE_L.Text = WF_TODOKEhdn.Value
+
+        work.WF_SEL_DEPARTURE_L.Text = WF_DEPARTURE.SelectedValue '出荷地
+        work.WF_SEL_SHABAN_FROM_L.Text = WF_SHABAN_FROM.Text '車番FROM
+        work.WF_SEL_SHABAN_TO_L.Text = WF_SHABAN_TO.Text '車番TO
+        work.WF_SEL_CHKDELDATAFLG_L.Text = ChkDelDataFlg.Checked '削除済みデータ表示状態
+        work.WF_SEL_INPUTPAGE_L.Text = TxtPageNo.Text '入力ページ
+        work.WF_SEL_NOWPAGECNT_L.Text = WF_NOWPAGECNT.Text
+
+    End Sub
+
+    ''' <summary>
+    ''' 実績届先プルダウン選択値取得
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub SelectTodoke()
+
+        Me.WF_TODOKEhdn.Value = ""
+        Me.WF_TODOKENAMEhdn.Value = ""
+
+        If Me.WF_TODOKE.Items.Count > 0 Then
+            Dim SelectedCount As Integer = 0
+            Dim intSelCnt As Integer = 0
+            '○ フィールド名とフィールドの型を取得
+            For index As Integer = 0 To WF_TODOKE.Items.Count - 1
+                If WF_TODOKE.Items(index).Selected = True Then
+                    SelectedCount += 1
+                    If intSelCnt = 0 Then
+                        Me.WF_TODOKEhdn.Value = WF_TODOKE.Items(index).Value
+                        Me.WF_TODOKENAMEhdn.Value = WF_TODOKE.Items(index).Text
+                        intSelCnt = 1
+                    Else
+                        Me.WF_TODOKEhdn.Value = Me.WF_TODOKEhdn.Value & "," & WF_TODOKE.Items(index).Value
+                        Me.WF_TODOKENAMEhdn.Value = Me.WF_TODOKENAMEhdn.Value & "," & WF_TODOKE.Items(index).Text
+                        intSelCnt = 2
+                    End If
+                End If
+            Next
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 実績届先プルダウン選択値復元
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub RestoreSelectTodoke()
+        Me.WF_TODOKE.Items.Clear()
+        If Not work.WF_SEL_TORI_L.Text = "" Then
+            Dim retTodokeList As New DropDownList
+            retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TORI_L.Text)
+            For index As Integer = 0 To retTodokeList.Items.Count - 1
+                WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+            Next
+        End If
+
+        Dim TodokeHT As New Hashtable
+        Dim arrTodoke() As String = work.WF_SEL_TODOKE_L.Text.Split(",")
+        For Each Value In arrTodoke
+            TodokeHT.Add(Value, Value)
+        Next
+        For index As Integer = 0 To WF_TODOKE.Items.Count - 1
+            If TodokeHT.ContainsKey(WF_TODOKE.Items(index).Value) Then
+                WF_TODOKE.Items(index).Selected = True
+            End If
+        Next
     End Sub
 
     ' ******************************************************************************
@@ -746,7 +1076,39 @@ Public Class LNM0006TankaList
             Exit Sub
         End Try
 
-        work.WF_SEL_TARGETYMD_L.Text = WF_StYMD.Value
+        'ダブルクリックした行が削除行の場合、遷移せずに削除フラグだけ有効にする
+        If LNM0006tbl.Rows(WW_LineCNT)("DELFLG") = C_DELETE_FLG.DELETE Then
+            Dim WW_ROW As DataRow
+            WW_ROW = LNM0006tbl.Rows(WW_LineCNT)
+            Dim DATENOW As Date = Date.Now
+            Dim WW_UPDTIMSTP As Date
+
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                ' DataBase接続
+                SQLcon.Open()
+
+                '履歴登録(変更前)
+                InsertHist(SQLcon, WW_ROW, C_DELETE_FLG.ALIVE, LNM0006WRKINC.MODIFYKBN.BEFDATA, DATENOW, WW_ErrSW)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                '削除フラグ有効化
+                DelflgValid(SQLcon, WW_ROW, DATENOW, WW_UPDTIMSTP)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                '履歴登録(変更後)
+                InsertHist(SQLcon, WW_ROW, C_DELETE_FLG.DELETE, LNM0006WRKINC.MODIFYKBN.AFTDATA, DATENOW, WW_ErrSW)
+                If Not isNormal(WW_ErrSW) Then
+                    Exit Sub
+                End If
+                LNM0006tbl.Rows(WW_LineCNT)("DELFLG") = C_DELETE_FLG.ALIVE
+                LNM0006tbl.Rows(WW_LineCNT)("UPDTIMSTP") = WW_UPDTIMSTP
+                Master.SaveTable(LNM0006tbl)
+                Master.Output(C_MESSAGE_NO.DELETE_ROW_ACTIVATION, C_MESSAGE_TYPE.NOR, needsPopUp:=True)
+            End Using
+            Exit Sub
+        End If
 
         work.WF_SEL_LINECNT.Text = LNM0006tbl.Rows(WW_LineCNT)("LINECNT")                           '選択行
 
@@ -814,6 +1176,152 @@ Public Class LNM0006TankaList
         '○ 登録画面ページへ遷移
         Master.TransitionPage(Master.USERCAMP)
 
+    End Sub
+
+    ''' <summary>
+    ''' 削除フラグ有効化
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="WW_ROW"></param>
+    ''' <remarks></remarks>
+    Public Sub DelflgValid(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByVal WW_NOW As Date, ByRef WW_UPDTIMSTP As Date)
+
+        WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ 対象データ更新
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" UPDATE                                      ")
+        SQLStr.Append("     LNG.LNM0006_NEWTANKA                    ")
+        SQLStr.Append(" SET                                         ")
+        SQLStr.Append("     DELFLG               = '0'              ")
+        SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
+        SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
+        SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
+        SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
+        SQLStr.Append(" WHERE                                       ")
+        SQLStr.Append("         COALESCE(TORICODE, '')             = @TORICODE ")
+        SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.Append("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOSHUKABASHO, '')             = @AVOCADOSHUKABASHO ")
+        SQLStr.Append("    AND  COALESCE(AVOCADOTODOKECODE, '')             = @AVOCADOTODOKECODE ")
+        SQLStr.Append("    AND  COALESCE(SHABAN, '')             = @SHABAN ")
+        SQLStr.Append("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
+        SQLStr.Append("    AND  COALESCE(BRANCHCODE, '0')             = @BRANCHCODE ")
+        SQLStr.Append("    AND  COALESCE(SYAGATA, '')             = @SYAGATA ")
+        SQLStr.Append("    AND  COALESCE(SYABARA, '0')             = @SYABARA ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
+                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+
+                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_STYMD.Value = WW_ROW("STYMD") '有効開始日
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
+                P_UPDYMD.Value = WW_NOW             '更新年月日
+                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+
+                '登録
+                SQLcmd.CommandTimeout = 300
+                SQLcmd.ExecuteNonQuery()
+            End Using
+        Catch ex As Exception
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006L UPDATE"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
+
+        'タイムスタンプ取得
+        '○ 対象データ取得
+        Dim SQLStrTimStp = New StringBuilder
+        SQLStrTimStp.AppendLine(" SELECT ")
+        SQLStrTimStp.AppendLine("    UPDTIMSTP                                          ")
+        SQLStrTimStp.AppendLine(" FROM")
+        SQLStrTimStp.AppendLine("     LNG.LNM0006_NEWTANKA")
+        SQLStrTimStp.AppendLine(" WHERE")
+        SQLStrTimStp.AppendLine("       TORICODE  = @TORICODE                           ")
+        SQLStrTimStp.AppendLine("   AND ORGCODE  = @ORGCODE                             ")
+        SQLStrTimStp.AppendLine("   AND KASANORGCODE  = @KASANORGCODE                   ")
+        SQLStrTimStp.AppendLine("   AND AVOCADOSHUKABASHO  = @AVOCADOSHUKABASHO         ")
+        SQLStrTimStp.AppendLine("   AND AVOCADOTODOKECODE  = @AVOCADOTODOKECODE         ")
+        SQLStrTimStp.AppendLine("   AND SHABAN  = @SHABAN                               ")
+        SQLStrTimStp.AppendLine("   AND BRANCHCODE  = @BRANCHCODE                       ")
+        SQLStrTimStp.AppendLine("   AND SYAGATA  = @SYAGATA                             ")
+        SQLStrTimStp.AppendLine("   AND SYABARA  = @SYABARA                             ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStrTimStp.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6) '加算先部門コード
+                Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar, 6)     '実績出荷場所コード
+                Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar, 6)     '実績届先コード
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar, 20)     '車番
+                Dim P_BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar, 2) '枝番
+                Dim P_SYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SYAGATA", MySqlDbType.VarChar, 1)     '車型
+                Dim P_SYABARA As MySqlParameter = SQLcmd.Parameters.Add("@SYABARA", MySqlDbType.Decimal, 10, 3)     '車腹
+
+                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
+                P_KASANORGCODE.Value = WW_ROW("KASANORGCODE") '加算先部門コード
+                P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO") '実績出荷場所コード
+                P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE") '実績届先コード
+                P_SHABAN.Value = WW_ROW("SHABAN") '車番
+                P_BRANCHCODE.Value = WW_ROW("BRANCHCODE") '枝番
+                P_SYAGATA.Value = WW_ROW("SYAGATA") '車型
+                P_SYABARA.Value = WW_ROW("SYABARA") '車腹
+
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    If WW_Tbl.Rows.Count >= 1 Then
+                        WW_UPDTIMSTP = WW_Tbl.Rows(0)("UPDTIMSTP").ToString
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0006_NEWTANKA SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            WW_ErrSW = C_MESSAGE_NO.DB_ERROR
+            Exit Sub
+        End Try
     End Sub
 
     ''' <summary>
@@ -1124,6 +1632,7 @@ Public Class LNM0006TankaList
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
 
         Dim WW_TEXT As String = ""
+        Dim WW_TEXTLIST = New StringBuilder
         Dim WW_CNT As Integer = 0
         Dim WW_HT As New Hashtable
 
@@ -1143,10 +1652,31 @@ Public Class LNM0006TankaList
 
             '有効終了日
             WW_TEXT = "※未入力の場合は「2099/12/31」が設定されます。"
-            '選択比較項目-発荷主コード
             sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).AddComment(WW_TEXT)
             With sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.ENDYMD).Comment.Shape
                 .Width = 180
+                .Height = 30
+            End With
+
+            '単価区分
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("0:通常単価")
+            WW_TEXTLIST.AppendLine("1:調整単価")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TANKAKBN).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.TANKAKBN).Comment.Shape
+                .Width = 100
+                .Height = 30
+            End With
+
+            '車型
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("1:単車")
+            WW_TEXTLIST.AppendLine("2:トレーラ")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0006WRKINC.INOUTEXCELCOL.SYAGATA).Comment.Shape
+                .Width = 100
                 .Height = 30
             End With
 

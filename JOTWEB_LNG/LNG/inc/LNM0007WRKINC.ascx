@@ -7,7 +7,15 @@
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>                  <!-- 選択行 -->
 
     <!-- 一覧用 -->
-    <asp:TextBox ID="WF_SEL_TARGETYM_L" runat="server"></asp:TextBox>              <!-- 対象年月 -->
+    <asp:TextBox ID="WF_SEL_TARGETYM_L" runat="server"></asp:TextBox>               <!-- 対象年月 -->
+    <asp:TextBox ID="WF_SEL_TORI_L" runat="server"></asp:TextBox>                   <!-- 取引先コード -->
+    <asp:TextBox ID="WF_SEL_ORG_L" runat="server"></asp:TextBox>                    <!-- 部門コード -->
+    <asp:TextBox ID="WF_SEL_SHABAN_FROM_L" runat="server"></asp:TextBox>            <!-- 車番FROM -->
+    <asp:TextBox ID="WF_SEL_SHABAN_TO_L" runat="server"></asp:TextBox>              <!-- 車番TO -->
+    <asp:TextBox ID="WF_SEL_SEASON_L" runat="server"></asp:TextBox>                 <!-- 季節料金 -->
+    <asp:TextBox ID="WF_SEL_CHKDELDATAFLG_L" runat="server"></asp:TextBox>          <!-- 削除フラグ -->
+    <asp:TextBox ID="WF_SEL_INPUTPAGE_L" runat="server"></asp:TextBox>              <!-- 入力ページ -->
+    <asp:TextBox ID="WF_SEL_NOWPAGECNT_L" runat="server"></asp:TextBox>             <!-- 表示中ページ -->
 
     <!-- 登録・更新用 -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                <!-- 削除フラグ -->

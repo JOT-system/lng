@@ -427,7 +427,7 @@ Public Class LNM0006WRKINC
     ''' </summary>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownAvocadotodokeList(ByVal I_MAPID As String, ByVal I_ORGCODE As String, Optional ByVal I_TORINAME As String = "") As DropDownList
+    Public Shared Function getDowpDownAvocadotodokeList(ByVal I_MAPID As String, ByVal I_ORGCODE As String, Optional ByVal I_TORICODE As String = "") As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -452,8 +452,8 @@ Public Class LNM0006WRKINC
         SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     '0' = '0'                                                                                       ")
-        If Not I_TORINAME = "" Then
-            SQLStr.AppendLine(" AND  LNM0006.TORINAME COLLATE UTF8_UNICODE_CI LIKE'%" & I_TORINAME & "%'                                               ")
+        If Not I_TORICODE = "" Then
+            SQLStr.AppendLine(" AND  LNM0006.TORICODE = '" & I_TORICODE & "'                                                    ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -478,10 +478,10 @@ Public Class LNM0006WRKINC
                     Next
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
-                    If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
-                        Dim listBlankItm As New ListItem("全て表示", "")
-                        retList.Items.Add(listBlankItm)
-                    End If
+                    'If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+                    '    Dim listBlankItm As New ListItem("全て表示", "")
+                    '    retList.Items.Add(listBlankItm)
+                    'End If
                     For Each WW_ROW As DataRow In WW_Tbl.Rows
                         Dim listItm As New ListItem(WW_ROW("AVOCADOTODOKENAME"), WW_ROW("AVOCADOTODOKECODE"))
                         retList.Items.Add(listItm)
@@ -506,9 +506,9 @@ Public Class LNM0006WRKINC
 
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       TORICODE AS TORICODE")
-        SQLStr.AppendLine("      ,RTRIM(TORINAME) AS TORINAME")
+        SQLStr.AppendLine(" Select DISTINCT")
+        SQLStr.AppendLine("       TORICODE As TORICODE")
+        SQLStr.AppendLine("      , RTrim(TORINAME) As TORINAME")
         SQLStr.AppendLine(" FROM")
         SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
 
@@ -668,9 +668,9 @@ Public Class LNM0006WRKINC
 
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       AVOCADOTODOKECODE AS AVOCADOTODOKECODE")
-        SQLStr.AppendLine("      ,RTRIM(AVOCADOTODOKENAME) AS AVOCADOTODOKENAME")
+        SQLStr.AppendLine(" Select DISTINCT")
+        SQLStr.AppendLine("       AVOCADOTODOKECODE As AVOCADOTODOKECODE")
+        SQLStr.AppendLine("      ,RTRIM(AVOCADOTODOKENAME) As AVOCADOTODOKENAME")
         SQLStr.AppendLine(" FROM")
         SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
 
@@ -708,8 +708,8 @@ Public Class LNM0006WRKINC
 
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT ")
-        SQLStr.AppendLine("       CODE AS CODE")
+        SQLStr.AppendLine(" Select ")
+        SQLStr.AppendLine("       CODE As CODE")
         SQLStr.AppendLine(" FROM")
         SQLStr.AppendLine("     COM.LNS0005_ROLE")
         SQLStr.AppendLine(" WHERE")

@@ -897,17 +897,17 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine(" FROM")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
         SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
+        'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
 
-                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
                 P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
 
@@ -956,19 +956,19 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine(" FROM")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
         SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
+        'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+                'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
                 Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
 
-                P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+                'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
                 P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
                 P_GROUPID.Value = WW_ROW("GROUPID")           'グループID

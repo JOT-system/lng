@@ -48,6 +48,7 @@
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonKintone" class="btn-sticky  btn-action" value="実績取込" onclick="ButtonClick('WF_ButtonKintone');" />
                                 <input type="button" id="WF_ButtonZero" class="btn-sticky  btn-action" value="実績数量ゼロ" onclick="ButtonClick('WF_ButtonZero');" />
+                                <input type="button" id="WF_ButtonNgPrint" class="btn-sticky  btn-action" value="実績不良データ" onclick="ButtonClick('WF_ButtonNgPrint');" />
                                 <%--id="WF_ButtonEND"は、メニューへ、ログアウトボタンを追加するキーワードとなる--%>
                                 <%--ここでは、ログアウトボタンを表示したくないためid="WF_ButtonEND2"とする--%>
                                 <input type="button" id="WF_ButtonEND2"      class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" /> 

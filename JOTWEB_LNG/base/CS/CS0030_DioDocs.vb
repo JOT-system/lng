@@ -1,6 +1,7 @@
 ﻿Imports System.Web
 Imports System.IO
 Imports GrapeCity.Documents.Excel
+Imports System.Drawing
 
 ''' <summary>
 ''' 帳票出力
@@ -79,6 +80,14 @@ Public Structure CS0030REPORT
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Property TARGETDATE() As String
+
+    ''' <summary>
+    ''' チェックテーブル（6/9現在、LNT0001Dのためのみ）
+    ''' </summary>
+    ''' <value>チェックテーブル</value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property CHKTBL() As DataTable
 
     ''' <summary>
     ''' エラーコード
@@ -676,6 +685,28 @@ Public Structure CS0030REPORT
                             '項目名が無い場合、無視
                             If columnCheck(TBLDATA, CS0021PROFXLS.FIELD(j)) Then
                                 WW_Workbook.Worksheets(intSheetNo).Cells(WW_Y, WW_X).Value = TBLDATA.Rows(i)(CS0021PROFXLS.FIELD(j)).ToString
+
+                                '---------------------------------------------
+                                '実績取込（実績不良データ出力）のみ
+                                '---------------------------------------------
+                                If MAPID = "LNT0001D" AndAlso String.IsNullOrEmpty(TBLDATA.Rows(i)(CS0021PROFXLS.FIELD(j)).ToString) Then
+                                    '荷主別にエラー項目が異なるための処理
+                                    For Each ChkRow As DataRow In CHKTBL.Select("KEYCODE ='" & TBLDATA.Rows(i)("TORICODE") & "'")
+                                        For idx As Integer = 1 To 20
+                                            'VALUNE1～20に値が存在する分、処理する
+                                            Dim ValueStr As String = "VALUE" & idx
+                                            If String.IsNullOrEmpty(ChkRow(ValueStr)) Then
+                                                Exit For
+                                            End If
+                                            If CS0021PROFXLS.FIELDNAME(j) = ChkRow(ValueStr) Then
+                                                If String.IsNullOrEmpty(TBLDATA.Rows(i)(CS0021PROFXLS.FIELD(j))) Then
+                                                    'チェック項目がNGの場合、実績不良テーブルへの黄色い網掛指示
+                                                    WW_Workbook.Worksheets(intSheetNo).Cells(WW_Y, WW_X).Interior.Color = Color.Yellow
+                                                End If
+                                            End If
+                                        Next
+                                    Next
+                                End If
                             End If
                         End If
                     Next

@@ -1,17 +1,25 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* スプレッドシートのダブルクリックイベント紐づけ */
-    //var spread = document.getElementById("FpSpread1");
-
-    //if (spread.addEventListener) {
-    //    spread.addEventListener("dblclick", DblClick, false);
-    //} else {
-    //    spread.ondblclick = DblClick;
-    //}
-
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+
+    //　届先複数選択
+    $(document).ready(function () {
+        $("#contents1_WF_TODOKE").multiselect({
+            menuHeight: 390,
+            noneSelectedText: "選択してください",
+            selectedText: "# 個選択",
+            autoopen: false,
+            multiple: true,
+            buttonWidth: 330,
+
+            position: {
+                my: 'center',
+                at: 'center'
+            }
+        });
+    });
 
 }
 
@@ -25,8 +33,10 @@ window.onload = function () {
     //情シス、高圧ガス以外の場合、変更履歴、パンくず(検索)をを非表示にする
     if (VisibleKeyOrgCode == "") {
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
-        document.getElementById('PAGE_SEARCH').style.display = "none";
     }
+
+    //削除行灰色表示
+    f_DeleteRowGray()
 }
 
 /**
@@ -126,3 +136,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+// ○削除行を灰色表示
+function f_DeleteRowGray() {
+    var objTable = document.getElementById("pnlListArea_DR").children[0];
+    var Col = {
+        DELFLG: 31 //削除フラグ
+    };
+
+    for (var i = 0; i < objTable.rows.length; i++) {
+        //削除行の場合
+        if (objTable.rows[i].cells[Col.DELFLG].innerHTML == "1") {
+            objTable.rows[i].style.backgroundColor = "gray";
+        }
+    }
+}
