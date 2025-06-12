@@ -429,6 +429,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TODOKECODE_003840 As String = "003840"
     ''' <summary>
+    ''' 日本ピュアフード
+    ''' </summary>
+    Public Const CONST_TODOKECODE_006837 As String = "006837"
+    ''' <summary>
     ''' ナガセケムテックス
     ''' </summary>
     Public Const CONST_TODOKECODE_006880 As String = "006880"

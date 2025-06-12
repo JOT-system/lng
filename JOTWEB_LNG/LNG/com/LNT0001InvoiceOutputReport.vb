@@ -12,6 +12,7 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoTmp06 As Integer = 0
     Private WW_SheetNoTobuGas As Integer = 0            '-- ＥＮＥＯＳ(八戸)[東部瓦斯]
     Private WW_SheetNoNipuro As Integer = 0             '-- ＥＮＥＯＳ(八戸)[ニプロ]
+    Private WW_SheetNoNihonPurefood As Integer = 0      '-- ＥＮＥＯＳ(八戸)[日本ピュアフード]
     Private WW_SheetNoMitsuiES As Integer = 0           '-- ＥＮＥＯＳ(水島)[三井Ｅ＆Ｓ]
     Private WW_SheetNoCocacola As Integer = 0           '-- ＥＮＥＯＳ(水島)[コカ・コーラ　ボトラーズジャパン]
     Private WW_SheetNoNichiei As Integer = 0            '-- ＤＧＥ(泉北)[日栄]
@@ -153,6 +154,9 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "ニプロ") Then
                         '〇ENEOS(シート[ニプロ])
                         WW_SheetNoNipuro = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 AndAlso WW_Workbook.Worksheets(i).Name = "日本ピュアフード") Then
+                        '〇ENEOS(シート[日本ピュアフード])
+                        WW_SheetNoNihonPurefood = i
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 AndAlso WW_Workbook.Worksheets(i).Name = "三井Ｅ＆Ｓ") Then
                         '〇ENEOS(シート[三井Ｅ＆Ｓ])
                         WW_SheetNoMitsuiES = i
@@ -327,6 +331,9 @@ Public Class LNT0001InvoiceOutputReport
                 EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_001269, "AND BRANCHCODE = '2' ", "L", "", WW_SheetNoNipuro, 12)
                 '・ニプロ（株）カメイ
                 EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_003840, "AND BRANCHCODE = '2' ", "M", "", WW_SheetNoNipuro, 12)
+
+                '★[日本ピュアフード]独自対応 
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_006837, "AND BRANCHCODE = '2' ", "L", "", WW_SheetNoNihonPurefood, 12)
 
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
                 '★水島営業所の場合([三井Ｅ＆Ｓ]独自対応)
@@ -571,6 +578,10 @@ Public Class LNT0001InvoiceOutputReport
                             AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
                             '☆(ニプロ)独自仕様※ニプロ（株）カメイ
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_006837 _
+                            AndAlso PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                            '☆(日本ピュアフード)独自仕様
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         Else
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If
@@ -830,6 +841,15 @@ Public Class LNT0001InvoiceOutputReport
                 evaNumber -= 1
                 WW_Workbook.Worksheets(sheetNo).Range("E" + cellLine.ToString()).Value = evaQuantity
                 WW_Workbook.Worksheets(sheetNo).Range("F" + cellLine.ToString()).Value = evaNumber
+
+                '★ＥＮＥＯＳ(八戸)の場合([日本ピュアフード]独自対応)
+            ElseIf todokeCode = BaseDllConst.CONST_TODOKECODE_006837 Then
+                '設定済みの項目(数量 （t）, 台数)を取得
+                Dim evaQuantity = Double.Parse(WW_Workbook.Worksheets(sheetNo).Range("E" + cellLine.ToString()).Value.ToString())
+                'Dim evaNumber = Integer.Parse(WW_Workbook.Worksheets(sheetNo).Range("F" + cellLine.ToString()).Value.ToString())
+                '★不積(数量)として設定
+                WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = evaQuantity
+                WW_Workbook.Worksheets(sheetNo).Range("I" + cellLine.ToString()).Value = "※不積実施"
 
             Else
                 Dim regNumber As New Regex("[0-9]")
