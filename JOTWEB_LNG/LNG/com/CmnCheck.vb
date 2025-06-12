@@ -1042,6 +1042,123 @@ Public Class CmnCheck
     End Sub
 #End Region
 
+#Region "北海道LNG"
+    ''' <summary>
+    ''' (帳票)項目チェック処理(北海道LNG)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub WW_ReportCheckHokaidoLNG(ByVal reportName As String, ByVal reportCode As String,
+                                        ByRef dcHokaidoLNGList As Dictionary(Of String, String),
+                                        ByRef LNT0001tbl As DataTable, ByRef LNT0001Tanktbl As DataTable, ByRef LNT0001Koteihi As DataTable, ByRef LNT0001KihonFeeA As DataTable,
+                                        ByRef LNT0001TogouSprate As DataTable, ByRef LNT0001Calendar As DataTable, ByRef LNT0001HolidayRate As DataTable, ByRef LNT0001HolidayRateNum As DataTable)
+
+        Dim dtHokkaidoLNGTank As New DataTable
+        Dim dtHokkaidoLNGTodoke As New DataTable
+        Dim sekiyuHokkaidoTankLNGClass As String = ""
+        Dim sekiyuHokkaidoTodokeLNGClass As String = ""
+        Dim sekiyuHokkaidoKoteihiLNGClass As String = ""
+        Dim arrToriCode As String() = {"", "", ""}
+        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
+
+        Select Case reportCode
+            '"北海道LNG　輸送費請求書"
+            Case BaseDllConst.CONST_ORDERORGCODE_020104
+                sekiyuHokkaidoTankLNGClass = "HOKKAIDO_LNG_TANK"
+                sekiyuHokkaidoTodokeLNGClass = "HOKKAIDO_LNG_TODOKE"
+                sekiyuHokkaidoKoteihiLNGClass = "HOKKAIDO_LNG_KOTEIHI"
+                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0239900000
+                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020104
+                arrToriCode(2) = Nothing
+        End Select
+
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuHokkaidoTankLNGClass, dtHokkaidoLNGTank)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuHokkaidoTodokeLNGClass, dtHokkaidoLNGTodoke)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuHokkaidoTodokeLNGClass, LNT0001Tanktbl)
+            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuHokkaidoTankLNGClass)
+            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
+            CMNPTS.SelectHokkaidoLNG_YusouhiKihonFeeA(sekiyuHokkaidoKoteihiLNGClass, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001KihonFeeA)
+
+            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtHokkaidoLNGTodoke, I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
+            CMNPTS.SelectHokkaidoLNG_YusouhiHolidayRate(arrToriCode(0), TaishoYm + "/01", LNT0001HolidayRateNum)
+        End Using
+
+        '〇(帳票)使用項目の設定
+        WW_ReportMeisaiAdd(LNT0001tbl)
+
+        '〇陸事番号マスタ設定
+        For Each dtHokkaidoLNGTankrow As DataRow In dtHokkaidoLNGTank.Rows
+            Dim condition As String = String.Format("GYOMUTANKNUM='{0}'", dtHokkaidoLNGTankrow("KEYCODE04"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                '★届日より日を取得(セル(行数)の設定のため)
+                Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                Dim lastMonth As Boolean = False
+                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(TaishoYm + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                    lastMonth = True
+                End If
+                Dim iLine As Integer = Integer.Parse(setDay) - 1
+                iLine = (iLine * Integer.Parse(dtHokkaidoLNGTankrow("VALUE06"))) + Integer.Parse(dtHokkaidoLNGTankrow("VALUE05"))
+                '★トリップより位置を取得
+                Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+                iTrip += iLine
+                LNT0001tblrow("ROWSORTNO") = dtHokkaidoLNGTankrow("VALUE01")
+                LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE02") + iTrip.ToString()
+                'LNT0001tblrow("SETCELL02") = dtHokkaidoLNGTankrow("VALUE03") + iTrip.ToString()
+                'LNT0001tblrow("SETCELL03") = dtHokkaidoLNGTankrow("VALUE04") + iTrip.ToString()
+                LNT0001tblrow("SETLINE") = iTrip.ToString()
+
+                '★表示セルフラグ(1:表示)
+                LNT0001tblrow("DISPLAYCELL_START") = dtHokkaidoLNGTankrow("VALUE02").ToString()
+                LNT0001tblrow("DISPLAYCELL_END") = dtHokkaidoLNGTankrow("VALUE02").ToString()
+                'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtHokkaidoLNGTankrow("VALUE08").ToString()
+
+                '★備考設定用(出荷日と届日が不一致の場合)
+                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                    If lastMonth = True Then
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                    Else
+                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                    End If
+                End If
+            Next
+        Next
+
+        '〇(北海道LNG)届先出荷場所車庫マスタ設定
+        For Each dtHokkaidoLNGTodokerow As DataRow In dtHokkaidoLNGTodoke.Rows
+            Dim condition As String = String.Format("TODOKECODE='{0}'", dtHokkaidoLNGTodokerow("KEYCODE01"))
+            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+                LNT0001tblrow("SHEETSORTNO_REP") = dtHokkaidoLNGTodokerow("KEYCODE03")
+                LNT0001tblrow("TODOKENAME_REP") = dtHokkaidoLNGTodokerow("VALUE01")
+                LNT0001tblrow("SHEETNAME_REP") = dtHokkaidoLNGTodokerow("VALUE06")
+
+                '〇届先が追加された場合
+                If dtHokkaidoLNGTodokerow("VALUE02").ToString() = "1" Then
+                    LNT0001tblrow("TODOKECELL_REP") = dtHokkaidoLNGTodokerow("VALUE03")
+                    LNT0001tblrow("MASTERCELL_REP") = dtHokkaidoLNGTodokerow("VALUE04")
+                    LNT0001tblrow("SHEETDISPLAY_REP") = dtHokkaidoLNGTodokerow("VALUE05")
+                Else
+                    LNT0001tblrow("TODOKECELL_REP") = ""
+                    LNT0001tblrow("MASTERCELL_REP") = ""
+                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
+                End If
+            Next
+        Next
+
+        'シート名取得用
+        For Each dtHokkaidoLNGTodokerow As DataRow In dtHokkaidoLNGTodoke.Select("", "KEYCODE01")
+            If dtHokkaidoLNGTodokerow("KEYCODE01").ToString() = "" Then Continue For
+            Try
+                dcHokaidoLNGList.Add(dtHokkaidoLNGTodokerow("KEYCODE01"), dtHokkaidoLNGTodokerow("VALUE06"))
+            Catch ex As Exception
+            End Try
+        Next
+
+    End Sub
+#End Region
+
     Protected Sub WW_ReportMeisaiAdd(ByRef LNT0001tbl As DataTable)
         '〇(帳票)使用項目の設定
         LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号

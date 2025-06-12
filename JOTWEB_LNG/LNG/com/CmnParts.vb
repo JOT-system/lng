@@ -321,12 +321,25 @@ Public Class CmnParts
             SQLStr &= "   ,LNM0005.KEYCODE04 AS TODOKENAME_MASTER "
             'SQLStr &= "   ,'' AS TODOKENAME_SHEET "
             SQLStr &= "   ,'' AS GRPNO "
+            SQLStr &= "   ,'' AS TODOKESHEET_CELL "
+            SQLStr &= "   ,0 AS TODOKESHEET_DISPLAYFLG "
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0239900000 Then
+            '★取引先コードが「北海道LNG」の場合
+            SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
+            SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
+            SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
+            SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
+            SQLStr &= "   ,'' AS GRPNO "
+            SQLStr &= "   ,CAST(LNM0005.VALUE03 AS SIGNED) AS TODOKESHEET_CELL "
+            SQLStr &= "   ,CAST(LNM0005.VALUE02 AS SIGNED) AS TODOKESHEET_DISPLAYFLG "
         Else
             SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
             SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
             SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
             SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
             SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
+            SQLStr &= "   ,'' AS TODOKESHEET_CELL "
+            SQLStr &= "   ,0 AS TODOKESHEET_DISPLAYFLG "
         End If
 
         '-- FROM
@@ -345,6 +358,13 @@ Public Class CmnParts
             '    SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
             '    SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
             '    SQLStr &= " AND LNM0005.KEYCODE04 = LNM0006.KASANORGCODE "
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0239900000 Then
+            '★取引先コードが「北海道LNG」の場合
+            SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
+            SQLStr &= " AND LNM0005.KEYCODE04 = LNM0006.AVOCADOSHUKABASHO "
+
         Else
             SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
             SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
@@ -1216,6 +1236,7 @@ Public Class CmnParts
         SQLStr &= "    , IFNULL(LNM0014.BIKOU3, '') AS BIKOU3 "                             '-- 備考3
         SQLStr &= "    , '' AS KOTEIHI_DISPLAYFLG "
         SQLStr &= "    , '' AS KOTEIHI_CELLNUM "
+        SQLStr &= "    , '' AS KOTEIHI_CLASSIFYCODE "
 
         '-- FROM(統合版特別料金マスタ)
         SQLStr &= " FROM ( "
@@ -1231,6 +1252,7 @@ Public Class CmnParts
         SQLStr &= String.Format("     LNM0014.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
         SQLStr &= String.Format(" AND LNM0014.TARGETYM = '{0}' ", I_TAISHOYM)
         SQLStr &= String.Format(" AND LNM0014.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= " AND LNM0014.DISPLAYFLG = '1' "                              '-- 表示フラグ("1"(表示する))
         '★部門コード
         If Not IsNothing(I_ORGCODE) Then
             SQLStr &= String.Format(" AND LNM0014.ORGCODE IN ({0}) ", I_ORGCODE)
@@ -1368,6 +1390,64 @@ Public Class CmnParts
             Catch ex As Exception
                 'Throw '呼び出し元の例外にスロー
             End Try
+
+        ElseIf Not IsNothing(I_CLASS) _
+            AndAlso I_TORICODE = BaseDllConst.CONST_TORICODE_0239900000 _
+            AndAlso I_ORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '〇北海道LNG
+
+            '★その他明細の明細IDの付替え実施
+            Dim i As Decimal = 0
+            For Each dtSPRATEFEEMasrow As DataRow In O_dtSPRATEFEEMas.Select("GROUPID='5'", "DETAILID")
+                i += 1
+                dtSPRATEFEEMasrow("DETAILID") = i
+            Next
+
+            '-- SELECT
+            SQLStrSub &= " SELECT LNM0005.* "
+            '-- FROM
+            SQLStrSub &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- WHERE
+            SQLStrSub &= " WHERE "
+            SQLStrSub &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStrSub &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStrSub &= " AND LNM0005.KEYCODE01 IN ('5','10') "    '※委託料、その他
+
+            Try
+                Using SQLcmd As New MySqlCommand(SQLStrSub, SQLcon)
+                    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            convertMAS.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        convertMAS.Load(SQLdr)
+                    End Using
+                End Using
+
+                For Each dtSPRATEFEEMasrow As DataRow In O_dtSPRATEFEEMas.Rows
+                    Dim condition As String = ""
+                    '〇条件
+                    '・GRPID
+                    condition &= String.Format(" KEYCODE04='{0}' ", dtSPRATEFEEMasrow("GROUPID"))
+                    '・明細ID
+                    condition &= String.Format(" AND KEYCODE07='{0}' ", dtSPRATEFEEMasrow("DETAILID"))
+
+                    For Each convertMASrow As DataRow In convertMAS.Select(condition)
+                        '■シート[従量運賃]
+                        '・表示セルフラグ(1:表示)
+                        dtSPRATEFEEMasrow("KOTEIHI_DISPLAYFLG") = convertMASrow("VALUE01")
+                        '・行(設定)セル
+                        dtSPRATEFEEMasrow("KOTEIHI_CELLNUM") = convertMASrow("VALUE02")
+                    Next
+
+                Next
+
+            Catch ex As Exception
+                'Throw '呼び出し元の例外にスロー
+            End Try
+
         End If
 
     End Sub
@@ -1548,6 +1628,12 @@ Public Class CmnParts
         '★月末日取得
         Dim lastDay As String = ""
         lastDay = Date.Parse(I_TAISHOYM).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
+        '★取引コード(北海道LNG)の場合
+        If I_TORICODE = BaseDllConst.CONST_TORICODE_0239900000 Then
+            Dim thisYear As String = Date.Parse(I_TAISHOYM).ToString("yyyy")
+            I_TAISHOYM = thisYear + "/01/01"
+            lastDay = thisYear + "/12/31"
+        End If
 
         Dim SQLStr As String = ""
         '-- SELECT
@@ -1938,6 +2024,38 @@ Public Class CmnParts
             SQLStr &= " WHERE "
             SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
             SQLStr &= " AND LNM0005.VALUE11 = '1' "
+
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0239900000 Then
+            '■北海道LNG
+            SQLStr &= " ,  LNM0005.VALUE02   AS SETMASTERCELL "
+            SQLStr &= " ,  '' AS ORDERORGCODE_LNM0005 "
+            SQLStr &= " ,  '' AS ORDERORGNAME_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE04 AS SHUKABASHOCODE_LNM0005 "
+            SQLStr &= " ,  LNM0005.KEYCODE06 AS SHUKABASHONAME_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKECODE_LNM0005 "
+            SQLStr &= " ,  '' AS TODOKENAME_LNM0005 "
+            SQLStr &= " ,  '' AS GYOMUTANKNUM_LNM0005 "
+
+            '-- FROM
+            SQLStr &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+            '-- LEFT JOIN
+            SQLStr &= " LEFT JOIN ( "
+            SQLStr &= " SELECT * FROM LNG.LNM0017_HOLIDAYRATE LNM0017 "
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0017.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+            SQLStr &= String.Format(" AND LNM0017.TORICODE = '{0}' ", I_TORICODE)
+            '★受注受付部署コード
+            If Not IsNothing(I_ORDERORGCODE) Then
+                SQLStr &= String.Format(" AND LNM0017.ORDERORGCODE IN ({0}) ", I_ORDERORGCODE)
+            End If
+            SQLStr &= " ) LNM0017 ON "
+            SQLStr &= " LNM0017.SHUKABASHO = LNM0005.KEYCODE02 "
+            SQLStr &= " AND LNM0017.TODOKECODE = LNM0005.KEYCODE05 "
+
+            '-- WHERE
+            SQLStr &= " WHERE "
+            SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
+            SQLStr &= " AND LNM0005.KEYCODE01 = '11' "
 
         Else
             '※上記(以外)
@@ -2545,6 +2663,167 @@ Public Class CmnParts
 
         Return SQLStr
     End Function
+
+    ''' <summary>
+    ''' 北海道LNG(シート[輸送費明細])【基本料金A】取得用SQL
+    ''' </summary>
+    Public Sub SelectHokkaidoLNG_YusouhiKihonFeeA(ByVal I_CLASS As String,
+                                                  ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String,
+                                                  ByRef O_dtYusouhiFEEA As DataTable)
+        Dim SQLStr As String = ""
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0005.SYAKONO "
+        SQLStr &= " ,  LNM0005.SYAKONAME "
+        SQLStr &= " ,  LNM0005.SYAGATA "
+        SQLStr &= " ,  LNM0005.SYAGATANAME "
+        SQLStr &= " ,  LNM0005.SORTNO "
+        SQLStr &= " ,  IFNULL(LNM0007.SYABARA, 0)     AS SYABARA "
+        SQLStr &= " ,  IFNULL(LNM0007.SYAKO_COUNT, 0) AS SYAKO_COUNT "
+        SQLStr &= " ,  IFNULL(LNM0007.KOTEIHIM, 0)    AS KOTEIHIM "
+        SQLStr &= " ,  LNM0005.SETCELLNO "
+
+        '-- FROM
+        SQLStr &= " FROM "
+        '-- ①変換マスタ【基本料金A】(雛型)取得
+        SQLStr &= " ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "        LNM0005.KEYCODE03 "
+        SQLStr &= "     ,  LNM0005.KEYCODE04 AS SYAKONO "
+        SQLStr &= "     ,  LNM0005.KEYCODE06 AS SYAKONAME "
+        SQLStr &= "     ,  LNM0005.KEYCODE07 AS SYAGATA "
+        SQLStr &= "     ,  LNM0005.KEYCODE08 AS SYAGATANAME "
+        SQLStr &= "     ,  LNM0005.KEYCODE09 AS SORTNO "
+        SQLStr &= "     ,  LNM0005.VALUE02 AS SETCELLNO "
+        SQLStr &= "     FROM LNG.LNM0005_CONVERT LNM0005 "
+        SQLStr &= String.Format("     WHERE LNM0005.CLASS = '{0}' ", I_CLASS)
+        SQLStr &= "       AND LNM0005.KEYCODE01 = '1' "
+        SQLStr &= " ) LNM0005 "
+
+        '-- LEFT JOIN
+        SQLStr &= " LEFT JOIN "
+        '-- ②統合版固定費マスタ【基本料金A】[台数][料金]取得
+        SQLStr &= " ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "        LNM0007.SYAKONO "
+        SQLStr &= "     ,  LNM0007.SYAKONAME "
+        SQLStr &= "     ,  LNM0007.SYAGATA "
+        SQLStr &= "     ,  LNM0007.SYAGATANAME "
+        SQLStr &= "     ,  ROW_NUMBER() OVER(PARTITION BY LNM0007.SYAKONO, LNM0007.SYAGATA"
+        SQLStr &= "                          ORDER BY LNM0007.SYAKONO, LNM0007.SYAGATA ) AS SORTNO "
+        SQLStr &= "     ,  LNM0007.SYABARA "
+        SQLStr &= "     ,  LNM0007.KOTEIHIM "
+        SQLStr &= "     ,  COUNT(1) AS SYAKO_COUNT "
+        SQLStr &= "     FROM ( "
+        SQLStr &= "         SELECT "
+        SQLStr &= "            CASE "
+        SQLStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '室蘭' THEN '2' "
+        SQLStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '釧路' THEN '3' "
+        SQLStr &= "            ELSE '1' "
+        SQLStr &= "            END AS SYAKONO "
+        SQLStr &= "         ,  SUBSTRING(LNM0007.RIKUBAN,1,2) AS SYAKONAME "
+        SQLStr &= "         ,  LNM0007.SYAGATA "
+        SQLStr &= "         ,  LNM0007.SYAGATANAME "
+        SQLStr &= "         ,  LNM0007.SYABARA "
+        SQLStr &= "         ,  LNM0007.KOTEIHIM "
+        SQLStr &= "         FROM LNG.LNM0007_FIXED LNM0007 "
+        SQLStr &= String.Format("         WHERE LNM0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format("           AND LNM0007.TORICODE = '{0}'  ", I_TORICODE)
+        SQLStr &= String.Format("           AND LNM0007.ORGCODE  = '{0}'  ", I_ORGCODE)
+        SQLStr &= String.Format("           AND LNM0007.TARGETYM = '{0}'  ", I_TAISHOYM)
+        SQLStr &= "     ) LNM0007 "
+        SQLStr &= "     GROUP BY "
+        SQLStr &= "        LNM0007.SYAKONO "
+        SQLStr &= "     ,  LNM0007.SYAKONAME "
+        SQLStr &= "     ,  LNM0007.SYAGATA "
+        SQLStr &= "     ,  LNM0007.SYAGATANAME "
+        SQLStr &= "     ,  LNM0007.SYABARA "
+        SQLStr &= "     ,  LNM0007.KOTEIHIM "
+        SQLStr &= " ) LNM0007 ON "
+
+        '--LEFT JOIN(条件)
+        SQLStr &= "     LNM0005.SYAKONO = LNM0007.SYAKONO "
+        SQLStr &= " AND LNM0005.SYAGATA = LNM0007.SYAGATA "
+        SQLStr &= " AND LNM0005.SORTNO  = LNM0007.SORTNO "
+
+        '--ORDER BY
+        SQLStr &= " ORDER BY LNM0005.SYAKONO, LNM0005.SYAGATA, LNM0005.SORTNO, LNM0007.KOTEIHIM "
+
+        '〇SQL結果取得
+        O_dtYusouhiFEEA = SelectSearch(SQLStr)
+
+    End Sub
+
+    ''' <summary>
+    ''' 北海道LNG(シート[輸送費明細])【休日割増料金(回数)】取得用SQL
+    ''' </summary>
+    Public Sub SelectHokkaidoLNG_YusouhiHolidayRate(ByVal I_TORICODE As String, ByVal I_TAISHOYM As String,
+                                                    ByRef O_dtYusouhiHRate As DataTable)
+        '★月末日取得
+        Dim lastDay As String = ""
+        lastDay = Date.Parse(I_TAISHOYM).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd")
+
+        Dim SQLStr As String = ""
+        SQLStr &= " SELECT "
+        SQLStr &= "    LNM0016.GRPKEY "
+        SQLStr &= " ,  LNM0016.GRPKEYNAME "
+        SQLStr &= " ,  COUNT(1) AS GRPCNT "
+        SQLStr &= " ,  LNM0016.TANKA "
+
+        '--FROM
+        SQLStr &= " FROM "
+        '-- ①カレンダーマスタ【休日】(実績データ)取得
+        SQLStr &= " ( "
+        SQLStr &= "     SELECT "
+        SQLStr &= "        LNM0016.TORICODE "
+        SQLStr &= "     ,  LNM0016.YMD "
+        SQLStr &= "     ,  LNM0016.WORKINGDAY "
+        SQLStr &= "     ,  LNM0016.WORKINGDAYNAME "
+        SQLStr &= "     ,  LNM0016.PUBLICHOLIDAYNAME "
+        SQLStr &= "     ,  CASE "
+        SQLStr &= "        WHEN SUBSTRING(LNT0001.TANKNUMBER,1,2) = '室蘭' THEN 2 "
+        SQLStr &= "        WHEN SUBSTRING(LNT0001.TANKNUMBER,1,2) = '釧路' THEN 3 "
+        SQLStr &= "        ELSE 1 "
+        SQLStr &= "        END GRPKEY "
+        SQLStr &= "     ,  CASE "
+        SQLStr &= "        WHEN SUBSTRING(LNT0001.TANKNUMBER,1,2) = '室蘭' THEN '室蘭車庫' "
+        SQLStr &= "        WHEN SUBSTRING(LNT0001.TANKNUMBER,1,2) = '釧路' THEN '釧路車庫' "
+        SQLStr &= "        ELSE '石狩車庫' "
+        SQLStr &= "        END GRPKEYNAME "
+        SQLStr &= "     ,  LNT0001.GYOMUTANKNUM "
+        SQLStr &= "     ,  LNM0017.TANKA "
+        SQLStr &= "     FROM LNG.LNM0016_CALENDAR LNM0016 "
+
+        '--INNER JOIN(実績データ)
+        SQLStr &= "     INNER JOIN LNG.LNT0001_ZISSEKI LNT0001 ON "
+        SQLStr &= "           LNT0001.ZISSEKI <> 0 "
+        SQLStr &= "       AND LNT0001.TORICODE = LNM0016.TORICODE "
+        SQLStr &= "       AND LNT0001.TODOKEDATE = LNM0016.YMD "
+
+        '--INNER JOIN(休日割増単価マスタ)
+        SQLStr &= "     INNER JOIN LNG.LNM0017_HOLIDAYRATE LNM0017 ON "
+        SQLStr &= "           LNM0017.TORICODE = LNM0016.TORICODE "
+
+        '--WHERE
+        SQLStr &= String.Format("     WHERE LNM0016.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format("       AND LNM0016.YMD BETWEEN '{0}' AND '{1}' ", I_TAISHOYM, lastDay)
+        SQLStr &= "       AND LNM0016.WORKINGDAY <> '0' "
+        SQLStr &= " ) LNM0016 "
+
+        '--GROUP BY
+        SQLStr &= " GROUP BY "
+        SQLStr &= "    LNM0016.GRPKEY "
+        SQLStr &= " ,  LNM0016.GRPKEYNAME "
+        SQLStr &= " ,  LNM0016.TANKA "
+
+        '--ORDER BY
+        SQLStr &= " ORDER BY "
+        SQLStr &= "    LNM0016.GRPKEY "
+        SQLStr &= " ,  LNM0016.GRPKEYNAME "
+
+        '〇SQL結果取得
+        O_dtYusouhiHRate = SelectSearch(SQLStr)
+
+    End Sub
 
     ''' <summary>
     ''' マスタ検索処理

@@ -33,6 +33,8 @@ Public Class LNT0002TranStatusList
     Private LNT0001SKSurcharge As DataTable                          '-- SK燃料サーチャージマスタ
     Private LNT0001Calendar As DataTable                             '-- カレンダーマスタ
     Private LNT0001HolidayRate As DataTable                          '-- 休日割増単価マスタ
+    Private LNT0001HolidayRateNum As DataTable                       '-- 休日割増単価マスタ(回数)※実績データより取得
+    Private LNT0001KihonFeeA As DataTable                            '-- ★北海道LNG(基本料金A)データ格納用
 
     Private LNT0002tbl As DataTable           '一覧格納用テーブル
     Private LNT0002tblHIST As DataTable       '履歴一覧格納用テーブル
@@ -1372,7 +1374,28 @@ Public Class LNT0002TranStatusList
         '北海道ＬＮＧ
         If selectOrgCode = BaseDllConst.CONST_ORDERORGCODE_020104 _
             AndAlso WF_TORIORG.Items(WF_TORI.SelectedIndex).Text = BaseDllConst.CONST_TORICODE_0239900000 Then
+            '〇(帳票)項目チェック処理(北海道LNG)
+            Dim dcHokkaidoLNG As New Dictionary(Of String, String)
+            CMNCHK.WW_ReportCheckHokaidoLNG(Me.WF_TORI.SelectedItem.Text, selectOrgCode, dcHokkaidoLNG,
+                                            LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001KihonFeeA, LNT0001TogouSprate, LNT0001Calendar, LNT0001HolidayRate, LNT0001HolidayRateNum)
 
+            Dim LNT0001InvoiceOutputReport As New LNT0001InvoiceOutputHOKAIDOLng(Master.MAPID, selectOrgCode, Me.WF_TORIEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text,
+                                                                                 LNT0001tbl, LNT0001Tanktbl, LNT0001Koteihi, LNT0001KihonFeeA, LNT0001Calendar, dcHokkaidoLNG,
+                                                                                 printTogouSprateDataClass:=LNT0001TogouSprate,
+                                                                                 printHolidayRateDataClass:=LNT0001HolidayRate,
+                                                                                 printHolidayRateNumDataClass:=LNT0001HolidayRateNum,
+                                                                                 taishoYm:=Me.WF_TaishoYm.Value)
+            Dim url As String
+            Try
+                url = LNT0001InvoiceOutputReport.CreateExcelPrintData()
+            Catch ex As Exception
+                Return
+            End Try
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = url
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+            Exit Sub
         End If
 
         'エスジーリキッドサービス（西部ガス）

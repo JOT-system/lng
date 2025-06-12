@@ -399,7 +399,9 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
                     '★数量
-                    If PrintTogouSpraterow("CALCUNIT").ToString() = "式" Then
+                    'If PrintTogouSpraterow("CALCUNIT").ToString() = "式" Then
+                    If PrintTogouSpraterow("GROUPID").ToString() = "3" _
+                        AndAlso PrintTogouSpraterow("QUANTITY").ToString() <> "0.00" Then
                         Try
                             WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
                         Catch ex As Exception
