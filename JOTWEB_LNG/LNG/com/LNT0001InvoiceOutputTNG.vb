@@ -196,16 +196,22 @@ Public Class LNT0001InvoiceOutputTNG
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A9").Value = Convert.ToString(SheetRowData("TITLENAME"))
                     PrintOutputRowIdx = Convert.ToInt32(SheetRowData("MAXROW")) + 4
                     PrintTotalFirstRowIdx = Convert.ToInt32(SheetRowData("MAXROW")) + 4
+                    Dim TankaFlg As Boolean = False
                     Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()  ' DataBase接続
                         dt = GetTankaData(SQLcon, Convert.ToString(SheetRowData("TODOKECODE")), Convert.ToString(SheetRowData("SHUKABASHO")), "1")
                         For Each Row As DataRow In dt.Rows
                             '◯合計の設定
                             EditTotalArea(Row, SheetRowData)
+                            TankaFlg = True
                         Next
                     End Using
                     PrintTotalLastRowIdx = PrintOutputRowIdx - 1
                     '◯合計の設定
+                    '単価が存在しない場合、合計行の出力を＋１行する
+                    If TankaFlg = False Then
+                        PrintOutputRowIdx += 1
+                    End If
                     EditTotalLastArea(SheetRowData)
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Visible = Visibility.Visible
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(SheetRowData("SHEETNAME"))
