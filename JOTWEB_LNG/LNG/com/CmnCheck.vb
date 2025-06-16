@@ -1090,45 +1090,20 @@ Public Class CmnCheck
 
         '〇陸事番号マスタ設定
         For Each dtHokkaidoLNGTankrow As DataRow In dtHokkaidoLNGTank.Rows
+            '★届日より日を取得(セル(行数)の設定のため)
             Dim condition As String = String.Format("GYOMUTANKNUM='{0}'", dtHokkaidoLNGTankrow("KEYCODE04"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                '★届日より日を取得(セル(行数)の設定のため)
-                Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-                Dim lastMonth As Boolean = False
-                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(TaishoYm + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-                    lastMonth = True
-                End If
-                Dim iLine As Integer = Integer.Parse(setDay) - 1
-                iLine = (iLine * Integer.Parse(dtHokkaidoLNGTankrow("VALUE06"))) + Integer.Parse(dtHokkaidoLNGTankrow("VALUE05"))
-                '★トリップより位置を取得
-                Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-                iTrip += iLine
-                LNT0001tblrow("ROWSORTNO") = dtHokkaidoLNGTankrow("VALUE01")
-                LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE02") + iTrip.ToString()
-                'LNT0001tblrow("SETCELL02") = dtHokkaidoLNGTankrow("VALUE03") + iTrip.ToString()
-                'LNT0001tblrow("SETCELL03") = dtHokkaidoLNGTankrow("VALUE04") + iTrip.ToString()
-                LNT0001tblrow("SETLINE") = iTrip.ToString()
-
-                '★表示セルフラグ(1:表示)
-                LNT0001tblrow("DISPLAYCELL_START") = dtHokkaidoLNGTankrow("VALUE02").ToString()
-                LNT0001tblrow("DISPLAYCELL_END") = dtHokkaidoLNGTankrow("VALUE02").ToString()
-                'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtHokkaidoLNGTankrow("VALUE08").ToString()
-
-                '★備考設定用(出荷日と届日が不一致の場合)
-                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-                    If lastMonth = True Then
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-                    Else
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
-                    End If
-                End If
-            Next
+            WW_HokkaidoLNGRikugiMas(dtHokkaidoLNGTankrow, condition, fuzumiLimit, LNT0001tbl)
         Next
 
         '〇(北海道LNG)届先出荷場所車庫マスタ設定
         For Each dtHokkaidoLNGTodokerow As DataRow In dtHokkaidoLNGTodoke.Rows
             Dim condition As String = String.Format("TODOKECODE='{0}'", dtHokkaidoLNGTodokerow("KEYCODE01"))
+            '★特殊届先(条件)チェック([雪印メグ中標津][大塚製薬工場])
+            If dtHokkaidoLNGTodokerow("KEYCODE01") = BaseDllConst.CONST_TODOKECODE_003630 _
+                    OrElse dtHokkaidoLNGTodokerow("KEYCODE01") = BaseDllConst.CONST_TODOKECODE_007279 Then
+                condition &= String.Format(" AND SHUKABASHO = '{0}' ", dtHokkaidoLNGTodokerow("KEYCODE04"))
+            End If
+
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 LNT0001tblrow("SHEETSORTNO_REP") = dtHokkaidoLNGTodokerow("KEYCODE03")
                 LNT0001tblrow("TODOKENAME_REP") = dtHokkaidoLNGTodokerow("VALUE01")
@@ -1153,10 +1128,72 @@ Public Class CmnCheck
             Try
                 dcHokaidoLNGList.Add(dtHokkaidoLNGTodokerow("KEYCODE01"), dtHokkaidoLNGTodokerow("VALUE06"))
             Catch ex As Exception
+                '★特殊届先チェック([雪印メグ中標津][大塚製薬工場])
+                If dtHokkaidoLNGTodokerow("KEYCODE01") = BaseDllConst.CONST_TODOKECODE_003630 _
+                    OrElse dtHokkaidoLNGTodokerow("KEYCODE01") = BaseDllConst.CONST_TODOKECODE_007279 Then
+                    dcHokaidoLNGList.Add(dtHokkaidoLNGTodokerow("KEYCODE01") + "02", dtHokkaidoLNGTodokerow("VALUE06"))
+                End If
             End Try
         Next
 
     End Sub
+
+    ''' <summary>
+    ''' 北海道LNG(届先(明細)セル値設定)
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WW_HokkaidoLNGRikugiMas(ByVal dtHokkaidoLNGTankrow As DataRow, ByVal condition As String, ByVal fuzumiLimit As Decimal, ByRef LNT0001tbl As DataTable)
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
+
+            '★釧路配属車の場合(出荷場所が[釧路エルエヌジー](006826))チェック
+            If dtHokkaidoLNGTankrow("KEYCODE07").ToString() = "3" _
+                AndAlso dtHokkaidoLNGTankrow("KEYCODE04").ToString() = "3308" Then
+                If LNT0001tblrow("SHUKABASHO").ToString() = "006826" Then
+                    '### 釧路配属車の場合は、下記処理を実施
+                Else
+                    Continue For
+                End If
+            End If
+
+            '★届日より日を取得(セル(行数)の設定のため)
+            Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+            Dim lastMonth As Boolean = False
+            If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(TaishoYm + "/01").AddMonths(-1).ToString("yyyy/MM") Then
+                setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
+                lastMonth = True
+            End If
+            Dim iLine As Integer = Integer.Parse(setDay) - 1
+            iLine = (iLine * Integer.Parse(dtHokkaidoLNGTankrow("VALUE06"))) + Integer.Parse(dtHokkaidoLNGTankrow("VALUE05"))
+            ''★トリップより位置を取得
+            'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
+            'iTrip += iLine
+            LNT0001tblrow("ROWSORTNO") = dtHokkaidoLNGTankrow("VALUE01")
+            '★室蘭ガスの場合(専用セルに設定)
+            If LNT0001tblrow("TODOKECODE") = BaseDllConst.CONST_TODOKECODE_004831 Then
+                LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE03") + iLine.ToString()
+            Else
+                LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE02") + iLine.ToString()
+            End If
+            'LNT0001tblrow("SETCELL02") = dtHokkaidoLNGTankrow("VALUE03") + iLine.ToString()
+            'LNT0001tblrow("SETCELL03") = dtHokkaidoLNGTankrow("VALUE04") + iLine.ToString()
+            LNT0001tblrow("SETLINE") = iLine.ToString()
+
+            '★表示セルフラグ(1:表示)
+            LNT0001tblrow("DISPLAYCELL_START") = dtHokkaidoLNGTankrow("VALUE02").ToString()
+            LNT0001tblrow("DISPLAYCELL_END") = dtHokkaidoLNGTankrow("VALUE02").ToString()
+            'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtHokkaidoLNGTankrow("VALUE08").ToString()
+
+            '★備考設定用(出荷日と届日が不一致の場合)
+            If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
+                If lastMonth = True Then
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
+                Else
+                    LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                End If
+            End If
+        Next
+    End Sub
+
 #End Region
 
     Protected Sub WW_ReportMeisaiAdd(ByRef LNT0001tbl As DataTable)

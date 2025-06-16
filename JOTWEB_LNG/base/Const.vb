@@ -496,6 +496,18 @@ Public Module BaseDllConst
     ''' 商船三井
     ''' </summary>
     Public Const CONST_TODOKECODE_007110 As String = "007110"
+    ''' <summary>
+    ''' （日通）室蘭ガス
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004831 As String = "004831"
+    ''' <summary>
+    ''' （浜中）大塚製薬
+    ''' </summary>
+    Public Const CONST_TODOKECODE_003630 As String = "003630"
+    ''' <summary>
+    ''' （浜中）雪印メグミルクなかしべつ
+    ''' </summary>
+    Public Const CONST_TODOKECODE_007279 As String = "007279"
 #End Region
 
 #Region "業務ID"
