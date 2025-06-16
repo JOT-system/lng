@@ -383,14 +383,13 @@ Public Class LNT0001InvoiceOutputReport
                 Else
                     '★ 表示
                     WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())).Hidden = False
+                    '★ トレーラ
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("F" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TANKNUMBER").ToString()
                 End If
                 '★ トラクタ
-                If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
-                    OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
                     WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("E" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TRACTORNUMBER").ToString()
                 End If
-                '★ トレーラ
-                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("F" + PrintDatarow("DISPLAYCELL_KOTEICHI").ToString()).Value = PrintDatarow("TANKNUMBER").ToString()
 
                 '〇シート「請求書明細」
                 If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" Then
