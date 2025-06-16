@@ -378,8 +378,12 @@ Public Class LNT0001InvoiceOutputReport
                 WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("DISPLAYCELL_END").ToString() + "4").Value = dblZyutyu.ToString() + "t"
 
                 '〇シート「固定費」
-                '★ 表示
-                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())).Hidden = False
+                If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                    '### 後続で管理
+                Else
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", PrintDatarow("DISPLAYCELL_KOTEICHI").ToString())).Hidden = False
+                End If
                 '★ トラクタ
                 If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 _
                     OrElse Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
@@ -441,10 +445,34 @@ Public Class LNT0001InvoiceOutputReport
             Next
 
             '〇陸事番号(固定費)設定
+            'PrintKoteihiData.Columns.Add("KOTEIHI_CELLNUM_INT", Type.GetType("System.Int32"))
+            'For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
+            '    PrintKoteihiDatarow("KOTEIHI_CELLNUM_INT") = CInt(PrintKoteihiDatarow("KOTEIHI_CELLNUM"))
+            'Next
+            Dim iNo As Integer = 1
+            Dim iCellNo As Integer = 3
             For Each PrintKoteihiDatarow As DataRow In PrintKoteihiData.Select("KOTEIHI_CELLNUM<>''")
                 '〇シート「固定費」
-                '★ 月額固定費
-                WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+                '〇水島営業所の場合
+                If PrintKoteihiDatarow("ORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                    '★ No
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("B" + iCellNo.ToString()).Value = iNo
+                    '★ 車型
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("C" + iCellNo.ToString()).Value = PrintKoteihiDatarow("SYAGATANAME").ToString()
+                    '★ 車腹
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("D" + iCellNo.ToString()).Value = Double.Parse(PrintKoteihiDatarow("SYABARA").ToString())
+                    '★ ﾄﾚｰﾗ
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("F" + iCellNo.ToString()).Value = PrintKoteihiDatarow("RIKUBAN").ToString()
+                    '★ 月額固定費
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G" + iCellNo.ToString()).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range(String.Format("{0}:{0}", iCellNo.ToString())).Hidden = False
+                Else
+                    '★ 月額固定費
+                    WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+                End If
+                iNo += 1        '-- No
+                iCellNo += 1    '-- セル
             Next
             ''〇陸事番号(固定費(八戸人員/八戸出荷))設定
             'For Each PrintHachinoheSprateDatarow As DataRow In PrintHachinoheSprateData.Rows
