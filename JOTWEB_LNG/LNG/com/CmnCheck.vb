@@ -1170,8 +1170,16 @@ Public Class CmnCheck
             LNT0001tblrow("ROWSORTNO") = dtHokkaidoLNGTankrow("VALUE01")
             '★室蘭ガスの場合(専用セルに設定)
             If LNT0001tblrow("TODOKECODE") = BaseDllConst.CONST_TODOKECODE_004831 Then
-                LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE03") + iLine.ToString()
+                '※ただし、ナンバーが室蘭の場合のみ(専用セル)
+                If LNT0001tblrow("TANKNUMBER").ToString().Substring(0, 2) = "室蘭" Then
+                    LNT0001tblrow("SETCELL") = dtHokkaidoLNGTankrow("VALUE03")
+                    LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE03") + iLine.ToString()
+                Else
+                    LNT0001tblrow("SETCELL") = dtHokkaidoLNGTankrow("VALUE02")
+                    LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE02") + iLine.ToString()
+                End If
             Else
+                LNT0001tblrow("SETCELL") = dtHokkaidoLNGTankrow("VALUE02")
                 LNT0001tblrow("SETCELL01") = dtHokkaidoLNGTankrow("VALUE02") + iLine.ToString()
             End If
             'LNT0001tblrow("SETCELL02") = dtHokkaidoLNGTankrow("VALUE03") + iLine.ToString()
@@ -1199,6 +1207,7 @@ Public Class CmnCheck
     Protected Sub WW_ReportMeisaiAdd(ByRef LNT0001tbl As DataTable)
         '〇(帳票)使用項目の設定
         LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
+        LNT0001tbl.Columns.Add("SETCELL", Type.GetType("System.String"))                '// 【入力用】EXCEL用セル
         LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
         LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
         LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)

@@ -2807,6 +2807,7 @@ Public Class CmnParts
         SQLStr &= String.Format("     WHERE LNM0016.TORICODE = '{0}' ", I_TORICODE)
         SQLStr &= String.Format("       AND LNM0016.YMD BETWEEN '{0}' AND '{1}' ", I_TAISHOYM, lastDay)
         SQLStr &= "       AND LNM0016.WORKINGDAY <> '0' "
+        SQLStr &= "       AND LNM0016.WORKINGDAY <> '5' "
         SQLStr &= " ) LNM0016 "
 
         '--GROUP BY

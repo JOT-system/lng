@@ -8,7 +8,8 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
     Private WW_SheetNoCalendar As Integer = 0
     Private WW_SheetNoHoliday As Integer = 0
     Private WW_SheetNoMaster As Integer = 0
-    Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用
+    Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(出荷場所：石狩)
+    Private WW_ArrSheetNo02 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(出荷場所：釧路)
     Private WW_ArrCalendarWeek As String() = {"日", "月", "火", "水", "木", "金", "土"}
 
     Private WW_DicHokkaidoLNGList As Dictionary(Of String, String)
@@ -135,16 +136,14 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
                 ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
                     '〇共通(シート[ﾏｽﾀ])
                     WW_SheetNoMaster = i
-                ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(0) + 1).ToString("00") Then
+                ElseIf WW_Workbook.Worksheets(i).Name = "TMP1" + (j(0) + 1).ToString("00") Then
+                    '〇追加用(シート[石狩])
                     WW_ArrSheetNo01(j(0)) = i
                     j(0) += 1
-                    'ElseIf WW_Workbook.Worksheets(i).Name = "①KG石狩～釧路(40ft) " _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟②" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)秋田" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(東北)" _
-                    '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(茨城)" Then
-                    '    WW_ArrSheetNoKoteichi(j(1)) = i
-                    '    j(1) += 1
+                ElseIf WW_Workbook.Worksheets(i).Name = "TMP2" + (j(1) + 1).ToString("00") Then
+                    '〇追加用(シート[釧路])
+                    WW_ArrSheetNo02(j(1)) = i
+                    j(1) += 1
                 End If
             Next
 
@@ -172,6 +171,8 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
             '◯(固定費・単価)の設定
             EditTogouMasterArea()
             '***** TODO処理 ここまで *****
+            '★ [祝日]シート非表示
+            WW_Workbook.Worksheets(WW_SheetNoHoliday).Visible = Visibility.Hidden
             '★ [ﾏｽﾀ]シート非表示
             WW_Workbook.Worksheets(WW_SheetNoMaster).Visible = Visibility.Hidden
 
@@ -257,7 +258,7 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
                 '★条件設定
                 conditionSb = String.Format(condition, sheetName)
                 '〇セル設定
-                EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01)
+                EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01, sheetName)
 
             Next
 
@@ -273,13 +274,46 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
     ''' <summary>
     ''' 帳票の明細設定(サブ)
     ''' </summary>
-    Private Sub EditDetailAreaSub(ByVal condition As String, ByVal todokeCode As String, ByVal dicSheetNo01 As KeyValuePair(Of String, Integer))
+    Private Sub EditDetailAreaSub(ByVal condition As String, ByVal todokeCode As String, ByVal dicSheetNo01 As KeyValuePair(Of String, Integer), ByVal sheetName As String)
         For Each PrintDatarow As DataRow In PrintData.Select(condition, "ROWSORTNO, SHUKADATE, TODOKEDATE")
             If PrintDatarow("TODOKECODE").ToString() <> todokeCode Then
                 Continue For
             End If
             '◯ 実績数量
             WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+            '★ (列)表示
+            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(String.Format("{0}:{0}", PrintDatarow("SETCELL").ToString())).Hidden = False
+            '★ (行)表示
+            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(String.Format("{0}:{0}", PrintDatarow("SETLINE").ToString())).Hidden = False
+
+            Try
+                '〇届名称(追加)用設定(追加ではない場合はSKIP)
+                If PrintDatarow("TODOKECELL_REP").ToString() = "" Then Continue For
+
+                Dim iDisp As Integer = 0
+                If PrintDatarow("SHEETDISPLAY_REP").ToString() <> "" Then
+                    iDisp = CInt(PrintDatarow("SHEETDISPLAY_REP").ToString())
+                End If
+
+                Dim WW_ArrSheetNo As Integer = 0
+                If sheetName.Substring(0, 4) = "TMP1" Then
+                    WW_ArrSheetNo = WW_ArrSheetNo01(iDisp)
+                    '★ シート名変更
+                    WW_Workbook.Worksheets(WW_ArrSheetNo).Name = PrintDatarow("TODOKENAME_REP").ToString()
+                ElseIf sheetName.Substring(0, 4) = "TMP2" Then
+                    WW_ArrSheetNo = WW_ArrSheetNo02(iDisp)
+                    '★ シート名変更
+                    WW_Workbook.Worksheets(WW_ArrSheetNo).Name = PrintDatarow("TODOKENAME_REP").ToString()
+                Else
+                    WW_ArrSheetNo = dicSheetNo01.Value
+                End If
+
+                '★ シート表示
+                WW_Workbook.Worksheets(WW_ArrSheetNo).Visible = Visibility.Visible
+
+            Catch ex As Exception
+            End Try
+
         Next
     End Sub
 
