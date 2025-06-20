@@ -63,11 +63,12 @@ Public Class LNT0001ZissekiAjustMap_aspx
                             WF_ButtonUPDATE()
                         Case "WF_ButtonCLEAR"           '戻るボタンクリック
                             WF_ButtonEND_Click()
+                        Case "WF_SelectCALENDARChange"  'カレンダー変更時
+                            WF_TARGETTABLEInitialize()
                         Case "WF_TARGETTABLEChange"     '対象選択クリック
                             WF_TARGETTABLEInitialize()
                         Case "WF_ButtonSearch"          '検索ボタンクリック
                             WF_ButtonSearch_Click()
-
                         Case "WF_MouseWheelUp"
 
                         Case "WF_ButtonRelease"         '解除ボタンクリック
@@ -84,7 +85,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     If WW_ErrSW <> "ERR" _
                         AndAlso WF_ButtonClick.Value <> "WF_ButtonSearch" _
                         AndAlso WF_ButtonClick.Value <> "WF_ButtonRelease" _
-                        AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" Then
+                        AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" _
+                        AndAlso WF_ButtonClick.Value <> "WF_SelectCALENDARChange" Then
                         '○ 一覧再表示処理
                         DisplayGrid()
                     End If

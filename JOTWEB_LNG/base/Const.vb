@@ -334,6 +334,10 @@ Public Module BaseDllConst
     ''' 北海道ＬＮＧ
     ''' </summary>
     Public Const CONST_TORICODE_0239900000 As String = "0239900000"
+    ''' <summary>
+    ''' 東北電力
+    ''' </summary>
+    Public Const CONST_TORICODE_0175400000 As String = "0175400000"
 #End Region
 
 #Region "受注受付部署"

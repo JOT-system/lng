@@ -2658,6 +2658,30 @@ Public Class CmnParts
 
         SQLStr &= " ) LT1                                                                "
 
+        '★統合版単価マスタ('1':調整単価)
+        SQLStr &= " INNER JOIN LNG.LNM0006_NEWTANKA LNM0006 ON "
+        SQLStr &= "     LNM0006.TANKAKBN = '1' "
+        SQLStr &= " AND LT1.TODOKEDATE BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD "
+        SQLStr &= " AND LNM0006.TORICODE = LT1.TORICODE "
+        SQLStr &= " AND LNM0006.AVOCADOTODOKECODE = LT1.TODOKECODE "
+
+        '★車番も条件の取引コードの場合は含める
+        If WF_TORI = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '〇シーエナジー
+            SQLStr &= " AND LNM0006.SHABAN = LT1.GYOMUTANKNUM "
+            SQLStr &= " AND LNM0006.AVOCADOSHUKABASHO = LT1.SHUKABASHO "
+
+        ElseIf WF_TORI = BaseDllConst.CONST_TORICODE_0175400000 Then
+            '〇東北電力
+            SQLStr &= " AND LNM0006.SHABAN = LT1.GYOMUTANKNUM "
+
+        ElseIf WF_TORI = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso WF_TORIORG <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '〇石油資源開発(本州)
+            SQLStr &= " AND LNM0006.SHABAN = LT1.GYOMUTANKNUM "
+
+        End If
+
         SQLStr &= " ORDER BY                                                            "
         SQLStr &= "     LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE  "
 

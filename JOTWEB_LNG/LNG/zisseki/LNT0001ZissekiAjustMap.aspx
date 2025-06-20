@@ -49,7 +49,7 @@
                                     <div class="d-flex align-items-center gap-2 me-3">
                                         <strong class="flex-shrink-0">対象年月</strong>
                                         <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest" >
-                                            <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" data-input >
+                                            <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS"  onchange="ButtonClick('WF_SelectCALENDARChange');" data-input >
                                             <span class="input-group-text" data-toggle >
                                                 <span class="material-symbols-outlined">calendar_month</span>
                                             </span>
