@@ -147,7 +147,7 @@ Public Class LNT0001InvoiceOutputSAIBU
         arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_024001
         Using SQLcon As MySql.Data.MySqlClient.MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, "SAIBU_KYUSHU_TODOKE", dtKyushuTodoke, I_ORDERBY_KEY:="VALUE01")
+            'CMNPTS.SelectCONVERTMaster(SQLcon, "SAIBU_KYUSHU_TODOKE", dtKyushuTodoke, I_ORDERBY_KEY:="VALUE01")
             SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", "SAIBU_KYUSHU_TODOKE", LNT0001Tanktbl)
             SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm, LNT0001Koteihitbl)
         End Using
@@ -161,8 +161,7 @@ Public Class LNT0001InvoiceOutputSAIBU
                             .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of Decimal)("KOTEIHIM")))
                         }
 
-        '届先毎グルーピングして数量をサマリー（LINQを使う）
-        'エコア以外
+        '届先毎、枝番毎グルーピングして数量をサマリー（LINQを使う）
         Dim query = From row In InputData.AsEnumerable()
                     Group row By TODOKECODE = row.Field(Of String)("TODOKECODE"), BRANCHCODE = row.Field(Of String)("BRANCHCODE") Into Group
                     Select New With {
@@ -171,121 +170,90 @@ Public Class LNT0001InvoiceOutputSAIBU
                             .DAISU = Group.Count(),
                             .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
                         }
-        'エコア１回転
-        'Dim query01 = From row In InputData.AsEnumerable()
-        '              Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-        '                    row.Field(Of UInt64)("TRIP_REP").ToString = "1"
-        '              Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-        '              Select New With {
-        '                    .TODOKECODE = TODOKECODE,
-        '                    .DAISU = Group.Count(),
-        '                    .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-        '                }
-        'エコア２回転
-        'Dim query02 = From row In InputData.AsEnumerable()
-        '              Where row.Field(Of String)("TODOKECODE") = TODOKE_003769 AndAlso
-        '                    row.Field(Of UInt64)("TRIP_REP").ToString = "2"
-        '              Group row By TODOKECODE = row.Field(Of String)("TODOKECODE") Into Group
-        '              Select New With {
-        '                    .TODOKECODE = TODOKECODE,
-        '                    .DAISU = Group.Count(),
-        '                    .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI")))
-        '                }
 
         PrintData = New DataTable
-        PrintData.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))
-        PrintData.Columns.Add("TODOKECODE", Type.GetType("System.String"))
         PrintData.Columns.Add("TODOKECLASS", Type.GetType("System.String"))
+        PrintData.Columns.Add("TODOKEMULTI", Type.GetType("System.String"))
+        PrintData.Columns.Add("TODOKECODE", Type.GetType("System.String"))
         PrintData.Columns.Add("TODOKENAME", Type.GetType("System.String"))
         PrintData.Columns.Add("BRANCHCODE", Type.GetType("System.Decimal"))
         PrintData.Columns.Add("TANKA", Type.GetType("System.Int32"))
         PrintData.Columns.Add("DAISU", Type.GetType("System.Int32"))
         PrintData.Columns.Add("ZISSEKI", Type.GetType("System.Decimal"))
         PrintData.Columns.Add("AMT", Type.GetType("System.Decimal"))
-        PrintData.Columns.Add("SETCELL01", Type.GetType("System.String"))
-        PrintData.Columns.Add("SETCELL02", Type.GetType("System.String"))
-        PrintData.Columns.Add("SETCELL03", Type.GetType("System.String"))
-        PrintData.Columns.Add("SETCELL04", Type.GetType("System.String"))
-        PrintData.Columns.Add("ROW", Type.GetType("System.String"))
+
+        Dim prtRow As DataRow
 
         '〇請求書出力情報を保存
-        For Each dtKyushuTodokerow As DataRow In dtKyushuTodoke.Rows
-            Dim prtRow As DataRow = PrintData.NewRow
-            prtRow("ROWSORTNO") = dtKyushuTodokerow("VALUE01")
-            prtRow("SETCELL01") = If(dtKyushuTodokerow("VALUE02").ToString <> "", dtKyushuTodokerow("VALUE02").ToString & dtKyushuTodokerow("VALUE06").ToString, "")
-            prtRow("SETCELL02") = If(dtKyushuTodokerow("VALUE03").ToString <> "", dtKyushuTodokerow("VALUE03").ToString & dtKyushuTodokerow("VALUE06").ToString, "")
-            prtRow("SETCELL03") = If(dtKyushuTodokerow("VALUE04").ToString <> "", dtKyushuTodokerow("VALUE04").ToString & dtKyushuTodokerow("VALUE06").ToString, "")
-            prtRow("SETCELL04") = If(dtKyushuTodokerow("VALUE05").ToString <> "", dtKyushuTodokerow("VALUE05").ToString & dtKyushuTodokerow("VALUE06").ToString, "")
-            prtRow("TODOKECODE") = dtKyushuTodokerow("KEYCODE01")
-            prtRow("TODOKECLASS") = dtKyushuTodokerow("KEYCODE02")
-            prtRow("TODOKENAME") = dtKyushuTodokerow("KEYCODE03")
+        '固定費設定
+        For Each result In queryK
+            prtRow = PrintData.NewRow
+            prtRow("TODOKECLASS") = "K"
+            prtRow("TODOKECODE") = ""
+            prtRow("TODOKENAME") = result.DAISU & "台"
+            prtRow("BRANCHCODE") = "1"
             prtRow("TANKA") = 0
             prtRow("DAISU") = 0
             prtRow("ZISSEKI") = 0
-            prtRow("AMT") = 0
-            prtRow("ROW") = dtKyushuTodokerow("VALUE06").ToString
+            prtRow("AMT") = result.KOTEIHI
             PrintData.Rows.Add(prtRow)
         Next
-
-        '固定費設定
-        For Each result In queryK
-            For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = "KOTEIHI" Then
-                    prtRow("TANKA") = 0
-                    prtRow("TODOKENAME") = result.DAISU & "台"
-                    prtRow("AMT") = result.KOTEIHI
-                    Exit For
-                End If
-            Next
-        Next
-        ' 表示情報を付加（台数、数量）
-        'エコア以外
-        For Each result In query
-            For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
-                   prtRow("TODOKECLASS").ToString = result.BRANCHCODE Then
-                    prtRow("TANKA") = 0
-                    prtRow("DAISU") = result.DAISU
-                    prtRow("ZISSEKI") = result.ZISSEKI
-                    Exit For
-                End If
-            Next
-        Next
-        'エコア１回転
-        'For Each result In query01
-        '    For Each prtRow As DataRow In PrintData.Rows
-        '        If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
-        '           prtRow("TODOKECLASS").ToString = "1" Then
-        '            prtRow("TANKA") = 0
-        '            prtRow("DAISU") = result.DAISU
-        '            prtRow("ZISSEKI") = result.ZISSEKI
-        '            Exit For
-        '        End If
-        '    Next
-        'Next
-        'エコア２回転
-        'For Each result In query02
-        '    For Each prtRow As DataRow In PrintData.Rows
-        '        If prtRow("TODOKECODE").ToString = result.TODOKECODE AndAlso
-        '           prtRow("TODOKECLASS").ToString = "2" Then
-        '            prtRow("TANKA") = 0
-        '            prtRow("DAISU") = result.DAISU
-        '            prtRow("ZISSEKI") = result.ZISSEKI
-        '            Exit For
-        '        End If
-        '    Next
-        'Next
-
-        '単価設定
+        '明細行設定
         For Each result As DataRow In LNT0001Tanktbl.Rows
-            For Each prtRow As DataRow In PrintData.Rows
-                If prtRow("TODOKECODE").ToString = result("AVOCADOTODOKECODE").ToString AndAlso
-                   prtRow("TODOKECLASS").ToString = CInt(result("TODOKEBRANCHCODE")).ToString Then
-                    prtRow("TANKA") = result("TANKA")
+            prtRow = PrintData.NewRow
+            prtRow("TODOKECLASS") = result("BRANCHCODE")
+            prtRow("TODOKEMULTI") = "OFF"
+            prtRow("TODOKECODE") = result("AVOCADOTODOKECODE")
+            prtRow("TODOKENAME") = result("AVOCADOTODOKENAME")
+            prtRow("BRANCHCODE") = result("BRANCHCODE")
+            prtRow("TANKA") = result("TANKA")
+            prtRow("DAISU") = 0
+            prtRow("ZISSEKI") = 0
+            prtRow("AMT") = 0
+            For Each dtRow In query
+                If prtRow("TODOKECODE").ToString = dtRow.TODOKECODE AndAlso
+                   prtRow("BRANCHCODE").ToString = dtRow.BRANCHCODE Then
+                    prtRow("DAISU") = dtRow.DAISU
+                    prtRow("ZISSEKI") = dtRow.ZISSEKI
                     Exit For
                 End If
             Next
+            PrintData.Rows.Add(prtRow)
+
+            If result("BRANCHCODE").ToString > "1" Then
+                prtRow = PrintData.NewRow
+                prtRow("TODOKECLASS") = "T"
+                prtRow("TODOKEMULTI") = "OFF"
+                prtRow("TODOKECODE") = result("AVOCADOTODOKECODE")
+                prtRow("TODOKENAME") = result("AVOCADOTODOKENAME")
+                prtRow("BRANCHCODE") = 0
+                prtRow("TANKA") = 0
+                prtRow("DAISU") = 0
+                prtRow("ZISSEKI") = 0
+                prtRow("AMT") = 0
+                PrintData.Rows.Add(prtRow)
+            End If
         Next
+        'ローリー変動費計
+        prtRow = PrintData.NewRow
+        prtRow("TODOKECLASS") = "H"
+        prtRow("TODOKEMULTI") = "OFF"
+        prtRow("TODOKECODE") = ""
+        prtRow("TODOKENAME") = "ローリー変動費計"
+        prtRow("BRANCHCODE") = 0
+        prtRow("TANKA") = 0
+        prtRow("DAISU") = 0
+        prtRow("ZISSEKI") = 0
+        prtRow("AMT") = 0
+        PrintData.Rows.Add(prtRow)
+
+        '複数回転のマーキング（枝番が１以上のものが存在すれば、同一届先をマーキング）
+        For Each result As DataRow In LNT0001Tanktbl.Select("BRANCHCODE > '1'")
+            For Each multirow As DataRow In PrintData.Select("TODOKECODE = '" & Convert.ToString(result("AVOCADOTODOKECODE")) & "'")
+                multirow("TODOKEMULTI") = "ON"
+            Next
+        Next
+
 
     End Sub
 
@@ -309,6 +277,9 @@ Public Class LNT0001InvoiceOutputSAIBU
     ''' </summary>
     Private Sub EditDetailArea()
         Try
+            Dim lineKcnt As Integer = 7
+            Dim lineHcnt As Integer = 10
+            Dim lineTcnt As Integer = 0
             Dim srcRange As IRange = Nothing
             Dim destRange As IRange = Nothing
             Dim rowInx As Integer = 11
@@ -325,36 +296,40 @@ Public Class LNT0001InvoiceOutputSAIBU
             Dim lastRow As Integer = WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Row + WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Rows.Count - 1
             WW_Workbook.Worksheets(WW_SheetNo).Range(rowInx.ToString + ":" + lastRow.ToString).Delete()
 
-            For Each PrintDatarow As DataRow In PrintData.Select("SETCELL01<>''", "ROWSORTNO")
+            For Each PrintDatarow As DataRow In PrintData.Rows
                 If PrintDatarow("TODOKECLASS").ToString = "K" Then
                     '固定費の編集
                     '◯ 届先名
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("A" & lineKcnt.ToString).Value = PrintDatarow("TODOKENAME").ToString()
                     '◯ 固定費
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("AMT").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("E" & lineKcnt.ToString).Value = Double.Parse(PrintDatarow("AMT").ToString())
 
-                    KoteihiCell = PrintDatarow("SETCELL02").ToString()
+                    KoteihiCell = "E" & lineKcnt.ToString
 
                 ElseIf PrintDatarow("TODOKECLASS").ToString = "H" Then
-                    '変動費合計の編集
+                    lineTcnt = lineHcnt + 1
+                    '２．変動費合計の編集
                     srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A9:E10")
-                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) - 1).ToString())
+                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & lineTcnt.ToString())
                     '行の高さコピー
                     destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A9").RowHeight
                     destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A10").RowHeight
                     srcRange.Copy(destRange)
-                    '◯ 届先名
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
-                    '◯ 台数
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Formula = FormulaT1
-                    '◯ 数量
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Formula = FormulaT2
-                    '◯ 輸送費
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL04").ToString()).Formula = FormulaT3
 
-                    '合計の編集
+                    lineTcnt += 1
+                    '◯ 届先名
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("A" & lineTcnt.ToString).Value = PrintDatarow("TODOKENAME").ToString()
+                    '◯ 台数
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("C" & lineTcnt.ToString).Formula = FormulaT1
+                    '◯ 数量
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("D" & lineTcnt.ToString).Formula = FormulaT2
+                    '◯ 輸送費
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("E" & lineTcnt.ToString).Formula = FormulaT3
+
+                    '３．合計の編集
+                    Dim TtlRow As Integer = lineTcnt + 1
                     srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A11:E15")
-                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) + 1).ToString())
+                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & TtlRow.ToString())
                     '行の高さコピー
                     destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A11").RowHeight
                     destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A12").RowHeight
@@ -363,21 +338,23 @@ Public Class LNT0001InvoiceOutputSAIBU
                     destRange.Rows(4).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A15").RowHeight
                     srcRange.Copy(destRange)
                     '◯ 輸送費（小計＝固定費＋変動費）
-                    WW_Workbook.Worksheets(WW_SheetNo).Range("E" & (Val(PrintDatarow("ROW")) + 3).ToString()).Formula = "=" & KoteihiCell & "+" & PrintDatarow("SETCELL04").ToString()
+                    TtlRow += 2
+                    WW_Workbook.Worksheets(WW_SheetNo).Range("E" & TtlRow.ToString()).Formula = "=" & KoteihiCell & "+" & "E" & lineTcnt.ToString()
                     '◯ 輸送費（消費税、合計はEXCELに任せる）
                 Else
                     '変動費明細
-                    '行コピー
+                    '行コピー（枠組みの作成）
                     If PrintDatarow("TODOKECLASS").ToString = "1" Then
+                        lineHcnt += 1
                         srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A3:E4")
-                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (Val(PrintDatarow("ROW")) - 1).ToString())
+                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & lineHcnt.ToString())
                         '行の高さコピー
                         destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A3").RowHeight
                         destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4").RowHeight
                         srcRange.Copy(destRange)
                     ElseIf PrintDatarow("TODOKECLASS").ToString = "2" Then
                         srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A7:E8")
-                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & Val(PrintDatarow("ROW")).ToString())
+                        destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" & (lineHcnt + 1).ToString())
                         '行の高さコピー
                         destRange.Rows(0).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A7").RowHeight
                         destRange.Rows(1).RowHeight = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A8").RowHeight
@@ -385,45 +362,53 @@ Public Class LNT0001InvoiceOutputSAIBU
                     End If
 
                     '届先別の輸送費編集
-                    '◯ 届先名
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = PrintDatarow("TODOKENAME").ToString()
-                    '◯ 単価
-                    WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("TANKA").ToString())
+                    lineHcnt += 1
 
                     '合計行の編集（エコア合計（1回転＋2回転））
-                    '変換マスタ（lnm0005_convert）の内容を参照
                     If PrintDatarow("TODOKECLASS").ToString = "1" Then
-                        Formula1 = "=" & PrintDatarow("SETCELL03").ToString
-                        Formula2 = "=" & PrintDatarow("SETCELL04").ToString
+                        Formula1 = "=" & "C" & lineHcnt.ToString
+                        Formula2 = "=" & "D" & lineHcnt.ToString
                     ElseIf PrintDatarow("TODOKECLASS").ToString <> "T" Then
-                        Formula1 &= "+" & PrintDatarow("SETCELL03").ToString
-                        Formula2 &= "+" & PrintDatarow("SETCELL04").ToString
+                        Formula1 &= "+" & "C" & lineHcnt.ToString
+                        Formula2 &= "+" & "D" & lineHcnt.ToString
                     End If
 
                     '合計行の場合、上記で編集した数式を設定
                     If PrintDatarow("TODOKECLASS").ToString = "T" Then
+                        '◯ 届先
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("A" & lineHcnt.ToString).Value = PrintDatarow("TODOKENAME").ToString() & "（合　計）"
                         '◯ 台数
-                        WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Formula = Formula1
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("C" & lineHcnt.ToString).Formula = Formula1
                         '◯ 実績数量
-                        WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL04").ToString()).Formula = Formula2
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("D" & lineHcnt.ToString).Formula = Formula2
                     Else
+                        '◯ 届先名
+                        Dim AddStr As String = ""
+                        If PrintDatarow("TODOKEMULTI").ToString = "OFF" Then
+                            AddStr = ""
+                        Else
+                            AddStr = "（" & PrintDatarow("BRANCHCODE").ToString & "回転）"
+                        End If
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("A" & lineHcnt.ToString).Value = PrintDatarow("TODOKENAME").ToString() & AddStr
+                        '◯ 単価
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("B" & lineHcnt.ToString).Value = Double.Parse(PrintDatarow("TANKA").ToString())
                         '◯ 台数
-                        WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL03").ToString()).Value = Double.Parse(PrintDatarow("DAISU").ToString())
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("C" & lineHcnt.ToString).Value = Double.Parse(PrintDatarow("DAISU").ToString())
                         '◯ 実績数量
-                        WW_Workbook.Worksheets(WW_SheetNo).Range(PrintDatarow("SETCELL04").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString())
+                        WW_Workbook.Worksheets(WW_SheetNo).Range("D" & lineHcnt.ToString).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString())
                     End If
 
                     '変動費の合計行の数式編集
                     If IsNumeric(PrintDatarow("TODOKECLASS")) Then
                         If FirstFlg = False Then
                             FirstFlg = True
-                            FormulaT1 &= "=C" & PrintDatarow("ROW").ToString
-                            FormulaT2 &= "=D" & PrintDatarow("ROW").ToString
-                            FormulaT3 &= "=E" & PrintDatarow("ROW").ToString
+                            FormulaT1 &= "=C" & lineHcnt.ToString
+                            FormulaT2 &= "=D" & lineHcnt.ToString
+                            FormulaT3 &= "=E" & lineHcnt.ToString
                         Else
-                            FormulaT1 &= "+C" & PrintDatarow("ROW").ToString
-                            FormulaT2 &= "+D" & PrintDatarow("ROW").ToString
-                            FormulaT3 &= "+E" & PrintDatarow("ROW").ToString
+                            FormulaT1 &= "+C" & lineHcnt.ToString
+                            FormulaT2 &= "+D" & lineHcnt.ToString
+                            FormulaT3 &= "+E" & lineHcnt.ToString
                         End If
                     End If
                 End If
@@ -468,7 +453,7 @@ Public Class LNT0001InvoiceOutputSAIBU
         SQLStr &= "   ,LNM0006.SHABAN "
         SQLStr &= "   ,LNM0006.STYMD "
         SQLStr &= "   ,LNM0006.ENDYMD "
-        SQLStr &= "   ,LNM0006.BRANCHCODE AS TODOKEBRANCHCODE "
+        SQLStr &= "   ,LNM0006.BRANCHCODE "
         SQLStr &= "   ,LNM0006.TANKAKBN "
         SQLStr &= "   ,LNM0006.MEMO "
         SQLStr &= "   ,LNM0006.TANKA "
@@ -481,18 +466,9 @@ Public Class LNT0001InvoiceOutputSAIBU
         SQLStr &= "   ,LNM0006.BIKOU1 "
         SQLStr &= "   ,LNM0006.BIKOU2 "
         SQLStr &= "   ,LNM0006.BIKOU3 "
-        SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
-        SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
-        SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
-        SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
-        SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0006_NEWTANKA LNM0006 "
-        SQLStr &= " LEFT JOIN LNG.LNM0005_CONVERT LNM0005 ON "
-        SQLStr &= String.Format("     LNM0005.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-        SQLStr &= " AND LNM0005.KEYCODE01 = LNM0006.AVOCADOTODOKECODE "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -508,7 +484,7 @@ Public Class LNT0001InvoiceOutputSAIBU
         End If
 
         '-- ORDER BY
-        SQLStr &= " ORDER BY CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
+        SQLStr &= " ORDER BY LNM0006.AVOCADOTODOKECODE, LNM0006.BRANCHCODE "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
