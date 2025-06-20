@@ -1049,7 +1049,7 @@ Public Class CmnCheck
     ''' <remarks></remarks>
     Public Sub WW_ReportCheckHokaidoLNG(ByVal reportName As String, ByVal reportCode As String,
                                         ByRef dcHokaidoLNGList As Dictionary(Of String, String),
-                                        ByRef LNT0001tbl As DataTable, ByRef LNT0001Tanktbl As DataTable, ByRef LNT0001Koteihi As DataTable, ByRef LNT0001KihonFeeA As DataTable,
+                                        ByRef LNT0001tbl As DataTable, ByRef LNT0001Tanktbl As DataTable, ByRef LNT0001Koteihi As DataTable, ByRef LNT0001KihonFeeA As DataTable, ByRef LNT0001KihonSyabanFeeA As DataTable,
                                         ByRef LNT0001TogouSprate As DataTable, ByRef LNT0001Calendar As DataTable, ByRef LNT0001HolidayRate As DataTable, ByRef LNT0001HolidayRateNum As DataTable)
 
         Dim dtHokkaidoLNGTank As New DataTable
@@ -1078,7 +1078,7 @@ Public Class CmnCheck
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuHokkaidoTodokeLNGClass, LNT0001Tanktbl)
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuHokkaidoTankLNGClass)
             CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
-            CMNPTS.SelectHokkaidoLNG_YusouhiKihonFeeA(sekiyuHokkaidoKoteihiLNGClass, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001KihonFeeA)
+            CMNPTS.SelectHokkaidoLNG_YusouhiKihonFeeA(sekiyuHokkaidoKoteihiLNGClass, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001KihonFeeA, LNT0001KihonSyabanFeeA)
 
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtHokkaidoLNGTodoke, I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)

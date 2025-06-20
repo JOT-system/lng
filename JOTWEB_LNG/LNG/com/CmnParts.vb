@@ -2693,8 +2693,9 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectHokkaidoLNG_YusouhiKihonFeeA(ByVal I_CLASS As String,
                                                   ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String,
-                                                  ByRef O_dtYusouhiFEEA As DataTable)
+                                                  ByRef O_dtYusouhiFEEA As DataTable, ByRef O_dtYusouhiSyabanFEEA As DataTable)
         Dim SQLStr As String = ""
+        Dim SQLSYABANStr As String = ""
         SQLStr &= " SELECT "
         SQLStr &= "    LNM0005.SYAKONO "
         SQLStr &= " ,  LNM0005.SYAKONAME "
@@ -2705,6 +2706,7 @@ Public Class CmnParts
         SQLStr &= " ,  IFNULL(LNM0007.SYAKO_COUNT, 0) AS SYAKO_COUNT "
         SQLStr &= " ,  IFNULL(LNM0007.KOTEIHIM, 0)    AS KOTEIHIM "
         SQLStr &= " ,  LNM0005.SETCELLNO "
+        SQLStr &= " ,  '' AS SYABAN "
 
         '-- FROM
         SQLStr &= " FROM "
@@ -2738,22 +2740,26 @@ Public Class CmnParts
         SQLStr &= "     ,  LNM0007.KOTEIHIM "
         SQLStr &= "     ,  COUNT(1) AS SYAKO_COUNT "
         SQLStr &= "     FROM ( "
-        SQLStr &= "         SELECT "
-        SQLStr &= "            CASE "
-        SQLStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '室蘭' THEN '2' "
-        SQLStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '釧路' THEN '3' "
-        SQLStr &= "            ELSE '1' "
-        SQLStr &= "            END AS SYAKONO "
-        SQLStr &= "         ,  SUBSTRING(LNM0007.RIKUBAN,1,2) AS SYAKONAME "
-        SQLStr &= "         ,  LNM0007.SYAGATA "
-        SQLStr &= "         ,  LNM0007.SYAGATANAME "
-        SQLStr &= "         ,  LNM0007.SYABARA "
-        SQLStr &= "         ,  LNM0007.KOTEIHIM "
-        SQLStr &= "         FROM LNG.LNM0007_FIXED LNM0007 "
-        SQLStr &= String.Format("         WHERE LNM0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
-        SQLStr &= String.Format("           AND LNM0007.TORICODE = '{0}'  ", I_TORICODE)
-        SQLStr &= String.Format("           AND LNM0007.ORGCODE  = '{0}'  ", I_ORGCODE)
-        SQLStr &= String.Format("           AND LNM0007.TARGETYM = '{0}'  ", I_TAISHOYM)
+
+        SQLSYABANStr &= "         SELECT "
+        SQLSYABANStr &= "            CASE "
+        SQLSYABANStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '室蘭' THEN '2' "
+        SQLSYABANStr &= "            WHEN SUBSTRING(LNM0007.RIKUBAN,1,2) = '釧路' THEN '3' "
+        SQLSYABANStr &= "            ELSE '1' "
+        SQLSYABANStr &= "            END AS SYAKONO "
+        SQLSYABANStr &= "         ,  SUBSTRING(LNM0007.RIKUBAN,1,2) AS SYAKONAME "
+        SQLSYABANStr &= "         ,  LNM0007.SYABAN "
+        SQLSYABANStr &= "         ,  LNM0007.SYAGATA "
+        SQLSYABANStr &= "         ,  LNM0007.SYAGATANAME "
+        SQLSYABANStr &= "         ,  LNM0007.SYABARA "
+        SQLSYABANStr &= "         ,  LNM0007.KOTEIHIM "
+        SQLSYABANStr &= "         FROM LNG.LNM0007_FIXED LNM0007 "
+        SQLSYABANStr &= String.Format("         WHERE LNM0007.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+        SQLSYABANStr &= String.Format("           AND LNM0007.TORICODE = '{0}'  ", I_TORICODE)
+        SQLSYABANStr &= String.Format("           AND LNM0007.ORGCODE  = '{0}'  ", I_ORGCODE)
+        SQLSYABANStr &= String.Format("           AND LNM0007.TARGETYM = '{0}'  ", I_TAISHOYM)
+
+        SQLStr &= SQLSYABANStr
         SQLStr &= "     ) LNM0007 "
         SQLStr &= "     GROUP BY "
         SQLStr &= "        LNM0007.SYAKONO "
@@ -2774,6 +2780,40 @@ Public Class CmnParts
 
         '〇SQL結果取得
         O_dtYusouhiFEEA = SelectSearch(SQLStr)
+        O_dtYusouhiSyabanFEEA = SelectSearch(SQLSYABANStr)
+
+        '〇車号の設定
+        For Each O_dtYusouhiFEEArow As DataRow In O_dtYusouhiFEEA.Rows
+            Dim arrSyaban As String = ""
+            Dim listSyaban As New List(Of String)
+            Dim condition As String = ""
+            condition &= String.Format(" SYAKONO='{0}' ", O_dtYusouhiFEEArow("SYAKONO").ToString())
+            condition &= String.Format(" AND SYAGATA='{0}' ", O_dtYusouhiFEEArow("SYAGATA").ToString())
+            condition &= String.Format(" AND KOTEIHIM='{0}' ", O_dtYusouhiFEEArow("KOTEIHIM").ToString())
+            Dim i As Integer = 0
+            Dim firstFlg As Boolean = True
+            For Each O_dtYusouhiSyabanFEEArow As DataRow In O_dtYusouhiSyabanFEEA.Select(condition)
+                '★室蘭や釧路表記を削除
+                Dim syban As String = O_dtYusouhiSyabanFEEArow("SYABAN").ToString().Replace("室蘭", "").Replace("釧路", "")
+                syban &= "号車"
+                '★初回車番の場合
+                If firstFlg = True Then
+                    firstFlg = False
+                    arrSyaban &= syban
+                Else
+                    '★４車両毎に改行
+                    If i = 4 Then
+                        arrSyaban &= ControlChars.NewLine   '// 改行
+                        arrSyaban &= syban                  '// 改行後は、カンマなし
+                        i = 0
+                    Else
+                        arrSyaban &= "," + syban
+                    End If
+                End If
+                i += 1
+            Next
+            O_dtYusouhiFEEArow("SYABAN") = arrSyaban
+        Next
 
     End Sub
 

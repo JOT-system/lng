@@ -505,6 +505,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TODOKECODE_004831 As String = "004831"
     ''' <summary>
+    ''' 大岡技研室蘭工場
+    ''' </summary>
+    Public Const CONST_TODOKECODE_004830 As String = "004830"
+    ''' <summary>
     ''' （浜中）大塚製薬
     ''' </summary>
     Public Const CONST_TODOKECODE_003630 As String = "003630"

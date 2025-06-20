@@ -25,6 +25,7 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
     Private PrintKihonFeeAData As DataTable
+    Private PrintKihonSyabanFeeAData As DataTable
     Private PrintTogouSprate As DataTable
     Private PrintCalendarData As DataTable
     Private PrintHolidayRateData As DataTable
@@ -49,7 +50,7 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
     ''' <param name="dicHokkaidoLNGList">北海道LNG(届先)格納</param>
     ''' <param name="printHolidayRateDataClass">休日割増単価マスタ</param>
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
-                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printKihonFeeADataClass As DataTable, printCalendarDataClass As DataTable,
+                   printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printKihonFeeADataClass As DataTable, printKihonSyabanFeeADataClass As DataTable, printCalendarDataClass As DataTable,
                    dicHokkaidoLNGList As Dictionary(Of String, String),
                    Optional ByVal printTogouSprateDataClass As DataTable = Nothing,
                    Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
@@ -63,6 +64,7 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
             Me.PrintTankData = printTankDataClass
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintKihonFeeAData = printKihonFeeADataClass
+            Me.PrintKihonSyabanFeeAData = printKihonSyabanFeeADataClass
             Me.PrintCalendarData = printCalendarDataClass
             Me.PrintTogouSprate = printTogouSprateDataClass
             Me.PrintHolidayRateData = printHolidayRateDataClass
@@ -339,9 +341,11 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
     Private Sub EditTogouTankaArea()
         '〇[単価]設定(統合版単価マスタ)
         Dim i As Integer = 0
-        For Each PrintTankDatarow As DataRow In PrintTankData.Select("", "TODOKESHEET_CELL")
+        For Each PrintTankDatarow As DataRow In PrintTankData.Select("", "TODOKESHEET_CELL, SYAGATA, TANKAKBN")
+            Dim j As Integer = 0
             '★設定セルが未設定の場合SKIP
             If PrintTankDatarow("TODOKESHEET_CELL").ToString() = "" Then Continue For
+            Dim setTODOKESHEET_CELL As Integer = CInt(PrintTankDatarow("TODOKESHEET_CELL").ToString())
 
             '〇シート「輸送費明細」
             '★ 3.従量料金
@@ -352,12 +356,33 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
             Else
                 cellGYO = "H"
             End If
+
+            '★大岡技研室蘭工場(独自仕様)
+            If PrintTankDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004830 Then
+                '車型が"2"(トレーラ)
+                If PrintTankDatarow("SYAGATA").ToString() = "2" Then
+                    setTODOKESHEET_CELL += 1
+                End If
+            ElseIf PrintTankDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_003630 _
+                AndAlso PrintTankDatarow("AVOCADOSHUKABASHO").ToString() = "003554" Then
+                '★（浜中）大塚製薬(独自仕様)
+                If PrintTankDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                    '枝番が"02"(ENEX所属車単価)
+                    j = 1
+                    i -= 1
+                ElseIf PrintTankDatarow("TODOKEBRANCHCODE").ToString() = "01" Then
+                    '枝番が"01"(浜中単価)
+                    setTODOKESHEET_CELL += 1
+                    i += 1
+                End If
+            End If
+
             '--No
-            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("A" + PrintTankDatarow("TODOKESHEET_CELL").ToString()).Value = i
+            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("A" + setTODOKESHEET_CELL.ToString()).Value = i - j
             '--従量料金
-            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(cellGYO + PrintTankDatarow("TODOKESHEET_CELL").ToString()).Value = Double.Parse(PrintTankDatarow("TANKA").ToString())
+            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(cellGYO + setTODOKESHEET_CELL.ToString()).Value = Double.Parse(PrintTankDatarow("TANKA").ToString())
             '★ 表示
-            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(String.Format("{0}:{0}", PrintTankDatarow("TODOKESHEET_CELL").ToString())).Hidden = False
+            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(String.Format("{0}:{0}", setTODOKESHEET_CELL.ToString())).Hidden = False
         Next
 
     End Sub
@@ -370,6 +395,8 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
         For Each PrintKihonFeeADatarow As DataRow In PrintKihonFeeAData.Select("SETCELLNO<>''")
             '〇シート「輸送費明細」
             '★ 1.基本料金A
+            '--車番
+            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("D" + PrintKihonFeeADatarow("SETCELLNO").ToString()).Value = PrintKihonFeeADatarow("SYABAN").ToString()
             '--台数
             WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("E" + PrintKihonFeeADatarow("SETCELLNO").ToString()).Value = Integer.Parse(PrintKihonFeeADatarow("SYAKO_COUNT").ToString())
             '--単価
