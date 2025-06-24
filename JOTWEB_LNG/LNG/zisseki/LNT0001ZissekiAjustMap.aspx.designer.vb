@@ -131,6 +131,42 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     Protected WithEvents ddlGYOMUTANKNUM As Global.System.Web.UI.WebControls.ListBox
     
     '''<summary>
+    '''WF_BRANCHCODE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BRANCHCODE As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_NOWPAGECNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_NOWPAGECNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_NOWPAGESLASH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_NOWPAGESLASH As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TOTALPAGECNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TOTALPAGECNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''pnlListArea コントロール。
     '''</summary>
     '''<remarks>

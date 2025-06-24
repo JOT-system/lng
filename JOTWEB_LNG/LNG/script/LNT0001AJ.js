@@ -74,6 +74,8 @@ function InitDisplay() {
         commonBindEnterToVerticalTabStep();
     }, 100);
 
+    // チェックボックス
+    ChangeCheckBox();
 
 }
 
@@ -309,4 +311,44 @@ function ListField_Change(pnlList, Line, fieldNM) {
         document.getElementById('WF_ButtonClick').value = "WF_ListChange";
         document.forms[0].submit();
     }
+}
+
+// ○チェックボックス変更
+function ChangeCheckBox() {
+
+    var objTable = document.getElementById("pnlListArea_DL").children[0];
+
+    var chkObjs = objTable.querySelectorAll("input[id^='chkpnlListAreaOPERATIONCB']");
+    var spnObjs = objTable.querySelectorAll("span[id^='hchkpnlListAreaOPERATIONCB']");
+
+    for (let i = 0; i < chkObjs.length; i++) {
+
+        if (chkObjs[i] !== null) {
+            if (spnObjs[i].innerText === "on") {
+                chkObjs[i].checked = true;
+            } else {
+                chkObjs[i].checked = false;
+            }
+        }
+    }
+}
+
+// ○チェックボックス選択
+function SelectCheckBox(obj, lineCnt) {
+
+    if (document.getElementById("MF_SUBMIT").value === "FALSE") {
+        let chkObj = obj.querySelector("input");
+        if (chkObj === null) {
+            return;
+        }
+        if (chkObj.disabled === true) {
+            return;
+        }
+
+        document.getElementById("WF_SelectedIndex").value = lineCnt;
+        document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
+        document.body.style.cursor = "wait";
+        document.forms[0].submit();
+    }
+
 }

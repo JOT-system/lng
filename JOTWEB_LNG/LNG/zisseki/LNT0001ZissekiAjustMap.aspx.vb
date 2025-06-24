@@ -20,8 +20,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
     ''' <summary>
     ''' 定数
     ''' </summary>
-    Private Const CONST_DISPROWCOUNT As Integer = 60                '1画面表示用
-    Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
+    Private Const CONST_DISPROWCOUNT As Integer = 15                '1画面表示用
+    Private Const CONST_SCROLLCOUNT As Integer = 15                 'マウススクロール時稼働行数
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
@@ -38,6 +38,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
     Private WW_RtnSW As String = ""
     Private WW_Dummy As String = ""
     Private WW_ErrCode As String                                    'サブ用リターンコード
+    Private WW_GridPositionARROW As Integer
 
     ''' <summary>
     ''' サーバー処理の遷移先
@@ -58,7 +59,22 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     End If
                     '★戻り値(初期化)
                     WW_ErrSW = ""
+                    WW_GridPositionARROW = 0
                     Select Case WF_ButtonClick.Value
+                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                            WF_CheckBoxSELECT_Click()
+                        Case "WF_ButtonALLSELECT"       '全選択ボタン押下
+                            WF_ButtonALLSELECT_Click()
+                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                            WF_ButtonSELECT_LIFTED_Click()
+                        Case "WF_ButtonREFLECT"         '反映ボタン押下
+                            WF_ButtonREFLECT_Click()
+                        Case "WF_ButtonPAGE",           'ページボタン押下時処理
+                             "WF_ButtonFIRST",
+                             "WF_ButtonPREVIOUS",
+                             "WF_ButtonNEXT",
+                             "WF_ButtonLAST"
+                            Me.WF_ButtonPAGE_Click()
                         Case "WF_ButtonUPDATE"          '保存ボタンクリック
                             WF_ButtonUPDATE()
                         Case "WF_ButtonCLEAR"           '戻るボタンクリック
@@ -70,7 +86,9 @@ Public Class LNT0001ZissekiAjustMap_aspx
                         Case "WF_ButtonSearch"          '検索ボタンクリック
                             WF_ButtonSearch_Click()
                         Case "WF_MouseWheelUp"
-
+                            Me.WF_ButtonPAGE_Click()
+                        Case "WF_MouseWheelDown"
+                            Me.WF_ButtonPAGE_Click()
                         Case "WF_ButtonRelease"         '解除ボタンクリック
                             WF_ButtonRelease_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
@@ -82,13 +100,15 @@ Public Class LNT0001ZissekiAjustMap_aspx
                         Case "WF_ListChange"            'リスト変更
                             WF_ListChange()
                     End Select
-                    If WW_ErrSW <> "ERR" _
-                        AndAlso WF_ButtonClick.Value <> "WF_ButtonSearch" _
-                        AndAlso WF_ButtonClick.Value <> "WF_ButtonRelease" _
-                        AndAlso WF_ButtonClick.Value <> "WF_TARGETTABLEChange" _
-                        AndAlso WF_ButtonClick.Value <> "WF_SelectCALENDARChange" Then
+                    If WW_ErrSW = "ERR" _
+                        OrElse WF_ButtonClick.Value = "WF_ButtonSearch" _
+                        OrElse WF_ButtonClick.Value = "WF_ButtonRelease" _
+                        OrElse WF_ButtonClick.Value = "WF_TARGETTABLEChange" _
+                        OrElse WF_ButtonClick.Value = "WF_SelectCALENDARChange" Then
+                        '※一覧再表示処理[未実施]
+                    Else
                         '○ 一覧再表示処理
-                        DisplayGrid()
+                        DisplayGrid(gridPosition:=WW_GridPositionARROW)
                     End If
                 End If
             Else
@@ -180,6 +200,11 @@ Public Class LNT0001ZissekiAjustMap_aspx
         '★フィルタ設定(日)
         setDDLDay(yyyyMM:=WF_TaishoYm.Value)
 
+        '★ドロップダウンリスト（単価(枝番)）作成
+        Dim dtBranchCodeType As New DataTable
+        CMNPTS.SelectNewTanka_BRANCHCODE(work.WF_SEL_TORICODE.Text, WF_TaishoYm.Value & "/01", dtBranchCodeType)
+        setDDLItem(dtBranchCodeType, "BRANCHCODE", "BRANCHCODE", Me.WF_BRANCHCODE, blankFlg:=False)
+
         '〇実績データ取得
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
@@ -202,6 +227,11 @@ Public Class LNT0001ZissekiAjustMap_aspx
         Me.pnlPriceArea.Visible = False
         'Me.pnlFixedCostsArea.Visible = False
         'Me.pnlSurchargeArea.Visible = False
+
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = "1"
+        '〇 最終ページ
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -235,14 +265,14 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
     End Sub
 
-    Private Sub setDDLItem(ByVal dt As DataTable, ByVal ItemCode As String, ByVal ItemaName As String, ByRef ddlList As DropDownList)
+    Private Sub setDDLItem(ByVal dt As DataTable, ByVal ItemCode As String, ByVal ItemaName As String, ByRef ddlList As DropDownList, Optional blankFlg As Boolean = True)
 
         Dim resTrainFlagList As New List(Of ListItem)
         Dim itemList = From wrkitm In dt Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By g Select g, h
         'Dim itemList = From wrkitm In LNT0001tbl Group By g = Convert.ToString(wrkitm(ItemCode)), h = Convert.ToString(wrkitm(ItemaName)) Into Group Order By CDec(g) Select g, h
         ddlList.Items.Clear()
         resTrainFlagList = New List(Of ListItem)
-        resTrainFlagList.Add(New ListItem("", ""))
+        If blankFlg = True Then resTrainFlagList.Add(New ListItem("", ""))
         For Each itemLists In itemList
             resTrainFlagList.Add(New ListItem(itemLists.h, itemLists.g))
         Next
@@ -370,7 +400,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 condition &= String.Format(" AND GYOMUTANKNUM='{0}' ", dtTankaAjustrow("VALUE10").ToString())
             End If
 
-            '枝番
+            '単価(枝番)
             condition &= String.Format(" AND BRANCHCODE='{0}' ", dtTankaAjustrow("KEYCODE").ToString())
 
             For Each LNT0001row As DataRow In LNT0001tbl.Select(condition)
@@ -447,9 +477,9 @@ Public Class LNT0001ZissekiAjustMap_aspx
     ''' 一覧再表示処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub DisplayGrid()
-        Dim WW_GridPosition As Integer          '表示位置(開始)
-        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+    Protected Sub DisplayGrid(Optional ByVal gridPosition As Integer = Nothing)
+        Dim WW_GridPosition As Integer = gridPosition   '表示位置(開始)
+        Dim WW_DataCNT As Integer = 0                   '(絞り込み後)有効Data数
 
         '○ 表示対象行カウント(絞り込み対象)
         For Each LNT0001row As DataRow In LNT0001tbl.Rows
@@ -522,6 +552,205 @@ Public Class LNT0001ZissekiAjustMap_aspx
 
         TBLview.Dispose()
         TBLview = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' チェックボックス(選択)クリック処理
+    ''' </summary>
+    Protected Sub WF_CheckBoxSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(LNT0001tbl)
+
+        'チェックボックス判定
+        For i As Integer = 0 To LNT0001tbl.Rows.Count - 1
+            If LNT0001tbl.Rows(i)("LINECNT") = WF_SelectedIndex.Value Then
+                If LNT0001tbl.Rows(i)("OPERATIONCB") = "on" Then
+                    LNT0001tbl.Rows(i)("OPERATIONCB") = ""
+                Else
+                    LNT0001tbl.Rows(i)("OPERATIONCB") = "on"
+                End If
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全選択ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonALLSELECT_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(LNT0001tbl)
+
+        '全チェックボックスON
+        For i As Integer = 0 To LNT0001tbl.Rows.Count - 1
+            If LNT0001tbl.Rows(i)("HIDDEN") = "0" Then
+                LNT0001tbl.Rows(i)("OPERATIONCB") = "on"
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 全解除ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonSELECT_LIFTED_Click()
+
+        '○ 画面表示データ復元
+        Master.RecoverTable(LNT0001tbl)
+
+        '全チェックボックスOFF
+        For i As Integer = 0 To LNT0001tbl.Rows.Count - 1
+            If LNT0001tbl.Rows(i)("HIDDEN") = "0" Then
+                LNT0001tbl.Rows(i)("OPERATIONCB") = ""
+            End If
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' 反映ボタン押下時処理
+    ''' </summary>
+    Protected Sub WF_ButtonREFLECT_Click()
+
+        Dim Msg As String = ""
+        If LNT0001tbl.Select("OPERATIONCB='on'").Count = 0 Then
+            Msg = "明細が選択されていません。ご確認ください。"
+            Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+            Exit Sub
+        End If
+
+        Dim dtTankaInfo As New DataTable
+        Dim todokeCodeHozon As String = ""
+        Dim gyomuTanknumHozon As String = ""
+        For Each LNT0001tblrow As DataRow In LNT0001tbl.Select("OPERATIONCB='on'", "TORICODE,ORDERORGCODE,TODOKECODE,GYOMUTANKNUM")
+            '〇初回、または届先が変更になった場合
+            If todokeCodeHozon = "" _
+                OrElse todokeCodeHozon <> LNT0001tblrow("TODOKECODE").ToString() _
+                OrElse gyomuTanknumHozon <> LNT0001tblrow("GYOMUTANKNUM").ToString() Then
+                '★単価情報取得
+                GS0007FIXVALUElst.CAMPCODE = Master.USERCAMP
+                GS0007FIXVALUElst.CLAS = "NEWTANKA"
+                GS0007FIXVALUElst.ADDITIONAL_CONDITION =
+                " AND VALUE2 = '" + LNT0001tblrow("TORICODE").ToString() & "'" &            '取扱店コード
+                " AND VALUE4 = '" + LNT0001tblrow("ORDERORGCODE").ToString() & "'" &        '部門コード
+                " AND VALUE8 = '" + LNT0001tblrow("TODOKECODE").ToString() & "'"            '実績届先コード
+                If LNT0001tblrow("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0132800000 _
+                                    AndAlso LNT0001tblrow("ORDERORGCODE").ToString() <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    GS0007FIXVALUElst.ADDITIONAL_CONDITION &=
+                    " AND VALUE10 = '" + LNT0001tblrow("GYOMUTANKNUM").ToString() & "'"     '業務車番
+                End If
+                '★条件
+                If WF_BRANCHCODE.SelectedValue <> "1" Then
+                    '-- 単価区分"1"(調整単価)
+                    GS0007FIXVALUElst.ADDITIONAL_CONDITION &= " AND VALUE19 = '1' "
+                End If
+                '-- 単価(※設定した枝番)
+                GS0007FIXVALUElst.ADDITIONAL_CONDITION &= String.Format(" AND KEYCODE = '{0}' ", WF_BRANCHCODE.SelectedValue)
+                '★データ取得
+                dtTankaInfo = GS0007FIXVALUElst.GS0007FIXVALUETbl()
+                If Not isNormal(GS0007FIXVALUElst.ERR) Then
+                    'Master.Output(CS0013ProfView.ERR, C_MESSAGE_TYPE.ABORT, "単価情報取得エラー")
+                    Continue For
+                End If
+            End If
+
+            '★入力した値が単価マスタに存在するか確認
+            Dim condition As String = " KEYCODE='{0}' "
+            condition = String.Format(condition, WF_BRANCHCODE.SelectedValue)
+            If dtTankaInfo.Select(condition).Count = 0 Then
+                Msg = "対象の届先は、選択した単価(枝番)は存在しません。"
+                Msg &= String.Format("<br>届先【{0}】届先名【{1}】", LNT0001tblrow("TODOKECODE").ToString(), LNT0001tblrow("TODOKENAME").ToString())
+                Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, I_PARA01:=Msg, needsPopUp:=True)
+                Exit For
+            End If
+            For Each dtTankaInforow As DataRow In dtTankaInfo.Select(condition)
+                LNT0001tblrow("OPERATION") = "1"
+                LNT0001tblrow("BRANCHCODE") = dtTankaInforow("KEYCODE")
+                LNT0001tblrow("BRANCHNAME") = dtTankaInforow("VALUE1")
+            Next
+
+            '★届先コード保管
+            todokeCodeHozon = LNT0001tblrow("TODOKECODE").ToString()
+            '★業務車番保管
+            gyomuTanknumHozon = LNT0001tblrow("GYOMUTANKNUM").ToString()
+
+        Next
+
+        '○ 画面表示データ保存
+        Master.SaveTable(LNT0001tbl)
+
+    End Sub
+
+    ''' <summary>
+    ''' ページボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub WF_ButtonPAGE_Click()
+
+        'Dim WW_GridPosition As Integer          '表示位置(開始)
+        Dim intLineNo As Integer = 0
+        Dim intPage As Integer = 0
+
+        Select Case WF_ButtonClick.Value
+            'Case "WF_ButtonPAGE"            '指定ページボタン押下
+            '    intPage = CInt(Me.TxtPageNo.Text.PadLeft(5, "0"c))
+            '    If intPage < 1 Then
+            '        intPage = 1
+            '    End If
+            Case "WF_ButtonFIRST"           '先頭ページボタン押下
+                intPage = 1
+            Case "WF_ButtonPREVIOUS",       '前ページボタン押下
+                 "WF_MouseWheelDown"
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage > 1 Then
+                    intPage += -1
+                End If
+            Case "WF_ButtonNEXT",           '次ページボタン押下
+                 "WF_MouseWheelUp"
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage < CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage += 1
+                End If
+            Case "WF_ButtonLAST"            '最終ページボタン押下
+                intPage = CInt(Me.WF_TOTALPAGECNT.Text)
+        End Select
+        Me.WF_NOWPAGECNT.Text = intPage.ToString
+
+        If WF_ButtonClick.Value = "WF_MouseWheelDown" _
+            OrElse WF_ButtonClick.Value = "WF_MouseWheelUp" Then
+            '※マウス操作については
+            '　後続処理で計算するため、ここでは未実施
+        Else
+            If intPage = 1 Then
+                WW_GridPositionARROW = 1
+            Else
+                WW_GridPositionARROW = (intPage - 1) * CONST_SCROLLCOUNT + 1
+            End If
+            WF_GridPosition.Text = WW_GridPositionARROW
+        End If
+
+        Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+
+        '○ 表示対象行カウント(絞り込み対象)
+        For Each LNT0001row As DataRow In LNT0001tbl.Rows
+            If LNT0001row("HIDDEN") = 0 Then
+                WW_DataCNT += 1
+                ' 行(LINECNT)を再設定する。既存項目(SELECT)を利用
+                LNT0001row("SELECT") = WW_DataCNT
+            End If
+        Next
+
     End Sub
 
     ''' <summary>

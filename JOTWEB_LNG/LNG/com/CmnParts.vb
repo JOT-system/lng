@@ -2398,6 +2398,7 @@ Public Class CmnParts
             & "     ,0                                                    AS HIDDEN               " _
             & "     ,0                                                    AS LINECNT              " _
             & "     ,''                                                   AS OPERATION            " _
+            & "     ,''                                                   AS OPERATIONCB          " _
             & "     ,coalesce(LT1.RECONO, '')                             AS RECONO			    " _
             & "     ,coalesce(LT1.LOADUNLOTYPE, '')                       AS LOADUNLOTYPE		    " _
             & "     ,coalesce(LT1.STACKINGTYPE, '')                       AS STACKINGTYPE		    " _
@@ -2887,6 +2888,30 @@ Public Class CmnParts
 
         '〇SQL結果取得
         O_dtYusouhiHRate = SelectSearch(SQLStr)
+
+    End Sub
+
+    ''' <summary>
+    ''' 統合版単価マスタ(枝番)取得用SQL
+    ''' </summary>
+    Public Sub SelectNewTanka_BRANCHCODE(ByVal I_TORICODE As String, ByVal I_TAISHOYM As String,
+                                         ByRef O_dtNewTanka_BRANCHCODE As DataTable)
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT DISTINCT "
+        SQLStr &= "    LNM0006.BRANCHCODE "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0006_NEWTANKA LNM0006 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format(" LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_TAISHOYM)
+
+        '〇SQL結果取得
+        O_dtNewTanka_BRANCHCODE = SelectSearch(SQLStr)
 
     End Sub
 

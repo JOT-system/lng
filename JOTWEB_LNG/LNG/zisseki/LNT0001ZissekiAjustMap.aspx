@@ -120,6 +120,35 @@
                                     <input type="button" id="WF_ButtonRelease" class="btn-sticky" value="解除"  onclick="ButtonClick('WF_ButtonRelease');" />
                                 </div>
                             </div>
+                            <div id="tab3" class="tabBox">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="button" id="WF_ButtonALLSELECT" class="btn-sticky" value="全選択"       onclick  ="ButtonClick('WF_ButtonALLSELECT');" />
+                                    <input type="button" id="WF_ButtonSELECT_LIFTED" class="btn-sticky" value="選択解除" onclick ="ButtonClick('WF_ButtonSELECT_LIFTED');" />
+                                    <strong class="flex-shrink-0">単価</strong>
+                                    <asp:DropDownList ID="WF_BRANCHCODE" runat="server" class="form-select rounded-0" Width="70" />
+                                    <input type="button" id="WF_ButtonREFLECT" class="btn-sticky" value="反映"       onclick  ="ButtonClick('WF_ButtonREFLECT');" />
+                                </div>
+                                <div class="searchBar">
+                                    　
+                                    <div class="arrowFirstPage">
+                                        <input type="button" id="WF_ButtonFIRST" class="firstPage" onclick="ButtonClick('WF_ButtonFIRST');" />
+                                    </div>
+                                    <div class="arrowPreviousPage">
+                                        <input type="button" id="WF_ButtonPREVIOUS" class="previousPage" onclick="ButtonClick('WF_ButtonPREVIOUS');" />
+                                    </div>
+                                    <div style="text-align: right">
+                                        <asp:Label ID="WF_NOWPAGECNT" runat="server" Text="" Visible="true" Width="30px"></asp:Label>
+                                        <asp:Label ID="WF_NOWPAGESLASH" runat="server" Text="/" Visible="true"></asp:Label>
+                                        <asp:Label ID="WF_TOTALPAGECNT" runat="server" Text="" Visible="true" Width="30px"></asp:Label>
+                                    </div>
+                                    <div class="arrowNextPage">
+                                        <input type="button" id="WF_ButtonNEXT" class="nextPage" onclick="ButtonClick('WF_ButtonNEXT');" />
+                                    </div>
+                                    <div class="arrowLastPage">
+                                        <input type="button" id="WF_ButtonLASTT" class="lastPage" onclick="ButtonClick('WF_ButtonLAST');" />
+                                    </div>
+                                </div>
+                            </div>
                         </asp:Panel>
                         <%-- 固定費調整(検索エリア) --%>
 <%--                        <asp:Panel ID="pnlFixedCostsArea" runat="server">
