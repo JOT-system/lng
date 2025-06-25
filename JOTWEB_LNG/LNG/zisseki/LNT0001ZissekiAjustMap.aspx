@@ -15,7 +15,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css"/>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/style.css"/>
     <link href='<%=ResolveUrl("~/LNG/css/LNT0001AJ.css")%>' rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@latest/dist/plugins/monthSelect/index.js"></script>
     <script type="text/javascript" src='<%=ResolveUrl("~/script/fixed_midashi.js")%>'></script>
     <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNT0001AJ.js")%>'></script>
     <script type="text/javascript">

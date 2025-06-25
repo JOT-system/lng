@@ -839,9 +839,13 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     '★フィルタ設定(日)
                     setDDLDay(yyyyMM:=WF_TaishoYm.Value)
                     WF_TaishoYmhdn.Value = WF_TaishoYm.Value
+                    '〇最初ページ(初期化)
+                    Me.WF_NOWPAGECNT.Text = "1"
                 End If
                 '○ GridView初期設定
                 GridViewInitialize()
+                '〇 最終ページ(再取得)
+                Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
             Case "固定費調整"
                 'Me.pnlFixedCostsArea.Visible = True
             Case "サーチャージ"
@@ -893,6 +897,11 @@ Public Class LNT0001ZissekiAjustMap_aspx
         '○ GridView初期設定
         GridViewInitialize()
 
+        '〇 最初ページ(初期化)
+        Me.WF_NOWPAGECNT.Text = "1"
+        '〇 最終ページ(再取得)
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
+
     End Sub
 
     ''' <summary>
@@ -911,6 +920,11 @@ Public Class LNT0001ZissekiAjustMap_aspx
         WF_TaishoYmhdn.Value = WF_TaishoYm.Value
         '○ GridView初期設定
         GridViewInitialize()
+
+        '〇 最初ページ(初期化)
+        Me.WF_NOWPAGECNT.Text = "1"
+        '〇 最終ページ(再取得)
+        Me.WF_TOTALPAGECNT.Text = Math.Floor((CONST_DISPROWCOUNT + LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
 
     End Sub
 
