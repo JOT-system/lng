@@ -7,7 +7,8 @@ Public Class LNT0001InvoiceOutputTNG
     Private WW_SheetNo As Integer = 0                                      '届先シート
     Private WW_SheetNoInv As Integer = 0                                   '請求書シート
     Private WW_SheetNoYuu As Integer = 0                                   '電力融通シート
-    Private WW_SheetNoTmp As Integer = 0                                   'テンプレートシート
+    Private WW_SheetNoDetail As Integer = 0                                '届先明細テンプレートシート
+    Private WW_SheetNoEnex As Integer = 0                                  '実績（エネックス東北使用）テンプレートシート
 
     ''' <summary>
     ''' 雛形ファイルパス
@@ -16,6 +17,7 @@ Public Class LNT0001InvoiceOutputTNG
     Private UploadRootPath As String = ""
     Private UrlRoot As String = ""
     Private PrintData As DataTable
+    Private TodokeData As DataTable
     Private SheetData As DataTable
     Private YuuduuSheetData As DataTable
     Private KaisuuData As DataTable
@@ -29,12 +31,15 @@ Public Class LNT0001InvoiceOutputTNG
     Private USERID As String = ""
     Private USERTERMID As String = ""
 
+    Private PrintKagamiRowIdx As Int32 = 0                                  '出力位置（鏡行）  　※初期値：0
+    Private PrintYuuduuRowIdx As Int32 = 0                                  '出力位置（融通行）　※初期値：0
     Private PrintOutputRowIdx As Int32 = 12                                 '出力位置（行）    　※初期値：12
     Private PrintMaxRowIdx As Int32 = 0                                     '最終位置（行）    　※初期値：0
     Private PrintTotalFirstRowIdx As Int32 = 0                              '合計最初位置（行）  ※初期値：0
     Private PrintTotalLastRowIdx As Int32 = 0                               '合計最終位置（行）  ※初期値：0
     Private PrintTotalRowIdx As Int32 = 0                                   '合計位置（行）      ※初期値：0
     Private PrintSuuRowIdx As Int32 = 2                                     '数量位置（行）      ※初期値：2
+    Private PrintEnexRowIdx As Int32 = 3                                    '実績（エネックス）位置（行）      ※初期値：3
     Private PrintaddsheetFlg As Boolean = False                             'シート追加フラグ　  ※初期値：False
     Private TodokeCodeCHGFlg As Boolean = False                             '届先変更フラグ    　※初期値：False
     Private ShukaBashoCHGFlg As Boolean = False                             '出荷場所変更フラグ　※初期値：False
@@ -104,8 +109,8 @@ Public Class LNT0001InvoiceOutputTNG
                     WW_SheetNoInv = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "電力融通（JOT入力）" Then
                     WW_SheetNoYuu = i
-                ElseIf WW_Workbook.Worksheets(i).Name = "temp" Then
-                    WW_SheetNoTmp = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "WORK（明細）" Then
+                    WW_SheetNoDetail = i
                 End If
             Next
 
@@ -115,10 +120,12 @@ Public Class LNT0001InvoiceOutputTNG
 
                 '帳票出力データ取得
                 PrintData = GetPrintData(SQLcon)
-                'シート情報データ取得
-                SheetData = GetSheetData(SQLcon)
-                '電力融通シート情報データ取得
-                YuuduuSheetData = GetYuuduuSheetData(SQLcon)
+                '届先別シート情報データ取得
+                TodokeData = GetTodokeData(SQLcon)
+                ''シート情報データ取得
+                'SheetData = GetSheetData(SQLcon)
+                ''電力融通シート情報データ取得
+                'YuuduuSheetData = GetYuuduuSheetData(SQLcon)
                 '東北電力使用回数データ取得
                 KaisuuData = GetKaisuuData(SQLcon)
                 '休日割増単価マスタ取得
@@ -151,17 +158,30 @@ Public Class LNT0001InvoiceOutputTNG
         Dim NichiShukuCount As Integer = 0
         Dim srcRange As IRange = Nothing
         Dim destRange As IRange = Nothing
-        Dim OldKagamirow As Integer = 0
+        Dim OldTodokecode As String = ""
 
         Try
 
             '***** 届先別シート作成 TODO処理 ここから *****
 
-            '〇シート情報データループ
-            For Each SheetRowData As DataRow In SheetData.Rows
-                WW_SheetNo = CInt(SheetRowData("SHEETNO"))
+            PrintKagamiRowIdx = 60
+            '〇出荷場所、届先情報データループ
+            For Each TodokeRowData As DataRow In TodokeData.Rows
+                'テンプレートシートの検索
+                For i As Integer = 0 To WW_Workbook.Worksheets.Count - 1
+                    If WW_Workbook.Worksheets(i).Name = "WORK（明細）" Then
+                        WW_SheetNoDetail = i
+                    End If
+                Next
+                '出力シートの作成（テンプレートシートをコピーして届先、出荷場所別シートを作成）
+                Dim copy_worksheet As IWorksheet = Me.WW_Workbook.Worksheets(Me.WW_SheetNoDetail).CopyBefore(Me.WW_Workbook.Worksheets(Me.WW_SheetNoDetail))
+                copy_worksheet.Name = Left(Convert.ToString(TodokeRowData("SHEETNAME")), 31)
+                copy_worksheet.Visible = Visibility.Visible
+
+                '届先、出荷場所別シートの編集
+                WW_SheetNo = CInt(copy_worksheet.Index)
                 PrintOutputRowIdx = 12
-                PrintMaxRowIdx = CInt(SheetRowData("MAXROW"))
+                PrintMaxRowIdx = 63
                 COL_MONTH = "L"
                 COL_DAY1 = "M"
                 COL_DAY2 = "N"
@@ -171,96 +191,113 @@ Public Class LNT0001InvoiceOutputTNG
                 DataExist = "0"
                 NichiShukuCount = 0
 
+                '--------------------------
+                'ヘッダーの編集
+                '--------------------------
                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A5").Value = StrConv(TaishoYYYY, VbStrConv.Wide) & "年 " & StrConv(TaishoMM, VbStrConv.Wide) & "月 分 Ｌ Ｎ Ｇ 運 賃 明 細 書 　"
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A9").Value = Convert.ToString(TodokeRowData("TITLENAME"))
 
-                Dim DataCount As Integer = PrintData.Select("TODOKECODE ='" & Convert.ToString(SheetRowData("TODOKECODE")) & "' and SHUKABASHO ='" & Convert.ToString(SheetRowData("SHUKABASHO")) & "'").Count
-                If DataCount > 0 Then
-                    Dim OutPutRowData As DataRow() = PrintData.Select("TODOKECODE ='" & Convert.ToString(SheetRowData("TODOKECODE")) & "' and SHUKABASHO ='" & Convert.ToString(SheetRowData("SHUKABASHO")) & "'")
-                    If OutPutRowData.Length > 0 Then
-                        DataExist = "1"
-                        For i As Integer = 0 To OutPutRowData.Length - 1
-                            '◯明細の設定
-                            EditDetailArea(OutPutRowData, i, FirstFLG)
-                            '営業日区分が休日割増単価マスタに存在するか
-                            If HolidayRate.Rows(0)("RANGECODE").ToString.IndexOf(Convert.ToString(OutPutRowData(i)("WORKINGDAY"))) >= 0 Then
-                                NichiShukuCount += 1
-                            End If
-                        Next
+                '--------------------------
+                '日別配送実績の編集
+                '--------------------------
+                Dim SelKey As String = "TODOKECODE ='" & Convert.ToString(TodokeRowData("TODOKECODE")) & "' and SHUKABASHO ='" & Convert.ToString(TodokeRowData("SHUKABASHO")) & "'"
+                Dim SortKey As String = "TODOKEDATE ASC, SHUKADATE ASC, GYOMUTANKNUM ASC"
+                For Each OutPutRowData As DataRow In PrintData.Select(SelKey, SortKey)
+                    DataExist = "1"
+                    '◯明細の設定
+                    EditDetailArea(OutPutRowData, FirstFLG)
+                    '営業日区分が休日割増単価マスタに存在するか
+                    If HolidayRate.Rows(0)("RANGECODE").ToString.IndexOf(Convert.ToString(OutPutRowData("WORKINGDAY"))) >= 0 Then
+                        NichiShukuCount += 1
                     End If
-                End If
+                Next
 
-                '届先別シートの編集
-                If DataExist = "1" AndAlso Convert.ToString(SheetRowData("SHEETDISPLAY")) = "1" Then
-                    Dim dt As New DataTable
+                '車番毎集計の編集
+                'If DataExist = "1" Then
+                Dim dt As New DataTable
 
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A9").Value = Convert.ToString(SheetRowData("TITLENAME"))
-                    PrintOutputRowIdx = Convert.ToInt32(SheetRowData("MAXROW")) + 4
-                    PrintTotalFirstRowIdx = Convert.ToInt32(SheetRowData("MAXROW")) + 4
-                    Dim TankaFlg As Boolean = False
+                    PrintOutputRowIdx = 67
+                    PrintTotalFirstRowIdx = PrintOutputRowIdx
                     Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                         SQLcon.Open()  ' DataBase接続
-                        dt = GetTankaData(SQLcon, Convert.ToString(SheetRowData("TODOKECODE")), Convert.ToString(SheetRowData("SHUKABASHO")), "1")
+                        dt = GetTankaData(SQLcon, Convert.ToString(TodokeRowData("TODOKECODE")), Convert.ToString(TodokeRowData("SHUKABASHO")), "1")
                         For Each Row As DataRow In dt.Rows
                             '◯合計の設定
-                            EditTotalArea(Row, SheetRowData)
-                            TankaFlg = True
+                            EditTotalArea(Row, TodokeRowData)
                         Next
                     End Using
-                    PrintTotalLastRowIdx = PrintOutputRowIdx - 1
                     '◯合計の設定
-                    '単価が存在しない場合、合計行の出力を＋１行する
-                    If TankaFlg = False Then
-                        PrintOutputRowIdx += 1
-                    End If
-                    EditTotalLastArea(SheetRowData)
+                    PrintTotalLastRowIdx = 86
+                    EditTotalLastArea(TodokeRowData)
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Visible = Visibility.Visible
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Name = Convert.ToString(SheetRowData("SHEETNAME"))
 
-                End If
+                'End If
 
                 '日・祝日割増料金
                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("L9").Value = NichiShukuCount
 
+                '--------------------------
                 '請求書（鏡）の編集
-                If Convert.ToString(SheetRowData("SHEETDISPLAY")) = "1" Then
+                '--------------------------
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(PrintKagamiRowIdx - 1).Hidden = False
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & PrintKagamiRowIdx.ToString).Value = Convert.ToString(TodokeRowData("TODOKENAME"))
 
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(CInt(SheetRowData("KAGAMIROW")) - 1).Hidden = False
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & SheetRowData("KAGAMIROW").ToString).Value = Convert.ToString(SheetRowData("TODOKENAME_INV"))
-                    If DataExist = "1" Then
-                        If OldKagamirow = CInt(SheetRowData("KAGAMIROW")) Then
-                            '同じ行番号の場合、足し算
-                            Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & SheetRowData("KAGAMIROW").ToString).Formula &= "+'" & Convert.ToString(SheetRowData("SHEETNAME")) & "'!E" & Me.PrintTotalRowIdx.ToString
-                        Else
-                            Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & SheetRowData("KAGAMIROW").ToString).Formula = "='" & Convert.ToString(SheetRowData("SHEETNAME")) & "'!E" & Me.PrintTotalRowIdx.ToString
-                        End If
-                    Else
-                        If OldKagamirow = CInt(SheetRowData("KAGAMIROW")) Then
-                            '同じ行番号の場合、足し算
-                            Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & SheetRowData("KAGAMIROW").ToString).Formula &= "+0"
-                        Else
-                            Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & SheetRowData("KAGAMIROW").ToString).Value = 0
-                        End If
-                    End If
-
-                    srcRange = Nothing
-                    destRange = Nothing
-                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("O2:P2")
-                    destRange = WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("N" & SheetRowData("KAGAMIQTYROW").ToString)
-                    srcRange.Copy(destRange)
-
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("N" & SheetRowData("KAGAMIQTYROW").ToString).Value = Convert.ToString(SheetRowData("SHEETNAME"))
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("O" & SheetRowData("KAGAMIQTYROW").ToString).Formula = "='" & Convert.ToString(SheetRowData("SHEETNAME")) & "'!L6"
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("O" & SheetRowData("KAGAMIQTYROW").ToString).NumberFormat = ""
-                    PrintSuuRowIdx += 1
-
-                    '同じ行番号の判定用
-                    OldKagamirow = CInt(SheetRowData("KAGAMIROW"))
+                If Convert.ToString(TodokeRowData("ORGCODE")) = "020402" Then
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("K" & PrintKagamiRowIdx.ToString).Value = "EX東北/輸送費"
                 End If
+
+                If DataExist = "1" Then
+                    If OldTodokecode = Convert.ToString(TodokeRowData("TODOKECODE")) Then
+                        '同じ行届先の場合、足し算
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & (PrintKagamiRowIdx - 1).ToString).Formula &= "+'" & Convert.ToString(TodokeRowData("SHEETNAME")) & "'!E" & Me.PrintTotalRowIdx.ToString
+                    Else
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & PrintKagamiRowIdx.ToString).Formula = "='" & Convert.ToString(TodokeRowData("SHEETNAME")) & "'!E" & Me.PrintTotalRowIdx.ToString
+                        PrintKagamiRowIdx += 1
+                    End If
+                Else
+                    If OldTodokecode = Convert.ToString(TodokeRowData("TODOKECODE")) Then
+                        '同じ行届先の場合、足し算
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & (PrintKagamiRowIdx - 1).ToString).Formula &= "+0"
+                    Else
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & PrintKagamiRowIdx.ToString).Value = 0
+                        PrintKagamiRowIdx += 1
+                    End If
+                End If
+                '同じ行届先の判定用
+                OldTodokecode = Convert.ToString(TodokeRowData("TODOKECODE"))
+
+                '数量欄の編集
+                srcRange = Nothing
+                destRange = Nothing
+                srcRange = WW_Workbook.Worksheets(WW_SheetNoInv).Range("Q2:R2")
+                destRange = WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("N" & PrintSuuRowIdx.ToString)
+                srcRange.Copy(destRange)
+
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("N" & PrintSuuRowIdx.ToString).Value = Convert.ToString(TodokeRowData("SHEETNAME"))
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("O" & PrintSuuRowIdx.ToString).Formula = "='" & Convert.ToString(TodokeRowData("SHEETNAME")) & "'!L6"
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("O" & PrintSuuRowIdx.ToString).NumberFormat = ""
+                PrintSuuRowIdx += 1
+
+                '--------------------------
+                '実績（エネックス東北使用）シートの編集
+                '--------------------------
+                WW_SheetNoEnex = WW_Workbook.Worksheets.Count - 1   '出荷場所、届先シートが増えるため常に最終シート№を取得
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoEnex).Range("B" & PrintEnexRowIdx.ToString).Value = Convert.ToString(TodokeRowData("SHEETNAME"))
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoEnex).Range("C" & PrintEnexRowIdx.ToString).Formula = "='" & Convert.ToString(TodokeRowData("SHEETNAME")) & "'!L6"
+                If Convert.ToString(TodokeRowData("ORGCODE")) = "020402" Then
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoEnex).Range("H" & PrintEnexRowIdx.ToString).Value = "EX東北"
+                Else
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoEnex).Range("H" & PrintEnexRowIdx.ToString).Value = "EX新潟"
+                End If
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNoEnex).Rows(PrintEnexRowIdx - 1).Hidden = False
+                PrintEnexRowIdx += 1
+
             Next
 
+            '数量欄（合計行）の編集
             srcRange = Nothing
             destRange = Nothing
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("L25:M25")
+            srcRange = WW_Workbook.Worksheets(WW_SheetNoInv).Range("Q3:R3")
             destRange = WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("N" & Me.PrintSuuRowIdx.ToString)
             srcRange.Copy(destRange)
 
@@ -270,48 +307,36 @@ Public Class LNT0001InvoiceOutputTNG
 
 
             '***** 電力融通シート作成 TODO処理 ここから *****
+            PrintKagamiRowIdx = 33
+            PrintYuuduuRowIdx = 10
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()  ' DataBase接続
                 '〇電力融通シート情報データループ
-                For Each YuuduuSheetRowData As DataRow In YuuduuSheetData.Rows
+                For Each KaisuuRowData As DataRow In KaisuuData.Rows
                     FirstFLG = "1"
                     DataExist = "0"
 
-                    Dim DataCount As Integer = KaisuuData.Select("SYABAN ='" & Convert.ToString(YuuduuSheetRowData("SYABAN")) & "'").Count
-                    If DataCount > 0 Then
-                        Dim OutPutRowData As DataRow() = KaisuuData.Select("SYABAN ='" & Convert.ToString(YuuduuSheetRowData("SYABAN")) & "'")
-                        If OutPutRowData.Length > 0 Then
-                            DataExist = "1"
-                            For i As Integer = 0 To OutPutRowData.Length - 1
-                                '◯明細の設定
-                                If Convert.ToString(YuuduuSheetRowData("ROWDISPLAY")) = "1" Then
-                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("B" & Convert.ToString(YuuduuSheetRowData("ROWNO"))).Value = YuuduuSheetRowData("SYABANNAME")
-                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & Convert.ToString(YuuduuSheetRowData("KAGAMIROW"))).Value = YuuduuSheetRowData("KAGAMINAME")
-                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(YuuduuSheetRowData("KAGAMIROW"))).Formula = "='電力融通（JOT入力）'!G" & Convert.ToString(YuuduuSheetRowData("ROWNO"))
-                                End If
-                                Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("C" & Convert.ToString(YuuduuSheetRowData("ROWNO"))).Value = OutPutRowData(i)("KOTEIHIM")
-                                Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("D" & Convert.ToString(YuuduuSheetRowData("ROWNO"))).Value = OutPutRowData(i)("KOTEIHID")
-                                If Convert.ToString(OutPutRowData(i)("KAISU")) <> "0" Then
-                                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("E" & Convert.ToString(YuuduuSheetRowData("ROWNO"))).Value = Convert.ToString(OutPutRowData(i)("KAISU"))
-                                End If
-                            Next
-                        End If
-                    Else
-                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & Convert.ToString(YuuduuSheetRowData("KAGAMIROW"))).Value = YuuduuSheetRowData("KAGAMINAME")
-                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(YuuduuSheetRowData("KAGAMIROW"))).Value = 0
+                    '◯鏡の設定
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & Convert.ToString(PrintKagamiRowIdx)).Value = Convert.ToString(KaisuuRowData("SYABANNAME")) & "（固定費）"
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(PrintKagamiRowIdx)).Formula = "='電力融通（JOT入力）'!G" & Convert.ToString(PrintYuuduuRowIdx)
+                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(PrintKagamiRowIdx - 1).Hidden = False
+                    If Not String.IsNullOrEmpty(Convert.ToString(KaisuuRowData("YUUDUU"))) Then
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("K" & Convert.ToString(PrintKagamiRowIdx)).Value = "EX東北/固定費"
                     End If
+                    PrintKagamiRowIdx += 1
 
-                    'If DataExist = "1" AndAlso Convert.ToString(YuuduuSheetRowData("ROWDISPLAY")) = "1" Then
-                    If Convert.ToString(YuuduuSheetRowData("ROWDISPLAY")) = "1" Then
-                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Rows(CInt(YuuduuSheetRowData("ROWNO")) - 1).Hidden = False
-                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(CInt(YuuduuSheetRowData("KAGAMIROW")) - 1).Hidden = False
-                        'If Convert.ToString(YuuduuSheetRowData("SYABAN")) = "324" Then
-                        '    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(34).Hidden = True
-                        'ElseIf Convert.ToString(YuuduuSheetRowData("SYABAN")) = "330" Then
-                        '    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(35).Hidden = True
-                        'ElseIf Convert.ToString(YuuduuSheetRowData("SYABAN")) = "359" Then
-                        '    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(49).Hidden = True
-                        'End If
+                    '◯電力融通の設定
+                    If Not String.IsNullOrEmpty(Convert.ToString(KaisuuRowData("YUUDUU"))) Then
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("B" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("SYABANNAME")
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("C" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("KOTEIHIM")
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("D" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("KOTEIHID")
+                        If Convert.ToString(KaisuuRowData("KAISU")) <> "0" Then
+                            Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("E" & Convert.ToString(PrintYuuduuRowIdx)).Value = Convert.ToString(KaisuuRowData("KAISU"))
+                        End If
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("F" & Convert.ToString(PrintYuuduuRowIdx)).Formula = "D" & Convert.ToString(PrintYuuduuRowIdx) & "*E" & Convert.ToString(PrintYuuduuRowIdx)
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("G" & Convert.ToString(PrintYuuduuRowIdx)).Formula = "C" & Convert.ToString(PrintYuuduuRowIdx) & "-D" & Convert.ToString(PrintYuuduuRowIdx) & "*E" & Convert.ToString(PrintYuuduuRowIdx)
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Rows(PrintYuuduuRowIdx - 1).Hidden = False
+                        PrintYuuduuRowIdx += 1
                     End If
                 Next
             End Using
@@ -411,26 +436,26 @@ Public Class LNT0001InvoiceOutputTNG
     ''' <summary>
     ''' 帳票の明細設定
     ''' </summary>
-    Private Sub EditDetailArea(ByVal pOutputRowData As DataRow(), ByVal row As Integer, ByRef FirstFLG As String)
+    Private Sub EditDetailArea(ByVal pOutputRowData As DataRow, ByRef FirstFLG As String)
 
         Try
             '届日(月)
             If FirstFLG = "1" Then
-                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_MONTH + Me.PrintOutputRowIdx.ToString()).Value = Format(Date.Parse(pOutputRowData(row)("TODOKEDATE").ToString), "MM") & "/"
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_MONTH + Me.PrintOutputRowIdx.ToString()).Value = Format(Date.Parse(pOutputRowData("TODOKEDATE").ToString), "MM") & "/"
                 FirstFLG = "0"
             Else
                 Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_MONTH + Me.PrintOutputRowIdx.ToString()).Value = ""
             End If
             '届日(日)
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_DAY1 + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(Format(Date.Parse(pOutputRowData(row)("TODOKEDATE").ToString), "dd"))
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_DAY1 + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(Format(Date.Parse(pOutputRowData("TODOKEDATE").ToString), "dd"))
             '出荷日(日)
-            If Not pOutputRowData(row)("SHUKADATE") Is DBNull.Value Then
-                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_DAY2 + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(Format(Date.Parse(pOutputRowData(row)("SHUKADATE").ToString), "dd"))
+            If Not pOutputRowData("SHUKADATE") Is DBNull.Value Then
+                Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_DAY2 + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(Format(Date.Parse(pOutputRowData("SHUKADATE").ToString), "dd"))
             End If
             '車号
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_SHAGOU + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(pOutputRowData(row)("GYOMUTANKNUM"))
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_SHAGOU + Me.PrintOutputRowIdx.ToString()).Value = Convert.ToInt32(pOutputRowData("GYOMUTANKNUM"))
             '数量
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_SUURYOU + Me.PrintOutputRowIdx.ToString()).Value = pOutputRowData(row)("ZISSEKI")
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range(COL_SUURYOU + Me.PrintOutputRowIdx.ToString()).Value = pOutputRowData("ZISSEKI")
 
             '最大行まで出力したら列変更
             If Me.PrintOutputRowIdx = PrintMaxRowIdx Then
@@ -466,12 +491,10 @@ Public Class LNT0001InvoiceOutputTNG
 
         Try
             '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("B3:I3")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Rows(PrintMaxRowIdx - 1).Hidden = False
 
-            Dim Fomula1 As String = "=COUNTIF($D$12:$D$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")+COUNTIF($I$12:$I$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")"
-            Dim Fomula2 As String = "=SUMIF($D$12:$D$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$E$12:$E$" & pSheetRowData("MAXROW").ToString & ")+SUMIF($I$12:$I$" & pSheetRowData("MAXROW").ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$J$12:$J$" & pSheetRowData("MAXROW").ToString & ")"
+            Dim Fomula1 As String = "=COUNTIF($D$12:$D$" & PrintMaxRowIdx.ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")+COUNTIF($I$12:$I$" & PrintMaxRowIdx.ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ")"
+            Dim Fomula2 As String = "=SUMIF($D$12:$D$" & PrintMaxRowIdx.ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$E$12:$E$" & PrintMaxRowIdx.ToString & ")+SUMIF($I$12:$I$" & PrintMaxRowIdx.ToString & ",B" & Me.PrintOutputRowIdx.ToString() & ",$J$12:$J$" & PrintMaxRowIdx.ToString & ")"
             Dim Fomula3 As String = "=ROUND(E" & Me.PrintOutputRowIdx.ToString() & "*F" & Me.PrintOutputRowIdx.ToString() & ",0)"
 
             '車号
@@ -498,48 +521,40 @@ Public Class LNT0001InvoiceOutputTNG
     ''' <summary>
     ''' 帳票の合計設定
     ''' </summary>
-    Private Sub EditTotalLastArea(ByVal pSheetRowData As DataRow)
+    Private Sub EditTotalLastArea(ByVal pTodokeRowData As DataRow)
 
         Dim srcRange As IRange = Nothing
         Dim destRange As IRange = Nothing
 
         Try
             '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("B4:I4")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("B" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
-
             Dim Fomula1 As String = "=SUM(D" & Me.PrintTotalFirstRowIdx.ToString() & ":D" & Me.PrintTotalLastRowIdx.ToString() & ")"
             Dim Fomula2 As String = "=SUM(F" & Me.PrintTotalFirstRowIdx.ToString() & ":G" & Me.PrintTotalLastRowIdx.ToString() & ")"
             Dim Fomula3 As String = "=SUM(H" & Me.PrintTotalFirstRowIdx.ToString() & ":I" & Me.PrintTotalLastRowIdx.ToString() & ")"
 
             '車数
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("D" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula1
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("D" + (Me.PrintTotalLastRowIdx + 1).ToString()).Formula = Fomula1
             '数量
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("F" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula2
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("F" + (Me.PrintTotalLastRowIdx + 1).ToString()).Formula = Fomula2
             '金額
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" + Me.PrintOutputRowIdx.ToString()).Formula = Fomula3
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("H" + (Me.PrintTotalLastRowIdx + 1).ToString()).Formula = Fomula3
 
             '出力件数加算
-            Me.AddPrintRowCnt(1)
-            '行クリア（テンプレートのごみをクリアしておく（行削除、行追加）
-            '最終行の取得
-            Dim lastRow As Integer = WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Row + WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Rows.Count - 1
-            For i As Integer = Me.PrintOutputRowIdx To lastRow
-                WW_Workbook.Worksheets(Me.WW_SheetNo).Range(i.ToString + ":" + i.ToString).Delete()
-                WW_Workbook.Worksheets(Me.WW_SheetNo).Range(i.ToString + ":" + i.ToString).Insert()
-            Next
+            'Me.AddPrintRowCnt(1)
+            ''行クリア（テンプレートのごみをクリアしておく（行削除、行追加）
+            ''最終行の取得
+            'Dim lastRow As Integer = WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Row + WW_Workbook.Worksheets(Me.WW_SheetNo).UsedRange.Rows.Count - 1
+            'For i As Integer = Me.PrintOutputRowIdx To lastRow
+            '    WW_Workbook.Worksheets(Me.WW_SheetNo).Range(i.ToString + ":" + i.ToString).Delete()
+            '    WW_Workbook.Worksheets(Me.WW_SheetNo).Range(i.ToString + ":" + i.ToString).Insert()
+            'Next
 
             '出力件数加算
-            Me.AddPrintRowCnt(1)
-
-            '明細行コピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A6:F11")
-            destRange = WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" + Me.PrintOutputRowIdx.ToString())
-            srcRange.Copy(destRange)
+            PrintOutputRowIdx = PrintTotalLastRowIdx + 1
+            Me.AddPrintRowCnt(2)
 
             '合計
-            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" + Me.PrintOutputRowIdx.ToString()).Value = pSheetRowData("TOTALNAME")
+            Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("A" + Me.PrintOutputRowIdx.ToString()).Value = pTodokeRowData("TODOKENAME")
             Me.WW_Workbook.Worksheets(Me.WW_SheetNo).Range("E" + Me.PrintOutputRowIdx.ToString()).Formula = "=H" & (Me.PrintOutputRowIdx - 2).ToString()
             '出力件数加算
             Me.AddPrintRowCnt(1)
@@ -639,6 +654,68 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= " , A01.TODOKEDATE "
         SQLStr &= " , A01.GYOMUTANKNUM "
         SQLStr &= " , A01.SHUKADATE "
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    dt.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+        Return dt
+    End Function
+
+    ''' <summary>
+    ''' 届先一覧取得
+    ''' </summary>
+    Private Function GetTodokeData(ByVal SQLcon As MySqlConnection) As DataTable
+
+        Dim dt As New DataTable
+
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "   A01.ORGCODE"
+        SQLStr &= " , A01.AVOCADOSHUKABASHO AS SHUKABASHO"
+        SQLStr &= " , REPLACE(A01.AVOCADOSHUKANAME,'（ＴＮＧ）','')  AS SHUKANAME"
+        SQLStr &= " , A01.AVOCADOTODOKECODE AS TODOKECODE"
+        SQLStr &= " , REPLACE(A01.AVOCADOTODOKENAME,'（ＴＮＧ）','') AS TODOKENAME "
+        SQLStr &= " ,  CONCAT(REPLACE(A01.AVOCADOSHUKANAME,'（ＴＮＧ）',''), ' ～ ', REPLACE(A01.AVOCADOTODOKENAME,'（ＴＮＧ）','')) AS TITLENAME "
+        SQLStr &= " ,  CONCAT(REPLACE(REPLACE(A01.AVOCADOTODOKENAME,'（ＴＮＧ）',''),'・',''), '(', REPLACE(REPLACE(A01.AVOCADOSHUKANAME,'（ＴＮＧ）',''),'・',''),')') AS SHEETNAME "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.LNM0006_NEWTANKA A01 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     A01.TORICODE = '{0}' ", "0175300000")
+        SQLStr &= String.Format(" AND A01.ORGCODE IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format(" AND A01.STYMD  <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.ENDYMD >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+
+        '-- GROUP BY
+        SQLStr &= " GROUP BY "
+        SQLStr &= "   A01.ORGCODE"
+        SQLStr &= " , A01.AVOCADOSHUKABASHO"
+        SQLStr &= " , A01.AVOCADOSHUKANAME"
+        SQLStr &= " , A01.AVOCADOTODOKECODE"
+        SQLStr &= " , A01.AVOCADOTODOKENAME"
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY "
+        SQLStr &= "   A01.ORGCODE DESC"
+        SQLStr &= " , A01.AVOCADOTODOKECODE"
+        SQLStr &= " , A01.AVOCADOSHUKABASHO DESC"
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -773,11 +850,14 @@ Public Class LNT0001InvoiceOutputTNG
         '-- SELECT
         SQLStr &= " SELECT "
         SQLStr &= "   A01.SYABAN"
+        SQLStr &= " , CONCAT(A01.SYABAN,'号車') AS SYABANNAME"
         SQLStr &= " , A01.KOTEIHIM "
         SQLStr &= " , IFNULL(A01.KOTEIHID,0) AS KOTEIHID "
         SQLStr &= " , IFNULL(A02.KAISU,0) AS KAISU "
         SQLStr &= " , IFNULL(A01.KOTEIHID,0) * IFNULL(A02.KAISU,0) AS GENGAKU "
         SQLStr &= " , A01.KOTEIHIM - IFNULL(A01.KOTEIHID,0) * IFNULL(A02.KAISU,0) AS GOUKEI "
+        SQLStr &= " , A01.ORGCODE "
+        SQLStr &= " , F01.VALUE1 AS YUUDUU "
 
         '-- FROM
         SQLStr &= " FROM LNG.LNM0007_FIXED A01 "
@@ -806,6 +886,13 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= String.Format(" ON A02.TODOKEDATE >= '{0}' ", TaishoYm & "/01")
         SQLStr &= String.Format("AND A02.TODOKEDATE <= '{0}' ", Date.Parse(TaishoYm + "/" + "01").AddDays(-(Date.Parse(TaishoYm + "/" + "01").Day - 1)).AddMonths(1).AddDays(-1).ToString("yyyy/MM/dd"))
         SQLStr &= "              AND A02.SYABAN      = A01.SYABAN "
+        SQLStr &= " LEFT JOIN  COM.LNS0006_FIXVALUE F01"
+        SQLStr &= String.Format(" ON  F01.CAMPCODE = '{0}' ", "01")
+        SQLStr &= String.Format(" AND F01.CLASS    = '{0}' ", "TNG_YUUDUU_ORG")
+        SQLStr &= String.Format(" AND F01.STYMD   <= '{0}' ", TaishoYm & "/01")
+        SQLStr &= String.Format(" AND F01.ENDYMD  >= '{0}' ", TaishoYm & "/01")
+        SQLStr &= "               AND F01.DELFLG   = '0' "
+        SQLStr &= "               AND F01.KEYCODE  = A01.ORGCODE "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -813,6 +900,10 @@ Public Class LNT0001InvoiceOutputTNG
         SQLStr &= String.Format(" AND A01.TARGETYM  = '{0}' ", TaishoYm.Replace("/", ""))
         SQLStr &= String.Format(" AND A01.DELFLG   <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
 
+        '-- ORDER BY
+        SQLStr &= " ORDER BY "
+        SQLStr &= "   A01.ORGCODE DESC"
+        SQLStr &= " , A01.SYABAN"
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
