@@ -378,18 +378,18 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
                 '〇シート「内訳」
                 '★ 月額固定費
-                If PrintTogouSpraterow("GROUPSORTNO").ToString() = "5" _
-                    AndAlso (PrintTogouSpraterow("DETAILSORTNO").ToString() = "7" _
-                             OrElse PrintTogouSpraterow("DETAILSORTNO").ToString() = "8") Then
+                If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
+                    AndAlso (PrintTogouSpraterow("SMALLCATECODE").ToString() = "12" _
+                             OrElse PrintTogouSpraterow("SMALLCATECODE").ToString() = "13") Then
                     '〇３）バンカリング追加人件費
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
-                ElseIf PrintTogouSpraterow("GROUPSORTNO").ToString() = "6" Then
+                ElseIf PrintTogouSpraterow("BIGCATECODE").ToString() = "4" Then
                     Dim otDetailNo As Integer = 0
-                    otDetailNo = CInt(PrintTogouSpraterow("DETAILID").ToString())
+                    otDetailNo = CInt(PrintTogouSpraterow("SMALLCATECODE").ToString())
                     '★ その他
                     '・名称設定
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("DETAILNAME").ToString()
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("SMALLCATENAME").ToString()
                     '・金額設定
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
                     '★ 表示
@@ -398,22 +398,30 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 Else
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
-                    '★数量
+                    '〇車両固定運賃・コンテナ料金・追加人件費
                     'If PrintTogouSpraterow("CALCUNIT").ToString() = "式" Then
-                    If PrintTogouSpraterow("GROUPID").ToString() = "3" _
+                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
                         AndAlso PrintTogouSpraterow("QUANTITY").ToString() <> "0.00" Then
                         Try
+                            '★ 名称
+                            Dim cellNo As String = WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("B" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value.ToString()
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = cellNo + PrintTogouSpraterow("SMALLCATENAME").ToString()
+                            '★ 数量
                             WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+                            '★ 表示
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
                         Catch ex As Exception
                         End Try
 
                         '### [1）勇払向け] かつ [⑤日祝割増運賃] #################################################
                         'または
                         '### [2)．日本製鉄室蘭製鉄所　構内バース向け] かつ [①陸上輸送分（15.7t）]以外 ###########
-                    ElseIf (PrintTogouSpraterow("GROUPSORTNO").ToString() = "3" _
-                            AndAlso PrintTogouSpraterow("DETAILSORTNO").ToString() = "5") _
-                        OrElse (PrintTogouSpraterow("GROUPSORTNO").ToString() = "4" _
-                            AndAlso PrintTogouSpraterow("DETAILSORTNO").ToString() <> "1") Then
+                    ElseIf (PrintTogouSpraterow("BIGCATECODE").ToString() = "2" _
+                            AndAlso PrintTogouSpraterow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005834 _
+                            AndAlso PrintTogouSpraterow("SMALLCATECODE").ToString() = "5") _
+                        OrElse (PrintTogouSpraterow("BIGCATECODE").ToString() = "2" _
+                            AndAlso PrintTogouSpraterow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_006915 _
+                            AndAlso PrintTogouSpraterow("SMALLCATECODE").ToString() <> "6") Then
                         Try
                             WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
                         Catch ex As Exception

@@ -414,29 +414,37 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
         '★2.基本料金B（3309号車）
         Dim kihonBNo As String = "99"
         Dim kihonB_CellNo As Integer = 5
-        For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select(String.Format("DETAILSORTNO='{0}'", kihonBNo))
+        For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select(String.Format("BIGCATECODE='{0}'", kihonBNo))
             Dim kihonB_CellNoSub As Integer = kihonB_CellNo
-            kihonB_CellNoSub += CInt(PrintTogouSpraterow("DETAILID").ToString())
+            kihonB_CellNoSub += CInt(PrintTogouSpraterow("SMALLCATECODE").ToString())
             '★月額単価(車両費・運行維持費)
             WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("M" + kihonB_CellNoSub.ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
         Next
 
         '★4.その他
-        For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select(String.Format("KOTEIHI_CELLNUM<>'' AND DETAILSORTNO<>'{0}'", kihonBNo))
+        For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select(String.Format("KOTEIHI_CELLNUM<>'' AND BIGCATECODE<>'{0}'", kihonBNo))
             '★ 4.その他(委託料)
             WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("E" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
             '★ 4.その他(その他)
-            If PrintTogouSpraterow("GROUPID").ToString() = "5" Then
+            If PrintTogouSpraterow("BIGCATECODE").ToString() = "5" Then
                 '★ 明細名称
                 Dim cellNo As String = WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("R" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Text
-                cellNo &= PrintTogouSpraterow("DETAILNAME").ToString()
+                cellNo &= PrintTogouSpraterow("SMALLCATENAME").ToString()
                 WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("B" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = cellNo
                 '★ 回数
                 WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("G" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
-                '★ 表示
-                WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
+
+                '★ 4.宿泊費・待機料金・その他
+            ElseIf PrintTogouSpraterow("BIGCATECODE").ToString() = "7" _
+                OrElse PrintTogouSpraterow("BIGCATECODE").ToString() = "8" _
+                OrElse PrintTogouSpraterow("BIGCATECODE").ToString() = "9" Then
+                '★ 回数
+                WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range("G" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+
             End If
+            '★ 表示
+            WW_Workbook.Worksheets(WW_SheetNoYusouhiMeisai).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
         Next
 
         '〇届先(休日割増単価)設定

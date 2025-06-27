@@ -641,38 +641,44 @@ Public Class LNT0001InvoiceOutputReport
                 End If
             Next
 
-            '〇ENEOS業務委託料
-            condition = ""
-            If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
-                If Me.TaishoMM = "12" Then
-                    condition = "RECOID='2'"
-                Else
-                    condition = "RECOID='1'"
-                End If
-            End If
-            For Each PrintEneosComfeeDatarow As DataRow In PrintEneosComfeeData.Select(condition)
-                WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Integer.Parse(PrintEneosComfeeDatarow("KINGAKU").ToString())
-            Next
+            ''〇ENEOS業務委託料
+            'condition = ""
+            'If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
+            '    If Me.TaishoMM = "12" Then
+            '        condition = "RECOID='2'"
+            '    Else
+            '        condition = "RECOID='1'"
+            '    End If
+            'End If
+            'For Each PrintEneosComfeeDatarow As DataRow In PrintEneosComfeeData.Select(condition)
+            '    WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Integer.Parse(PrintEneosComfeeDatarow("KINGAKU").ToString())
+            'Next
 
             '■八戸営業所
             If Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_020202 Then
-                '〇陸事番号(固定費(八戸人員/八戸出荷))設定
+                '〇陸事番号(固定費(八戸人員/八戸出荷), 業務委託料)設定
                 For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Rows
                     '★1：八戸人員
-                    If PrintTogouSpraterow("GROUPID").ToString() = "1" Then
+                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "1" Then
                         '★1：追加人員固定費１
-                        If PrintTogouSpraterow("DETAILID").ToString() = "1" Then
+                        If PrintTogouSpraterow("SMALLCATECODE").ToString() = "1" Then
                             WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G39").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
                         End If
                         '★2：追加人員固定費２
-                        If PrintTogouSpraterow("DETAILID").ToString() = "2" Then
+                        If PrintTogouSpraterow("SMALLCATECODE").ToString() = "2" Then
                             WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G40").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
                         End If
                     End If
                     '★2：八戸出荷
-                    If PrintTogouSpraterow("GROUPID").ToString() = "2" Then
+                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "2" Then
                         '八戸ターミナル負担分
                         WW_Workbook.Worksheets(WW_SheetNoTmp02).Range("G41").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    End If
+
+                    '★3：業務委託料("1"(鑑分けする))
+                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
+                        AndAlso PrintTogouSpraterow("ASSESSMENTFLG").ToString() = "1" Then
+                        WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
                     End If
                 Next
 
@@ -681,6 +687,17 @@ Public Class LNT0001InvoiceOutputReport
                 For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
                     If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
                     WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                Next
+
+                '■水島営業所
+            ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_023301 Then
+                '〇陸事番号(業務委託料)設定
+                For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Rows
+                    '★1：業務委託料("1"(鑑分けする))
+                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "1" _
+                        AndAlso PrintTogouSpraterow("ASSESSMENTFLG").ToString() = "1" Then
+                        WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    End If
                 Next
 
                 '■西日本支店車庫(泉北・新宮)

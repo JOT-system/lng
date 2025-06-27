@@ -25,6 +25,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     Private PrintData As DataTable
     Private PrintTankData As DataTable
     Private PrintKoteihiData As DataTable
+    Private PrintTogouSprate As DataTable
     Private PrintCalendarData As DataTable
     Private PrintHolidayRateData As DataTable
     Private TaishoYm As String = ""
@@ -51,6 +52,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
     Public Sub New(mapId As String, orgCode As String, excelFileName As String, outputFileName As String, printDataClass As DataTable,
                    printTankDataClass As DataTable, printKoteihiDataClass As DataTable, printCalendarDataClass As DataTable,
                    dicCenergyList As Dictionary(Of String, String), dicElNessList As Dictionary(Of String, String),
+                   Optional ByVal printTogouSprateDataClass As DataTable = Nothing,
                    Optional ByVal printHolidayRateDataClass As DataTable = Nothing,
                    Optional ByVal taishoYm As String = Nothing,
                    Optional ByVal calcNumber As Integer = 1,
@@ -62,6 +64,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             Me.PrintKoteihiData = printKoteihiDataClass
             Me.PrintCalendarData = printCalendarDataClass
             'Me.PrintSKKoteichiData = printSKKoteichiDataClass
+            Me.PrintTogouSprate = printTogouSprateDataClass
             Me.PrintHolidayRateData = printHolidayRateDataClass
             Me.TaishoYm = taishoYm
             Me.TaishoYYYY = Date.Parse(taishoYm + "/" + "01").ToString("yyyy")

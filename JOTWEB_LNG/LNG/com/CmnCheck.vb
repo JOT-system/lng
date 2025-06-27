@@ -77,16 +77,24 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTodokeClass, dtEneosTodoke)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", eneosTodokeClass, LNT0001Tanktbl)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", eneosTodokeClass, LNT0001Tanktbl)
+            '--〇統合版固定費マスタ
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=eneosTankClass)
             'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001Koteihi, I_CLASS:=eneosTankClass)
-            CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001HachinoheSprate)
-            CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001EneosComfee)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
+            'CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001HachinoheSprate)
+            'CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001EneosComfee)
+            '--〇(新)統合版特別料金マスタ
+            CMNPTS.SelectNewIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
+            'CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
+            '--〇カレンダーマスタ
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            '--〇休日割増単価マスタ
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtEneosTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=eneosTodokeClass)
         End Using
 
@@ -248,13 +256,19 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTankClass, dtDaigasTank)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, daigasTodokeClass, dtDaigasTodoke)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
+            '--〇統合版固定費マスタ
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=daigasTankClass)
             'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001Koteihi, I_CLASS:=daigasTankClass)
+            '--〇カレンダーマスタ
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            '--〇休日割増単価マスタ
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtDaigasTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=daigasTodokeClass)
         End Using
 
@@ -433,17 +447,26 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl, I_SEKIYU_HONSHU_FLG:=True)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
+            '--〇統合版固定費マスタ
             CMNPTS.SelectSKFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
             'CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
+            '--〇SK燃料サーチャージマスタ
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), BaseDllConst.CONST_ORDERORGCODE_020804, TaishoYm.Replace("/", ""), LNT0001SKSurcharge)
+            '--〇(新)統合版特別料金マスタ
+            CMNPTS.SelectNewIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
+            'CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
+            '--〇カレンダーマスタ
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
-            CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
+            '--〇休日割増単価マスタ
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtSekiyuSigenTodoke, I_ORDERORGCODE:=commaOrderOrgCode, I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenTodokeClass)
         End Using
 
@@ -710,15 +733,23 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankHKDClass, dtSekiyuSigenHKDTank)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeHKDClass, dtSekiyuSigenHKDTodoke)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
-            CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            '--〇SK燃料サーチャージマスタ
             CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001SKSurcharge)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            '--〇(新)統合版特別料金マスタ
+            CMNPTS.SelectNewIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            'CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            'CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            '--〇カレンダーマスタ
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=LNT0001SKSprate, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenKoteihiHKDClass)
+            '--〇休日割増単価マスタ
+            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=LNT0001TogouSprate, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenKoteihiHKDClass)
         End Using
 
         '〇(帳票)使用項目の設定
@@ -880,13 +911,21 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTankClass, dtCenergyElNessTank)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
             CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", cenergyTodokeClass, LNT0001Tanktbl)
+            '--〇統合版固定費マスタ
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=cenergyElNessTankClass)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate)
+            '--〇(新)統合版特別料金マスタ
+            CMNPTS.SelectNewIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate)
+            'CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate)
+            '--〇カレンダーマスタ
+            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            '--〇休日割増単価マスタ
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtCenergyElNessTank, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=cenergyElNessTankClass)
         End Using
 
@@ -1073,14 +1112,22 @@ Public Class CmnCheck
 
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
+            '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuHokkaidoTankLNGClass, dtHokkaidoLNGTank)
+            '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuHokkaidoTodokeLNGClass, dtHokkaidoLNGTodoke)
+            '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuHokkaidoTodokeLNGClass, LNT0001Tanktbl)
+            '--〇統合版固定費マスタ
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuHokkaidoTankLNGClass)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
             CMNPTS.SelectHokkaidoLNG_YusouhiKihonFeeA(sekiyuHokkaidoKoteihiLNGClass, arrToriCode(0), arrToriCode(1), TaishoYm.Replace("/", ""), LNT0001KihonFeeA, LNT0001KihonSyabanFeeA)
+            '--〇(新)統合版特別料金マスタ
+            CMNPTS.SelectNewIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
+            'CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), TaishoYm.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
 
+            '--〇カレンダーマスタ
             CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), TaishoYm + "/01", LNT0001Calendar)
+            '--〇休日割増単価マスタ
             CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtHokkaidoLNGTodoke, I_CLASS:=sekiyuHokkaidoKoteihiLNGClass)
             CMNPTS.SelectHokkaidoLNG_YusouhiHolidayRate(arrToriCode(0), TaishoYm + "/01", LNT0001HolidayRateNum)
         End Using
