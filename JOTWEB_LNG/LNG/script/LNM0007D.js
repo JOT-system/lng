@@ -37,9 +37,35 @@ window.onload = function () {
         document.getElementById('WF_SEASONKBN').backgroundColor = "#F2F2F2";
     }
 
+    //ポップアップメッセージ
+    let wkmessage1 = "JOT手数料として収受する割合(JOT収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。";
+    document.getElementById("WF_JOTPERCENTAGE_L").title = wkmessage1;
+
+    let wkmessage2 = "ENEXへ支払う割合(ENEX収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。";
+    document.getElementById("WF_ENEXPERCENTAGE_L").title = wkmessage2;
+
     f_syagata();
     f_seasonkbn();
 };
+
+function InitDisplay() {
+
+    /* スクロール位置復元 */
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        let top = Number(document.getElementById("WF_scrollY").value);
+        panel.scrollTo(0, top);
+    }
+}
+
+function saveTabScrollPosition() {
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        document.getElementById("WF_scrollY").value = panel.scrollTop;
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -69,6 +95,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
     });
+
+    /* scrollイベント発生時に表示タブのスクロール位置を保存する処理を追加 */
+    var panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        panel.addEventListener('scroll', saveTabScrollPosition);
+    }
+
 });
 
 //車型リストボックス変更時

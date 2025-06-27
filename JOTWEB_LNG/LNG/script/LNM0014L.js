@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function f_DeleteRowGray() {
     var objTable = document.getElementById("pnlListArea_DR").children[0];
     var Col = {
-        DELFLG: 34 //削除フラグ
+        DELFLG: 40 //削除フラグ
     };
 
     for (var i = 0; i < objTable.rows.length; i++) {

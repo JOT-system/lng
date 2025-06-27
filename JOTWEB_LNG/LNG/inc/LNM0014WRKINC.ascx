@@ -49,6 +49,12 @@
     <asp:TextBox ID="WF_SEL_ATENACOMPANYDEVNAME" runat="server"></asp:TextBox>     <!-- 宛名会社部門名 -->
     <asp:TextBox ID="WF_SEL_FROMORGNAME" runat="server"></asp:TextBox>             <!-- 請求書発行部店名 -->
     <asp:TextBox ID="WF_SEL_MEISAICATEGORYID" runat="server"></asp:TextBox>        <!-- 明細区分 -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTCODE" runat="server"></asp:TextBox>             <!-- 勘定科目コード -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTNAME" runat="server"></asp:TextBox>             <!-- 勘定科目名 -->
+    <asp:TextBox ID="WF_SEL_SEGMENTCODE" runat="server"></asp:TextBox>             <!-- セグメントコード -->
+    <asp:TextBox ID="WF_SEL_SEGMENTNAME" runat="server"></asp:TextBox>             <!-- セグメント名 -->
+    <asp:TextBox ID="WF_SEL_JOTPERCENTAGE" runat="server"></asp:TextBox>           <!-- 割合JOT -->
+    <asp:TextBox ID="WF_SEL_ENEXPERCENTAGE" runat="server"></asp:TextBox>          <!-- 割合ENEX -->
     <asp:TextBox ID="WF_SEL_BIKOU1" runat="server"></asp:TextBox>                  <!-- 備考1 -->
     <asp:TextBox ID="WF_SEL_BIKOU2" runat="server"></asp:TextBox>                  <!-- 備考2 -->
     <asp:TextBox ID="WF_SEL_BIKOU3" runat="server"></asp:TextBox>                  <!-- 備考3 -->

@@ -39,6 +39,12 @@
     <asp:TextBox ID="WF_SEL_KAISU" runat="server"></asp:TextBox>              <!-- 回数 -->
     <asp:TextBox ID="WF_SEL_GENGAKU" runat="server"></asp:TextBox>              <!-- 減額費用 -->
     <asp:TextBox ID="WF_SEL_AMOUNT" runat="server"></asp:TextBox>              <!-- 請求額 -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTCODE" runat="server"></asp:TextBox>             <!-- 勘定科目コード -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTNAME" runat="server"></asp:TextBox>             <!-- 勘定科目名 -->
+    <asp:TextBox ID="WF_SEL_SEGMENTCODE" runat="server"></asp:TextBox>             <!-- セグメントコード -->
+    <asp:TextBox ID="WF_SEL_SEGMENTNAME" runat="server"></asp:TextBox>             <!-- セグメント名 -->
+    <asp:TextBox ID="WF_SEL_JOTPERCENTAGE" runat="server"></asp:TextBox>           <!-- 割合JOT -->
+    <asp:TextBox ID="WF_SEL_ENEXPERCENTAGE" runat="server"></asp:TextBox>          <!-- 割合ENEX -->
     <asp:TextBox ID="WF_SEL_BIKOU1" runat="server"></asp:TextBox>              <!-- 備考1 -->
     <asp:TextBox ID="WF_SEL_BIKOU2" runat="server"></asp:TextBox>              <!-- 備考2 -->
     <asp:TextBox ID="WF_SEL_BIKOU3" runat="server"></asp:TextBox>              <!-- 備考3 -->

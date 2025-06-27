@@ -85,16 +85,52 @@ Public Class LNM0014SprateDetail
                             WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
                         Case "WF_KASANORGChange"    '加算先部門コードチェンジ
                             WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
-                            'Case "WF_MAEKABUChange"    '前株チェンジ
-                            '    If ddlMAEKABU.SelectedValue = "前株" And ddlATOKABU.SelectedValue = "後株" Then
-                            '        ddlATOKABU.SelectedValue = ""
-                            '    End If
-                            'Case "WF_ATOKABUChange"    '後株チェンジ
-                            '    If ddlMAEKABU.SelectedValue = "前株" And ddlATOKABU.SelectedValue = "後株" Then
-                            '        ddlMAEKABU.SelectedValue = ""
-                            '    End If
+                        Case "WF_SelectCALENDARChange" 'カレンダーチェンジ
+                            WF_ACCOUNTCODE_TEXT.Text = ""
+                            WF_SEGMENTCODE_TEXT.Text = ""
+                            '勘定科目
+                            Me.WF_ACCOUNT.Items.Clear()
+                            Me.WF_ACCOUNT.Items.Add("")
+                            Dim retAccountList As New DropDownList
+                            retAccountList = LNM0014WRKINC.getDowpDownAccountList(WF_TARGETYM.Value)
+                            For index As Integer = 0 To retAccountList.Items.Count - 1
+                                WF_ACCOUNT.Items.Add(New ListItem(retAccountList.Items(index).Text, retAccountList.Items(index).Value))
+                            Next
 
+                            'セグメント
+                            Me.WF_SEGMENT.Items.Clear()
+                        Case "WF_ACCOUNTChange" '勘定科目チェンジ
+                            WF_ACCOUNTCODE_TEXT.Text = WF_ACCOUNT.SelectedValue
 
+                            Dim WK_TARGETYM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+                            Dim WW_YM As String = ""
+                            '更新の場合
+                            If Not DisabledKeyItem.Value = "" Then
+                                WW_YM = WK_TARGETYM.Substring(0, 4) & "/" & WK_TARGETYM.Substring(4, 2)
+                            Else
+                                WW_YM = WF_TARGETYM.Value
+                            End If
+
+                            'セグメント
+                            Me.WF_SEGMENT.Items.Clear()
+                            WF_SEGMENTCODE_TEXT.Text = ""
+                            Dim retSegmentList As New DropDownList
+                            retSegmentList = LNM0014WRKINC.getDowpDownSegmentList(WW_YM, WF_ACCOUNT.SelectedValue)
+
+                            If retSegmentList.Items.Count > 1 Then
+                                Me.WF_SEGMENT.Items.Add("")
+                            End If
+
+                            For index As Integer = 0 To retSegmentList.Items.Count - 1
+                                WF_SEGMENT.Items.Add(New ListItem(retSegmentList.Items(index).Text, retSegmentList.Items(index).Value))
+                            Next
+
+                            If WF_SEGMENT.Items.Count = 1 Then
+                                WF_SEGMENTCODE_TEXT.Text = WF_SEGMENT.SelectedValue
+                            End If
+
+                        Case "WF_SEGMENTChange" 'セグメントチェンジ
+                            WF_SEGMENTCODE_TEXT.Text = WF_SEGMENT.SelectedValue
                     End Select
                 End If
             Else
@@ -192,7 +228,7 @@ Public Class LNM0014SprateDetail
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
-            If LNM0007WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+            If LNM0014WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
                 Dim WW_OrgPermitHt As New Hashtable
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     SQLcon.Open()  ' DataBase接続
@@ -230,6 +266,36 @@ Public Class LNM0014SprateDetail
                 ddlSelectCALCUNIT.Items.Add(New ListItem(retCALCUNITList.Items(index).Text, retCALCUNITList.Items(index).Value))
             Next
         End If
+
+        Dim WK_TARGETYM As String = Replace(work.WF_SEL_TARGETYM.Text, "/", "")
+        Dim WW_YM As String = ""
+        If Not WK_TARGETYM = "" Then
+            WW_YM = WK_TARGETYM.Substring(0, 4) & "/" & WK_TARGETYM.Substring(4, 2)
+        Else
+            WW_YM = work.WF_SEL_TARGETYM.Text
+        End If
+
+        '勘定科目
+        Me.WF_ACCOUNT.Items.Clear()
+        Me.WF_ACCOUNT.Items.Add("")
+        Dim retAccountList As New DropDownList
+        retAccountList = LNM0007WRKINC.getDowpDownAccountList(WW_YM)
+        For index As Integer = 0 To retAccountList.Items.Count - 1
+            WF_ACCOUNT.Items.Add(New ListItem(retAccountList.Items(index).Text, retAccountList.Items(index).Value))
+        Next
+
+        'セグメント
+        Me.WF_SEGMENT.Items.Clear()
+        Dim retSegmentList As New DropDownList
+        retSegmentList = LNM0007WRKINC.getDowpDownSegmentList(WW_YM, work.WF_SEL_ACCOUNTCODE.Text)
+
+        If retSegmentList.Items.Count > 1 Then
+            Me.WF_SEGMENT.Items.Add("")
+        End If
+
+        For index As Integer = 0 To retSegmentList.Items.Count - 1
+            WF_SEGMENT.Items.Add(New ListItem(retSegmentList.Items(index).Text, retSegmentList.Items(index).Value))
+        Next
 
     End Sub
 
@@ -341,6 +407,16 @@ Public Class LNM0014SprateDetail
         TxtFROMORGNAME.Text = work.WF_SEL_FROMORGNAME.Text
         '明細区分
         ddlMEISAICATEGORYID.SelectedValue = work.WF_SEL_MEISAICATEGORYID.Text
+        '勘定科目
+        WF_ACCOUNT.SelectedValue = work.WF_SEL_ACCOUNTCODE.Text
+        WF_ACCOUNTCODE_TEXT.Text = work.WF_SEL_ACCOUNTCODE.Text
+        'セグメント
+        WF_SEGMENT.SelectedValue = work.WF_SEL_SEGMENTCODE.Text
+        WF_SEGMENTCODE_TEXT.Text = work.WF_SEL_SEGMENTCODE.Text
+        '割合JOT
+        TxtJOTPERCENTAGE.Text = work.WF_SEL_JOTPERCENTAGE.Text
+        '割合ENEX
+        TxtENEXPERCENTAGE.Text = work.WF_SEL_ENEXPERCENTAGE.Text
         '備考1
         TxtBIKOU1.Text = work.WF_SEL_BIKOU1.Text
         '備考2
@@ -375,6 +451,8 @@ Public Class LNM0014SprateDetail
         Me.TxtDIESELPRICECURRENT.Attributes("onkeyPress") = "CheckDeci()"             '実勢軽油価格
         Me.TxtDIESELPRICESTANDARD.Attributes("onkeyPress") = "CheckDeci()"             '基準経由価格
         Me.TxtDIESELCONSUMPTION.Attributes("onkeyPress") = "CheckDeci()"             '燃料使用量
+        Me.TxtJOTPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"       '割合JOT
+        Me.TxtENEXPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"      '割合ENEX
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -466,6 +544,12 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , ATENACOMPANYDEVNAME                 ")
         SQLStr.AppendLine("       , FROMORGNAME                         ")
         SQLStr.AppendLine("       , MEISAICATEGORYID                    ")
+        SQLStr.AppendLine("       , ACCOUNTCODE                         ")
+        SQLStr.AppendLine("       , ACCOUNTNAME                         ")
+        SQLStr.AppendLine("       , SEGMENTCODE                         ")
+        SQLStr.AppendLine("       , SEGMENTNAME                         ")
+        SQLStr.AppendLine("       , JOTPERCENTAGE                       ")
+        SQLStr.AppendLine("       , ENEXPERCENTAGE                      ")
         SQLStr.AppendLine("       , BIKOU1                              ")
         SQLStr.AppendLine("       , BIKOU2                              ")
         SQLStr.AppendLine("       , BIKOU3                              ")
@@ -509,6 +593,12 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("        , @ATENACOMPANYDEVNAME               ")
         SQLStr.AppendLine("        , @FROMORGNAME                       ")
         SQLStr.AppendLine("        , @MEISAICATEGORYID                  ")
+        SQLStr.AppendLine("       , @ACCOUNTCODE                        ")
+        SQLStr.AppendLine("       , @ACCOUNTNAME                        ")
+        SQLStr.AppendLine("       , @SEGMENTCODE                        ")
+        SQLStr.AppendLine("       , @SEGMENTNAME                        ")
+        SQLStr.AppendLine("       , @JOTPERCENTAGE                      ")
+        SQLStr.AppendLine("       , @ENEXPERCENTAGE                     ")
         SQLStr.AppendLine("        , @BIKOU1                            ")
         SQLStr.AppendLine("        , @BIKOU2                            ")
         SQLStr.AppendLine("        , @BIKOU3                            ")
@@ -551,6 +641,12 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , ATENACOMPANYDEVNAME     = @ATENACOMPANYDEVNAME  ")
         SQLStr.AppendLine("       , FROMORGNAME     = @FROMORGNAME                  ")
         SQLStr.AppendLine("       , MEISAICATEGORYID     = @MEISAICATEGORYID        ")
+        SQLStr.AppendLine("       , ACCOUNTCODE =  @ACCOUNTCODE")
+        SQLStr.AppendLine("       , ACCOUNTNAME =  @ACCOUNTNAME")
+        SQLStr.AppendLine("       , SEGMENTCODE =  @SEGMENTCODE")
+        SQLStr.AppendLine("       , SEGMENTNAME =  @SEGMENTNAME")
+        SQLStr.AppendLine("       , JOTPERCENTAGE =  @JOTPERCENTAGE")
+        SQLStr.AppendLine("       , ENEXPERCENTAGE =  @ENEXPERCENTAGE")
         SQLStr.AppendLine("       , BIKOU1     = @BIKOU1                            ")
         SQLStr.AppendLine("       , BIKOU2     = @BIKOU2                            ")
         SQLStr.AppendLine("       , BIKOU3     = @BIKOU3                            ")
@@ -595,6 +691,12 @@ Public Class LNM0014SprateDetail
         SQLJnl.AppendLine("   , ATENACOMPANYDEVNAME                    ")
         SQLJnl.AppendLine("   , FROMORGNAME                            ")
         SQLJnl.AppendLine("   , MEISAICATEGORYID                       ")
+        SQLJnl.AppendLine("   , ACCOUNTCODE                         ")
+        SQLJnl.AppendLine("   , ACCOUNTNAME                         ")
+        SQLJnl.AppendLine("   , SEGMENTCODE                         ")
+        SQLJnl.AppendLine("   , SEGMENTNAME                         ")
+        SQLJnl.AppendLine("   , JOTPERCENTAGE                       ")
+        SQLJnl.AppendLine("   , ENEXPERCENTAGE                      ")
         SQLJnl.AppendLine("   , BIKOU1                                 ")
         SQLJnl.AppendLine("   , BIKOU2                                 ")
         SQLJnl.AppendLine("   , BIKOU3                                 ")
@@ -652,6 +754,12 @@ Public Class LNM0014SprateDetail
                 Dim P_ATENACOMPANYDEVNAME As MySqlParameter = SQLcmd.Parameters.Add("@ATENACOMPANYDEVNAME", MySqlDbType.VarChar, 50)     '宛名会社部門名
                 Dim P_FROMORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@FROMORGNAME", MySqlDbType.VarChar, 50)     '請求書発行部店名
                 Dim P_MEISAICATEGORYID As MySqlParameter = SQLcmd.Parameters.Add("@MEISAICATEGORYID", MySqlDbType.VarChar, 1)     '明細区分
+                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)     '勘定科目コード
+                Dim P_ACCOUNTNAME As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTNAME", MySqlDbType.VarChar, 100)     '勘定科目名
+                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)     'セグメントコード
+                Dim P_SEGMENTNAME As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTNAME", MySqlDbType.VarChar, 100)     'セグメント名
+                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合JOT
+                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 100)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 100)     '備考2
                 Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 100)     '備考3
@@ -804,6 +912,39 @@ Public Class LNM0014SprateDetail
                 End If
 
                 P_MEISAICATEGORYID.Value = LNM0014row("MEISAICATEGORYID")           '明細区分
+
+                '勘定科目コード
+                If LNM0014row("ACCOUNTCODE").ToString = "" Then
+                    P_ACCOUNTCODE.Value = DBNull.Value
+                Else
+                    P_ACCOUNTCODE.Value = LNM0014row("ACCOUNTCODE")
+                End If
+
+                P_ACCOUNTNAME.Value = LNM0014row("ACCOUNTNAME")           '勘定科目名
+
+                'セグメントコード
+                If LNM0014row("SEGMENTCODE").ToString = "" Then
+                    P_SEGMENTCODE.Value = DBNull.Value
+                Else
+                    P_SEGMENTCODE.Value = LNM0014row("SEGMENTCODE")
+                End If
+
+                P_SEGMENTNAME.Value = LNM0014row("SEGMENTNAME")           'セグメント名
+
+                '割合JOT
+                If LNM0014row("JOTPERCENTAGE").ToString = "" Then
+                    P_JOTPERCENTAGE.Value = DBNull.Value
+                Else
+                    P_JOTPERCENTAGE.Value = LNM0014row("JOTPERCENTAGE")
+                End If
+
+                '割合ENEX
+                If LNM0014row("ENEXPERCENTAGE").ToString = "" Then
+                    P_ENEXPERCENTAGE.Value = DBNull.Value
+                Else
+                    P_ENEXPERCENTAGE.Value = LNM0014row("ENEXPERCENTAGE")
+                End If
+
                 P_BIKOU1.Value = LNM0014row("BIKOU1")           '備考1
                 P_BIKOU2.Value = LNM0014row("BIKOU2")           '備考2
                 P_BIKOU3.Value = LNM0014row("BIKOU3")           '備考3
@@ -994,6 +1135,12 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     ,ATENACOMPANYDEVNAME  ")
         SQLStr.AppendLine("     ,FROMORGNAME  ")
         SQLStr.AppendLine("     ,MEISAICATEGORYID  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,ACCOUNTNAME  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTNAME  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,BIKOU1  ")
         SQLStr.AppendLine("     ,BIKOU2  ")
         SQLStr.AppendLine("     ,BIKOU3  ")
@@ -1039,6 +1186,12 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     ,ATENACOMPANYDEVNAME  ")
         SQLStr.AppendLine("     ,FROMORGNAME  ")
         SQLStr.AppendLine("     ,MEISAICATEGORYID  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,ACCOUNTNAME  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTNAME  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,BIKOU1  ")
         SQLStr.AppendLine("     ,BIKOU2  ")
         SQLStr.AppendLine("     ,BIKOU3  ")
@@ -1326,7 +1479,6 @@ Public Class LNM0014SprateDetail
         LNM0014INProw("GROUPSORTNO") = TxtGROUPSORTNO.Text            'グループソート順
         LNM0014INProw("DETAILSORTNO") = TxtDETAILSORTNO.Text            '明細ソート順
 
-
         '単価
         If TxtTANKA.Text = "" Then
             LNM0014INProw("TANKA") = "0"
@@ -1403,6 +1555,21 @@ Public Class LNM0014SprateDetail
         LNM0014INProw("ATENACOMPANYDEVNAME") = TxtATENACOMPANYDEVNAME.Text            '宛名会社部門名
         LNM0014INProw("FROMORGNAME") = TxtFROMORGNAME.Text            '請求書発行部店名
         LNM0014INProw("MEISAICATEGORYID") = ddlMEISAICATEGORYID.SelectedValue            '明細区分
+
+        LNM0014INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue           '勘定科目コード
+        LNM0014INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem            '勘定科目名
+
+        If Not WF_ACCOUNT.SelectedValue = "" Then
+            LNM0014INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue           'セグメントコード
+            LNM0014INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem            'セグメント名
+        Else
+            LNM0014INProw("SEGMENTCODE") = ""           'セグメントコード
+            LNM0014INProw("SEGMENTNAME") = ""            'セグメント名
+        End If
+
+        LNM0014INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text            '割合JOT
+        LNM0014INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text            '割合ENEX
+
         LNM0014INProw("BIKOU1") = TxtBIKOU1.Text            '備考1
         LNM0014INProw("BIKOU2") = TxtBIKOU2.Text            '備考2
         LNM0014INProw("BIKOU3") = TxtBIKOU3.Text            '備考3
@@ -1461,6 +1628,12 @@ Public Class LNM0014SprateDetail
                     LNM0014row("ATENACOMPANYDEVNAME") = LNM0014INProw("ATENACOMPANYDEVNAME") AndAlso
                     LNM0014row("FROMORGNAME") = LNM0014INProw("FROMORGNAME") AndAlso
                     LNM0014row("MEISAICATEGORYID") = LNM0014INProw("MEISAICATEGORYID") AndAlso
+                    LNM0014row("ACCOUNTCODE") = LNM0014INProw("ACCOUNTCODE") AndAlso                                '勘定科目コード
+                    LNM0014row("ACCOUNTNAME") = LNM0014INProw("ACCOUNTNAME") AndAlso                                '勘定科目名
+                    LNM0014row("SEGMENTCODE") = LNM0014INProw("SEGMENTCODE") AndAlso                                'セグメントコード
+                    LNM0014row("SEGMENTNAME") = LNM0014INProw("SEGMENTNAME") AndAlso                                'セグメント名
+                    LNM0014row("JOTPERCENTAGE") = LNM0014INProw("JOTPERCENTAGE") AndAlso                                '割合JOT
+                    LNM0014row("ENEXPERCENTAGE") = LNM0014INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                     LNM0014row("BIKOU1") = LNM0014INProw("BIKOU1") AndAlso
                     LNM0014row("BIKOU2") = LNM0014INProw("BIKOU2") AndAlso
                     LNM0014row("BIKOU3") = LNM0014INProw("BIKOU3") Then
@@ -1563,6 +1736,8 @@ Public Class LNM0014SprateDetail
         TxtATENACOMPANYNAME.Text = ""                    '宛名会社名
         TxtATENACOMPANYDEVNAME.Text = ""                    '宛名会社部門名
         TxtFROMORGNAME.Text = ""                    '請求書発行部店名
+        TxtJOTPERCENTAGE.Text = ""                    '割合JOT
+        TxtENEXPERCENTAGE.Text = ""                    '割合ENEX
         TxtBIKOU1.Text = ""                    '備考1
         TxtBIKOU2.Text = ""                    '備考2
         TxtBIKOU3.Text = ""                    '備考3
@@ -1637,7 +1812,8 @@ Public Class LNM0014SprateDetail
             '    CODENAME_get("KASANORGCODE", TxtKASANORGCODE.Text, TxtKASANORGNAME.Text, WW_RtnSW)  '加算先部門コード
             '    TxtKASANORGCODE.Focus()
             Case "TxtTODOKECODE"
-                CODENAME_get("TODOKECODE", TxtTODOKECODE.Text, TxtTODOKENAME.Text, WW_RtnSW)  '届先コード
+                'CODENAME_get("TODOKECODE", TxtTODOKECODE.Text, TxtTODOKENAME.Text, WW_RtnSW)  '届先コード
+                CODENAME_get("TODOKECODE", TxtTODOKENAME.Text, TxtTODOKECODE.Text, WW_RtnSW)  '届先コード
                 TxtTODOKECODE.Focus()
             Case "TxtGROUPNAME"
                 CODENAME_get("GROUPNAME", TxtGROUPNAME.Text, TxtGROUPID.Text, WW_RtnSW)  'グループ名
@@ -2309,6 +2485,60 @@ Public Class LNM0014SprateDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
+            ' 勘定科目コード(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", LNM0014INProw("ACCOUNTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・勘定科目コードエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 勘定科目名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTNAME", LNM0014INProw("ACCOUNTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・勘定科目名エラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' セグメントコード(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "SEGMENTCODE", LNM0014INProw("SEGMENTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・セグメントコードエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' セグメント名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "SEGMENTNAME", LNM0014INProw("SEGMENTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・セグメント名エラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 割合JOT(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "JOTPERCENTAGE", LNM0014INProw("JOTPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・割合JOTエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 割合ENEX(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ENEXPERCENTAGE", LNM0014INProw("ENEXPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・割合ENEXエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
             ' 備考1(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "BIKOU1", LNM0014INProw("BIKOU1"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2335,6 +2565,36 @@ Public Class LNM0014SprateDetail
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+
+            '割合JOT、割合ENEX合計値チェック
+            If Not String.IsNullOrEmpty(LNM0014INProw("JOTPERCENTAGE")) Or
+                    Not String.IsNullOrEmpty(LNM0014INProw("ENEXPERCENTAGE")) Then
+                Dim WW_Decimal As Decimal
+                Dim WW_JOTPERCENTAGE As Double
+                Dim WW_ENEXPERCENTAGE As Double
+                Dim WW_TOTALPERCENTAGE As Double
+
+                If Decimal.TryParse(LNM0014INProw("JOTPERCENTAGE").ToString, WW_Decimal) Then
+                    WW_JOTPERCENTAGE = WW_Decimal
+                Else
+                    WW_JOTPERCENTAGE = 0
+                End If
+                If Decimal.TryParse(LNM0014INProw("ENEXPERCENTAGE").ToString, WW_Decimal) Then
+                    WW_ENEXPERCENTAGE = WW_Decimal
+                Else
+                    WW_ENEXPERCENTAGE = 0
+                End If
+
+                WW_TOTALPERCENTAGE = WW_JOTPERCENTAGE + WW_ENEXPERCENTAGE
+
+                If WW_TOTALPERCENTAGE > 100.0 Then
+                    WW_CheckMES1 = "・割合JOT＆割合ENEXエラーです。"
+                    WW_CheckMES2 = "割合合計エラー"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
             End If
 
             ' 排他チェック
@@ -2471,6 +2731,12 @@ Public Class LNM0014SprateDetail
                         LNM0014row("ATENACOMPANYDEVNAME") = LNM0014INProw("ATENACOMPANYDEVNAME") AndAlso
                         LNM0014row("FROMORGNAME") = LNM0014INProw("FROMORGNAME") AndAlso
                         LNM0014row("MEISAICATEGORYID") = LNM0014INProw("MEISAICATEGORYID") AndAlso
+                        LNM0014row("ACCOUNTCODE") = LNM0014INProw("ACCOUNTCODE") AndAlso                                '勘定科目コード
+                        LNM0014row("ACCOUNTNAME") = LNM0014INProw("ACCOUNTNAME") AndAlso                                '勘定科目名
+                        LNM0014row("SEGMENTCODE") = LNM0014INProw("SEGMENTCODE") AndAlso                                'セグメントコード
+                        LNM0014row("SEGMENTNAME") = LNM0014INProw("SEGMENTNAME") AndAlso                                'セグメント名
+                        LNM0014row("JOTPERCENTAGE") = LNM0014INProw("JOTPERCENTAGE") AndAlso                                '割合JOT
+                        LNM0014row("ENEXPERCENTAGE") = LNM0014INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                         LNM0014row("BIKOU1") = LNM0014INProw("BIKOU1") AndAlso
                         LNM0014row("BIKOU2") = LNM0014INProw("BIKOU2") AndAlso
                         LNM0014row("BIKOU3") = LNM0014INProw("BIKOU3") AndAlso

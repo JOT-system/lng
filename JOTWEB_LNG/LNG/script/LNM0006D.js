@@ -81,6 +81,15 @@ window.onload = function () {
         String.fromCharCode(34) + "2回転時単価" + String.fromCharCode(34) + "など、識別しやすい文字列の登録を推奨します。"; 
     document.getElementById("WF_MEMO_L").title = wkmessage2;
 
+    let wkmessage3 = "JOT手数料として収受する割合(JOT収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。"; 
+    document.getElementById("WF_JOTPERCENTAGE_L").title = wkmessage3;
+
+    let wkmessage4 = "ENEXへ支払う割合(ENEX収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。";
+    document.getElementById("WF_ENEXPERCENTAGE_L").title = wkmessage4;
+
+
     //チェックボックス状態復元(出荷場所)
     if (document.getElementById('WF_SHUKACHKSTATUS').value == "true") {
         document.getElementById('WF_SHUKACHANGE').checked = true;
@@ -101,6 +110,24 @@ window.onload = function () {
     f_syagata();
 };
 
+
+function InitDisplay() {
+
+    /* スクロール位置復元 */
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        let top = Number(document.getElementById("WF_scrollY").value);
+        panel.scrollTo(0, top);
+    }
+}
+
+function saveTabScrollPosition() {
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        document.getElementById("WF_scrollY").value = panel.scrollTop;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     // カレンダー表示
     document.querySelectorAll('.datetimepicker').forEach(picker => {
@@ -114,6 +141,13 @@ document.addEventListener("DOMContentLoaded", function () {
             //defaultDate: new Date() // 必要に応じてカスタマイズ
         });
     });
+
+    /* scrollイベント発生時に表示タブのスクロール位置を保存する処理を追加 */
+    var panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        panel.addEventListener('scroll', saveTabScrollPosition);
+    }
+
 });
 
 //出荷場所チェックボックス変更時処理

@@ -279,6 +279,35 @@
                                 </div>
                             </asp:Panel>
 
+                            <p id="TYPE_U_LINE_1">
+                                <!-- 勘定科目コード -->
+                                <span>
+                                    <asp:Label ID="WF_ACCOUNT_L" runat="server" Text="勘定科目名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_ACCOUNT" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ACCOUNTChange');" />
+                                    <asp:TextBox ID="WF_ACCOUNTCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_U_LINE_2">
+                                <!-- セグメントコード -->
+                                <span>
+                                    <asp:Label ID="WF_SEGMENT_L" runat="server" Text="セグメント名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_SEGMENT" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SEGMENTChange');" />
+                                    <asp:TextBox ID="WF_SEGMENTCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_V_LINE_1">
+                                <span>
+                                    <!-- 割合JOT -->
+                                    <asp:Label ID="WF_JOTPERCENTAGE_L" runat="server" Text="割合JOT" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtJOTPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_JOTPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 割合ENEX -->
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_L" runat="server" Text="割合ENEX" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtENEXPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+
                             <div class="Operation">
                                     <div class="actionButtonBox">
                                         <div class="centerSide">
@@ -449,6 +478,9 @@
         <input id="WF_ORG_SAVE" runat="server" value="" type="text" />  
         <input id="WF_GROUPNAME_SAVE" runat="server" value="" type="text" />          
         <input id="WF_DETAILNAME_SAVE" runat="server" value="" type="text" />  
+
+        <!-- 縦スクロール位置 -->
+        <input id="WF_scrollY" runat="server" value="0" type="text" />
 
     </div>
  
