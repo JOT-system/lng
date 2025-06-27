@@ -496,6 +496,57 @@ p {
     width: 34.5em;
 }
 
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(2) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(3) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(4) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(5) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+
 .WF_RADIO {
     display: inline-block;
 }
@@ -556,11 +607,11 @@ p {
         border-color: #ED7D31;
     }
 
-#TxtBRANCHCODE, #TxtKOTEIHIM, #TxtTANKA, #TxtROUNDTRIP, #TxtTOLLFEE, #TxtSYABARA {
+#TxtBRANCHCODE, #TxtKOTEIHIM, #TxtTANKA, #TxtROUNDTRIP, #TxtTOLLFEE, #TxtSYABARA, #TxtJOTPERCENTAGE, #TxtENEXPERCENTAGE {
     text-align: right !important;
 }
 
-#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT {
+#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT, #WF_ACCOUNTCODE_TEXT, #WF_SEGMENTCODE_TEXT {
     background-color: #F2F2F2;
 }
 
@@ -579,7 +630,7 @@ p {
     margin-left: 100px !important;
 }
 
-#WF_SHUKA_CHANGE::after, #WF_TODOKE_CHANGE::after, #WF_MEMO_L::after {
+#WF_SHUKA_CHANGE::after, #WF_TODOKE_CHANGE::after, #WF_MEMO_L::after, #WF_JOTPERCENTAGE_L::after, #WF_ENEXPERCENTAGE_L::after {
     content: "";
     background-image: url(../img/help.png);
     display: inline-block;

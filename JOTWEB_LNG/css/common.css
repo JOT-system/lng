@@ -944,7 +944,7 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
     position: fixed;
     top: 5em;
     bottom: 1.4em;
-    right: 1em;
+    right: 0em;
     width: 0em;
     overflow: hidden;
     background-color: gray;

@@ -55,6 +55,12 @@ Public Class LNM0006WRKINC
         TANKAKBN   '単価区分
         MEMO   '単価用途
         TANKA   '単価
+        ACCOUNTCODE   '勘定科目コード
+        ACCOUNTNAME   '勘定科目名
+        SEGMENTCODE   'セグメントコード
+        SEGMENTNAME   'セグメント名
+        JOTPERCENTAGE   '割合JOT
+        ENEXPERCENTAGE   '割合ENEX
         CALCKBN   '計算区分
         ROUNDTRIP   '往復距離
         TOLLFEE   '通行料
@@ -98,6 +104,12 @@ Public Class LNM0006WRKINC
         TANKAKBN   '単価区分
         MEMO   '単価用途
         TANKA   '単価
+        ACCOUNTCODE   '勘定科目コード
+        ACCOUNTNAME   '勘定科目名
+        SEGMENTCODE   'セグメントコード
+        SEGMENTNAME   'セグメント名
+        JOTPERCENTAGE   '割合JOT
+        ENEXPERCENTAGE   '割合ENEX
         CALCKBN   '計算区分
         ROUNDTRIP   '往復距離
         TOLLFEE   '通行料
@@ -484,6 +496,125 @@ Public Class LNM0006WRKINC
                     'End If
                     For Each WW_ROW As DataRow In WW_Tbl.Rows
                         Dim listItm As New ListItem(WW_ROW("AVOCADOTODOKENAME"), WW_ROW("AVOCADOTODOKECODE"))
+                        retList.Items.Add(listItm)
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
+    ''' ドロップダウンリスト勘定科目データ取得
+    ''' </summary>
+    ''' <param name="I_STYMD">有効開始日</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownAccountList(ByVal I_STYMD As String) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       ACCOUNTCODE AS ACCOUNTCODE                                                                    ")
+        SQLStr.AppendLine("      ,ACCOUNTNAME AS ACCOUNTNAME                                                                    ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0018_ACCOUNT LNM0018                                                                     ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("       @STYMD BETWEEN FROMYMD AND ENDYMD                                                             ")
+        SQLStr.AppendLine("   AND DELFLG <> '1'                                                                                 ")
+        SQLStr.AppendLine(" ORDER BY                                                                       ")
+        SQLStr.AppendLine("     LNM0018.ACCOUNTCODE                                                         ")
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@STYMD", MySqlDbType.Date).Value = CDate(I_STYMD)
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    'If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+                    '    Dim listBlankItm As New ListItem("全て表示", "")
+                    '    retList.Items.Add(listBlankItm)
+                    'End If
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        Dim listItm As New ListItem(WW_ROW("ACCOUNTNAME"), WW_ROW("ACCOUNTCODE"))
+                        retList.Items.Add(listItm)
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
+    ''' ドロップダウンリストセグメントデータ取得
+    ''' </summary>
+    ''' <param name="I_STYMD">有効開始日</param>
+    ''' <param name="I_ACCOUNTCODE">勘定科目コード</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownSegmentList(ByVal I_STYMD As String, ByVal I_ACCOUNTCODE As String) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       SEGMENTCODE AS SEGMENTCODE                                                                    ")
+        SQLStr.AppendLine("      ,SEGMENTNAME AS SEGMENTNAME                                                                    ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0018_ACCOUNT LNM0018                                                                     ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("       ACCOUNTCODE = @ACCOUNTCODE                                                                    ")
+        SQLStr.AppendLine("   AND @STYMD BETWEEN FROMYMD AND ENDYMD                                                             ")
+        SQLStr.AppendLine("   AND DELFLG <> '1'                                                                                 ")
+        SQLStr.AppendLine(" ORDER BY                                                                       ")
+        SQLStr.AppendLine("     LNM0018.SEGMENTCODE                                                         ")
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@STYMD", MySqlDbType.Date).Value = CDate(I_STYMD)
+                    .Add("@ACCOUNTCODE", MySqlDbType.VarChar).Value = I_ACCOUNTCODE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    'If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+                    '    Dim listBlankItm As New ListItem("全て表示", "")
+                    '    retList.Items.Add(listBlankItm)
+                    'End If
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        Dim listItm As New ListItem(WW_ROW("SEGMENTNAME"), WW_ROW("SEGMENTCODE"))
                         retList.Items.Add(listItm)
                     Next
                 End Using

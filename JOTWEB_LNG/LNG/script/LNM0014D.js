@@ -49,6 +49,14 @@ window.onload = function () {
         "　・・・グループで束ねたい場合に使用してください。\n" +
         "　　　　束ねる必要が無い場合はグループ名を使用し、こちらは入力不要です。"; 
 
+    let wkmessage1 = "JOT手数料として収受する割合(JOT収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。";
+    document.getElementById("WF_JOTPERCENTAGE_L").title = wkmessage1;
+
+    let wkmessage2 = "ENEXへ支払う割合(ENEX収入分)をパーセンテージで入力してください。\n" +
+        "JOTとENEXの割合は、合計100%となるようにしてください。";
+    document.getElementById("WF_ENEXPERCENTAGE_L").title = wkmessage2;
+
     //チェックボックス状態復元
     if (document.getElementById('WF_ATENACHKSTATUS').value == "true") {
         document.getElementById('WF_ATENACHANGE').checked = true;
@@ -66,6 +74,23 @@ window.onload = function () {
         document.getElementById("ddlATOKABU").options[1].selected = true;
     }
 };
+
+function InitDisplay() {
+
+    /* スクロール位置復元 */
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        let top = Number(document.getElementById("WF_scrollY").value);
+        panel.scrollTo(0, top);
+    }
+}
+
+function saveTabScrollPosition() {
+    let panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        document.getElementById("WF_scrollY").value = panel.scrollTop;
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -95,6 +120,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
     });
+
+    /* scrollイベント発生時に表示タブのスクロール位置を保存する処理を追加 */
+    var panel = document.getElementById("detailkeybox");
+    if (panel != null) {
+        panel.addEventListener('scroll', saveTabScrollPosition);
+    }
+
 });
 
 

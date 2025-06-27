@@ -288,6 +288,12 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(KAISU), '')                                       AS KAISU              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(GENGAKU), '')                                     AS GENGAKU              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(AMOUNT), '')                                      AS AMOUNT              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ACCOUNTCODE), '')                                 AS ACCOUNTCODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ACCOUNTNAME), '')                                 AS ACCOUNTNAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEGMENTCODE), '')                                 AS SEGMENTCODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEGMENTNAME), '')                                 AS SEGMENTNAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(JOTPERCENTAGE), '')                               AS JOTPERCENTAGE       ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ENEXPERCENTAGE), '')                              AS ENEXPERCENTAGE      ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU1), '')                                      AS BIKOU1              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU2), '')                                      AS BIKOU2              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
@@ -320,6 +326,10 @@ Public Class LNM0007KoteihiHistory
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(AMOUNT), '') = '' THEN ''                                                  ")
         SQLStr.AppendLine("      ELSE  FORMAT(AMOUNT,0)                                                                         ")
         SQLStr.AppendLine("     END AS SCRAMOUNT                                                                                ")
+        '割合JOT
+        SQLStr.AppendLine("   , ''                                                                       AS SCRJOTPERCENTAGE   ")
+        '割合ENEX
+        SQLStr.AppendLine("   , ''                                                                       AS SCRENEXPERCENTAGE  ")
 
         SQLStr.AppendLine("   , CASE                 ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(OPERATEKBN), '') ='2' AND COALESCE(RTRIM(MODIFYKBN), '') ='2' THEN '変更前 更新' ")
@@ -399,6 +409,18 @@ Public Class LNM0007KoteihiHistory
                         Case "1" : LNM0007row("SCRSEASONKBN") = "夏季料金"
                         Case "2" : LNM0007row("SCRSEASONKBN") = "冬季料金"
                         Case Else : LNM0007row("SCRSEASONKBN") = ""
+                    End Select
+
+                    '割合JOT
+                    Select Case LNM0007row("JOTPERCENTAGE").ToString
+                        Case "" : LNM0007row("SCRJOTPERCENTAGE") = ""
+                        Case Else : LNM0007row("SCRJOTPERCENTAGE") = LNM0007row("JOTPERCENTAGE").ToString & "%"
+                    End Select
+
+                    '割合ENEX
+                    Select Case LNM0007row("ENEXPERCENTAGE").ToString
+                        Case "" : LNM0007row("SCRENEXPERCENTAGE") = ""
+                        Case Else : LNM0007row("SCRENEXPERCENTAGE") = LNM0007row("ENEXPERCENTAGE").ToString & "%"
                     End Select
 
                 Next
@@ -937,6 +959,12 @@ Public Class LNM0007KoteihiHistory
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Value = "回数"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Value = "減額費用"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Value = "請求額"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = "勘定科目コード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = "勘定科目名"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = "セグメントコード"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = "セグメント名"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = "割合JOT"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = "割合ENEX"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = "備考1"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = "備考2"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = "備考3"
@@ -1022,6 +1050,25 @@ Public Class LNM0007KoteihiHistory
                 sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Value = CDbl(Row("AMOUNT"))
             End If
 
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = Row("ACCOUNTCODE") '勘定科目コード
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = Row("ACCOUNTNAME") '勘定科目名
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = Row("SEGMENTCODE") 'セグメントコード
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = Row("SEGMENTNAME") 'セグメント名
+
+            '割合JOT
+            If Row("JOTPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = Row("JOTPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = CDbl(Row("JOTPERCENTAGE"))
+            End If
+
+            '割合ENEX
+            If Row("ENEXPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = Row("ENEXPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = CDbl(Row("ENEXPERCENTAGE"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2	
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3	
@@ -1033,6 +1080,8 @@ Public Class LNM0007KoteihiHistory
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.KAISU).Style = IntStyle
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.GENGAKU).Style = IntStyle
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.AMOUNT).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Style = DecStyle
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0007WRKINC.MODIFYKBN.AFTDATA Then

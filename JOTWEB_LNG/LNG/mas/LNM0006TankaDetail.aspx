@@ -33,8 +33,7 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active" id="PAGE_SEARCH"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006S');">単価マスタ（検索）</a></li>
-                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006L');">単価マスタ（一覧）</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0006L');">単価マスタ</a></li>
                         <li class="breadcrumb-item active" id="PAGE_NAME1" aria-current="page">単価マスタ（詳細）</li>
                     </ol>
                 </nav>
@@ -86,7 +85,7 @@
                                     <asp:Label ID="WF_STYMD_L" runat="server" Text="有効開始日" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <b class="calendararea">
                                         <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                            <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS" data-input>
+                                            <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
                                             <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
                                                 <span class="material-symbols-outlined">calendar_month</span>
                                             </span>
@@ -119,7 +118,7 @@
                             <p id="TYPE_C_LINE_2">
                                 <!-- 部門コード -->
                                 <span>
-                                    <asp:Label ID="Label1" runat="server" Text="担当部門名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:Label ID="WF_ORG_L" runat="server" Text="担当部門名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
                                     <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ORGChange');" />
                                     <asp:TextBox ID="WF_ORGCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
                                 </span>
@@ -267,6 +266,34 @@
                                     <asp:TextBox ID="TxtBRANCHCODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                                 </span>
                             </p>
+                            <p id="TYPE_U_LINE_1">
+                                <!-- 勘定科目コード -->
+                                <span>
+                                    <asp:Label ID="WF_ACCOUNT_L" runat="server" Text="勘定科目名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_ACCOUNT" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ACCOUNTChange');" />
+                                    <asp:TextBox ID="WF_ACCOUNTCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_U_LINE_2">
+                                <!-- セグメントコード -->
+                                <span>
+                                    <asp:Label ID="WF_SEGMENT_L" runat="server" Text="セグメント名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_SEGMENT" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SEGMENTChange');" />
+                                    <asp:TextBox ID="WF_SEGMENTCODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_V_LINE_1">
+                                <span>
+                                    <!-- 割合JOT -->
+                                    <asp:Label ID="WF_JOTPERCENTAGE_L" runat="server" Text="割合JOT" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtJOTPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_JOTPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 割合ENEX -->
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_L" runat="server" Text="割合ENEX" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtENEXPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
                             <p id="TYPE_T_LINE_1">
                                 <span>
                                     <!-- 備考1 -->
@@ -377,6 +404,8 @@
         <input id="WF_SYAGATA_SAVE" runat="server" value="" type="text" />
         <input id="WF_SYABARA_SAVE" runat="server" value="" type="text" />
 
+        <!-- 縦スクロール位置 -->
+        <input id="WF_scrollY" runat="server" value="0" type="text" />
     </div>
  
 </asp:Content>

@@ -420,6 +420,50 @@ p {
     width: 565px;
 }
 
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(2) {
+    display: inline-block;
+    width: 565px;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(1) {
+    display: inline-block;
+    width: 10.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(2) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(3) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(4) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(5) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
 .WF_RADIO {
     display: inline-block;
 }
@@ -450,11 +494,11 @@ p {
         border-color: #ED7D31;
     }
 
-#TxtSYABARA, #TxtKOTEIHIM, #TxtKOTEIHID, #TxtKAISU, #TxtGENGAKU, #TxtAMOUNT {
+#TxtSYABARA, #TxtKOTEIHIM, #TxtKOTEIHID, #TxtKAISU, #TxtGENGAKU, #TxtAMOUNT, #TxtJOTPERCENTAGE, #TxtENEXPERCENTAGE {
     text-align: right !important;
 }
 
-#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT,#TxtKAISU, #TxtGENGAKU, #TxtAMOUNT {
+#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT, #TxtKAISU, #TxtGENGAKU, #TxtAMOUNT, #WF_ACCOUNTCODE_TEXT, #WF_SEGMENTCODE_TEXT {
     background-color: #F2F2F2;
 }
 
@@ -471,4 +515,16 @@ p {
 
 #WF_ButtonCANCEL {
     margin-left: 100px !important;
+}
+
+#WF_JOTPERCENTAGE_L::after, #WF_ENEXPERCENTAGE_L::after {
+    content: "";
+    background-image: url(../img/help.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-left: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
 }

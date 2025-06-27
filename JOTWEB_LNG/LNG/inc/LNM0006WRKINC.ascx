@@ -41,6 +41,12 @@
     <asp:TextBox ID="WF_SEL_TANKAKBN" runat="server"></asp:TextBox>                <!-- 単価区分 -->
     <asp:TextBox ID="WF_SEL_MEMO" runat="server"></asp:TextBox>                    <!-- 単価用途 -->
     <asp:TextBox ID="WF_SEL_TANKA" runat="server"></asp:TextBox>                   <!-- 単価 -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTCODE" runat="server"></asp:TextBox>             <!-- 勘定科目コード -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTNAME" runat="server"></asp:TextBox>             <!-- 勘定科目名 -->
+    <asp:TextBox ID="WF_SEL_SEGMENTCODE" runat="server"></asp:TextBox>             <!-- セグメントコード -->
+    <asp:TextBox ID="WF_SEL_SEGMENTNAME" runat="server"></asp:TextBox>             <!-- セグメント名 -->
+    <asp:TextBox ID="WF_SEL_JOTPERCENTAGE" runat="server"></asp:TextBox>           <!-- 割合JOT -->
+    <asp:TextBox ID="WF_SEL_ENEXPERCENTAGE" runat="server"></asp:TextBox>          <!-- 割合ENEX -->
     <asp:TextBox ID="WF_SEL_CALCKBN" runat="server"></asp:TextBox>                 <!-- 計算区分 -->
     <asp:TextBox ID="WF_SEL_ROUNDTRIP" runat="server"></asp:TextBox>               <!-- 往復距離 -->
     <asp:TextBox ID="WF_SEL_TOLLFEE" runat="server"></asp:TextBox>                 <!-- 通行料 -->

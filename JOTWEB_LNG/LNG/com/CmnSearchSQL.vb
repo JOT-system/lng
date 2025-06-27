@@ -464,7 +464,7 @@ Public Class CmnSearchSQL
 
         '-- 届先取得
         SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     TODOKECODE AS KEYCODE")
+        SQLBldr.AppendLine("     CONCAT(TODOKECODE,TODOKENAME) AS KEYCODE")
         SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS TODOKECODE")
         SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS TODOKENAME")
         SQLBldr.AppendLine(" FROM")

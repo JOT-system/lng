@@ -554,6 +554,114 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents TxtFROMORGNAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
+    '''WF_ACCOUNT_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNT_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ACCOUNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNT As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_ACCOUNTCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ACCOUNTCODE_TEXT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_SEGMENT_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEGMENT_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_SEGMENT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEGMENT As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
+    '''WF_SEGMENTCODE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SEGMENTCODE_TEXT As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_JOTPERCENTAGE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_JOTPERCENTAGE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtJOTPERCENTAGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtJOTPERCENTAGE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_JOTPERCENTAGE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_JOTPERCENTAGE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_ENEXPERCENTAGE_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ENEXPERCENTAGE_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtENEXPERCENTAGE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtENEXPERCENTAGE As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
+    '''WF_ENEXPERCENTAGE_TEXT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_ENEXPERCENTAGE_TEXT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
     '''WF_DEPARTURE_L コントロール。
     '''</summary>
     '''<remarks>
@@ -1020,6 +1128,15 @@ Partial Public Class LNM0014SprateDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DETAILNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_scrollY コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_scrollY As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。

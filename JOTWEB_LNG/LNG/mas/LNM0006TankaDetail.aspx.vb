@@ -110,8 +110,43 @@ Public Class LNM0006TankaDetail
                             Else
                                 WF_AVOCADOTODOKECODE_TEXT.Text = ""
                             End If
+                        Case "WF_SelectCALENDARChange" 'カレンダーチェンジ
+                            WF_ACCOUNTCODE_TEXT.Text = ""
+                            WF_SEGMENTCODE_TEXT.Text = ""
+                            '勘定科目
+                            Me.WF_ACCOUNT.Items.Clear()
+                            Me.WF_ACCOUNT.Items.Add("")
+                            Dim retAccountList As New DropDownList
+                            retAccountList = LNM0006WRKINC.getDowpDownAccountList(WF_StYMD.Value)
+                            For index As Integer = 0 To retAccountList.Items.Count - 1
+                                WF_ACCOUNT.Items.Add(New ListItem(retAccountList.Items(index).Text, retAccountList.Items(index).Value))
+                            Next
 
+                            'セグメント
+                            Me.WF_SEGMENT.Items.Clear()
+                        Case "WF_ACCOUNTChange" '勘定科目チェンジ
+                            WF_ACCOUNTCODE_TEXT.Text = WF_ACCOUNT.SelectedValue
 
+                            'セグメント
+                            Me.WF_SEGMENT.Items.Clear()
+                            WF_SEGMENTCODE_TEXT.Text = ""
+                            Dim retSegmentList As New DropDownList
+                            retSegmentList = LNM0006WRKINC.getDowpDownSegmentList(WF_StYMD.Value, WF_ACCOUNT.SelectedValue)
+
+                            If retSegmentList.Items.Count > 1 Then
+                                Me.WF_SEGMENT.Items.Add("")
+                            End If
+
+                            For index As Integer = 0 To retSegmentList.Items.Count - 1
+                                WF_SEGMENT.Items.Add(New ListItem(retSegmentList.Items(index).Text, retSegmentList.Items(index).Value))
+                            Next
+
+                            If WF_SEGMENT.Items.Count = 1 Then
+                                WF_SEGMENTCODE_TEXT.Text = WF_SEGMENT.SelectedValue
+                            End If
+
+                        Case "WF_SEGMENTChange" 'セグメントチェンジ
+                            WF_SEGMENTCODE_TEXT.Text = WF_SEGMENT.SelectedValue
                     End Select
                 End If
             Else
@@ -281,6 +316,28 @@ Public Class LNM0006TankaDetail
         WF_AVOCADOTODOKE_DL.InnerHtml = WF_AVOCADOTODOKE_OPTIONS
         Me.WF_AVOCADOTODOKENAME.Attributes("list") = Me.WF_AVOCADOTODOKE_DL.ClientID
 
+        '勘定科目
+        Me.WF_ACCOUNT.Items.Clear()
+        Me.WF_ACCOUNT.Items.Add("")
+        Dim retAccountList As New DropDownList
+        retAccountList = LNM0006WRKINC.getDowpDownAccountList(work.WF_SEL_STYMD.Text)
+        For index As Integer = 0 To retAccountList.Items.Count - 1
+            WF_ACCOUNT.Items.Add(New ListItem(retAccountList.Items(index).Text, retAccountList.Items(index).Value))
+        Next
+
+        'セグメント
+        Me.WF_SEGMENT.Items.Clear()
+        Dim retSegmentList As New DropDownList
+        retSegmentList = LNM0006WRKINC.getDowpDownSegmentList(work.WF_SEL_STYMD.Text, work.WF_SEL_ACCOUNTCODE.Text)
+
+        If retSegmentList.Items.Count > 1 Then
+            Me.WF_SEGMENT.Items.Add("")
+        End If
+
+        For index As Integer = 0 To retSegmentList.Items.Count - 1
+            WF_SEGMENT.Items.Add(New ListItem(retSegmentList.Items(index).Text, retSegmentList.Items(index).Value))
+        Next
+
         '計算区分ドロップダウンのクリア
         Me.ddlSelectCALCKBN.Items.Clear()
         Me.ddlSelectCALCKBN.Items.Add("")
@@ -375,6 +432,16 @@ Public Class LNM0006TankaDetail
         TxtMEMO.Text = work.WF_SEL_MEMO.Text
         '単価
         TxtTANKA.Text = work.WF_SEL_TANKA.Text
+        '勘定科目
+        WF_ACCOUNT.SelectedValue = work.WF_SEL_ACCOUNTCODE.Text
+        WF_ACCOUNTCODE_TEXT.Text = work.WF_SEL_ACCOUNTCODE.Text
+        'セグメント
+        WF_SEGMENT.SelectedValue = work.WF_SEL_SEGMENTCODE.Text
+        WF_SEGMENTCODE_TEXT.Text = work.WF_SEL_SEGMENTCODE.Text
+        '割合JOT
+        TxtJOTPERCENTAGE.Text = work.WF_SEL_JOTPERCENTAGE.Text
+        '割合ENEX
+        TxtENEXPERCENTAGE.Text = work.WF_SEL_ENEXPERCENTAGE.Text
 
         '計算区分(KEYは固定値マスタのCALCKBNに合わせる)
         Select Case work.WF_SEL_CALCKBN.Text
@@ -442,6 +509,8 @@ Public Class LNM0006TankaDetail
         Me.TxtROUNDTRIP.Attributes("onkeyPress") = "CheckDeci()"             '往復距離
         Me.TxtTOLLFEE.Attributes("onkeyPress") = "CheckDeci()"             '通行料
         Me.TxtSYABARA.Attributes("onkeyPress") = "CheckDeci()"             '車腹
+        Me.TxtJOTPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"       '割合JOT
+        Me.TxtENEXPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"      '割合ENEX
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -484,6 +553,12 @@ Public Class LNM0006TankaDetail
         SQLStr.AppendLine("       , TANKAKBN                            ")
         SQLStr.AppendLine("       , MEMO                                ")
         SQLStr.AppendLine("       , TANKA                               ")
+        SQLStr.AppendLine("       , ACCOUNTCODE                         ")
+        SQLStr.AppendLine("       , ACCOUNTNAME                         ")
+        SQLStr.AppendLine("       , SEGMENTCODE                         ")
+        SQLStr.AppendLine("       , SEGMENTNAME                         ")
+        SQLStr.AppendLine("       , JOTPERCENTAGE                       ")
+        SQLStr.AppendLine("       , ENEXPERCENTAGE                      ")
         SQLStr.AppendLine("       , CALCKBN                             ")
         SQLStr.AppendLine("       , ROUNDTRIP                           ")
         SQLStr.AppendLine("       , TOLLFEE                             ")
@@ -524,6 +599,12 @@ Public Class LNM0006TankaDetail
         SQLStr.AppendLine("       , @TANKAKBN                           ")
         SQLStr.AppendLine("       , @MEMO                               ")
         SQLStr.AppendLine("       , @TANKA                              ")
+        SQLStr.AppendLine("       , @ACCOUNTCODE                        ")
+        SQLStr.AppendLine("       , @ACCOUNTNAME                        ")
+        SQLStr.AppendLine("       , @SEGMENTCODE                        ")
+        SQLStr.AppendLine("       , @SEGMENTNAME                        ")
+        SQLStr.AppendLine("       , @JOTPERCENTAGE                      ")
+        SQLStr.AppendLine("       , @ENEXPERCENTAGE                     ")
         SQLStr.AppendLine("       , @CALCKBN                            ")
         SQLStr.AppendLine("       , @ROUNDTRIP                          ")
         SQLStr.AppendLine("       , @TOLLFEE                            ")
@@ -563,6 +644,12 @@ Public Class LNM0006TankaDetail
         SQLStr.AppendLine("       , TANKAKBN     = @TANKAKBN                            ")
         SQLStr.AppendLine("       , MEMO     = @MEMO                            ")
         SQLStr.AppendLine("       , TANKA     = @TANKA                            ")
+        SQLStr.AppendLine("       , ACCOUNTCODE =  @ACCOUNTCODE")
+        SQLStr.AppendLine("       , ACCOUNTNAME =  @ACCOUNTNAME")
+        SQLStr.AppendLine("       , SEGMENTCODE =  @SEGMENTCODE")
+        SQLStr.AppendLine("       , SEGMENTNAME =  @SEGMENTNAME")
+        SQLStr.AppendLine("       , JOTPERCENTAGE =  @JOTPERCENTAGE")
+        SQLStr.AppendLine("       , ENEXPERCENTAGE =  @ENEXPERCENTAGE")
         SQLStr.AppendLine("       , CALCKBN     = @CALCKBN                            ")
         SQLStr.AppendLine("       , ROUNDTRIP     = @ROUNDTRIP                            ")
         SQLStr.AppendLine("       , TOLLFEE     = @TOLLFEE                            ")
@@ -604,6 +691,12 @@ Public Class LNM0006TankaDetail
         SQLJnl.AppendLine("   , TANKAKBN                              ")
         SQLJnl.AppendLine("   , MEMO                              ")
         SQLJnl.AppendLine("   , TANKA                              ")
+        SQLJnl.AppendLine("   , ACCOUNTCODE                         ")
+        SQLJnl.AppendLine("   , ACCOUNTNAME                         ")
+        SQLJnl.AppendLine("   , SEGMENTCODE                         ")
+        SQLJnl.AppendLine("   , SEGMENTNAME                         ")
+        SQLJnl.AppendLine("   , JOTPERCENTAGE                       ")
+        SQLJnl.AppendLine("   , ENEXPERCENTAGE                      ")
         SQLJnl.AppendLine("   , CALCKBN                              ")
         SQLJnl.AppendLine("   , ROUNDTRIP                              ")
         SQLJnl.AppendLine("   , TOLLFEE                              ")
@@ -663,6 +756,12 @@ Public Class LNM0006TankaDetail
                 Dim P_TANKAKBN As MySqlParameter = SQLcmd.Parameters.Add("@TANKAKBN", MySqlDbType.VarChar, 1)     '単価区分
                 Dim P_MEMO As MySqlParameter = SQLcmd.Parameters.Add("@MEMO", MySqlDbType.VarChar, 50)     '単価用途
                 Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal)         '単価
+                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)     '勘定科目コード
+                Dim P_ACCOUNTNAME As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTNAME", MySqlDbType.VarChar, 100)     '勘定科目名
+                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)     'セグメントコード
+                Dim P_SEGMENTNAME As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTNAME", MySqlDbType.VarChar, 100)     'セグメント名
+                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合JOT
+                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_CALCKBN As MySqlParameter = SQLcmd.Parameters.Add("@CALCKBN", MySqlDbType.VarChar, 2)     '計算区分
                 Dim P_ROUNDTRIP As MySqlParameter = SQLcmd.Parameters.Add("@ROUNDTRIP", MySqlDbType.Decimal, 5, 3)    '往復距離
                 Dim P_TOLLFEE As MySqlParameter = SQLcmd.Parameters.Add("@TOLLFEE", MySqlDbType.Decimal, 8, 3)        '通行料
@@ -735,6 +834,38 @@ Public Class LNM0006TankaDetail
                     P_TANKA.Value = "0"
                 Else
                     P_TANKA.Value = LNM0006row("TANKA")
+                End If
+
+                '勘定科目コード
+                If LNM0006row("ACCOUNTCODE").ToString = "" Then
+                    P_ACCOUNTCODE.Value = DBNull.Value
+                Else
+                    P_ACCOUNTCODE.Value = LNM0006row("ACCOUNTCODE")
+                End If
+
+                P_ACCOUNTNAME.Value = LNM0006row("ACCOUNTNAME")           '勘定科目名
+
+                'セグメントコード
+                If LNM0006row("SEGMENTCODE").ToString = "" Then
+                    P_SEGMENTCODE.Value = DBNull.Value
+                Else
+                    P_SEGMENTCODE.Value = LNM0006row("SEGMENTCODE")
+                End If
+
+                P_SEGMENTNAME.Value = LNM0006row("SEGMENTNAME")           'セグメント名
+
+                '割合JOT
+                If LNM0006row("JOTPERCENTAGE").ToString = "" Then
+                    P_JOTPERCENTAGE.Value = DBNull.Value
+                Else
+                    P_JOTPERCENTAGE.Value = LNM0006row("JOTPERCENTAGE")
+                End If
+
+                '割合ENEX
+                If LNM0006row("ENEXPERCENTAGE").ToString = "" Then
+                    P_ENEXPERCENTAGE.Value = DBNull.Value
+                Else
+                    P_ENEXPERCENTAGE.Value = LNM0006row("ENEXPERCENTAGE")
                 End If
 
                 '計算区分
@@ -971,6 +1102,12 @@ Public Class LNM0006TankaDetail
         SQLStr.AppendLine("     ,TANKAKBN  ")
         SQLStr.AppendLine("     ,MEMO  ")
         SQLStr.AppendLine("     ,TANKA  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,ACCOUNTNAME  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTNAME  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,CALCKBN  ")
         SQLStr.AppendLine("     ,ROUNDTRIP  ")
         SQLStr.AppendLine("     ,TOLLFEE  ")
@@ -1013,6 +1150,12 @@ Public Class LNM0006TankaDetail
         SQLStr.AppendLine("     ,TANKAKBN  ")
         SQLStr.AppendLine("     ,MEMO  ")
         SQLStr.AppendLine("     ,TANKA  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,ACCOUNTNAME  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTNAME  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,CALCKBN  ")
         SQLStr.AppendLine("     ,ROUNDTRIP  ")
         SQLStr.AppendLine("     ,TOLLFEE  ")
@@ -1411,6 +1554,21 @@ Public Class LNM0006TankaDetail
         LNM0006INProw("TANKAKBN") = RadioTANKAKBN.SelectedValue          '単価区分
         LNM0006INProw("MEMO") = TxtMEMO.Text            '単価用途
         LNM0006INProw("TANKA") = TxtTANKA.Text            '単価
+
+        LNM0006INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue           '勘定科目コード
+        LNM0006INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem            '勘定科目名
+
+        If Not WF_ACCOUNT.SelectedValue = "" Then
+            LNM0006INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue           'セグメントコード
+            LNM0006INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem            'セグメント名
+        Else
+            LNM0006INProw("SEGMENTCODE") = ""           'セグメントコード
+            LNM0006INProw("SEGMENTNAME") = ""            'セグメント名
+        End If
+
+        LNM0006INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text            '割合JOT
+        LNM0006INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text            '割合ENEX
+
         LNM0006INProw("CALCKBN") = ddlSelectCALCKBN.SelectedValue            '計算区分
         LNM0006INProw("ROUNDTRIP") = TxtROUNDTRIP.Text            '往復距離
         LNM0006INProw("TOLLFEE") = TxtTOLLFEE.Text            '通行料
@@ -1466,6 +1624,12 @@ Public Class LNM0006TankaDetail
                     LNM0006row("TANKAKBN") = LNM0006INProw("TANKAKBN") AndAlso                                '単価区分
                     LNM0006row("MEMO") = LNM0006INProw("MEMO") AndAlso                                '単価用途
                     LNM0006row("TANKA") = LNM0006INProw("TANKA") AndAlso                                '単価
+                    LNM0006row("ACCOUNTCODE") = LNM0006INProw("ACCOUNTCODE") AndAlso                                '勘定科目コード
+                    LNM0006row("ACCOUNTNAME") = LNM0006INProw("ACCOUNTNAME") AndAlso                                '勘定科目名
+                    LNM0006row("SEGMENTCODE") = LNM0006INProw("SEGMENTCODE") AndAlso                                'セグメントコード
+                    LNM0006row("SEGMENTNAME") = LNM0006INProw("SEGMENTNAME") AndAlso                                'セグメント名
+                    LNM0006row("JOTPERCENTAGE") = LNM0006INProw("JOTPERCENTAGE") AndAlso                                '割合JOT
+                    LNM0006row("ENEXPERCENTAGE") = LNM0006INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                     LNM0006row("CALCKBN") = LNM0006INProw("CALCKBN") AndAlso                                '計算区分
                     LNM0006row("ROUNDTRIP") = LNM0006INProw("ROUNDTRIP") AndAlso                                '往復距離
                     LNM0006row("TOLLFEE") = LNM0006INProw("TOLLFEE") AndAlso                                '通行料
@@ -1570,6 +1734,8 @@ Public Class LNM0006TankaDetail
         TxtBRANCHCODE.Text = ""                    '枝番
         TxtMEMO.Text = ""                    '単価用途
         TxtTANKA.Text = ""                    '単価
+        TxtJOTPERCENTAGE.Text = ""                    '割合JOT
+        TxtENEXPERCENTAGE.Text = ""                    '割合ENEX
         TxtROUNDTRIP.Text = ""                    '往復距離
         TxtTOLLFEE.Text = ""                    '通行料
         TxtSYABARA.Text = ""                    '車腹
@@ -2151,6 +2317,60 @@ Public Class LNM0006TankaDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
+            ' 勘定科目コード(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", LNM0006INProw("ACCOUNTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・勘定科目コードエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 勘定科目名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ACCOUNTNAME", LNM0006INProw("ACCOUNTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・勘定科目名エラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' セグメントコード(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "SEGMENTCODE", LNM0006INProw("SEGMENTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・セグメントコードエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' セグメント名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "SEGMENTNAME", LNM0006INProw("SEGMENTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・セグメント名エラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 割合JOT(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "JOTPERCENTAGE", LNM0006INProw("JOTPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・割合JOTエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+            ' 割合ENEX(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "ENEXPERCENTAGE", LNM0006INProw("ENEXPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            If Not isNormal(WW_CS0024FCheckerr) Then
+                WW_CheckMES1 = "・割合ENEXエラーです。"
+                WW_CheckMES2 = WW_CS0024FCheckReport
+                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
             ' 計算区分(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "CALCKBN", LNM0006INProw("CALCKBN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2245,6 +2465,36 @@ Public Class LNM0006TankaDetail
                         WW_LineErr = "ERR"
                         O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                     End If
+                End If
+            End If
+
+            '割合JOT、割合ENEX合計値チェック
+            If Not String.IsNullOrEmpty(LNM0006INProw("JOTPERCENTAGE")) Or
+                    Not String.IsNullOrEmpty(LNM0006INProw("ENEXPERCENTAGE")) Then
+                Dim WW_Decimal As Decimal
+                Dim WW_JOTPERCENTAGE As Double
+                Dim WW_ENEXPERCENTAGE As Double
+                Dim WW_TOTALPERCENTAGE As Double
+
+                If Decimal.TryParse(LNM0006INProw("JOTPERCENTAGE").ToString, WW_Decimal) Then
+                    WW_JOTPERCENTAGE = WW_Decimal
+                Else
+                    WW_JOTPERCENTAGE = 0
+                End If
+                If Decimal.TryParse(LNM0006INProw("ENEXPERCENTAGE").ToString, WW_Decimal) Then
+                    WW_ENEXPERCENTAGE = WW_Decimal
+                Else
+                    WW_ENEXPERCENTAGE = 0
+                End If
+
+                WW_TOTALPERCENTAGE = WW_JOTPERCENTAGE + WW_ENEXPERCENTAGE
+
+                If WW_TOTALPERCENTAGE > 100.0 Then
+                    WW_CheckMES1 = "・割合JOT＆割合ENEXエラーです。"
+                    WW_CheckMES2 = "割合合計エラー"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
                 End If
             End If
 
@@ -2384,6 +2634,12 @@ Public Class LNM0006TankaDetail
                         LNM0006row("TANKAKBN") = LNM0006INProw("TANKAKBN") AndAlso                                '単価区分
                         LNM0006row("MEMO") = LNM0006INProw("MEMO") AndAlso                                '単価用途
                         LNM0006row("TANKA") = LNM0006INProw("TANKA") AndAlso                                '単価
+                        LNM0006row("ACCOUNTCODE") = LNM0006INProw("ACCOUNTCODE") AndAlso                                '勘定科目コード
+                        LNM0006row("ACCOUNTNAME") = LNM0006INProw("ACCOUNTNAME") AndAlso                                '勘定科目名
+                        LNM0006row("SEGMENTCODE") = LNM0006INProw("SEGMENTCODE") AndAlso                                'セグメントコード
+                        LNM0006row("SEGMENTNAME") = LNM0006INProw("SEGMENTNAME") AndAlso                                'セグメント名
+                        LNM0006row("JOTPERCENTAGE") = LNM0006INProw("JOTPERCENTAGE") AndAlso                                '割合JOT
+                        LNM0006row("ENEXPERCENTAGE") = LNM0006INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                         LNM0006row("CALCKBN") = LNM0006INProw("CALCKBN") AndAlso                                '計算区分
                         LNM0006row("ROUNDTRIP") = LNM0006INProw("ROUNDTRIP") AndAlso                                '往復距離
                         LNM0006row("TOLLFEE") = LNM0006INProw("TOLLFEE") AndAlso                                '通行料

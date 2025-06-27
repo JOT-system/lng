@@ -65,7 +65,7 @@ Public Class LNM0006TankaHistory
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNM0006WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND", "LNM0006L", "LNM0006S"  '戻るボタン押下（LNS0001L、LNS0001Sは、パンくずより）
+                        Case "WF_ButtonEND", "LNM0006L"  '戻るボタン押下（LNS0001Lは、パンくずより）
                             WF_ButtonEND_Click()
                         Case "WF_ButtonFIRST"           '先頭頁ボタン押下
                             WF_ButtonFIRST_Click()
@@ -283,6 +283,12 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(TANKAKBN), '')                                    AS TANKAKBN            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(MEMO), '')                                        AS MEMO                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TANKA), '')                                       AS TANKA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ACCOUNTCODE), '')                                 AS ACCOUNTCODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ACCOUNTNAME), '')                                 AS ACCOUNTNAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEGMENTCODE), '')                                 AS SEGMENTCODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SEGMENTNAME), '')                                 AS SEGMENTNAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(JOTPERCENTAGE), '')                               AS JOTPERCENTAGE       ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(ENEXPERCENTAGE), '')                              AS ENEXPERCENTAGE      ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(CALCKBN), '')                                     AS CALCKBN             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(ROUNDTRIP), '')                                   AS ROUNDTRIP           ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TOLLFEE), '')                                     AS TOLLFEE             ")
@@ -301,6 +307,10 @@ Public Class LNM0006TankaHistory
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                  ")
         SQLStr.AppendLine("      ELSE  FORMAT(TANKA,0)                                                                         ")
         SQLStr.AppendLine("     END AS SCRTANKA                                                                                ")
+        '割合JOT
+        SQLStr.AppendLine("   , ''                                                                       AS SCRJOTPERCENTAGE   ")
+        '割合ENEX
+        SQLStr.AppendLine("   , ''                                                                       AS SCRENEXPERCENTAGE  ")
         '往復距離
         SQLStr.AppendLine("   , CASE                                                                                           ")
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(ROUNDTRIP), '') = '' THEN ''                                              ")
@@ -398,6 +408,18 @@ Public Class LNM0006TankaHistory
                         Case "0" : LNM0006row("SCRTANKAKBN") = "通常単価"
                         Case "1" : LNM0006row("SCRTANKAKBN") = "調整単価"
                         Case Else : LNM0006row("SCRTANKAKBN") = ""
+                    End Select
+
+                    '割合JOT
+                    Select Case LNM0006row("JOTPERCENTAGE").ToString
+                        Case "" : LNM0006row("SCRJOTPERCENTAGE") = ""
+                        Case Else : LNM0006row("SCRJOTPERCENTAGE") = LNM0006row("JOTPERCENTAGE").ToString & "%"
+                    End Select
+
+                    '割合ENEX
+                    Select Case LNM0006row("ENEXPERCENTAGE").ToString
+                        Case "" : LNM0006row("SCRENEXPERCENTAGE") = ""
+                        Case Else : LNM0006row("SCRENEXPERCENTAGE") = LNM0006row("ENEXPERCENTAGE").ToString & "%"
                     End Select
 
                 Next
@@ -937,6 +959,12 @@ Public Class LNM0006TankaHistory
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKAKBN).Value = "単価区分"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.MEMO).Value = "単価用途"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = "単価"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = "勘定科目コード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = "勘定科目名"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = "セグメントコード"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = "セグメント名"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = "割合JOT"
+        sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = "割合ENEX"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.CALCKBN).Value = "計算区分"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Value = "往復距離"
         sheet.Cells(WW_HEADERROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Value = "通行料"
@@ -1006,6 +1034,25 @@ Public Class LNM0006TankaHistory
                 sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TANKA).Value = CDbl(Row("TANKA"))
             End If
 
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = Row("ACCOUNTCODE") '勘定科目コード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = Row("ACCOUNTNAME") '勘定科目名
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = Row("SEGMENTCODE") 'セグメントコード
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = Row("SEGMENTNAME") 'セグメント名
+
+            '割合JOT
+            If Row("JOTPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = Row("JOTPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = CDbl(Row("JOTPERCENTAGE"))
+            End If
+
+            '割合ENEX
+            If Row("ENEXPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = Row("ENEXPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = CDbl(Row("ENEXPERCENTAGE"))
+            End If
+
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.CALCKBN).Value = Row("CALCKBN") '計算区分
 
             '往復距離
@@ -1042,6 +1089,8 @@ Public Class LNM0006TankaHistory
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ROUNDTRIP).Style = DecStyle
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.TOLLFEE).Style = DecStyle
             sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.SYABARA).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Style = DecStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0006WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Style = DecStyle
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0006WRKINC.MODIFYKBN.AFTDATA Then

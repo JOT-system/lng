@@ -318,7 +318,13 @@ Public Class LNT0001InvoiceOutputTNG
 
                     '◯鏡の設定
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("C" & Convert.ToString(PrintKagamiRowIdx)).Value = Convert.ToString(KaisuuRowData("SYABANNAME")) & "（固定費）"
-                    Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(PrintKagamiRowIdx)).Formula = "='電力融通（JOT入力）'!G" & Convert.ToString(PrintYuuduuRowIdx)
+                    If Not String.IsNullOrEmpty(Convert.ToString(KaisuuRowData("YUUDUU"))) Then
+                        '2025/06/25現在、東北の場合
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(PrintKagamiRowIdx)).Formula = "='電力融通（JOT入力）'!G" & Convert.ToString(PrintYuuduuRowIdx)
+                    Else
+                        '2025/06/25現在、新潟の場合
+                        Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("D" & Convert.ToString(PrintKagamiRowIdx)).Value = KaisuuRowData("KOTEIHIM")
+                    End If
                     Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Rows(PrintKagamiRowIdx - 1).Hidden = False
                     If Not String.IsNullOrEmpty(Convert.ToString(KaisuuRowData("YUUDUU"))) Then
                         Me.WW_Workbook.Worksheets(Me.WW_SheetNoInv).Range("K" & Convert.ToString(PrintKagamiRowIdx)).Value = "EX東北/固定費"
@@ -327,6 +333,7 @@ Public Class LNT0001InvoiceOutputTNG
 
                     '◯電力融通の設定
                     If Not String.IsNullOrEmpty(Convert.ToString(KaisuuRowData("YUUDUU"))) Then
+                        '2025/06/25現在、東北の場合のみ
                         Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("B" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("SYABANNAME")
                         Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("C" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("KOTEIHIM")
                         Me.WW_Workbook.Worksheets(Me.WW_SheetNoYuu).Range("D" & Convert.ToString(PrintYuuduuRowIdx)).Value = KaisuuRowData("KOTEIHID")
