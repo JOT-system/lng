@@ -1591,8 +1591,10 @@ Public Class LNT0001ZissekiIntake
                 & "     , KIKOTIME						            " _
                 & "     , CREWBIKOU1						        " _
                 & "     , CREWBIKOU2						        " _
+                & "     , CREWSEQ						            " _
                 & "     , SUBCREWBIKOU1						        " _
                 & "     , SUBCREWBIKOU2						        " _
+                & "     , SUBCREWSEQ						        " _
                 & "     , SUBSHUKKINTIME						    " _
                 & "     , CALENDERMEMO11						    " _
                 & "     , CALENDERMEMO12						    " _
@@ -1670,6 +1672,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , JXORDFILE						            " _
                 & "     , JXORDROUTE						        " _
                 & "     , JXORDTODOKENAME						    " _
+                & "     , NIPPONO						            " _
                 & "     , BRANCHCODE						        " _
                 & "     , UPDATEUSER						        " _
                 & "     , CREATEUSER						        " _
@@ -1808,8 +1811,10 @@ Public Class LNT0001ZissekiIntake
                 & "     , @KIKOTIME						            " _
                 & "     , @CREWBIKOU1						        " _
                 & "     , @CREWBIKOU2						        " _
+                & "     , @CREWSEQ						            " _
                 & "     , @SUBCREWBIKOU1						    " _
                 & "     , @SUBCREWBIKOU2						    " _
+                & "     , @SUBCREWSEQ						        " _
                 & "     , @SUBSHUKKINTIME						    " _
                 & "     , @CALENDERMEMO11						    " _
                 & "     , @CALENDERMEMO12						    " _
@@ -1887,6 +1892,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @JXORDFILE						        " _
                 & "     , @JXORDROUTE						        " _
                 & "     , @JXORDTODOKENAME					        " _
+                & "     , @NIPPONO					                " _
                 & "     , @BRANCHCODE						        " _
                 & "     , @UPDATEUSER						        " _
                 & "     , @CREATEUSER						        " _
@@ -2025,8 +2031,10 @@ Public Class LNT0001ZissekiIntake
                 & "     , KIKOTIME = @KIKOTIME						" _
                 & "     , CREWBIKOU1 = @CREWBIKOU1					" _
                 & "     , CREWBIKOU2 = @CREWBIKOU2					" _
+                & "     , CREWSEQ = @CREWSEQ					    " _
                 & "     , SUBCREWBIKOU1 = @SUBCREWBIKOU1			" _
                 & "     , SUBCREWBIKOU2 = @SUBCREWBIKOU2			" _
+                & "     , SUBCREWSEQ = @SUBCREWSEQ					" _
                 & "     , SUBSHUKKINTIME = @SUBSHUKKINTIME			" _
                 & "     , CALENDERMEMO11 = @CALENDERMEMO11			" _
                 & "     , CALENDERMEMO12 = @CALENDERMEMO12			" _
@@ -2104,6 +2112,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , JXORDFILE = @JXORDFILE				    " _
                 & "     , JXORDROUTE = @JXORDROUTE				    " _
                 & "     , JXORDTODOKENAME = @JXORDTODOKENAME	    " _
+                & "     , NIPPONO = @NIPPONO	                    " _
                 & "     , BRANCHCODE = CASE WHEN BRANCHCODE <> '1' THEN BRANCHCODE ELSE @BRANCHCODE END    " _
                 & "     , UPDATEUSER = @UPDATEUSER					" _
                 & "     , CREATEUSER = @CREATEUSER					" _
@@ -2241,8 +2250,10 @@ Public Class LNT0001ZissekiIntake
                         Dim KIKOTIME As MySqlParameter = SQLcmd.Parameters.Add("@KIKOTIME", MySqlDbType.VarChar)   '帰庫時間
                         Dim CREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU1", MySqlDbType.VarChar)    '乗務員備考1
                         Dim CREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU2", MySqlDbType.VarChar)    '乗務員備考2
+                        Dim CREWSEQ As MySqlParameter = SQLcmd.Parameters.Add("@CREWSEQ", MySqlDbType.VarChar)    '表示順_乗務員
                         Dim SUBCREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU1", MySqlDbType.VarChar)  '副乗務員備考1
                         Dim SUBCREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU2", MySqlDbType.VarChar)  '副乗務員備考2
+                        Dim SUBCREWSEQ As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWSEQ", MySqlDbType.VarChar)    '表示順_副乗務員
                         Dim SUBSHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSHUKKINTIME", MySqlDbType.VarChar)   '出勤時間_副乗務員
                         Dim CALENDERMEMO11 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO11", MySqlDbType.VarChar)    '乗務員選択_カレンダー画面メモ
                         Dim CALENDERMEMO12 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO12", MySqlDbType.VarChar)    '社員番号_カレンダー画面メモ
@@ -2320,6 +2331,7 @@ Public Class LNT0001ZissekiIntake
                         Dim JXORDFILE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDROUTE", MySqlDbType.VarChar)    'JX形式オーダーファイル名
                         Dim JXORDROUTE As MySqlParameter = SQLcmd.Parameters.Add("@JXORDFILE", MySqlDbType.VarChar)    'JX形式オーダールート番号
                         Dim JXORDTODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@JXORDTODOKENAME", MySqlDbType.VarChar)    'JX形式オーダー先頭届先名称
+                        Dim NIPPONO As MySqlParameter = SQLcmd.Parameters.Add("@NIPPONO", MySqlDbType.VarChar)    '運転日報番号
                         Dim BRANCHCODE As MySqlParameter = SQLcmd.Parameters.Add("@BRANCHCODE", MySqlDbType.VarChar)    '枝番
                         Dim UPDATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDATEUSER", MySqlDbType.VarChar)    '更新者
                         Dim CREATEUSER As MySqlParameter = SQLcmd.Parameters.Add("@CREATEUSER", MySqlDbType.VarChar)    '作成者
@@ -2522,8 +2534,10 @@ Public Class LNT0001ZissekiIntake
                             KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
                             CREWBIKOU1.Value = updRow("乗務員備考1") '乗務員備考1
                             CREWBIKOU2.Value = updRow("乗務員備考2") '乗務員備考2
+                            CREWSEQ.Value = updRow("表示順_乗務員") '表示順_乗務員
                             SUBCREWBIKOU1.Value = updRow("副乗務員備考1") '副乗務員備考1
                             SUBCREWBIKOU2.Value = updRow("副乗務員備考2") '副乗務員備考2
+                            SUBCREWSEQ.Value = updRow("表示順_副乗務員") '表示順_副乗務員
                             SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
                             CALENDERMEMO11.Value = updRow("乗務員選択_カレンダー画面メモ")    '乗務員選択_カレンダー画面メモ
                             CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
@@ -2637,6 +2651,7 @@ Public Class LNT0001ZissekiIntake
                             Else
                                 JXORDTODOKENAME.Value = ""   'JX形式オーダー先頭届先名称
                             End If
+                            NIPPONO.Value = updRow("運転日報番号")    '運転日報番号
                             BRANCHCODE.Value = "1"    '枝番
                             UPDATEUSER.Value = updRow("更新者")    '更新者
                             CREATEUSER.Value = updRow("作成者")    '作成者
