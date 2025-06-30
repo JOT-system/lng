@@ -618,9 +618,11 @@ Public Class CS0054KintoneApi
         Public Property 帰庫日 As NormalStruct
         Public Property 帰庫時間 As NormalStruct
         Public Property 乗務員備考1 As NormalStruct
+        Public Property 表示順_乗務員 As NormalStruct                 '2025/06/30 追加
         Public Property 乗務員備考2 As NormalStruct
         Public Property 副乗務員備考1 As NormalStruct
         Public Property 副乗務員備考2 As NormalStruct
+        Public Property 表示順_副乗務員 As NormalStruct               '2025/06/30 追加
         Public Property 出勤時間_副乗務員 As NormalStruct
         Public Property 乗務員選択_カレンダー画面メモ As NormalStruct
         Public Property 社員番号_カレンダー画面メモ As NormalStruct
@@ -703,6 +705,7 @@ Public Class CS0054KintoneApi
         Public Property JX形式オーダーファイル名 As NormalStruct
         Public Property JX形式オーダールート番号 As NormalStruct
         Public Property JX形式オーダー先頭届先名称 As NormalStruct              '2025/06/05 追加
+        Public Property 運転日報番号 As NormalStruct                            '2025/06/30 追加
         '東ガスのみの項目
         Public Property 回転数 As NormalStruct
         Public Property L配更新キー As NormalStruct
