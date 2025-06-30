@@ -8,12 +8,18 @@ function InitDisplay() {
     document.querySelectorAll('.datetimepicker').forEach(picker => {
         flatpickr(picker, {
             wrap: true,
-            dateFormat: 'Y/m',
+            dateFormat: 'Y/m/d',
             locale: 'ja',
             clickOpens: false,
             allowInput: true,
-            monthSelectorType: 'static',
-            //defaultDate: new Date() // 必要に応じてカスタマイズ
+            plugins: [
+                new monthSelectPlugin({
+                    shorthand: true, //defaults to false
+                    dateFormat: "Y/m",
+                    altFormat: "F Y", //defaults to "F Y"
+                    theme: "light" // defaults to "light"
+                })
+            ]
         });
     });
 
