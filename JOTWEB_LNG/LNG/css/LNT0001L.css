@@ -39,3 +39,186 @@ p {
     margin-top: 0;
     margin-bottom: 0rem;
 }
+
+#TxtPageNo {
+    font-size: 1.5rem;
+    width: 50px !important;
+}
+/* ************************** */
+/* ページ制御用ボタン         */
+/* ************************** */
+/* ページ番号 */
+input.pageNo {
+    width: 70px;
+    height: 32px;
+    font-size: 1.1em;
+    text-align: right;
+}
+
+/* 頁へのボタン */
+.btn-stickyPage {
+    text-decoration: none;
+    height: 32px;
+    width: 44px;
+    margin: 0 5px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    background-color: transparent;
+    border: solid 1px #cfcfcf;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+    box-sizing: border-box;
+}
+
+    .btn-stickyPage:not(:disabled):hover {
+        background: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .btn-stickyPage:disabled {
+        background-color: #f3f3f3;
+        color: #aaa;
+    }
+
+/* 一覧先頭ページ、最終ページボタン */
+/* 一覧前ページ、次ページボタン */
+.searchBar .arrowFirstPage,
+.searchBar .arrowPreviousPage,
+.searchBar .arrowNextPage,
+.searchBar .arrowLastPage {
+    width: 32px;
+    height: 32px;
+    position: relative;
+}
+
+.searchBar .arrowFirstPage,
+.searchBar .arrowNextPage {
+    margin-right: 5px;
+}
+
+    .searchBar .arrowFirstPage::before,
+    .searchBar .arrowFirstPage::after,
+    .searchBar .arrowPreviousPage::before,
+    .searchBar .arrowNextPage::before,
+    .searchBar .arrowLastPage::before,
+    .searchBar .arrowLastPage::after {
+        display: block;
+        content: "";
+        background-color: #333;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 0;
+        transform: translate(-50%, -50%);
+    }
+
+    .searchBar .arrowFirstPage::before {
+        width: 2px;
+        height: 14px;
+        margin-left: -8px;
+    }
+
+    .searchBar .arrowFirstPage::after {
+        clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+        width: 14px;
+        height: 14px;
+        margin-left: 2px;
+    }
+
+.searchBar .arrowPreviousPage::before {
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: -1px;
+}
+
+.searchBar .arrowNextPage::before {
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: 1px;
+}
+
+.searchBar .arrowLastPage::before {
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+    width: 14px;
+    height: 14px;
+    margin-left: -2px;
+}
+
+.searchBar .arrowLastPage::after {
+    width: 2px;
+    height: 14px;
+    margin-left: 8px;
+}
+
+.searchBar .arrowFirstPage:has(input:not(:disabled)):hover,
+.searchBar .arrowPreviousPage:has(input:not(:disabled)):hover,
+.searchBar .arrowNextPage:has(input:not(:disabled)):hover,
+.searchBar .arrowLastPage:has(input:not(:disabled)):hover {
+    background-color: #e1eeff;
+}
+
+    .searchBar .arrowFirstPage:has(input:not(:disabled)):hover::before,
+    .searchBar .arrowFirstPage:has(input:not(:disabled)):hover::after,
+    .searchBar .arrowPreviousPage:has(input:not(:disabled)):hover::before,
+    .searchBar .arrowNextPage:has(input:not(:disabled)):hover::before,
+    .searchBar .arrowLastPage:has(input:not(:disabled)):hover::before,
+    .searchBar .arrowLastPage:has(input:not(:disabled)):hover::after {
+        background-color: #0d6efd;
+    }
+
+.searchBar .arrowFirstPage:hover input:not(:disabled),
+.searchBar .arrowPreviousPage:hover input:not(:disabled),
+.searchBar .arrowNextPage:hover input:not(:disabled),
+.searchBar .arrowLastPage:hover input:not(:disabled) {
+    border-color: #0d6efd;
+    cursor: pointer;
+}
+
+/*非活性（:disabled）*/
+.searchBar .arrowFirstPage:has(input:disabled),
+.searchBar .arrowPreviousPage:has(input:disabled),
+.searchBar .arrowNextPage:has(input:disabled),
+.searchBar .arrowLastPage:has(input:disabled) {
+    background-color: #f3f3f3;
+    cursor: default;
+}
+
+    .searchBar .arrowFirstPage:has(input:disabled)::before,
+    .searchBar .arrowFirstPage:has(input:disabled)::after,
+    .searchBar .arrowPreviousPage:has(input:disabled)::before,
+    .searchBar .arrowNextPage:has(input:disabled)::before,
+    .searchBar .arrowLastPage:has(input:disabled)::before,
+    .searchBar .arrowLastPage:has(input:disabled)::after {
+        background-color: #aaa;
+    }
+
+
+.searchBar .firstPage,
+.searchBar .lastPage,
+.searchBar .previousPage,
+.searchBar .nextPage {
+    display: block;
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.searchBar .arrowPreviousPage + div {
+    display: flex;
+    align-items: center;
+    column-gap: 2px;
+    background-color: #f3f3f3;
+    height: 32px;
+    margin: 0 5px;
+    padding: 0 8px;
+}
