@@ -679,6 +679,11 @@ Public Class LNT0001InvoiceOutputReport
                     If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
                         AndAlso PrintTogouSpraterow("ASSESSMENTFLG").ToString() = "1" Then
                         WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+
+                        '〇帳票の明細設定(宛名)(ENEOS業務委託料)
+                        Dim cellFromOrgName As String() = {"J5", "J6", "J7"}
+                        EditDetailAreaAtenaCompany(PrintTogouSpraterow, "B2", "B3", cellFromOrgName)
+
                     End If
                 Next
 
@@ -697,6 +702,11 @@ Public Class LNT0001InvoiceOutputReport
                     If PrintTogouSpraterow("BIGCATECODE").ToString() = "1" _
                         AndAlso PrintTogouSpraterow("ASSESSMENTFLG").ToString() = "1" Then
                         WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("E22").Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+
+                        '〇帳票の明細設定(宛名)(ENEOS業務委託料)
+                        Dim cellFromOrgName As String() = {"J5", "J6", "J7"}
+                        EditDetailAreaAtenaCompany(PrintTogouSpraterow, "B2", "B3", cellFromOrgName)
+
                     End If
                 Next
 
@@ -912,6 +922,40 @@ Public Class LNT0001InvoiceOutputReport
             End If
         Next
 
+    End Sub
+
+    ''' <summary>
+    ''' 帳票の明細設定(宛名)
+    ''' (ENEOS業務委託料)
+    ''' </summary>
+    ''' <param name="PrintTogouSpraterow">統合版特別料金マスタ(データ)</param>
+    ''' <param name="cellCompanyName">設定セル(宛名会社名)</param>
+    ''' <param name="cellCompanyDevName">設定セル(宛名会社部門名)</param>
+    ''' <param name="cellFromOrgName">設定セル(請求書発行部店名)</param>
+    Private Sub EditDetailAreaAtenaCompany(ByVal PrintTogouSpraterow As DataRow,
+                                           ByVal cellCompanyName As String,
+                                           ByVal cellCompanyDevName As String,
+                                           ByVal cellFromOrgName As String())
+        '■宛名会社名
+        Dim atenaCompanyName = PrintTogouSpraterow("ATENACOMPANYNAME").ToString()
+        '※未設定の場合、取引先名称を設定する。
+        If atenaCompanyName = "" Then atenaCompanyName = PrintTogouSpraterow("TORINAME").ToString()
+        WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("B2").Value = atenaCompanyName
+
+        '■宛名会社部門名
+        Dim atenaCompanyDevName = PrintTogouSpraterow("ATENACOMPANYDEVNAME").ToString()
+        WW_Workbook.Worksheets(WW_SheetNoTmp05).Range("B3").Value = atenaCompanyDevName
+
+        '■請求書発行部店名
+        Dim fromOrgName = PrintTogouSpraterow("FROMORGNAME").ToString().Split()
+        If fromOrgName.Length <> 0 Then
+            Dim cellNum As Integer = 0
+            For Each orgName As String In fromOrgName
+                If orgName = "" Then Exit For
+                WW_Workbook.Worksheets(WW_SheetNoTmp05).Range(cellFromOrgName(cellNum)).Value = orgName
+                cellNum += 1
+            Next
+        End If
     End Sub
 
 End Class
