@@ -67,16 +67,15 @@ Public Class LNT0001ZissekiManage
                             WF_ButtonPRINT_Click()
                         Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
-                        Case "WF_ButtonFIRST"           '先頭頁ボタン押下
-                            WF_ButtonFIRST_Click()
-                        Case "WF_ButtonLAST"            '最終頁ボタン押下
-                            WF_ButtonLAST_Click()
                         Case "WF_TORI"                  'リスト変更
                             WF_ListChange(WF_ButtonClick.Value)
+                        Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
+                            Me.WF_ButtonPAGE_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     DisplayGrid()
+
                 End If
             Else
                 '○ 初期化処理
@@ -228,6 +227,16 @@ Public Class LNT0001ZissekiManage
 
         '〇 一覧の件数を取得
         Me.ListCount.Text = "件数：" + LNT0001tbl.Rows.Count.ToString()
+
+        '〇 表示中ページ
+        Me.WF_NOWPAGECNT.Text = "1"
+
+        '〇 最終ページ
+        If LNT0001tbl.Rows.Count < CONST_DISPROWCOUNT Then
+            Me.WF_TOTALPAGECNT.Text = 1
+        Else
+            Me.WF_TOTALPAGECNT.Text = Math.Ceiling((LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
+        End If
 
         '○ 一覧表示データ編集(性能対策)
         Dim TBLview As DataView = New DataView(LNT0001tbl)
@@ -592,6 +601,7 @@ Public Class LNT0001ZissekiManage
 
         Dim WW_GridPosition As Integer          '表示位置(開始)
         Dim WW_DataCNT As Integer = 0           '(絞り込み後)有効Data数
+        Dim intPage As Integer = 0
 
         '○ 表示対象行カウント(絞り込み対象)
         For Each LNM0023row As DataRow In LNT0001tbl.Rows
@@ -664,6 +674,13 @@ Public Class LNT0001ZissekiManage
             WF_GridPosition.Text = TBLview.Item(0)("SELECT")
         End If
 
+        '〇 表示中ページ
+        If WF_GridPosition.Text = "1" Then
+            Me.WF_NOWPAGECNT.Text = "1"
+        Else
+            Me.WF_NOWPAGECNT.Text = (CInt(WF_GridPosition.Text) - 1) / CONST_DISPROWCOUNT + 1
+        End If
+
         work.WF_SEL_YM.Text = WF_TaishoYm.Value
         work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
 
@@ -698,6 +715,13 @@ Public Class LNT0001ZissekiManage
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0001tbl)
+
+        '〇 最終ページ
+        If LNT0001tbl.Rows.Count < CONST_DISPROWCOUNT Then
+            Me.WF_TOTALPAGECNT.Text = 1
+        Else
+            Me.WF_TOTALPAGECNT.Text = Math.Ceiling((LNT0001tbl.Rows.Count) / CONST_DISPROWCOUNT)
+        End If
 
         WF_GridPosition.Text = "1"
     End Sub
@@ -894,6 +918,58 @@ Public Class LNT0001ZissekiManage
 
         TBLview.Dispose()
         TBLview = Nothing
+
+    End Sub
+
+    ''' <summary>
+    ''' ページボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub WF_ButtonPAGE_Click()
+
+        Dim intPage As Integer = 0
+
+        Select Case WF_ButtonClick.Value
+            Case "WF_ButtonPAGE"            '指定ページボタン押下
+                intPage = CInt(Me.TxtPageNo.Text.PadLeft(5, "0"c))
+                If intPage < 1 Then
+                    intPage = 1
+                End If
+                If intPage > CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage = CInt(Me.WF_TOTALPAGECNT.Text)
+                End If
+            Case "WF_ButtonFIRST"           '先頭ページボタン押下
+                    intPage = 1
+            Case "WF_ButtonPREVIOUS"        '前ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage > 1 Then
+                    intPage += -1
+                End If
+            Case "WF_ButtonNEXT"            '次ページボタン押下
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage < CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage += 1
+                End If
+            Case "WF_ButtonLAST"            '最終ページボタン押下
+                intPage = CInt(Me.WF_TOTALPAGECNT.Text)
+            Case "WF_MouseWheelUp"          '次頁スクロール
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage < CInt(Me.WF_TOTALPAGECNT.Text) Then
+                    intPage += 1
+                End If
+            Case "WF_MouseWheelDown"        '前頁スクロール
+                intPage = CInt(Me.WF_NOWPAGECNT.Text)
+                If intPage > 1 Then
+                    intPage += -1
+                End If
+        End Select
+
+        Me.WF_NOWPAGECNT.Text = intPage.ToString
+        If intPage = 1 Then
+            WF_GridPosition.Text = 1
+        Else
+            WF_GridPosition.Text = (intPage - 1) * CONST_SCROLLCOUNT + 1
+        End If
 
     End Sub
 

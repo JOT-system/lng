@@ -187,7 +187,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
 
                 '統合版特別料金マスタより
                 For Each SpRateRow As DataRow In SpRate.Rows
-                    Dim SyabanConv = ToHalfWidth(Convert.ToString(SpRateRow("DETAILNAME")))
+                    Dim SyabanConv = ToHalfWidth(Convert.ToString(SpRateRow("SMALLCATENAME")))
                     If SyabanConv Like Convert.ToString(TuiSheetRowData("GYOMUTANKTNAME")) & "*" Then
                         Me.WW_Workbook.Worksheets(Me.WW_SheetNoTui).Range("C" & PrintFixRowIdx.ToString).Value = SpRateRow("TANKA")
                         Exit For
@@ -1026,11 +1026,11 @@ Public Class LNT0001InvoiceOutputTOHOKU
         Dim SQLStr As String = ""
         '-- SELECT
         SQLStr &= " SELECT "
-        SQLStr &= "   A01.DETAILNAME"
+        SQLStr &= "   A01.SMALLCATENAME"
         SQLStr &= " , A01.TANKA "
 
         '-- FROM
-        SQLStr &= " FROM LNG.LNM0014_SPRATE A01 "
+        SQLStr &= " FROM LNG.LNM0014_SPRATE2 A01 "
 
         '-- WHERE
         SQLStr &= " WHERE "
@@ -1039,7 +1039,7 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= String.Format(" AND A01.ORGCODE IN ({0}) ", "'020402','021502'")
         SQLStr &= String.Format(" AND A01.DISPLAYFLG  = '{0}' ", "1")
         SQLStr &= String.Format(" AND A01.DELFLG  <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
-        SQLStr &= " ORDER BY A01.DETAILID "
+        SQLStr &= " ORDER BY A01.SMALLCATENAME "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)

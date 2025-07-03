@@ -50,22 +50,40 @@ Partial Public Class LNT0001ZissekiManage
     Protected WithEvents WF_TORI As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_ButtonFIRST コントロール。
+    '''TxtPageNo コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonFIRST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents TxtPageNo As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_ButtonLAST コントロール。
+    '''WF_NOWPAGECNT コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_ButtonLAST As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    Protected WithEvents WF_NOWPAGECNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_NOWPAGESLASH コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_NOWPAGESLASH As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''WF_TOTALPAGECNT コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_TOTALPAGECNT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
     '''pnlListArea コントロール。
