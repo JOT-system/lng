@@ -6,7 +6,7 @@ Public Class LNT0001WRKINC
 
     Public Const MAPIDL As String = "LNT0001L"      'MAPID
     Public Const MAPIDD As String = "LNT0001D"      'MAPID
-    Public Const MAPIDI As String = "LNT0001I"      'MAPID
+    Public Const MAPIDI As String = "LNT0002L"      'MAPID
     Public Const MAPIDZ As String = "LNT0001Z"      'MAPID
     Public Const MAPIDAJ As String = "LNT0001AJ"    'MAPID
 
