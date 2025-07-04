@@ -844,7 +844,7 @@ Public Class LNT0001ZissekiManage
         work.WF_SEL_TAISHOYM.Text = WF_TaishoYm.Value
 
         Dim WW_URL As String = ""
-        work.GetURL(LNT0001WRKINC.MAPIDI, WW_URL)
+        work.GetURL(LNT0001WRKINC.MAPID2L, WW_URL)
         Server.Transfer(WW_URL)
 
     End Sub
