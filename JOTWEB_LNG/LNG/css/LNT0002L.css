@@ -150,3 +150,12 @@ p {
     height: 1.2em;
     transform: translateY(20%)
 }
+
+/*  COMMON.CSSの置換    */
+div [data-generated="1"][data-scrolltype="1"] div[id$="pnlHISTListArea_HR"] {
+    right: auto;
+}
+div [data-generated="1"][data-scrolltype="1"] div[id$="pnlHISTListArea_DR"] {
+    right: auto;
+    overflow: auto;
+}
