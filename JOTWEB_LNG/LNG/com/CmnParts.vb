@@ -332,6 +332,16 @@ Public Class CmnParts
             SQLStr &= "   ,'' AS GRPNO "
             SQLStr &= "   ,CAST(LNM0005.VALUE03 AS SIGNED) AS TODOKESHEET_CELL "
             SQLStr &= "   ,CAST(LNM0005.VALUE02 AS SIGNED) AS TODOKESHEET_DISPLAYFLG "
+        ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+            AndAlso I_ORGCODE = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+            '★取引先コードが「石油資源開発(北海道)」の場合
+            SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
+            SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
+            SQLStr &= "   ,LNM0005.VALUE01 AS TODOKENAME_MASTER "
+            SQLStr &= "   ,LNM0005.VALUE06 AS TODOKENAME_SHEET "
+            SQLStr &= "   ,LNM0005.KEYCODE08 AS GRPNO "
+            SQLStr &= "   ,CAST(LNM0005.VALUE03 AS SIGNED) AS TODOKESHEET_CELL "
+            SQLStr &= "   ,CAST(LNM0005.VALUE02 AS SIGNED) AS TODOKESHEET_DISPLAYFLG "
         Else
             SQLStr &= "   ,CAST(LNM0005.KEYCODE03 AS SIGNED) AS SORTNO "
             SQLStr &= "   ,CAST(LNM0005.VALUE04 AS SIGNED) AS MASTERNO "
@@ -1237,6 +1247,7 @@ Public Class CmnParts
         SQLStr &= "    , '' AS KOTEIHI_DISPLAYFLG "
         SQLStr &= "    , '' AS KOTEIHI_CELLNUM "
         SQLStr &= "    , '' AS KOTEIHI_CLASSIFYCODE "
+        SQLStr &= "    , '' AS KOTEIHI_CONVERT "
 
         '-- FROM(統合版特別料金マスタ)
         SQLStr &= " FROM ( "
@@ -1326,13 +1337,22 @@ Public Class CmnParts
                             dtSPRATEFEEMasrow("TODOKECODE") = BaseDllConst.CONST_TODOKECODE_005834
                         Case "室蘭港バンカリング"
                             dtSPRATEFEEMasrow("TODOKECODE") = BaseDllConst.CONST_TODOKECODE_006915
+
+                        '※（注意）届先が追加された場合CASE分追加
+                        Case "テスト１"
+                            dtSPRATEFEEMasrow("TODOKECODE") = "009999"
+                        Case "テスト２"
+                            dtSPRATEFEEMasrow("TODOKECODE") = "008888"
+
                     End Select
 
                     Dim condition As String = ""
                     '〇条件
                     '・大分類コード
                     condition &= String.Format(" KEYCODE01='{0}' ", dtSPRATEFEEMasrow("BIGCATECODE"))
-                    '・届先コード(中分類コード)
+                    '・中分類コード
+                    condition &= String.Format(" AND KEYCODE04='{0}' ", dtSPRATEFEEMasrow("MIDCATECODE"))
+                    '・届先コード
                     condition &= String.Format(" AND KEYCODE05='{0}' ", dtSPRATEFEEMasrow("TODOKECODE"))
                     '・小分類コード
                     condition &= String.Format(" AND KEYCODE09='{0}' ", dtSPRATEFEEMasrow("SMALLCATECODE"))
@@ -1343,6 +1363,8 @@ Public Class CmnParts
                         dtSPRATEFEEMasrow("KOTEIHI_DISPLAYFLG") = convertMASrow("VALUE01")
                         '・行(設定)セル
                         dtSPRATEFEEMasrow("KOTEIHI_CELLNUM") = convertMASrow("VALUE02")
+                        '・分類
+                        dtSPRATEFEEMasrow("KOTEIHI_CONVERT") = convertMASrow("CLASS")
                     Next
 
                 Next
@@ -2204,6 +2226,7 @@ Public Class CmnParts
             SQLStr &= " WHERE "
             SQLStr &= String.Format("     LNM0005.CLASS = '{0}' ", I_CLASS)
             SQLStr &= " AND LNM0005.KEYCODE08 LIKE '日祝%' "
+            SQLStr &= " AND IFNULL(LNM0017.TORICODE, '') <> '' "
 
         ElseIf I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
             '■シーエナジー

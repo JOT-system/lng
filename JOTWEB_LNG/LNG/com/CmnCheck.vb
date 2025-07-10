@@ -725,7 +725,7 @@ Public Class CmnCheck
             Case BaseDllConst.CONST_ORDERORGCODE_020104
                 sekiyuSigenTankHKDClass = "SEKIYUSIGEN_HKD_TANK"
                 sekiyuSigenTodokeHKDClass = "SEKIYUSIG_HKD_TODOKE"
-                sekiyuSigenKoteihiHKDClass = "SEKIYU_HKD_KOTEIHI"
+                sekiyuSigenKoteihiHKDClass = "SEKIYU_HKD_KOTEIHI2"
                 arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
                 arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020104
                 arrToriCode(2) = Nothing
@@ -770,14 +770,17 @@ Public Class CmnCheck
             Dim condition As String = String.Format("TODOKECODE='{0}'", SekiyuSigenTodokerow("KEYCODE01"))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
                 LNT0001tblrow("SHEETSORTNO_REP") = SekiyuSigenTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = SekiyuSigenTodokerow("VALUE01")
 
                 '〇届先が追加された場合
                 If SekiyuSigenTodokerow("VALUE02").ToString() = "1" Then
+                    If SekiyuSigenTodokerow("KEYCODE10").ToString() = LNT0001tblrow("SETCELL03").ToString() Then
+                        LNT0001tblrow("TODOKENAME_REP") = String.Format(SekiyuSigenTodokerow("VALUE01"), SekiyuSigenTodokerow("KEYCODE02").ToString())
+                    End If
                     LNT0001tblrow("TODOKECELL_REP") = SekiyuSigenTodokerow("VALUE03")
                     LNT0001tblrow("MASTERCELL_REP") = SekiyuSigenTodokerow("VALUE04")
                     LNT0001tblrow("SHEETDISPLAY_REP") = SekiyuSigenTodokerow("VALUE05")
                 Else
+                    LNT0001tblrow("TODOKENAME_REP") = SekiyuSigenTodokerow("VALUE01")
                     LNT0001tblrow("TODOKECELL_REP") = ""
                     LNT0001tblrow("MASTERCELL_REP") = ""
                     LNT0001tblrow("SHEETDISPLAY_REP") = ""
@@ -788,7 +791,7 @@ Public Class CmnCheck
         For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenHKDTodoke.Rows
             Dim condition As String = String.Format("TODOKECODE='{0}' AND SETCELL03='{1}'", SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE10"))
             For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETNAME_REP") = SekiyuSigenTodokerow("VALUE06")
+                LNT0001tblrow("SHEETNAME_REP") = String.Format(SekiyuSigenTodokerow("VALUE06"), SekiyuSigenTodokerow("KEYCODE02").ToString())
                 LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
             Next
         Next

@@ -7,11 +7,17 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
     Private WW_SheetNoSeikyuMeisai As Integer = 0
     Private WW_SheetNoUchiwake As Integer = 0
     Private WW_SheetNoMuroran As Integer = 0
+    Private WW_SheetNoTotal As Integer = 0
+    Private WW_SheetNoTotal01 As Integer = 0
+    Private WW_SheetNoTotal02 As Integer = 0
     Private WW_SheetNoCalendar As Integer = 0
     Private WW_SheetNoMaster As Integer = 0
-    Private WW_SheetNo01Dic As New Dictionary(Of String, Integer)           '// 既存シート用(石狩)
-    Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}   '// 追加シート用(石狩)
-    Private WW_ArrSheetNoKoteichi As Integer() = {0, 0, 0, 0, 0}            '// 単価シート用
+    Private WW_SheetNo01Dic As New Dictionary(Of String, Integer)                       '// 既存シート用(石狩)
+    Private WW_ArrSheetNo01 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}               '// 追加(ＮＯ)シート用(北ガス出荷)
+    Private WW_ArrSheetName01 As String() = {"", "", "", "", "", "", "", "", "", ""}    '// 追加(名称)シート用(北ガス出荷)
+    Private WW_ArrSheetNo02 As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}               '// 追加(ＮＯ)シート用(ほくでん出荷)
+    Private WW_ArrSheetName02 As String() = {"", "", "", "", "", "", "", "", "", ""}    '// 追加(名称)シート用(ほくでん出荷)
+    Private WW_ArrSheetNoKoteichi As Integer() = {0, 0, 0, 0, 0}                        '// 単価シート用
     Private WW_DicIshikariList As Dictionary(Of String, String)
     Private WW_ReportOtherNo As String() = {"⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩"}
 
@@ -130,15 +136,29 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 ElseIf WW_Workbook.Worksheets(i).Name = "室蘭ガスサーチャージ" Then
                     '〇共通(シート[室蘭ガスサーチャージ])
                     WW_SheetNoMuroran = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "合計表（入力不要）" Then
+                    '〇共通(シート[合計表（入力不要）])
+                    WW_SheetNoTotal = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "合計表（入力不要）北ガス" Then
+                    '〇共通(シート[合計表（入力不要）北ガス])
+                    WW_SheetNoTotal01 = i
+                ElseIf WW_Workbook.Worksheets(i).Name = "合計表（入力不要）ほくでん" Then
+                    '〇共通(シート[合計表（入力不要）ほくでん])
+                    WW_SheetNoTotal02 = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "①KG石狩～釧路(40ft) " Then
                     '〇SK(シート[届先別])
                     WW_SheetNoCalendar = i
                 ElseIf WW_Workbook.Worksheets(i).Name = "ﾏｽﾀ" Then
                     '〇共通(シート[ﾏｽﾀ])
                     WW_SheetNoMaster = i
-                ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(0) + 1).ToString("00") Then
+                ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(0) + 1).ToString("00") + "1" Then
                     WW_ArrSheetNo01(j(0)) = i
+                    WW_ArrSheetName01(j(0)) = WW_Workbook.Worksheets(i).Name
                     j(0) += 1
+                ElseIf WW_Workbook.Worksheets(i).Name = "TMP9" + (j(1) + 1).ToString("00") + "2" Then
+                    WW_ArrSheetNo02(j(1)) = i
+                    WW_ArrSheetName02(j(1)) = WW_Workbook.Worksheets(i).Name
+                    j(1) += 1
                     'ElseIf WW_Workbook.Worksheets(i).Name = "①KG石狩～釧路(40ft) " _
                     '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)新潟②" _
                     '    OrElse WW_Workbook.Worksheets(i).Name = "固定値(新潟・庄内)秋田" _
@@ -238,6 +258,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             Dim todokeCode As String = ""
             Dim grpNo As String = ""
             Dim sheetName As String = ""
+            Dim cellStay As String = ""
 
             '★計算エンジンの無効化
             WW_Workbook.EnableCalculation = False
@@ -267,6 +288,90 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
 
                 'conditionSb = String.Format(condition, "1", "ローリー")
                 'EditDetailAreaSub(conditionSb, todokeCode, dicSheetNo01)
+            Next
+
+            '〇届名称(追加)用設定
+            cellStay = ""
+            For Each PrintDatarow As DataRow In PrintData.Select("TODOKECELL_REP<>''", "ROWSORTNO, SHUKADATE")
+                Try
+                    '★ シート「届先」表示
+                    Dim iDisp As Integer = Integer.Parse(PrintDatarow("SHEETDISPLAY_REP").ToString())
+                    Dim arrSheetNo As Integer = WW_ArrSheetNo01(iDisp)
+                    If PrintDatarow("SETCELL03").ToString() = "ローリー" Then
+                        arrSheetNo = WW_ArrSheetNo02(iDisp)
+                    End If
+                    WW_Workbook.Worksheets(arrSheetNo).Visible = Visibility.Visible
+
+                    '★ シート名(変更前取得)
+                    Dim beforeSheetName As String = WW_Workbook.Worksheets(arrSheetNo).Name
+
+                    '★ シート「合計表（入力不要）」の追加分[納入先]表示
+                    Dim sheetTotalFlg As Boolean = True
+                    Select Case beforeSheetName
+                        '〇合計表（入力不要）※北ガス出荷
+                        Case WW_ArrSheetName01(0), WW_ArrSheetName02(0)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal01).Range(String.Format("{0}:{1}", "M", "Q")).Hidden = False
+                        Case WW_ArrSheetName01(1), WW_ArrSheetName02(1)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal01).Range(String.Format("{0}:{1}", "Q", "V")).Hidden = False
+                        Case WW_ArrSheetName01(2), WW_ArrSheetName02(2)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal01).Range(String.Format("{0}:{1}", "W", "AA")).Hidden = False
+                        Case WW_ArrSheetName01(3), WW_ArrSheetName02(3)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal01).Range(String.Format("{0}:{1}", "AB", "AF")).Hidden = False
+                        Case WW_ArrSheetName01(4), WW_ArrSheetName02(4)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal01).Range(String.Format("{0}:{1}", "AG", "AK")).Hidden = False
+
+                        '〇合計表（入力不要）※ほくでん出荷
+                        Case WW_ArrSheetName01(5), WW_ArrSheetName02(5)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal02).Range(String.Format("{0}:{1}", "K", "O")).Hidden = False
+                        Case WW_ArrSheetName01(6), WW_ArrSheetName02(6)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal02).Range(String.Format("{0}:{1}", "P", "T")).Hidden = False
+                        Case WW_ArrSheetName01(7), WW_ArrSheetName02(7)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal02).Range(String.Format("{0}:{1}", "U", "Y")).Hidden = False
+                        Case WW_ArrSheetName01(8), WW_ArrSheetName02(8)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal02).Range(String.Format("{0}:{1}", "Z", "AD")).Hidden = False
+                        Case WW_ArrSheetName01(9), WW_ArrSheetName02(9)
+                            WW_Workbook.Worksheets(WW_SheetNoTotal02).Range(String.Format("{0}:{1}", "AE", "AI")).Hidden = False
+
+                        Case Else
+                            sheetTotalFlg = False
+                    End Select
+
+                    '★ [合計表（入力不要）]シート表示
+                    If sheetTotalFlg = True Then
+                        WW_Workbook.Worksheets(WW_SheetNoTotal).Visible = Visibility.Hidden
+                        WW_Workbook.Worksheets(WW_SheetNoTotal01).Visible = Visibility.Visible
+                        WW_Workbook.Worksheets(WW_SheetNoTotal02).Visible = Visibility.Visible
+                    End If
+
+                    '★ シート名変更
+                    WW_Workbook.Worksheets(arrSheetNo).Name = PrintDatarow("SHEETNAME_REP").ToString()
+                    '◯ 出荷日
+                    WW_Workbook.Worksheets(arrSheetNo).Range(PrintDatarow("SETCELL01").ToString()).Value = Date.Parse(PrintDatarow("SHUKADATE").ToString())
+                    '◯ 実績数量
+                    WW_Workbook.Worksheets(arrSheetNo).Range(PrintDatarow("SETCELL02").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+
+                Catch ex As Exception
+                End Try
+
+            Next
+
+            '★シート「マスタ」設定
+            cellStay = ""
+            For Each PrintDatarow As DataRow In PrintData.Select("TODOKECELL_REP<>''", "ROWSORTNO, SHUKADATE")
+                If cellStay <> "" AndAlso cellStay = PrintDatarow("TODOKECELL_REP").ToString() Then
+                    Continue For
+                End If
+
+                Try
+                    If PrintDatarow("SETCELL03").ToString() = "ローリー" Then
+                        WW_Workbook.Worksheets(WW_SheetNoMaster).Range("G" + PrintDatarow("MASTERCELL_REP").ToString()).Value = PrintDatarow("TODOKENAME_REP").ToString()
+                    Else
+                        WW_Workbook.Worksheets(WW_SheetNoMaster).Range("F" + PrintDatarow("MASTERCELL_REP").ToString()).Value = PrintDatarow("TODOKENAME_REP").ToString()
+                    End If
+                Catch ex As Exception
+                End Try
+                '表示用セル保管
+                cellStay = PrintDatarow("TODOKECELL_REP").ToString()
             Next
 
             '★計算エンジンの有効化
@@ -372,42 +477,82 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                         Continue For
                 End Select
                 WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCell).Value = Double.Parse(PrintTankDatarow("TANKA").ToString())
+
+                '表示セル("1"表示)
+                If PrintTankDatarow("TODOKESHEET_DISPLAYFLG").ToString() = "1" Then
+                    '〇シート「ﾏｽﾀ」
+                    '★ 納入先
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range("A" + PrintTankDatarow("MASTERNO").ToString()).Value = PrintTankDatarow("TODOKENAME").ToString()
+
+                    '★ 表示(範囲)設定
+                    Dim cellRange As Integer = 6
+                    If PrintTankDatarow("AVOCADOSHUKABASHO").ToString() = "006456" Then
+                        cellRange = 7
+                    End If
+
+                    '★ 表示(内訳シート)
+                    Dim cellStart As Integer = CInt(PrintTankDatarow("TODOKESHEET_CELL").ToString())
+                    Dim cellEnd As Integer = CInt(PrintTankDatarow("TODOKESHEET_CELL").ToString()) + cellRange
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{1}", cellStart.ToString(), cellEnd.ToString())).Hidden = False
+
+                End If
+
             Next
 
             '〇[単価][固定費]設定(統合版特別料金マスタ)
+            Dim uchiwakeNo As String = "B"      '-- 内訳NO
+            Dim uchiwakeName As String = "C"    '-- 内訳名称
+            Dim uchiwakeTanka As String = "F"   '-- 単価
+            Dim uchiwakeAmount As String = "H"  '-- 数量
+            Dim uchiwakeTaxable As String = "M" '-- 課税対象額
+            '★(新)レイアウト対応
+            If PrintTogouSprate.Rows(0)("KOTEIHI_CONVERT").ToString() = "SEKIYU_HKD_KOTEIHI2" Then
+                uchiwakeNo = "B"                '-- 内訳NO
+                uchiwakeName = "D"              '-- 内訳名称
+                uchiwakeTanka = "E"             '-- 単価
+                uchiwakeAmount = "F"            '-- 数量
+                uchiwakeTaxable = "J"           '-- 課税対象額
+            End If
             For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
                 '〇シート「内訳」
                 '★ 月額固定費
-                If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
-                    AndAlso (PrintTogouSpraterow("SMALLCATECODE").ToString() = "12" _
-                             OrElse PrintTogouSpraterow("SMALLCATECODE").ToString() = "13") Then
+                If PrintTogouSpraterow("BIGCATECODE").ToString() = "5" Then
                     '〇３）バンカリング追加人件費
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    '★ 名称
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString().Replace(PrintTogouSpraterow("MIDCATENAME").ToString() + "　", "")
+                    '★ 単価
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeTaxable + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    '★ 表示
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
 
-                ElseIf PrintTogouSpraterow("BIGCATECODE").ToString() = "4" Then
+                ElseIf PrintTogouSpraterow("BIGCATECODE").ToString() = "7" Then
                     Dim otDetailNo As Integer = 0
                     otDetailNo = CInt(PrintTogouSpraterow("SMALLCATECODE").ToString())
                     '★ その他
                     '・名称設定
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("SMALLCATENAME").ToString()
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString()
+                    'WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("SMALLCATENAME").ToString()
                     '・金額設定
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("M" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeTaxable + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
                     '★ 表示
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
 
                 Else
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("F" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeTanka + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("TANKA").ToString())
 
                     '〇車両固定運賃・コンテナ料金・追加人件費
                     'If PrintTogouSpraterow("CALCUNIT").ToString() = "式" Then
-                    If PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
+                    If (PrintTogouSpraterow("BIGCATECODE").ToString() = "3" _
+                            OrElse PrintTogouSpraterow("BIGCATECODE").ToString() = "4" _
+                            OrElse PrintTogouSpraterow("BIGCATECODE").ToString() = "5") _
                         AndAlso PrintTogouSpraterow("QUANTITY").ToString() <> "0.00" Then
                         Try
                             '★ 名称
-                            Dim cellNo As String = WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("B" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value.ToString()
-                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("C" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = cellNo + PrintTogouSpraterow("SMALLCATENAME").ToString()
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString().Replace(PrintTogouSpraterow("MIDCATENAME").ToString() + "　", "")
+                            'Dim cellNo As String = WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value.ToString()
+                            'WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = cellNo + PrintTogouSpraterow("SMALLCATENAME").ToString()
                             '★ 数量
-                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeAmount + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
                             '★ 表示
                             WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
                         Catch ex As Exception
@@ -421,9 +566,9 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                             AndAlso PrintTogouSpraterow("SMALLCATECODE").ToString() = "5") _
                         OrElse (PrintTogouSpraterow("BIGCATECODE").ToString() = "2" _
                             AndAlso PrintTogouSpraterow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_006915 _
-                            AndAlso PrintTogouSpraterow("SMALLCATECODE").ToString() <> "6") Then
+                            AndAlso PrintTogouSpraterow("SMALLCATECODE").ToString() <> "1") Then
                         Try
-                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range("H" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
+                            WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeAmount + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Double.Parse(PrintTogouSpraterow("QUANTITY").ToString())
                         Catch ex As Exception
                         End Try
                     End If
@@ -436,7 +581,7 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 Dim conditionSub As String = "RANGE_SUNDAY='1' OR RANGE_HOLIDAY='1' OR RANGE_YEAREND_NEWYEAR='1' OR RANGE_MAYDAY='1' "
                 For Each PrintHolidayRateDatarow As DataRow In PrintHolidayRateData.Select(conditionSub)
                     If PrintHolidayRateDatarow("SETMASTERCELL").ToString() = "" Then Continue For
-                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("F{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(String.Format("{0}{1}", uchiwakeTanka, PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                 Next
             End If
 
