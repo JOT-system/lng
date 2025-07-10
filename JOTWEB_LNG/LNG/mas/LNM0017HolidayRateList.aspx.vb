@@ -1211,6 +1211,10 @@ Public Class LNM0017HolidayRateList
         wb.ActiveSheet.Range("C2").Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY)
         wb.ActiveSheet.Range("D2").Value = "は入力不要"
 
+        wb.ActiveSheet.Range("E2").Value = "※新規追加の場合、ユニークIDを空白にしてください。"
+        wb.ActiveSheet.Range("E2").Font.Color = Color.Red
+        wb.ActiveSheet.Range("E2").Font.Bold = True
+
         '列幅自動調整
         wb.ActiveSheet.Range("A3:" + WW_MAXRANGE).EntireColumn.AutoFit()
 
@@ -1396,6 +1400,17 @@ Public Class LNM0017HolidayRateList
                     .Height = CONST_HEIGHT_PER_ROW * WW_CNT
                 End With
             End If
+
+            'ユニークID
+            WW_TEXTLIST.Clear()
+            WW_TEXTLIST.AppendLine("新規追加の場合、")
+            WW_TEXTLIST.AppendLine("ユニークIDを空白にしてください。")
+            WW_TEXT = WW_TEXTLIST.ToString
+            sheet.Cells(WW_HEADERROW, LNM0017WRKINC.INOUTEXCELCOL.ID).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0017WRKINC.INOUTEXCELCOL.ID).Comment.Shape
+                .Width = 200
+                .Height = 40
+            End With
 
             '受注受付部署判定区分
             WW_TEXTLIST.Clear()
