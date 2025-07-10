@@ -912,7 +912,11 @@ Public Class LNM0017HolidayRateDetail
         Next
         LNM0017INProw("GYOMUTANKNUMFROM") = WF_GYOMUTANKNUMFROM.Text                    '車番（開始）
         LNM0017INProw("GYOMUTANKNUMTO") = WF_GYOMUTANKNUMTO.Text                        '車番（終了）
-        LNM0017INProw("TANKA") = WF_TANKA.Text                                          '単価
+        If WF_TANKA.Text = "" Then
+            LNM0017INProw("TANKA") = 0                                                  '単価
+        Else
+            LNM0017INProw("TANKA") = WF_TANKA.Text                                      '単価
+        End If
 
         '○ チェック用テーブルに登録する
         LNM0017INPtbl.Rows.Add(LNM0017INProw)
@@ -1647,7 +1651,15 @@ Public Class LNM0017HolidayRateDetail
 
             '単価(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "TANKA", LNM0017INProw("TANKA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            If Not isNormal(WW_CS0024FCheckerr) Then
+            If isNormal(WW_CS0024FCheckerr) Then
+                If LNM0017INProw("TANKA") = 0 Then
+                    WW_CheckMES1 = "・単価エラーです。"
+                    WW_CheckMES2 = "必須入力です。"
+                    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            Else
                 WW_CheckMES1 = "・単価エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
