@@ -334,18 +334,31 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const LNM0016D As String = "ASP.LNG_MAS_LNM0016REST1MDETAIL_ASPX"
 
+        '''' <summary>
+        '''' 使用料特例マスタ１マスタメンテナンス（検索）
+        '''' </summary>
+        'Public Const LNM0017S As String = "ASP.LNG_MAS_LNM0017REST2MSEARCH_ASPX"
+        '''' <summary>
+        '''' 使用料特例マスタ１マスタメンテナンス（一覧）
+        '''' </summary>
+        'Public Const LNM0017L As String = "ASP.LNG_MAS_LNM0017REST2MLIST_ASPX"
+        '''' <summary>
+        '''' 使用料特例マスタ１マスタメンテナンス（詳細）
+        '''' </summary>
+        'Public Const LNM0017D As String = "ASP.LNG_MAS_LNM0017REST2MDETAIL_ASPX"
+
         ''' <summary>
-        ''' 使用料特例マスタ１マスタメンテナンス（検索）
+        ''' 休日割増単価マスタメンテナンス（一覧）
         ''' </summary>
-        Public Const LNM0017S As String = "ASP.LNG_MAS_LNM0017REST2MSEARCH_ASPX"
+        Public Const LNM0017L As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATELIST_ASPX"
         ''' <summary>
-        ''' 使用料特例マスタ１マスタメンテナンス（一覧）
+        ''' 休日割増単価マスタメンテナンス（詳細）
         ''' </summary>
-        Public Const LNM0017L As String = "ASP.LNG_MAS_LNM0017REST2MLIST_ASPX"
+        Public Const LNM0017D As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATEDETAIL_ASPX"
         ''' <summary>
-        ''' 使用料特例マスタ１マスタメンテナンス（詳細）
+        ''' 休日割増単価スタメンテナンス（履歴）
         ''' </summary>
-        Public Const LNM0017D As String = "ASP.LNG_MAS_LNM0017REST2MDETAIL_ASPX"
+        Public Const LNM0017H As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATEHISTORY_ASPX"
 
         ''' <summary>
         ''' 品目マスタメンテナンス（検索）
