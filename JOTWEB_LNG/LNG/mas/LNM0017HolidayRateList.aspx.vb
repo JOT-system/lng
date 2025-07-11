@@ -508,7 +508,7 @@ Public Class LNM0017HolidayRateList
         SQLStr.AppendLine("    ) AS RANGENAME                                                                                   ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM17.GYOMUTANKNUMFROM), '')                              AS GYOMUTANKNUMFROM    ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM17.GYOMUTANKNUMTO), '')                                AS GYOMUTANKNUMTO      ")
-        SQLStr.AppendLine("   , LNM17.TANKA                                                              AS TANKA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM17.TANKA),'')                                          AS TANKA               ")
         SQLStr.AppendLine("   , FORMAT(LNM17.TANKA,0)                                                    AS SRCTANKA            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM17.DELFLG), '')                                        AS DELFLG              ")
         SQLStr.AppendLine(" FROM                                                                                                ")
