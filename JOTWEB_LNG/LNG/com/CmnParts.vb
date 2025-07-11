@@ -269,7 +269,8 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectNEWTANKAMaster(ByVal SQLcon As MySqlConnection,
                                     ByVal I_TORICODE As String, ByVal I_ORGCODE As String, ByVal I_TAISHOYM As String, ByVal I_CLASS As String, ByRef O_dtTANKAMas As DataTable,
-                                    Optional ByVal I_TODOKECODE As String = Nothing, Optional ByVal I_SEKIYU_HONSHU_FLG As Boolean = False)
+                                    Optional ByVal I_TODOKECODE As String = Nothing, Optional ByVal I_SEKIYU_HONSHU_FLG As Boolean = False,
+                                    Optional ByRef dtCenergyTodoke As DataTable = Nothing, Optional ByRef dtElNessTodoke As DataTable = Nothing)
         If IsNothing(O_dtTANKAMas) Then
             O_dtTANKAMas = New DataTable
         End If
@@ -456,6 +457,75 @@ Public Class CmnParts
             Catch ex As Exception
 
             End Try
+
+            '〇統合版単価マスタ(届先(グルーピング))取得
+            Try
+                '①シーエナジー
+                Dim grCenergyTankaMas = From row In O_dtTANKAMas.AsEnumerable()
+                                        Where row.Field(Of String)("TORICODE") = BaseDllConst.CONST_TORICODE_0110600000
+                                        Group row By CONV_TODOKECODE = row.Field(Of String)("CONV_TODOKECODE"),
+                                                     CONV_TODOKENAME = row.Field(Of String)("CONV_TODOKENAME"),
+                                                     TODOKECODE = row.Field(Of String)("TODOKECODE"),
+                                                     TODOKENAME = row.Field(Of String)("TODOKENAME") Into Group
+                                        Select New With {
+                                            .CONV_TODOKECODE = CONV_TODOKECODE,
+                                            .CONV_TODOKENAME = CONV_TODOKENAME,
+                                            .TODOKECODE = TODOKECODE,
+                                            .TODOKENAME = TODOKENAME
+                                        }
+
+                '★基準シート(コード、届先)統合版単価マスタより取得
+                For Each result In grCenergyTankaMas
+                    Dim resCONV_TODOKECODE = result.CONV_TODOKECODE
+                    Dim resCONV_TODOKENAME = result.CONV_TODOKENAME
+                    Dim resTODOKECODE = result.TODOKECODE
+                    Dim resTODOKENAME = result.TODOKENAME
+                    Dim condition As String = ""
+                    condition &= String.Format("KEYCODE03 = '{0}'", resCONV_TODOKECODE)
+                    For Each dtCenergyTodokerow As DataRow In dtCenergyTodoke.Select(condition)
+                        dtCenergyTodokerow("KEYCODE03") = resCONV_TODOKECODE
+                        dtCenergyTodokerow("KEYCODE04") = resCONV_TODOKENAME
+                        dtCenergyTodokerow("KEYCODE01") = resTODOKECODE
+                        dtCenergyTodokerow("KEYCODE02") = resTODOKENAME
+                    Next
+                Next
+            Catch ex As Exception
+            End Try
+
+            Try
+                '②エルネス
+                Dim grElNessTankaMas = From row In O_dtTANKAMas.AsEnumerable()
+                                       Where row.Field(Of String)("TORICODE") = BaseDllConst.CONST_TORICODE_0238900000
+                                       Group row By CONV_TODOKECODE = row.Field(Of String)("CONV_TODOKECODE"),
+                                                    CONV_TODOKENAME = row.Field(Of String)("CONV_TODOKENAME"),
+                                                    TODOKECODE = row.Field(Of String)("TODOKECODE"),
+                                                    TODOKENAME = row.Field(Of String)("TODOKENAME") Into Group
+                                       Select New With {
+                                            .CONV_TODOKECODE = CONV_TODOKECODE,
+                                            .CONV_TODOKENAME = CONV_TODOKENAME,
+                                            .TODOKECODE = TODOKECODE,
+                                            .TODOKENAME = TODOKENAME
+                                        }
+
+                '★基準シート(コード、届先)統合版単価マスタより取得
+                For Each result In grElNessTankaMas
+                    Dim resCONV_TODOKECODE = result.CONV_TODOKECODE
+                    Dim resCONV_TODOKENAME = result.CONV_TODOKENAME
+                    Dim resTODOKECODE = result.TODOKECODE
+                    Dim resTODOKENAME = result.TODOKENAME
+                    Dim condition As String = ""
+                    condition &= String.Format("KEYCODE03 = '{0}'", resCONV_TODOKECODE)
+                    For Each dtElNessTodokerow As DataRow In dtElNessTodoke.Select(condition)
+                        dtElNessTodokerow("KEYCODE03") = resCONV_TODOKECODE
+                        dtElNessTodokerow("KEYCODE04") = resCONV_TODOKENAME
+                        dtElNessTodokerow("KEYCODE01") = resTODOKECODE
+                        dtElNessTodokerow("KEYCODE02") = resTODOKENAME
+                    Next
+                Next
+
+            Catch ex As Exception
+            End Try
+
         End If
 
     End Sub

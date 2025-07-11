@@ -920,7 +920,7 @@ Public Class CmnCheck
             CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
             CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
             '--〇統合版単価マスタ
-            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", cenergyTodokeClass, LNT0001Tanktbl)
+            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", cenergyTodokeClass, LNT0001Tanktbl, dtCenergyTodoke:=dtCenergyTodoke, dtElNessTodoke:=dtElNessTodoke)
             '--〇統合版固定費マスタ
             CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, TaishoYm.Replace("/", ""), LNT0001Koteihi, I_CLASS:=cenergyElNessTankClass)
             '--〇(新)統合版特別料金マスタ
