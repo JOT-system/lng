@@ -426,7 +426,7 @@ Public Class LNT0001InvoiceOutputReport
                     '〇DAIGAS(泉北)の場合
                 ElseIf PrintDatarow("ORDERORGCODE").ToString() = BaseDllConst.CONST_ORDERORGCODE_022702 Then
                     '★ 設定(向け先)
-                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
+                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("H{0}", PrintDatarow("MASTERCELL_REP").ToString())).Value = PrintDatarow("SHEETNAME_REP").ToString()
 
                 End If
 
@@ -550,7 +550,7 @@ Public Class LNT0001InvoiceOutputReport
                         'WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 Then
                             If PrintDatarow("MEMO").ToString() = "3名乗車" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Else
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
@@ -563,22 +563,22 @@ Public Class LNT0001InvoiceOutputReport
                             If cellValue = "昭和産業1" _
                                 AndAlso PrintDatarow("SYUBETSU").ToString() = "トン" _
                                 AndAlso PrintDatarow("MEMO").ToString() = "" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             ElseIf cellValue = "昭和産業2" _
                                 AndAlso PrintDatarow("SYUBETSU").ToString() = "トン" _
                                 AndAlso PrintDatarow("MEMO").ToString() = "2運行目" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
 
                             '☆(ハルナプロデュース)独自仕様
                         ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
                             If PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Else
                                 WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
                         Else
-                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                         End If
 
                         '〇姫路営業所独自仕様
@@ -624,9 +624,9 @@ Public Class LNT0001InvoiceOutputReport
                             '(日本栄船)独自仕様
                             If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_004916 _
                                 AndAlso PrintDatarow("BIKOU1").ToString() = "3名乗車" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("G{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Else
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
 
                         End If
@@ -722,14 +722,14 @@ Public Class LNT0001InvoiceOutputReport
                     If PrintHolidayRateDatarow("TODOKECODE_LNM0005").ToString() = BaseDllConst.CONST_TODOKECODE_004916 Then
                         If PrintHolidayRateDatarow("GYOMUTANKNUMFROM").ToString() = "2" Then
                             '・2名乗車
-                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                         ElseIf PrintHolidayRateDatarow("GYOMUTANKNUMFROM").ToString() = "3" Then
                             '・3名乗車
-                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("G{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                         End If
                     Else
                         '上記以外
-                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
+                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("F{0}", PrintHolidayRateDatarow("SETMASTERCELL").ToString())).Value = Integer.Parse(PrintHolidayRateDatarow("TANKA").ToString())
                     End If
 
                 Next
