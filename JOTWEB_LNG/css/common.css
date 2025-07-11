@@ -942,8 +942,8 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
 /* 右ボックス */
 #RF_RIGHTBOX {
     position: fixed;
-    top: 5em;
-    bottom: 1.4em;
+    top: 3em;
+    bottom: 0em;
     right: 0em;
     width: 0em;
     overflow: hidden;

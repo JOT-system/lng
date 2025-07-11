@@ -193,6 +193,95 @@ Public Class CmnLng
     End Function
 
     ''' <summary>
+    ''' ドロップダウンリスト(統合版単価マスタ) データ取得
+    ''' </summary>
+    ''' <param name="blnBlank">空白追加フラグ</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownNewTankaList(ByVal prmKeyWard As String, Optional ByVal blnBlank As Boolean = False) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim sqlStat As New StringBuilder
+
+        Select Case prmKeyWard
+            Case "TORI"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM6.TORICODE as CODE")
+                sqlStat.AppendLine("      ,LNM6.TORINAME as NAME")
+            Case "ORG"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM6.ORGCODE as CODE")
+                sqlStat.AppendLine("      ,LNM6.ORGNAME as NAME")
+            Case "SHUKABASHO"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM6.AVOCADOSHUKABASHO as CODE")
+                sqlStat.AppendLine("      ,LNM6.AVOCADOSHUKANAME as NAME")
+            Case "TODOKE"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM6.AVOCADOTODOKECODE as CODE")
+                sqlStat.AppendLine("      ,LNM6.AVOCADOTODOKENAME as NAME")
+            Case Else
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM6.TORICODE as CODE")
+                sqlStat.AppendLine("      ,LNM6.TORINAME as NAME")
+        End Select
+
+        sqlStat.AppendLine("  FROM LNG.LNM0006_NEWTANKA as LNM6")
+        sqlStat.AppendLine(" WHERE")
+        sqlStat.AppendLine("      LNM6.DELFLG = @DELFLG")
+        sqlStat.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN LNM6.STYMD AND LNM6.ENDYMD")
+
+        Select Case prmKeyWard
+            Case "TORI"
+                sqlStat.AppendLine(" GROUP BY  LNM6.TORICODE, LNM6.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  LNM6.TORICODE")
+            Case "ORG"
+                sqlStat.AppendLine(" GROUP BY  LNM6.ORGCODE, LNM6.ORGNAME")
+                sqlStat.AppendLine(" ORDER BY  LNM6.ORGCODE")
+            Case "SHUKABASHO"
+                sqlStat.AppendLine(" GROUP BY  LNM6.AVOCADOSHUKABASHO, LNM6.AVOCADOSHUKANAME")
+                sqlStat.AppendLine(" ORDER BY  LNM6.AVOCADOSHUKABASHO")
+            Case "TODOKE"
+                sqlStat.AppendLine(" GROUP BY  LNM6.AVOCADOTODOKECODE, LNM6.AVOCADOTODOKENAME")
+                sqlStat.AppendLine(" ORDER BY  LNM6.AVOCADOTODOKECODE")
+            Case Else
+                sqlStat.AppendLine(" GROUP BY  LNM6.TORICODE, LNM6.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  LNM6.TORICODE")
+        End Select
+
+
+        Try
+            '空白行判定
+            If blnBlank = True Then
+                Dim listBlankItm As New ListItem("", "")
+                retList.Items.Add(listBlankItm)
+            End If
+
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    While sqlDr.Read
+                        Dim listItm As New ListItem(Convert.ToString(sqlDr("NAME")), Convert.ToString(sqlDr("CODE")))
+                        retList.Items.Add(listItm)
+                    End While
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
     ''' ドロップダウンリスト(組織コード用) データ取得
     ''' </summary>
     ''' <param name="blnBlank">空白追加フラグ</param>
