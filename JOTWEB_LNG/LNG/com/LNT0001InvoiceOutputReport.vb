@@ -17,6 +17,7 @@ Public Class LNT0001InvoiceOutputReport
     Private WW_SheetNoCocacola As Integer = 0           '-- ＥＮＥＯＳ(水島)[コカ・コーラ　ボトラーズジャパン]
     Private WW_SheetNoNichiei As Integer = 0            '-- ＤＧＥ(泉北)[日栄]
     Private WW_SheetNoSyowasangyo As Integer = 0        '-- ＤＧＥ(泉北)[昭和産業(株)]
+    Private WW_SheetNoHaruna As Integer = 0             '-- ＤＧＥ(泉北)[ハルナプロデュース]
     Private WW_SheetNoNagaseKemutekkusu As Integer = 0  '-- ＤＧＥ(姫路)[ナガセケムテックス]
     Private WW_ArrSheetNo As Integer() = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
@@ -169,6 +170,9 @@ Public Class LNT0001InvoiceOutputReport
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" AndAlso WW_Workbook.Worksheets(i).Name = "昭和産業") Then
                         '〇DAIGAS(シート[昭和産業])
                         WW_SheetNoSyowasangyo = i
+                    ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022702 + "01" AndAlso WW_Workbook.Worksheets(i).Name = "ハルナプロデュース") Then
+                        '〇DAIGAS(シート[ハルナプロデュース])
+                        WW_SheetNoHaruna = i
                     ElseIf (Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 AndAlso WW_Workbook.Worksheets(i).Name = "ナガセケムテックス") Then
                         '〇DAIGAS(シート[ナガセケムテックス])
                         WW_SheetNoNagaseKemutekkusu = i
@@ -354,6 +358,12 @@ Public Class LNT0001InvoiceOutputReport
                 '★ＤＧＥ(泉北)の場合([日栄]独自対応)
                 EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_004916, "AND BRANCHCODE = '2' ", "L", "", WW_SheetNoNichiei, 12)
 
+                '★ＤＧＥ(泉北)の場合([ハルナプロデュース]独自対応)
+                '〇 8t(2運行目)
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_007304, "AND BRANCHCODE = '2' AND SYABARA = '8' ", "L", "", WW_SheetNoHaruna, 12)
+                '〇14t(2運行目)
+                EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_007304, "AND BRANCHCODE = '2' AND SYABARA = '14' ", "M", "", WW_SheetNoHaruna, 12)
+
             ElseIf Me.OutputOrgCode = BaseDllConst.CONST_ORDERORGCODE_022801 Then
                 '★ＤＧＥ(姫路営業所)の場合([ナガセケムテックス]独自対応)
                 EditDetailAreaTankaTyosei(BaseDllConst.CONST_TODOKECODE_006880, "AND BRANCHCODE = '2' ", "E", "F", WW_SheetNoNagaseKemutekkusu, 12)
@@ -496,7 +506,16 @@ Public Class LNT0001InvoiceOutputReport
                 Dim iTanka As Integer = Integer.Parse(PrintDatarow("TANKA").ToString())
                 If Convert.ToString(PrintDatarow("SYAGATA")) = "1" Then
                     '★単車
-                    WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    '☆(ハルナプロデュース)独自仕様
+                    If PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
+                        If PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("C{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        Else
+                            WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                        End If
+                    Else
+                        WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                    End If
                 ElseIf Convert.ToString(PrintDatarow("SYAGATA")) = "2" Then
                     '★トレーラ
                     '〇水島営業所(三井Ｅ＆Ｓ, コカ・コーラ)独自仕様
@@ -573,9 +592,9 @@ Public Class LNT0001InvoiceOutputReport
                             '☆(ハルナプロデュース)独自仕様
                         ElseIf PrintDatarow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
                             If PrintDatarow("TODOKEBRANCHCODE").ToString() = "02" Then
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("E{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             Else
-                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("B{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
+                                WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
                             End If
                         Else
                             WW_Workbook.Worksheets(WW_SheetNoTmp04).Range(String.Format("D{0}", PrintDatarow("MASTERNO").ToString())).Value = iTanka
@@ -872,6 +891,10 @@ Public Class LNT0001InvoiceOutputReport
             '★ＤＧＥ(泉北)の場合([日栄]独自対応)
             If todokeCode = BaseDllConst.CONST_TODOKECODE_004916 Then
                 WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = 1
+
+                '★ＤＧＥ(泉北)の場合([ハルナプロデュース]独自対応)
+            ElseIf todokeCode = BaseDllConst.CONST_TODOKECODE_007304 Then
+                WW_Workbook.Worksheets(sheetNo).Range(cellNum + cellLine.ToString()).Value = Decimal.Parse(PrintDatarow("ZISSEKI").ToString())
 
                 '★ＥＮＥＯＳ(八戸)の場合([ニプロ]独自対応)
             ElseIf todokeCode = BaseDllConst.CONST_TODOKECODE_001269 _

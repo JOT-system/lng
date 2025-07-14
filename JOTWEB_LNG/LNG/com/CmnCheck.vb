@@ -362,8 +362,8 @@ Public Class CmnCheck
                     If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_007304 Then
                         Dim sheetName = dtDaigasTodokerow("VALUE01").ToString().Replace("1", "").Replace("2", "")
                         Dim blanchCode = LNT0001tblrow("BRANCHCODE").ToString()
-                        LNT0001tblrow("TODOKENAME_REP") = sheetName + blanchCode
-                        'LNT0001tblrow("SHEETNAME_REP") = sheetName + blanchCode
+                        LNT0001tblrow("TODOKENAME_REP") = sheetName
+                        'LNT0001tblrow("TODOKENAME_REP") = sheetName + blanchCode
                     End If
 
                 Else
