@@ -38,14 +38,14 @@
     <%-- コンテンツ領域 --%>
     <asp:ContentPlaceHolder ID="head" runat="server" />
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-NECGFEWK93"></script>
-    <script>
+    <!-- Google tag (gtag.js) - Google Analytics --> 
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-0X0V5YJ34P"></script> 
+    <script>   
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', 'G-NECGFEWK93');
+        gtag('config', 'G-0X0V5YJ34P'); 
     </script>
 
 </head>
