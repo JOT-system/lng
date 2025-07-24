@@ -483,6 +483,9 @@ Public Class CmnCheck
             condition &= String.Format(" AND TODOKECODE NOT IN ('{0}', '{1}')",
                                        BaseDllConst.CONST_TODOKECODE_004012,
                                        BaseDllConst.CONST_TODOKECODE_005890)
+            '★枝番
+            condition &= String.Format(" AND BRANCHCODE = '{0}' ", dtSekiyuSigenTankrow("KEYCODE09").ToString())
+
             '届先(明細)セル値設定
             WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
 
@@ -496,27 +499,30 @@ Public Class CmnCheck
             End If
             '★届先(個別設定)のみ
             condition &= String.Format(" AND TODOKECODE IN ({0})", todokeMerge)
+            '★枝番
+            condition &= String.Format(" AND BRANCHCODE = '{0}' ", dtSekiyuSigenTankrow("KEYCODE09").ToString())
+
             '届先(明細)セル値設定
             WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
         Next
 
-        '〇石油資源開発(不積判定の設定) ----------------------------------------------------------
-        '■若松ｶﾞｽ(喜多方) 
-        '  --302号車(11.4t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, LNT0001tbl, gyomuNo:="302")
-        '■ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
-        '  --333号車(14.0t車)不積 
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, LNT0001tbl, gyomuNo:="333", tyoseiFlg:=True)
-        '  --334号車(15.7t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, LNT0001tbl, gyomuNo:="334", tyoseiFlg:=True)
-        ' ---------------------------------------------------------------------------------------/
+        ''〇石油資源開発(不積判定の設定) ----------------------------------------------------------
+        ''■若松ｶﾞｽ(喜多方) 
+        ''  --302号車(11.4t車)不積
+        'WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, LNT0001tbl, gyomuNo:="302")
+        ''■ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
+        ''  --333号車(14.0t車)不積 
+        'WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, LNT0001tbl, gyomuNo:="333", tyoseiFlg:=True)
+        ''  --334号車(15.7t車)不積
+        'WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, LNT0001tbl, gyomuNo:="334", tyoseiFlg:=True)
+        '' ---------------------------------------------------------------------------------------/
 
-        '〇石油資源開発(1.5回転の設定) -----------------------------------------------------------
-        '■若松ｶﾞｽ(玉川)
-        '  --326号車(若松1.5回転)
-        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "積込", "積置", "326", arrOPFCycle_002025_326, LNT0001tbl, judgeDate:="SHUKADATE")
-        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326, LNT0001tbl, tyoseiFlg:=True)
-        ' ---------------------------------------------------------------------------------------/
+        ''〇石油資源開発(1.5回転の設定) -----------------------------------------------------------
+        ''■若松ｶﾞｽ(玉川)
+        ''  --326号車(若松1.5回転)
+        'WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "積込", "積置", "326", arrOPFCycle_002025_326, LNT0001tbl, judgeDate:="SHUKADATE")
+        'WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326, LNT0001tbl, tyoseiFlg:=True)
+        '' ---------------------------------------------------------------------------------------/
 
         '〇(石油資源開発)届先出荷場所車庫マスタ設定
         For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Rows

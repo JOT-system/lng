@@ -428,18 +428,21 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
 
             Next
 
-            ''〇(その他)届名称(追加)用設定
-            'For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
-            '    '〇シート「従量運賃」
-            '    '★ 配送先
-            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("DETAILNAME").ToString()
-            '    '★ 輸送数量
-            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("K" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = ""
-            '    '★ 課税対象額
-            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("O" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
-            '    '★ 表示
-            '    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
-            'Next
+            '〇(その他)届名称(追加)用設定
+            For Each PrintTogouSpraterow As DataRow In PrintTogouSprate.Select("KOTEIHI_CELLNUM<>''")
+                '〇シート「従量運賃」
+                '★ 配送先
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString()
+                '★ 輸送数量
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("K" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = ""
+                '★ 課税対象額
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("O" + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = Decimal.Parse(PrintTogouSpraterow("TANKA").ToString())
+                '★ 表示
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(String.Format("{0}:{0}", PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString())).Hidden = False
+            Next
+
+            '〇不積セル(行)設定
+            SetDeadFreightCell()
 
             '〇届先(単価)設定
             For Each PrintDatarow As DataRow In PrintSKKoteichiData.Rows
@@ -448,13 +451,13 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
                 Dim iSheetNum As Integer = Integer.Parse(PrintDatarow("GRPNO").ToString()) - 1
                 Dim setCell As String = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + PrintDatarow("SET_CELL").ToString()
 
-                '■単価調整の場合
-                If PrintDatarow("BRANCHCODE").ToString() = "02" Then
-                    '★個別設定項目
-                    SetIndividualItem(PrintDatarow, WW_ArrSheetNoKoteichi(iSheetNum), iTanka)
-                Else
-                    WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = iTanka
-                End If
+                ''■単価調整の場合
+                'If PrintDatarow("BRANCHCODE").ToString() = "02" Then
+                '    '★個別設定項目
+                '    SetIndividualItem(PrintDatarow, WW_ArrSheetNoKoteichi(iSheetNum), iTanka)
+                'Else
+                WW_Workbook.Worksheets(WW_ArrSheetNoKoteichi(iSheetNum)).Range(setCell).Value = iTanka
+                'End If
 
                 If PrintDatarow("MEISAI_HYOJIFLG").ToString() = "1" Then
                     setCell = PrintDatarow("KOTEICHI_YOKOCELL").ToString() + "3"
@@ -525,6 +528,67 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGEN
 
         WW_Workbook.Worksheets(sheetNo).Range(setCell).Value = tanka
 
+    End Sub
+
+    ''' <summary>
+    ''' 不積セル(行)設定
+    ''' </summary>
+    Private Sub SetDeadFreightCell()
+        '〇新潟②
+        For Each PrintDatarow As DataRow In PrintSKKoteichiData.Select("GRPNO = '2' ")
+            Dim iSET_CELL As Integer = 0
+            iSET_CELL = CInt(PrintDatarow("SET_CELL").ToString())
+            Select Case PrintDatarow("BRANCHCODE").ToString()
+                '■不積料金
+                Case "02"
+                    iSET_CELL += 28
+            End Select
+            PrintDatarow("SET_CELL") = iSET_CELL.ToString()
+        Next
+
+        '〇新潟①
+        For Each PrintDatarow As DataRow In PrintSKKoteichiData.Select("GRPNO = '1' ")
+            Dim iSET_CELL As Integer = 0
+            iSET_CELL = CInt(PrintDatarow("SET_CELL").ToString())
+            Select Case PrintDatarow("BRANCHCODE").ToString()
+                '■不積料金
+                Case "02"
+                    iSET_CELL += 28
+                '■1.5回転単価
+                Case "03"
+                    iSET_CELL += 56
+                    PrintDatarow("GRPNO") = "2"
+                '■不積1.5回転単価
+                Case "04"
+                    iSET_CELL += 84
+                    PrintDatarow("GRPNO") = "2"
+            End Select
+            PrintDatarow("SET_CELL") = iSET_CELL.ToString()
+        Next
+
+        '〇秋田
+        For Each PrintDatarow As DataRow In PrintSKKoteichiData.Select("GRPNO = '3' ")
+            Dim iSET_CELL As Integer = 0
+            iSET_CELL = CInt(PrintDatarow("SET_CELL").ToString())
+            Select Case PrintDatarow("BRANCHCODE").ToString()
+                '■不積料金
+                Case "02", "04"
+                    iSET_CELL += 18
+            End Select
+            PrintDatarow("SET_CELL") = iSET_CELL.ToString()
+        Next
+
+        '〇東北・茨城
+        For Each PrintDatarow As DataRow In PrintSKKoteichiData.Select("GRPNO IN ('4','5') ")
+            Dim iSET_CELL As Integer = 0
+            iSET_CELL = CInt(PrintDatarow("SET_CELL").ToString())
+            Select Case PrintDatarow("BRANCHCODE").ToString()
+                '■不積料金
+                Case "02"
+                    iSET_CELL += 18
+            End Select
+            PrintDatarow("SET_CELL") = iSET_CELL.ToString()
+        Next
     End Sub
 
 End Class

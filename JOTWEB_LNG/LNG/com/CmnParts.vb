@@ -401,7 +401,7 @@ Public Class CmnParts
         End If
 
         '-- ORDER BY
-        SQLStr &= " ORDER BY LNM0006.TORICODE, LNM0006.SHUKABASHO, CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
+        SQLStr &= " ORDER BY LNM0006.TORICODE, LNM0006.ORGCODE, LNM0006.SHUKABASHO, CAST(LNM0005.KEYCODE03 AS SIGNED), LNM0006.BRANCHCODE "
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
@@ -929,7 +929,7 @@ Public Class CmnParts
         SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '4' THEN '5' "
         SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '3' THEN '4' "
         SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '2' THEN '3' "
-        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '1' AND LNM0005.VALUE05='45' THEN '2' "
+        SQLStr &= "    WHEN LNM0005_TODOKE.KEYCODE08 = '1' AND (LNM0005.VALUE05='45' OR LNM0005.VALUE05 = '126') THEN '2' "
         SQLStr &= "    ELSE '1' "
         SQLStr &= "    END AS GRPNO "
         SQLStr &= "  , LNM0005_TODOKE.KEYCODE01 AS TODOKENO "
@@ -1036,14 +1036,21 @@ Public Class CmnParts
             Dim condition As String = "GRPNO='5' "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
-                '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                End If
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+                dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
+                dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
+                ''★単価調整がある場合
+                'Dim iSET_CELL As Integer = 0
+                'Select Case dtSKKOTEICHIMasrow("BRANCHCODE").ToString()
+                '    Case "02"
+                '        '■不積料金
+                '        iSET_CELL = CInt(dtSKKOTEICHIMasrow("SET_CELL").ToString())
+                '        iSET_CELL += 18
+                '        dtSKKOTEICHIMasrow("SET_CELL") = iSET_CELL.ToString()
+                'End Select
             Next
         Next
 
@@ -1053,33 +1060,40 @@ Public Class CmnParts
             Dim condition As String = "GRPNO='4' "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
-                '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                End If
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+                dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
+                dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
+                ''★単価調整がある場合
+                'Dim iSET_CELL As Integer = 0
+                'Select Case dtSKKOTEICHIMasrow("BRANCHCODE").ToString()
+                '    Case "02"
+                '        '■不積料金
+                '        iSET_CELL = CInt(dtSKKOTEICHIMasrow("SET_CELL").ToString())
+                '        iSET_CELL += 18
+                '        dtSKKOTEICHIMasrow("SET_CELL") = iSET_CELL.ToString()
+                'End Select
             Next
         Next
 
         '-- 〇秋田
         'conditionSub = String.Format("GRPNO='2' AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
-        conditionSub = String.Format("GRPNO IN ('1','2') AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
+        'conditionSub = String.Format("GRPNO IN ('1','2') AND ORGCODE='{0}' ", BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub = String.Format(" GRPNO IN ('1','2') AND (ORGCODE='{0}' OR ORGCODE='{1}') ", BaseDllConst.CONST_ORDERORGCODE_021502, BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub &= String.Format(" AND AVOCADOSHUKABASHO='{0}' ", "005690")
         For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
             'Dim condition As String = "GRPNO='3' "
             Dim condition As String = "GRPNO IN ('1','3') "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
-                '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                End If
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+                dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
+                dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
             Next
         Next
         '-- ★秋田(宿泊有)
@@ -1091,11 +1105,22 @@ Public Class CmnParts
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             condition &= "AND KOTEICHI_GYOMUNOSUB ='01' "
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
+                'dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                 dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                 dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
+                ''★単価調整がある場合
+                'Dim iSET_CELL As Integer = 0
+                'Select Case dtSKKOTEICHIMasrow("BRANCHCODE").ToString()
+                '    Case "02", "04"
+                '        '■不積料金
+                '        iSET_CELL = CInt(dtSKKOTEICHIMasrow("SET_CELL").ToString())
+                '        iSET_CELL += 18
+                '        dtSKKOTEICHIMasrow("SET_CELL") = iSET_CELL.ToString()
+                'End Select
             Next
         Next
         '-- ★秋田(宿泊無)
@@ -1108,28 +1133,39 @@ Public Class CmnParts
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
             condition &= "AND KOTEICHI_GYOMUNOSUB ='02' "
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
                 dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
+                'dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
                 dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
                 dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
+                ''★単価調整がある場合
+                'Dim iSET_CELL As Integer = 0
+                'Select Case dtSKKOTEICHIMasrow("BRANCHCODE").ToString()
+                '    Case "02", "04"
+                '        '■不積料金
+                '        iSET_CELL = CInt(dtSKKOTEICHIMasrow("SET_CELL").ToString())
+                '        iSET_CELL += 18
+                '        dtSKKOTEICHIMasrow("SET_CELL") = iSET_CELL.ToString()
+                'End Select
             Next
         Next
 
         '-- 〇新潟
-        conditionSub = String.Format("GRPNO ='1' AND ORGCODE='{0}' AND AVOCADOSHUKABASHO<>'{1}' ", BaseDllConst.CONST_ORDERORGCODE_021502, "005690")
+        'conditionSub = String.Format("GRPNO ='1' AND ORGCODE='{0}' AND AVOCADOSHUKABASHO<>'{1}' ", BaseDllConst.CONST_ORDERORGCODE_021502, "005690")
+        conditionSub = String.Format(" GRPNO ='1' AND (ORGCODE='{0}' OR ORGCODE='{1}') ", BaseDllConst.CONST_ORDERORGCODE_021502, BaseDllConst.CONST_ORDERORGCODE_020601)
+        conditionSub &= String.Format(" AND AVOCADOSHUKABASHO <> '{0}' ", "005690")
         For Each dtTANKAMasrow As DataRow In I_dtTANKAMas.Select(conditionSub)
             Dim condition As String = "GRPNO IN ('1','2') "
             condition &= String.Format("AND TODOKENO ='{0}' ", dtTANKAMasrow("TODOKECODE").ToString())
             condition &= String.Format("AND KOTEICHI_GYOMUNO ='{0}' ", dtTANKAMasrow("SYAGOU").ToString())
+            condition &= String.Format("AND BRANCHCODE ='{0}' ", dtTANKAMasrow("TODOKEBRANCHCODE").ToString())
             For Each dtSKKOTEICHIMasrow As DataRow In O_dtSKKOTEICHIMas.Select(condition)
-                '★単価調整がある場合
-                If dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE") Then
-                    dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
-                    dtSKKOTEICHIMasrow("BRANCHCODE") = dtTANKAMasrow("TODOKEBRANCHCODE")
-                    dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
-                    dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
-                End If
+                dtSKKOTEICHIMasrow("TANKA") = dtTANKAMasrow("TANKA")
+                dtSKKOTEICHIMasrow("TANKAKBN") = dtTANKAMasrow("TANKAKBN")
+                dtSKKOTEICHIMasrow("MEMO") = dtTANKAMasrow("MEMO")
+
             Next
         Next
 
@@ -1456,7 +1492,7 @@ Public Class CmnParts
             SQLStrSub &= " WHERE "
             SQLStrSub &= String.Format("     LNM0005.DELFLG = '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
             SQLStrSub &= String.Format(" AND LNM0005.CLASS = '{0}' ", I_CLASS)
-            SQLStrSub &= " AND LNM0005.KEYCODE10 <> '' "    '※(GRPID + 明細ID)が設定されている
+            SQLStrSub &= " AND LNM0005.KEYCODE10 <> '' "    '※(大分類コード + 小分類コード)が設定されている
 
             Try
                 Using SQLcmd As New MySqlCommand(SQLStrSub, SQLcon)
