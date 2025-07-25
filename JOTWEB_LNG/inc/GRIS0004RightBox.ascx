@@ -5,12 +5,12 @@
             <div id="RF_ERR_MEMO">
                 <a>
                     <span style="position:relative;left:0.9em;top:1.2em;font-size:1em;">
-                        <asp:Label runat="server" Text="エラー詳細"></asp:Label>
+                        <asp:Label runat="server" Text="詳細"></asp:Label>
                         <!-- 　非表示　 --> 
                         <%--<asp:RadioButton ID="RF_RIGHT_SW1" runat="server" GroupName="rightbox" Text=" エラー詳細表示" Width="9em" Onclick="rightboxChange('0')" />--%>
                         <%--<asp:RadioButton ID="RF_RIGHT_SW2" runat="server" GroupName="rightbox" Text=" メモ表示" Width="9em" Onclick="rightboxChange('1')" />--%>
                     </span>
-                    <input type="button" id="RF_RIGHTBOX_CLOSEBTN" value="×" style="position: relative; left: 17.1em; top: 1.2em; width: 25px; font-size: 1em; text-align: center; border: solid 1px #2bb6c1; color: #2bb6c1;" onclick="r_boxDisplayNonSubmit();" />
+                    <input type="button" id="RF_RIGHTBOX_CLOSEBTN" value="×" style="position: relative; left: 20.1em; top: 1.2em; width: 25px; font-size: 1em; text-align: center; border: solid 1px #2bb6c1; color: #2bb6c1;" onclick="r_boxDisplayNonSubmit();" />
                 </a>
                 <br/>
 
@@ -20,7 +20,7 @@
                         <a id="RF_RIGHTBOX_ERROR_REPORT">
                             <span id="RF_ERROR_REPORT" style="position:relative;left:1em;top:1.5em;" >
 <%--                            <asp:TextBox ID="RF_ERR_REPORT" runat="server" Width="23.6em" Height="16.9em" TextMode="MultiLine" ReadOnly="true"></asp:TextBox>--%>
-                                <asp:TextBox ID="RF_ERR_REPORT" runat="server" Width="330px" Height="495px" TextMode="MultiLine" ReadOnly="true"></asp:TextBox>
+                                <asp:TextBox ID="RF_ERR_REPORT" runat="server" Width="345px" Height="495px" TextMode="MultiLine" ReadOnly="true"></asp:TextBox>
                             </span>
                             <br />
                         </a>
