@@ -426,17 +426,41 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
                 Dim setCellNum As String = ""
                 '〇季節料金判定区分("1"(通常), "2"(冬季))
                 If PrintKoteihiDatarow("SEASONKBN").ToString() = "1" Then
-                    '□基本運賃(通常)
+                    '□基本運賃(通常(夏季))
                     setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL02").ToString()
                 ElseIf PrintKoteihiDatarow("SEASONKBN").ToString() = "2" Then
                     '□基本運賃(冬季)
                     setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
+                ElseIf PrintKoteihiDatarow("SEASONKBN").ToString() = "0" Then
+                    '□基本運賃(通年)
+                    setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL02").ToString()
                 Else
                     Continue For
                 End If
-                setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
+                '★行セルが未設定の場合SKIP
+                If setCellNum = "" Then Continue For
 
+                '★基本運賃設定
+                setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
                 WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+                '□基本運賃(通年)の場合
+                If PrintKoteihiDatarow("SEASONKBN").ToString() = "0" Then
+                    '★基本運賃設定(□基本運賃(冬季))
+                    setCellNum = PrintKoteihiDatarow("KOTEIHI_CELL03").ToString()
+                    setCellNum &= PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = Integer.Parse(PrintKoteihiDatarow("KOTEIHI").ToString())
+                End If
+
+                '★車番(未設定)チェック
+                setCellNum = "A" + PrintKoteihiDatarow("KOTEIHI_CELLNUM").ToString()
+                Dim syabanName As String = ""
+                Try
+                    syabanName = WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value.ToString()
+                Catch ex As Exception
+                End Try
+                If syabanName = "" Then
+                    WW_Workbook.Worksheets(WW_SheetNoMaster).Range(setCellNum).Value = CInt(PrintKoteihiDatarow("SYABAN").ToString())
+                End If
             Next
 
             '★季節判定
