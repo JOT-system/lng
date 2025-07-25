@@ -1969,7 +1969,7 @@ Public Class LNS0001UserList
             SQLcon.Open()       'DataBase接続
             'Excelデータ格納用テーブルに格納する
             rightview.InitMemoErrList(WW_Dummy)
-            rightview.AddErrorReport("以下のデータ変換に失敗したためアップロードを中断しました。")
+            rightview.AddErrorReport("データ変換に失敗したためアップロードを中断しました。")
             SetExceltbl(SQLcon, filePath, WW_ErrSW)
             If WW_ErrSW = "ERR" Then
                 WF_RightboxOpen.Value = "Open"
@@ -2096,7 +2096,13 @@ Public Class LNS0001UserList
             End If
 
             'Rightboxを表示する
-            WF_RightboxOpen.Value = "Open"
+            If WW_UplErrCnt = 0 Then
+                'エラーなし
+                WF_RightboxOpen.Value = "OpenI"
+            Else
+                'エラーあり
+                WF_RightboxOpen.Value = "Open"
+            End If
 
             '更新完了メッセージを表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
@@ -2162,191 +2168,205 @@ Public Class LNS0001UserList
             Exit Sub
         End Try
 
-        'Excelファイルを開く
-        Dim fileStream As FileStream
-        fileStream = File.OpenRead(FilePath)
+        Try
+            'Excelファイルを開く
+            Dim fileStream As FileStream
+            fileStream = File.OpenRead(FilePath)
 
-        'ファイル内のシート名を取得
-        Dim sheetname = GrapeCity.Documents.Excel.Workbook.GetNames(fileStream)
+            'ファイル内のシート名を取得
+            Dim sheetname = GrapeCity.Documents.Excel.Workbook.GetNames(fileStream)
 
-        'データを取得
-        Dim WW_EXCELDATA = GrapeCity.Documents.Excel.Workbook.ImportData(fileStream, sheetname(0))
+            'データを取得
+            Dim WW_EXCELDATA = GrapeCity.Documents.Excel.Workbook.ImportData(fileStream, sheetname(0))
 
-        O_RTN = ""
-        Dim WW_TEXT As String = ""
-        Dim WW_DATATYPE As String = ""
-        Dim WW_RESULT As Boolean
+            O_RTN = ""
+            Dim WW_TEXT As String = ""
+            Dim WW_DATATYPE As String = ""
+            Dim WW_RESULT As Boolean
 
-        Dim WW_CheckMES1 As String = ""
-        Dim WW_CheckMES2 As String = ""
-        Dim WW_CS0024FCHECKERR As String = ""
-        Dim WW_CS0024FCHECKREPORT As String = ""
+            Dim WW_CheckMES1 As String = ""
+            Dim WW_CheckMES2 As String = ""
+            Dim WW_CS0024FCHECKERR As String = ""
+            Dim WW_CS0024FCHECKREPORT As String = ""
 
-        Dim LNS0001Exceltblrow As DataRow
-        Dim WW_LINECNT As Integer
+            Dim LNS0001Exceltblrow As DataRow
+            Dim WW_LINECNT As Integer
 
-        WW_LINECNT = 1
+            WW_LINECNT = 1
 
-        For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
-            LNS0001Exceltblrow = LNS0001Exceltbl.NewRow
+            For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
+                LNS0001Exceltblrow = LNS0001Exceltbl.NewRow
 
-            'LINECNT
-            LNS0001Exceltblrow("LINECNT") = WW_LINECNT
-            WW_LINECNT = WW_LINECNT + 1
+                'LINECNT
+                LNS0001Exceltblrow("LINECNT") = WW_LINECNT
+                WW_LINECNT = WW_LINECNT + 1
 
-            '◆データセット
-            'ユーザーID
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.USERID))
-            WW_DATATYPE = DataTypeHT("USERID")
-            LNS0001Exceltblrow("USERID") = LNS0001WRKINC.DataConvert("ユーザーID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'パスワード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.PASSWORD))
-            WW_DATATYPE = DataTypeHT("PASSWORD")
-            LNS0001Exceltblrow("PASSWORD") = LNS0001WRKINC.DataConvert("パスワード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '誤り回数
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MISSCNT))
-            WW_DATATYPE = DataTypeHT("MISSCNT")
-            LNS0001Exceltblrow("MISSCNT") = LNS0001WRKINC.DataConvert("誤り回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'パスワード有効期限
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.PASSENDYMD))
-            WW_DATATYPE = DataTypeHT("PASSENDYMD")
-            LNS0001Exceltblrow("PASSENDYMD") = LNS0001WRKINC.DataConvert("パスワード有効期限", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '開始年月日
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STYMD))
-            WW_DATATYPE = DataTypeHT("STYMD")
-            LNS0001Exceltblrow("STYMD") = LNS0001WRKINC.DataConvert("開始年月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '終了年月日
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.ENDYMD))
-            WW_DATATYPE = DataTypeHT("ENDYMD")
-            LNS0001Exceltblrow("ENDYMD") = LNS0001WRKINC.DataConvert("終了年月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '組織コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.ORG))
-            WW_DATATYPE = DataTypeHT("ORG")
-            LNS0001Exceltblrow("ORG") = LNS0001WRKINC.DataConvert("組織コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '社員名（短）
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMES))
-            WW_DATATYPE = DataTypeHT("STAFFNAMES")
-            LNS0001Exceltblrow("STAFFNAMES") = LNS0001WRKINC.DataConvert("社員名（短）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '社員名（長）
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMEL))
-            WW_DATATYPE = DataTypeHT("STAFFNAMEL")
-            LNS0001Exceltblrow("STAFFNAMEL") = LNS0001WRKINC.DataConvert("社員名（長）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'メールアドレス
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.EMAIL))
-            WW_DATATYPE = DataTypeHT("EMAIL")
-            LNS0001Exceltblrow("EMAIL") = LNS0001WRKINC.DataConvert("メールアドレス", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+                '◆データセット
+                'ユーザーID
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.USERID))
+                WW_DATATYPE = DataTypeHT("USERID")
+                LNS0001Exceltblrow("USERID") = LNS0001WRKINC.DataConvert("ユーザーID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'パスワード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.PASSWORD))
+                WW_DATATYPE = DataTypeHT("PASSWORD")
+                LNS0001Exceltblrow("PASSWORD") = LNS0001WRKINC.DataConvert("パスワード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '誤り回数
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MISSCNT))
+                WW_DATATYPE = DataTypeHT("MISSCNT")
+                LNS0001Exceltblrow("MISSCNT") = LNS0001WRKINC.DataConvert("誤り回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'パスワード有効期限
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.PASSENDYMD))
+                WW_DATATYPE = DataTypeHT("PASSENDYMD")
+                LNS0001Exceltblrow("PASSENDYMD") = LNS0001WRKINC.DataConvert("パスワード有効期限", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '開始年月日
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STYMD))
+                WW_DATATYPE = DataTypeHT("STYMD")
+                LNS0001Exceltblrow("STYMD") = LNS0001WRKINC.DataConvert("開始年月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '終了年月日
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.ENDYMD))
+                WW_DATATYPE = DataTypeHT("ENDYMD")
+                LNS0001Exceltblrow("ENDYMD") = LNS0001WRKINC.DataConvert("終了年月日", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '組織コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.ORG))
+                WW_DATATYPE = DataTypeHT("ORG")
+                LNS0001Exceltblrow("ORG") = LNS0001WRKINC.DataConvert("組織コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '社員名（短）
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMES))
+                WW_DATATYPE = DataTypeHT("STAFFNAMES")
+                LNS0001Exceltblrow("STAFFNAMES") = LNS0001WRKINC.DataConvert("社員名（短）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '社員名（長）
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.STAFFNAMEL))
+                WW_DATATYPE = DataTypeHT("STAFFNAMEL")
+                LNS0001Exceltblrow("STAFFNAMEL") = LNS0001WRKINC.DataConvert("社員名（長）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'メールアドレス
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.EMAIL))
+                WW_DATATYPE = DataTypeHT("EMAIL")
+                LNS0001Exceltblrow("EMAIL") = LNS0001WRKINC.DataConvert("メールアドレス", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
 
-            '画面ＩＤ
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPID))
-            WW_DATATYPE = DataTypeHT("MAPID")
-            LNS0001Exceltblrow("MAPID") = LNS0001WRKINC.DataConvert("画面ＩＤ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+                '画面ＩＤ
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPID))
+                WW_DATATYPE = DataTypeHT("MAPID")
+                LNS0001Exceltblrow("MAPID") = LNS0001WRKINC.DataConvert("画面ＩＤ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
 
-            ''メニュー表示制御ロール
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE))
-            'WW_DATATYPE = DataTypeHT("MENUROLE")
-            'LNS0001Exceltblrow("MENUROLE") = LNS0001WRKINC.DataConvert("メニュー表示制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
-            ''画面参照更新制御ロール
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE))
-            'WW_DATATYPE = DataTypeHT("MAPROLE")
-            'LNS0001Exceltblrow("MAPROLE") = LNS0001WRKINC.DataConvert("画面参照更新制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
-            ''画面表示項目制御ロール
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID))
-            'WW_DATATYPE = DataTypeHT("VIEWPROFID")
-            'LNS0001Exceltblrow("VIEWPROFID") = LNS0001WRKINC.DataConvert("画面表示項目制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
-            ''エクセル出力制御ロール
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID))
-            'WW_DATATYPE = DataTypeHT("RPRTPROFID")
-            'LNS0001Exceltblrow("RPRTPROFID") = LNS0001WRKINC.DataConvert("エクセル出力制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
+                ''メニュー表示制御ロール
+                'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MENUROLE))
+                'WW_DATATYPE = DataTypeHT("MENUROLE")
+                'LNS0001Exceltblrow("MENUROLE") = LNS0001WRKINC.DataConvert("メニュー表示制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                'If WW_RESULT = False Then
+                '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                'End If
+                ''画面参照更新制御ロール
+                'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.MAPROLE))
+                'WW_DATATYPE = DataTypeHT("MAPROLE")
+                'LNS0001Exceltblrow("MAPROLE") = LNS0001WRKINC.DataConvert("画面参照更新制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                'If WW_RESULT = False Then
+                '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                'End If
+                ''画面表示項目制御ロール
+                'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.VIEWPROFID))
+                'WW_DATATYPE = DataTypeHT("VIEWPROFID")
+                'LNS0001Exceltblrow("VIEWPROFID") = LNS0001WRKINC.DataConvert("画面表示項目制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                'If WW_RESULT = False Then
+                '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                'End If
+                ''エクセル出力制御ロール
+                'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.RPRTPROFID))
+                'WW_DATATYPE = DataTypeHT("RPRTPROFID")
+                'LNS0001Exceltblrow("RPRTPROFID") = LNS0001WRKINC.DataConvert("エクセル出力制御ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                'If WW_RESULT = False Then
+                '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                'End If
 
-            ''画面初期値ロール
-            'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT))
-            'WW_DATATYPE = DataTypeHT("VARIANT")
-            'LNS0001Exceltblrow("VARIANT") = LNS0001WRKINC.DataConvert("画面初期値ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            'If WW_RESULT = False Then
-            '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-            '    O_RTN = "ERR"
-            'End If
+                ''画面初期値ロール
+                'WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL._VARIANT))
+                'WW_DATATYPE = DataTypeHT("VARIANT")
+                'LNS0001Exceltblrow("VARIANT") = LNS0001WRKINC.DataConvert("画面初期値ロール", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                'If WW_RESULT = False Then
+                '    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                '    O_RTN = "ERR"
+                'End If
 
-            '削除フラグ
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG))
-            WW_DATATYPE = DataTypeHT("DELFLG")
-            LNS0001Exceltblrow("DELFLG") = LNS0001WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+                '削除フラグ
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNS0001WRKINC.INOUTEXCELCOL.DELFLG))
+                WW_DATATYPE = DataTypeHT("DELFLG")
+                LNS0001Exceltblrow("DELFLG") = LNS0001WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
 
-            'パスワード変更確認
-            If LNS0001Exceltblrow("PASSWORD").ToString.Replace("*", "") = "" Then
-                LNS0001Exceltblrow("PASSUPD") = "0" '変更なし
-            Else
-                LNS0001Exceltblrow("PASSUPD") = "1" '変更あり
-            End If
+                'パスワード変更確認
+                If LNS0001Exceltblrow("PASSWORD").ToString.Replace("*", "") = "" Then
+                    LNS0001Exceltblrow("PASSUPD") = "0" '変更なし
+                Else
+                    LNS0001Exceltblrow("PASSUPD") = "1" '変更あり
+                End If
 
-            '登録
-            LNS0001Exceltbl.Rows.Add(LNS0001Exceltblrow)
+                '登録
+                LNS0001Exceltbl.Rows.Add(LNS0001Exceltblrow)
 
-        Next
+            Next
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, "アップロードファイル不正、内容を確認してください。", needsPopUp:=True)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "アップロードファイル不正、内容を確認してください。"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.OIL_FREE_MESSAGE
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            O_RTN = "ERR"
+            Exit Sub
+
+        End Try
     End Sub
 
     '' <summary>
