@@ -2236,7 +2236,7 @@ Public Class LNM0014SprateList
             SQLcon.Open()       'DataBase接続
             'Excelデータ格納用テーブルに格納する
             rightview.InitMemoErrList(WW_Dummy)
-            rightview.AddErrorReport("以下のデータ変換に失敗したためアップロードを中断しました。")
+            rightview.AddErrorReport("データ変換に失敗したためアップロードを中断しました。")
             SetExceltbl(SQLcon, filePath, WW_ErrSW)
             If WW_ErrSW = "ERR" Then
                 WF_RightboxOpen.Value = "Open"
@@ -2368,7 +2368,13 @@ Public Class LNM0014SprateList
             End If
 
             'Rightboxを表示する
-            WF_RightboxOpen.Value = "Open"
+            If WW_UplErrCnt = 0 Then
+                'エラーなし
+                WF_RightboxOpen.Value = "OpenI"
+            Else
+                'エラーあり
+                WF_RightboxOpen.Value = "Open"
+            End If
 
             '更新完了メッセージを表示
             Master.Output(C_MESSAGE_NO.DATA_UPDATE_SUCCESSFUL, C_MESSAGE_TYPE.INF, needsPopUp:=True)
@@ -2456,373 +2462,388 @@ Public Class LNM0014SprateList
             Exit Sub
         End Try
 
-        'Excelファイルを開く
-        Dim fileStream As FileStream
-        fileStream = File.OpenRead(FilePath)
+        Try
 
-        'ファイル内のシート名を取得
-        Dim sheetname = GrapeCity.Documents.Excel.Workbook.GetNames(fileStream)
+            'Excelファイルを開く
+            Dim fileStream As FileStream
+            fileStream = File.OpenRead(FilePath)
 
-        'データを取得
-        Dim WW_EXCELDATA = GrapeCity.Documents.Excel.Workbook.ImportData(fileStream, sheetname(0))
+            'ファイル内のシート名を取得
+            Dim sheetname = GrapeCity.Documents.Excel.Workbook.GetNames(fileStream)
 
-        O_RTN = ""
-        Dim WW_TEXT As String = ""
-        Dim WW_DATATYPE As String = ""
-        Dim WW_RESULT As Boolean
+            'データを取得
+            Dim WW_EXCELDATA = GrapeCity.Documents.Excel.Workbook.ImportData(fileStream, sheetname(0))
 
-        Dim WW_CheckMES1 As String = ""
-        Dim WW_CheckMES2 As String = ""
-        Dim WW_CS0024FCHECKERR As String = ""
-        Dim WW_CS0024FCHECKREPORT As String = ""
+            O_RTN = ""
+            Dim WW_TEXT As String = ""
+            Dim WW_DATATYPE As String = ""
+            Dim WW_RESULT As Boolean
 
-        Dim LNM0014Exceltblrow As DataRow
-        Dim WW_LINECNT As Integer
+            Dim WW_CheckMES1 As String = ""
+            Dim WW_CheckMES2 As String = ""
+            Dim WW_CS0024FCHECKERR As String = ""
+            Dim WW_CS0024FCHECKREPORT As String = ""
 
-        WW_LINECNT = 1
+            Dim LNM0014Exceltblrow As DataRow
+            Dim WW_LINECNT As Integer
 
-        For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
-            LNM0014Exceltblrow = LNM0014Exceltbl.NewRow
+            WW_LINECNT = 1
 
-            'LINECNT
-            LNM0014Exceltblrow("LINECNT") = WW_LINECNT
-            WW_LINECNT = WW_LINECNT + 1
+            For WW_ROW As Integer = CONST_DATA_START_ROW To WW_EXCELDATA.GetLength(0) - 1
+                LNM0014Exceltblrow = LNM0014Exceltbl.NewRow
 
-            '◆データセット
-            '対象年月
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TARGETYM))
-            WW_DATATYPE = DataTypeHT("TARGETYM")
-            LNM0014Exceltblrow("TARGETYM") = LNM0014WRKINC.DataConvert("対象年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '取引先コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TORICODE))
-            WW_DATATYPE = DataTypeHT("TORICODE")
-            LNM0014Exceltblrow("TORICODE") = LNM0014WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '取引先名称
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TORINAME))
-            WW_DATATYPE = DataTypeHT("TORINAME")
-            LNM0014Exceltblrow("TORINAME") = LNM0014WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '部門コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ORGCODE))
-            WW_DATATYPE = DataTypeHT("ORGCODE")
-            LNM0014Exceltblrow("ORGCODE") = LNM0014WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '部門名称
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ORGNAME))
-            WW_DATATYPE = DataTypeHT("ORGNAME")
-            LNM0014Exceltblrow("ORGNAME") = LNM0014WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '加算先部門コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.KASANORGCODE))
-            WW_DATATYPE = DataTypeHT("KASANORGCODE")
-            LNM0014Exceltblrow("KASANORGCODE") = LNM0014WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '加算先部門名称
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.KASANORGNAME))
-            WW_DATATYPE = DataTypeHT("KASANORGNAME")
-            LNM0014Exceltblrow("KASANORGNAME") = LNM0014WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '届先コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKECODE))
-            WW_DATATYPE = DataTypeHT("TODOKECODE")
-            LNM0014Exceltblrow("TODOKECODE") = LNM0014WRKINC.DataConvert("届先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '届先名称
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKENAME))
-            WW_DATATYPE = DataTypeHT("TODOKENAME")
-            LNM0014Exceltblrow("TODOKENAME") = LNM0014WRKINC.DataConvert("届先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'グループソート順
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO)), ",", "")
-            WW_DATATYPE = DataTypeHT("GROUPSORTNO")
-            LNM0014Exceltblrow("GROUPSORTNO") = LNM0014WRKINC.DataConvert("グループソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'グループID
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID)), ",", "")
-            WW_DATATYPE = DataTypeHT("GROUPID")
-            LNM0014Exceltblrow("GROUPID") = LNM0014WRKINC.DataConvert("グループID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'グループ名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPNAME))
-            WW_DATATYPE = DataTypeHT("GROUPNAME")
-            LNM0014Exceltblrow("GROUPNAME") = LNM0014WRKINC.DataConvert("グループ名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '明細ソート順
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO)), ",", "")
-            WW_DATATYPE = DataTypeHT("DETAILSORTNO")
-            LNM0014Exceltblrow("DETAILSORTNO") = LNM0014WRKINC.DataConvert("明細ソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '明細ID
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID)), ",", "")
-            WW_DATATYPE = DataTypeHT("DETAILID")
-            LNM0014Exceltblrow("DETAILID") = LNM0014WRKINC.DataConvert("明細ID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '明細名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILNAME))
-            WW_DATATYPE = DataTypeHT("DETAILNAME")
-            LNM0014Exceltblrow("DETAILNAME") = LNM0014WRKINC.DataConvert("明細名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '単価
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA)), ",", "")
-            WW_DATATYPE = DataTypeHT("TANKA")
-            LNM0014Exceltblrow("TANKA") = LNM0014WRKINC.DataConvert("単価", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '数量
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY)), ",", "")
-            WW_DATATYPE = DataTypeHT("QUANTITY")
-            LNM0014Exceltblrow("QUANTITY") = LNM0014WRKINC.DataConvert("数量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '計算単位
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.CALCUNIT))
-            WW_DATATYPE = DataTypeHT("CALCUNIT")
-            LNM0014Exceltblrow("CALCUNIT") = LNM0014WRKINC.DataConvert("計算単位", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '出荷地
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DEPARTURE))
-            WW_DATATYPE = DataTypeHT("DEPARTURE")
-            LNM0014Exceltblrow("DEPARTURE") = LNM0014WRKINC.DataConvert("出荷地", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '走行距離
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE)), ",", "")
-            WW_DATATYPE = DataTypeHT("MILEAGE")
-            LNM0014Exceltblrow("MILEAGE") = LNM0014WRKINC.DataConvert("走行距離", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '輸送回数
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT)), ",", "")
-            WW_DATATYPE = DataTypeHT("SHIPPINGCOUNT")
-            LNM0014Exceltblrow("SHIPPINGCOUNT") = LNM0014WRKINC.DataConvert("輸送回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '燃費
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI)), ",", "")
-            WW_DATATYPE = DataTypeHT("NENPI")
-            LNM0014Exceltblrow("NENPI") = LNM0014WRKINC.DataConvert("燃費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '実勢軽油価格
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT)), ",", "")
-            WW_DATATYPE = DataTypeHT("DIESELPRICECURRENT")
-            LNM0014Exceltblrow("DIESELPRICECURRENT") = LNM0014WRKINC.DataConvert("実勢軽油価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '基準経由価格
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD)), ",", "")
-            WW_DATATYPE = DataTypeHT("DIESELPRICESTANDARD")
-            LNM0014Exceltblrow("DIESELPRICESTANDARD") = LNM0014WRKINC.DataConvert("基準経由価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '燃料使用量
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION)), ",", "")
-            WW_DATATYPE = DataTypeHT("DIESELCONSUMPTION")
-            LNM0014Exceltblrow("DIESELCONSUMPTION") = LNM0014WRKINC.DataConvert("燃料使用量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '表示フラグ
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG))
-            WW_DATATYPE = DataTypeHT("DISPLAYFLG")
-            LNM0014Exceltblrow("DISPLAYFLG") = LNM0014WRKINC.DataConvert("表示フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '鑑分けフラグ
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG))
-            WW_DATATYPE = DataTypeHT("ASSESSMENTFLG")
-            LNM0014Exceltblrow("ASSESSMENTFLG") = LNM0014WRKINC.DataConvert("鑑分けフラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '宛名会社名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ATENACOMPANYNAME))
-            WW_DATATYPE = DataTypeHT("ATENACOMPANYNAME")
-            LNM0014Exceltblrow("ATENACOMPANYNAME") = LNM0014WRKINC.DataConvert("宛名会社名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '宛名会社部門名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ATENACOMPANYDEVNAME))
-            WW_DATATYPE = DataTypeHT("ATENACOMPANYDEVNAME")
-            LNM0014Exceltblrow("ATENACOMPANYDEVNAME") = LNM0014WRKINC.DataConvert("宛名会社部門名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '請求書発行部店名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.FROMORGNAME))
-            WW_DATATYPE = DataTypeHT("FROMORGNAME")
-            LNM0014Exceltblrow("FROMORGNAME") = LNM0014WRKINC.DataConvert("請求書発行部店名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '明細区分
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MEISAICATEGORYID))
-            WW_DATATYPE = DataTypeHT("MEISAICATEGORYID")
-            LNM0014Exceltblrow("MEISAICATEGORYID") = LNM0014WRKINC.DataConvert("明細区分", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '勘定科目コード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ACCOUNTCODE))
-            WW_DATATYPE = DataTypeHT("ACCOUNTCODE")
-            LNM0014Exceltblrow("ACCOUNTCODE") = LNM0014WRKINC.DataConvert("勘定科目コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '勘定科目名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ACCOUNTNAME))
-            WW_DATATYPE = DataTypeHT("ACCOUNTNAME")
-            LNM0014Exceltblrow("ACCOUNTNAME") = LNM0014WRKINC.DataConvert("勘定科目名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'セグメントコード
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SEGMENTCODE))
-            WW_DATATYPE = DataTypeHT("SEGMENTCODE")
-            LNM0014Exceltblrow("SEGMENTCODE") = LNM0014WRKINC.DataConvert("セグメントコード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            'セグメント名
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SEGMENTNAME))
-            WW_DATATYPE = DataTypeHT("SEGMENTNAME")
-            LNM0014Exceltblrow("SEGMENTNAME") = LNM0014WRKINC.DataConvert("セグメント名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '割合JOT
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.JOTPERCENTAGE)), ",", "")
-            WW_DATATYPE = DataTypeHT("JOTPERCENTAGE")
-            LNM0014Exceltblrow("JOTPERCENTAGE") = LNM0014WRKINC.DataConvert("割合JOT", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '割合ENEX
-            WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE)), ",", "")
-            WW_DATATYPE = DataTypeHT("ENEXPERCENTAGE")
-            LNM0014Exceltblrow("ENEXPERCENTAGE") = LNM0014WRKINC.DataConvert("割合ENEX", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '備考1
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU1))
-            WW_DATATYPE = DataTypeHT("BIKOU1")
-            LNM0014Exceltblrow("BIKOU1") = LNM0014WRKINC.DataConvert("備考1", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '備考2
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU2))
-            WW_DATATYPE = DataTypeHT("BIKOU2")
-            LNM0014Exceltblrow("BIKOU2") = LNM0014WRKINC.DataConvert("備考2", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
-            '備考3
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU3))
-            WW_DATATYPE = DataTypeHT("BIKOU3")
-            LNM0014Exceltblrow("BIKOU3") = LNM0014WRKINC.DataConvert("備考3", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+                'LINECNT
+                LNM0014Exceltblrow("LINECNT") = WW_LINECNT
+                WW_LINECNT = WW_LINECNT + 1
 
-            '削除フラグ
-            WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DELFLG))
-            WW_DATATYPE = DataTypeHT("DELFLG")
-            LNM0014Exceltblrow("DELFLG") = LNM0014WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
-            If WW_RESULT = False Then
-                WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
-                O_RTN = "ERR"
-            End If
+                '◆データセット
+                '対象年月
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TARGETYM))
+                WW_DATATYPE = DataTypeHT("TARGETYM")
+                LNM0014Exceltblrow("TARGETYM") = LNM0014WRKINC.DataConvert("対象年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '取引先コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TORICODE))
+                WW_DATATYPE = DataTypeHT("TORICODE")
+                LNM0014Exceltblrow("TORICODE") = LNM0014WRKINC.DataConvert("取引先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '取引先名称
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TORINAME))
+                WW_DATATYPE = DataTypeHT("TORINAME")
+                LNM0014Exceltblrow("TORINAME") = LNM0014WRKINC.DataConvert("取引先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '部門コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ORGCODE))
+                WW_DATATYPE = DataTypeHT("ORGCODE")
+                LNM0014Exceltblrow("ORGCODE") = LNM0014WRKINC.DataConvert("部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '部門名称
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ORGNAME))
+                WW_DATATYPE = DataTypeHT("ORGNAME")
+                LNM0014Exceltblrow("ORGNAME") = LNM0014WRKINC.DataConvert("部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '加算先部門コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.KASANORGCODE))
+                WW_DATATYPE = DataTypeHT("KASANORGCODE")
+                LNM0014Exceltblrow("KASANORGCODE") = LNM0014WRKINC.DataConvert("加算先部門コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '加算先部門名称
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.KASANORGNAME))
+                WW_DATATYPE = DataTypeHT("KASANORGNAME")
+                LNM0014Exceltblrow("KASANORGNAME") = LNM0014WRKINC.DataConvert("加算先部門名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '届先コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKECODE))
+                WW_DATATYPE = DataTypeHT("TODOKECODE")
+                LNM0014Exceltblrow("TODOKECODE") = LNM0014WRKINC.DataConvert("届先コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '届先名称
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TODOKENAME))
+                WW_DATATYPE = DataTypeHT("TODOKENAME")
+                LNM0014Exceltblrow("TODOKENAME") = LNM0014WRKINC.DataConvert("届先名称", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'グループソート順
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPSORTNO)), ",", "")
+                WW_DATATYPE = DataTypeHT("GROUPSORTNO")
+                LNM0014Exceltblrow("GROUPSORTNO") = LNM0014WRKINC.DataConvert("グループソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'グループID
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPID)), ",", "")
+                WW_DATATYPE = DataTypeHT("GROUPID")
+                LNM0014Exceltblrow("GROUPID") = LNM0014WRKINC.DataConvert("グループID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'グループ名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.GROUPNAME))
+                WW_DATATYPE = DataTypeHT("GROUPNAME")
+                LNM0014Exceltblrow("GROUPNAME") = LNM0014WRKINC.DataConvert("グループ名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '明細ソート順
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILSORTNO)), ",", "")
+                WW_DATATYPE = DataTypeHT("DETAILSORTNO")
+                LNM0014Exceltblrow("DETAILSORTNO") = LNM0014WRKINC.DataConvert("明細ソート順", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '明細ID
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILID)), ",", "")
+                WW_DATATYPE = DataTypeHT("DETAILID")
+                LNM0014Exceltblrow("DETAILID") = LNM0014WRKINC.DataConvert("明細ID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '明細名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DETAILNAME))
+                WW_DATATYPE = DataTypeHT("DETAILNAME")
+                LNM0014Exceltblrow("DETAILNAME") = LNM0014WRKINC.DataConvert("明細名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '単価
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.TANKA)), ",", "")
+                WW_DATATYPE = DataTypeHT("TANKA")
+                LNM0014Exceltblrow("TANKA") = LNM0014WRKINC.DataConvert("単価", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '数量
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.QUANTITY)), ",", "")
+                WW_DATATYPE = DataTypeHT("QUANTITY")
+                LNM0014Exceltblrow("QUANTITY") = LNM0014WRKINC.DataConvert("数量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '計算単位
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.CALCUNIT))
+                WW_DATATYPE = DataTypeHT("CALCUNIT")
+                LNM0014Exceltblrow("CALCUNIT") = LNM0014WRKINC.DataConvert("計算単位", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '出荷地
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DEPARTURE))
+                WW_DATATYPE = DataTypeHT("DEPARTURE")
+                LNM0014Exceltblrow("DEPARTURE") = LNM0014WRKINC.DataConvert("出荷地", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '走行距離
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MILEAGE)), ",", "")
+                WW_DATATYPE = DataTypeHT("MILEAGE")
+                LNM0014Exceltblrow("MILEAGE") = LNM0014WRKINC.DataConvert("走行距離", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '輸送回数
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT)), ",", "")
+                WW_DATATYPE = DataTypeHT("SHIPPINGCOUNT")
+                LNM0014Exceltblrow("SHIPPINGCOUNT") = LNM0014WRKINC.DataConvert("輸送回数", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '燃費
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.NENPI)), ",", "")
+                WW_DATATYPE = DataTypeHT("NENPI")
+                LNM0014Exceltblrow("NENPI") = LNM0014WRKINC.DataConvert("燃費", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '実勢軽油価格
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT)), ",", "")
+                WW_DATATYPE = DataTypeHT("DIESELPRICECURRENT")
+                LNM0014Exceltblrow("DIESELPRICECURRENT") = LNM0014WRKINC.DataConvert("実勢軽油価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '基準経由価格
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD)), ",", "")
+                WW_DATATYPE = DataTypeHT("DIESELPRICESTANDARD")
+                LNM0014Exceltblrow("DIESELPRICESTANDARD") = LNM0014WRKINC.DataConvert("基準経由価格", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '燃料使用量
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DIESELCONSUMPTION)), ",", "")
+                WW_DATATYPE = DataTypeHT("DIESELCONSUMPTION")
+                LNM0014Exceltblrow("DIESELCONSUMPTION") = LNM0014WRKINC.DataConvert("燃料使用量", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '表示フラグ
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DISPLAYFLG))
+                WW_DATATYPE = DataTypeHT("DISPLAYFLG")
+                LNM0014Exceltblrow("DISPLAYFLG") = LNM0014WRKINC.DataConvert("表示フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '鑑分けフラグ
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ASSESSMENTFLG))
+                WW_DATATYPE = DataTypeHT("ASSESSMENTFLG")
+                LNM0014Exceltblrow("ASSESSMENTFLG") = LNM0014WRKINC.DataConvert("鑑分けフラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '宛名会社名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ATENACOMPANYNAME))
+                WW_DATATYPE = DataTypeHT("ATENACOMPANYNAME")
+                LNM0014Exceltblrow("ATENACOMPANYNAME") = LNM0014WRKINC.DataConvert("宛名会社名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '宛名会社部門名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ATENACOMPANYDEVNAME))
+                WW_DATATYPE = DataTypeHT("ATENACOMPANYDEVNAME")
+                LNM0014Exceltblrow("ATENACOMPANYDEVNAME") = LNM0014WRKINC.DataConvert("宛名会社部門名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '請求書発行部店名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.FROMORGNAME))
+                WW_DATATYPE = DataTypeHT("FROMORGNAME")
+                LNM0014Exceltblrow("FROMORGNAME") = LNM0014WRKINC.DataConvert("請求書発行部店名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '明細区分
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.MEISAICATEGORYID))
+                WW_DATATYPE = DataTypeHT("MEISAICATEGORYID")
+                LNM0014Exceltblrow("MEISAICATEGORYID") = LNM0014WRKINC.DataConvert("明細区分", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '勘定科目コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ACCOUNTCODE))
+                WW_DATATYPE = DataTypeHT("ACCOUNTCODE")
+                LNM0014Exceltblrow("ACCOUNTCODE") = LNM0014WRKINC.DataConvert("勘定科目コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '勘定科目名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ACCOUNTNAME))
+                WW_DATATYPE = DataTypeHT("ACCOUNTNAME")
+                LNM0014Exceltblrow("ACCOUNTNAME") = LNM0014WRKINC.DataConvert("勘定科目名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'セグメントコード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SEGMENTCODE))
+                WW_DATATYPE = DataTypeHT("SEGMENTCODE")
+                LNM0014Exceltblrow("SEGMENTCODE") = LNM0014WRKINC.DataConvert("セグメントコード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'セグメント名
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.SEGMENTNAME))
+                WW_DATATYPE = DataTypeHT("SEGMENTNAME")
+                LNM0014Exceltblrow("SEGMENTNAME") = LNM0014WRKINC.DataConvert("セグメント名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '割合JOT
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.JOTPERCENTAGE)), ",", "")
+                WW_DATATYPE = DataTypeHT("JOTPERCENTAGE")
+                LNM0014Exceltblrow("JOTPERCENTAGE") = LNM0014WRKINC.DataConvert("割合JOT", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '割合ENEX
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE)), ",", "")
+                WW_DATATYPE = DataTypeHT("ENEXPERCENTAGE")
+                LNM0014Exceltblrow("ENEXPERCENTAGE") = LNM0014WRKINC.DataConvert("割合ENEX", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '備考1
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU1))
+                WW_DATATYPE = DataTypeHT("BIKOU1")
+                LNM0014Exceltblrow("BIKOU1") = LNM0014WRKINC.DataConvert("備考1", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '備考2
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU2))
+                WW_DATATYPE = DataTypeHT("BIKOU2")
+                LNM0014Exceltblrow("BIKOU2") = LNM0014WRKINC.DataConvert("備考2", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '備考3
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.BIKOU3))
+                WW_DATATYPE = DataTypeHT("BIKOU3")
+                LNM0014Exceltblrow("BIKOU3") = LNM0014WRKINC.DataConvert("備考3", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
 
-            '登録
-            LNM0014Exceltbl.Rows.Add(LNM0014Exceltblrow)
+                '削除フラグ
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0014WRKINC.INOUTEXCELCOL.DELFLG))
+                WW_DATATYPE = DataTypeHT("DELFLG")
+                LNM0014Exceltblrow("DELFLG") = LNM0014WRKINC.DataConvert("削除フラグ", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
 
-        Next
+                '登録
+                LNM0014Exceltbl.Rows.Add(LNM0014Exceltblrow)
+
+            Next
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, "アップロードファイル不正、内容を確認してください。", needsPopUp:=True)
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "アップロードファイル不正、内容を確認してください。"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.OIL_FREE_MESSAGE
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            O_RTN = "ERR"
+            Exit Sub
+
+        End Try
     End Sub
 
     '' <summary>

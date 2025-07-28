@@ -88,6 +88,17 @@ window.addEventListener('load', function () {
         if (document.getElementById("WF_RightboxOpen").value === "Open") {
             document.getElementById("RF_RIGHTBOX").style.width = "25em";
             document.getElementById("rightb").style.display = "none";
+            document.getElementById("rightb").style.backgroundImage = "url('../img/guidanceIconE.png')"
+        }
+        if (document.getElementById("WF_RightboxOpen").value === "OpenI") {
+            document.getElementById("RF_RIGHTBOX").style.width = "25em";
+            document.getElementById("rightb").style.display = "none";
+            document.getElementById("rightb").style.backgroundImage = "url('../img/guidanceIconI.png')"
+        }
+        if (document.getElementById("WF_RightboxOpen").value === "OpenW") {
+            document.getElementById("RF_RIGHTBOX").style.width = "25em";
+            document.getElementById("rightb").style.display = "none";
+            document.getElementById("rightb").style.backgroundImage = "url('../img/guidanceIconW.png')"
         }
     }
 
