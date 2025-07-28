@@ -281,8 +281,26 @@ Public Class LNT0001InvoiceOutputHOKAIDOLng
             If PrintDatarow("TODOKECODE").ToString() <> todokeCode Then
                 Continue For
             End If
+
+            Dim dataZisseki As Double = 0.00
+            Try
+                dataZisseki = Double.Parse(WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value.ToString())
+            Catch ex As Exception
+            End Try
+            Dim dataCount As Integer = 0
+            Dim setCntCell As String = PrintDatarow("SETCELL").ToString() + "42"
+            Try
+                dataCount = Integer.Parse(WW_Workbook.Worksheets(dicSheetNo01.Value).Range(setCntCell).Value.ToString())
+            Catch ex As Exception
+            End Try
+            If dataZisseki <> 0.00 Then
+                dataCount += 1
+                WW_Workbook.Worksheets(dicSheetNo01.Value).Range(setCntCell).Value = dataCount
+            End If
+
             '◯ 実績数量
-            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
+            WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = (Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber) + dataZisseki
+            'WW_Workbook.Worksheets(dicSheetNo01.Value).Range(PrintDatarow("SETCELL01").ToString()).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString()) * Me.calcZissekiNumber
             '★ (列)表示
             WW_Workbook.Worksheets(dicSheetNo01.Value).Range(String.Format("{0}:{0}", PrintDatarow("SETCELL").ToString())).Hidden = False
             '★ (行)表示
