@@ -915,6 +915,7 @@ Public Class CmnCheck
                 listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021504)
                 listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021601)
                 listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022401)
+                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022402)
                 commaOrderOrgCode = String.Join(",", listOrderOrgCode)
         End Select
 

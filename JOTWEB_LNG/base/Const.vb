@@ -397,6 +397,10 @@ Public Module BaseDllConst
     ''' EX_四日市営業所
     ''' </summary>
     Public Const CONST_ORDERORGCODE_022401 As String = "022401"
+    ''' <summary>
+    ''' EX 三重支店車庫
+    ''' </summary>
+    Public Const CONST_ORDERORGCODE_022402 As String = "022402"
 #End Region
 
 #Region "届先"
