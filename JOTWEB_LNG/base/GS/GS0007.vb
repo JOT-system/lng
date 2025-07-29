@@ -539,7 +539,7 @@ Public Class GS0007FIXVALUElst
 
             Else
                 SQLStr =
-                      " SELECT                           " _
+                      " SELECT DISTINCT                  " _
                     & "      rtrim(KEYCODE) as KEYCODE , " _
                     & "      rtrim(VALUE1)  as VALUE1  , " _
                     & "      rtrim(VALUE2)  as VALUE2  , " _

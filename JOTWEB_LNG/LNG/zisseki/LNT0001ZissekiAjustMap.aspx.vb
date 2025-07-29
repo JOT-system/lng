@@ -980,6 +980,10 @@ Public Class LNT0001ZissekiAjustMap_aspx
                                     '★シーエナジー(またはエルネス)の場合
                                     prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) &=
                                     " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"   '業務車番
+                                ElseIf updHeader("TORICODE").ToString() = BaseDllConst.CONST_TORICODE_0175400000 Then
+                                    '★東北電力の場合
+                                    prmData.Item(C_PARAMETERS.LP_ADDITINALCONDITION) &=
+                                    " AND VALUE10 = '" + updHeader("GYOMUTANKNUM").ToString() & "'"   '業務車番
                                 End If
 
                                 WF_LeftMViewChange.Value = LIST_BOX_CLASSIFICATION.LC_BRANCHCODE
