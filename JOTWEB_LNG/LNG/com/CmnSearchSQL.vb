@@ -415,30 +415,71 @@ Public Class CmnSearchSQL
     'End Function
 
     ''' <summary>
-    ''' 特別料金グループ名検索タイトル取得
+    ''' 特別料金(大分類)名検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetSprateGroupTitle() As IEnumerable(Of DispFieldItem)
+    Public Shared Function GetSprateBigcateTitle() As IEnumerable(Of DispFieldItem)
         Dim colTitle As IEnumerable(Of DispFieldItem)
         colTitle = {
-                New DispFieldItem("GROUPID", "グループID", "100"),
-                New DispFieldItem("GROUPNAME", "グループ名", "500")
+                New DispFieldItem("BIGCATECODE", "大分類コード", "100"),
+                New DispFieldItem("BIGCATENAME", "大分類名", "500")
             }
         Return colTitle
     End Function
 
     ''' <summary>
-    ''' 特別料金明細名検索タイトル取得
+    ''' 特別料金(中分類)名検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetSprateDetailTitle() As IEnumerable(Of DispFieldItem)
+    Public Shared Function GetSprateMidCateTitle() As IEnumerable(Of DispFieldItem)
         Dim colTitle As IEnumerable(Of DispFieldItem)
         colTitle = {
-                New DispFieldItem("DETAILID", "明細ID", "100"),
-                New DispFieldItem("DETAILNAME", "明細名", "500")
+                New DispFieldItem("MIDCATECODE", "中分類コード", "100"),
+                New DispFieldItem("MIDCATENAME", "中分類名", "500")
             }
         Return colTitle
     End Function
+
+    ''' <summary>
+    ''' 特別料金(小分類)名検索タイトル取得
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateSmallCateTitle() As IEnumerable(Of DispFieldItem)
+        Dim colTitle As IEnumerable(Of DispFieldItem)
+        colTitle = {
+                New DispFieldItem("SMALLCATECODE", "小分類コード", "100"),
+                New DispFieldItem("SMALLCATENAME", "小分類名", "500")
+            }
+        Return colTitle
+    End Function
+
+#Region "コメント"
+    '''' <summary>
+    '''' 特別料金グループ名検索タイトル取得
+    '''' </summary>
+    '''' <returns></returns>
+    'Public Shared Function GetSprateGroupTitle() As IEnumerable(Of DispFieldItem)
+    '    Dim colTitle As IEnumerable(Of DispFieldItem)
+    '    colTitle = {
+    '            New DispFieldItem("GROUPID", "グループID", "100"),
+    '            New DispFieldItem("GROUPNAME", "グループ名", "500")
+    '        }
+    '    Return colTitle
+    'End Function
+
+    '''' <summary>
+    '''' 特別料金明細名検索タイトル取得
+    '''' </summary>
+    '''' <returns></returns>
+    'Public Shared Function GetSprateDetailTitle() As IEnumerable(Of DispFieldItem)
+    '    Dim colTitle As IEnumerable(Of DispFieldItem)
+    '    colTitle = {
+    '            New DispFieldItem("DETAILID", "明細ID", "100"),
+    '            New DispFieldItem("DETAILNAME", "明細名", "500")
+    '        }
+    '    Return colTitle
+    'End Function
+#End Region
 
     ''' <summary>
     ''' 特別料金取引先取得SQL
@@ -454,7 +495,7 @@ Public Class CmnSearchSQL
         SQLBldr.AppendLine("    , RTRIM(TORICODE) AS TORICODE")
         SQLBldr.AppendLine("    , RTRIM(TORINAME) AS TORINAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
         '部門コードが入力されている場合条件に含める
@@ -482,7 +523,7 @@ Public Class CmnSearchSQL
         SQLBldr.AppendLine("    , RTRIM(KASANORGCODE) AS KASANORGCODE")
         SQLBldr.AppendLine("    , RTRIM(KASANORGNAME) AS KASANORGNAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
         '部門コードが入力されている場合条件に含める
@@ -510,7 +551,7 @@ Public Class CmnSearchSQL
         SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS TODOKECODE")
         SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS TODOKENAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
         SQLBldr.AppendLine("  AND TODOKECODE <> ''")
@@ -529,108 +570,215 @@ Public Class CmnSearchSQL
 
     End Function
 
+    ''' <summary>
+    ''' 特別料金項目名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
+        'Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, ByVal prmTaishoYm As String, Optional ByVal prmOrgCode As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(ITEMID, '00')")
+        SQLBldr.AppendLine("  + ITEMNAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(ITEMID) AS ITEMID")
+        SQLBldr.AppendLine("    , RTRIM(ITEMNAME) AS ITEMNAME")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
+        'SQLBldr.AppendLine("  AND TAISHOYM = '" & prmTaishoYm & "'")
+        '部門コードが入力されている場合条件に含める
+        If Not prmOrgCode = "" Then
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     ITEMID")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金(大分類)名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateBigcateSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, Optional ByVal prmBigcateName As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(BIGCATECODE, '00')")
+        SQLBldr.AppendLine("  + BIGCATENAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(BIGCATECODE) AS BIGCATECODE")
+        SQLBldr.AppendLine("    , RTRIM(BIGCATENAME) AS BIGCATENAME")
+        'SQLBldr.AppendLine("    , GROUPSORTNO AS GROUPSORTNO")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+        '大分類名が入力されている場合条件に含める
+        If Not prmBigcateName = "" Then
+            SQLBldr.AppendLine("  AND BIGCATENAME LIKE '%" & prmBigcateName & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     BIGCATECODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金(中分類)名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateMidcateSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, ByVal prmBigcateCode As String, Optional ByVal prmMidCateName As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(MIDCATECODE, '00')")
+        SQLBldr.AppendLine("  + MIDCATENAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(MIDCATECODE) AS MIDCATECODE")
+        SQLBldr.AppendLine("    , RTRIM(MIDCATENAME) AS MIDCATENAME")
+        'SQLBldr.AppendLine("    , DETAILSORTNO AS DETAILSORTNO")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+        SQLBldr.AppendLine("  AND BIGCATECODE = '" & prmBigcateCode & "'")
+        'グループ名が入力されている場合条件に含める
+        If Not prmMidCateName = "" Then
+            SQLBldr.AppendLine("  AND MIDCATENAME LIKE '%" & prmMidCateName & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     MIDCATECODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+    ''' <summary>
+    ''' 特別料金(小分類)名取得SQL
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function GetSprateSmallcateSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, ByVal prmBigcateCode As String, ByVal prmMidCatecode As String, Optional ByVal prmSmallCateName As String = "") As String
+
+        Dim SQLBldr As New StringBuilder
+
+        '-- 項目名取得
+        SQLBldr.AppendLine(" SELECT DISTINCT")
+        SQLBldr.AppendLine("    (")
+        SQLBldr.AppendLine("    FORMAT(SMALLCATECODE, '00')")
+        SQLBldr.AppendLine("  + SMALLCATENAME")
+        SQLBldr.AppendLine("    ) AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(SMALLCATECODE) AS SMALLCATECODE")
+        SQLBldr.AppendLine("    , RTRIM(SMALLCATENAME) AS SMALLCATENAME")
+        'SQLBldr.AppendLine("    , DETAILSORTNO AS DETAILSORTNO")
+        SQLBldr.AppendLine(" FROM")
+        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE2 ")
+        SQLBldr.AppendLine(" WHERE")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+        SQLBldr.AppendLine("  AND BIGCATECODE = '" & prmBigcateCode & "'")
+        SQLBldr.AppendLine("  AND MIDCATECODE = '" & prmMidCatecode & "'")
+        'グループ名が入力されている場合条件に含める
+        If Not prmSmallCateName = "" Then
+            SQLBldr.AppendLine("  AND SMALLCATENAME LIKE '%" & prmSmallCateName & "%'")
+        End If
+        SQLBldr.AppendLine(" ORDER BY")
+        SQLBldr.AppendLine("     SMALLCATECODE")
+
+        Return SQLBldr.ToString
+
+    End Function
+
+#Region "コメント"
     '''' <summary>
-    '''' 特別料金項目名取得SQL
+    '''' 特別料金グループ名取得SQL
     '''' </summary>
     '''' <returns></returns>
-    'Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, Optional ByVal prmOrgCode As String = "") As String
-    '    'Public Shared Function GetSprateItemSQL(ByVal prmTableId As String, ByVal prmTaishoYm As String, Optional ByVal prmOrgCode As String = "") As String
+    'Public Shared Function GetSprateGroupSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, Optional ByVal prmGroupName As String = "") As String
 
     '    Dim SQLBldr As New StringBuilder
 
     '    '-- 項目名取得
     '    SQLBldr.AppendLine(" SELECT DISTINCT")
     '    SQLBldr.AppendLine("    (")
-    '    SQLBldr.AppendLine("    FORMAT(ITEMID, '00')")
-    '    SQLBldr.AppendLine("  + ITEMNAME")
+    '    SQLBldr.AppendLine("    FORMAT(GROUPID, '00')")
+    '    SQLBldr.AppendLine("  + GROUPNAME")
     '    SQLBldr.AppendLine("    ) AS KEYCODE")
-    '    SQLBldr.AppendLine("    , RTRIM(ITEMID) AS ITEMID")
-    '    SQLBldr.AppendLine("    , RTRIM(ITEMNAME) AS ITEMNAME")
+    '    SQLBldr.AppendLine("    , RTRIM(GROUPID) AS GROUPID")
+    '    SQLBldr.AppendLine("    , RTRIM(GROUPNAME) AS GROUPNAME")
+    '    SQLBldr.AppendLine("    , GROUPSORTNO AS GROUPSORTNO")
     '    SQLBldr.AppendLine(" FROM")
-    '    SQLBldr.AppendLine("     LNG.VIW0004_SPRATE")
+    '    SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
     '    SQLBldr.AppendLine(" WHERE")
     '    SQLBldr.AppendLine("     DELFLG = '0'")
-    '    SQLBldr.AppendLine("  AND TABLEID = '" & prmTableId & "'")
-    '    'SQLBldr.AppendLine("  AND TAISHOYM = '" & prmTaishoYm & "'")
-    '    '部門コードが入力されている場合条件に含める
-    '    If Not prmOrgCode = "" Then
-    '        SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
+    '    SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+    '    SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+    '    'グループ名が入力されている場合条件に含める
+    '    If Not prmGroupName = "" Then
+    '        SQLBldr.AppendLine("  AND GROUPNAME LIKE '%" & prmGroupName & "%'")
     '    End If
     '    SQLBldr.AppendLine(" ORDER BY")
-    '    SQLBldr.AppendLine("     ITEMID")
+    '    SQLBldr.AppendLine("     GROUPID")
 
     '    Return SQLBldr.ToString
 
     'End Function
 
-    ''' <summary>
-    ''' 特別料金グループ名取得SQL
-    ''' </summary>
-    ''' <returns></returns>
-    Public Shared Function GetSprateGroupSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, Optional ByVal prmGroupName As String = "") As String
+    '''' <summary>
+    '''' 特別料金明細名取得SQL
+    '''' </summary>
+    '''' <returns></returns>
+    'Public Shared Function GetSprateDetailSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, ByVal prmGroupId As String, Optional ByVal prmGroupName As String = "") As String
 
-        Dim SQLBldr As New StringBuilder
+    '    Dim SQLBldr As New StringBuilder
 
-        '-- 項目名取得
-        SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("    (")
-        SQLBldr.AppendLine("    FORMAT(GROUPID, '00')")
-        SQLBldr.AppendLine("  + GROUPNAME")
-        SQLBldr.AppendLine("    ) AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(GROUPID) AS GROUPID")
-        SQLBldr.AppendLine("    , RTRIM(GROUPNAME) AS GROUPNAME")
-        SQLBldr.AppendLine("    , GROUPSORTNO AS GROUPSORTNO")
-        SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
-        SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     DELFLG = '0'")
-        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
-        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
-        'グループ名が入力されている場合条件に含める
-        If Not prmGroupName = "" Then
-            SQLBldr.AppendLine("  AND GROUPNAME LIKE '%" & prmGroupName & "%'")
-        End If
-        SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     GROUPID")
+    '    '-- 項目名取得
+    '    SQLBldr.AppendLine(" SELECT DISTINCT")
+    '    SQLBldr.AppendLine("    (")
+    '    SQLBldr.AppendLine("    FORMAT(DETAILID, '00')")
+    '    SQLBldr.AppendLine("  + DETAILNAME")
+    '    SQLBldr.AppendLine("    ) AS KEYCODE")
+    '    SQLBldr.AppendLine("    , RTRIM(DETAILID) AS DETAILID")
+    '    SQLBldr.AppendLine("    , RTRIM(DETAILNAME) AS DETAILNAME")
+    '    SQLBldr.AppendLine("    , DETAILSORTNO AS DETAILSORTNO")
+    '    SQLBldr.AppendLine(" FROM")
+    '    SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
+    '    SQLBldr.AppendLine(" WHERE")
+    '    SQLBldr.AppendLine("     DELFLG = '0'")
+    '    SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
+    '    SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
+    '    SQLBldr.AppendLine("  AND GROUPID = '" & prmGroupId & "'")
+    '    'グループ名が入力されている場合条件に含める
+    '    If Not prmGroupName = "" Then
+    '        SQLBldr.AppendLine("  AND DETAILNAME LIKE '%" & prmGroupName & "%'")
+    '    End If
+    '    SQLBldr.AppendLine(" ORDER BY")
+    '    SQLBldr.AppendLine("     DETAILID")
 
-        Return SQLBldr.ToString
+    '    Return SQLBldr.ToString
 
-    End Function
-
-    ''' <summary>
-    ''' 特別料金明細名取得SQL
-    ''' </summary>
-    ''' <returns></returns>
-    Public Shared Function GetSprateDetailSQL(ByVal prmToriCode As String, ByVal prmOrgCode As String, ByVal prmGroupId As String, Optional ByVal prmGroupName As String = "") As String
-
-        Dim SQLBldr As New StringBuilder
-
-        '-- 項目名取得
-        SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("    (")
-        SQLBldr.AppendLine("    FORMAT(DETAILID, '00')")
-        SQLBldr.AppendLine("  + DETAILNAME")
-        SQLBldr.AppendLine("    ) AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(DETAILID) AS DETAILID")
-        SQLBldr.AppendLine("    , RTRIM(DETAILNAME) AS DETAILNAME")
-        SQLBldr.AppendLine("    , DETAILSORTNO AS DETAILSORTNO")
-        SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0014_SPRATE")
-        SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     DELFLG = '0'")
-        SQLBldr.AppendLine("  AND TORICODE = '" & prmToriCode & "'")
-        SQLBldr.AppendLine("  AND ORGCODE = '" & prmOrgCode & "'")
-        SQLBldr.AppendLine("  AND GROUPID = '" & prmGroupId & "'")
-        'グループ名が入力されている場合条件に含める
-        If Not prmGroupName = "" Then
-            SQLBldr.AppendLine("  AND DETAILNAME LIKE '%" & prmGroupName & "%'")
-        End If
-        SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     DETAILID")
-
-        Return SQLBldr.ToString
-
-    End Function
+    'End Function
+#End Region
 
     ''' <summary>
     ''' 品目検索タイトル取得

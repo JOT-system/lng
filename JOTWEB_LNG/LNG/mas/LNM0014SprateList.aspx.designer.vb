@@ -77,22 +77,13 @@ Partial Public Class LNM0014SprateList
     Protected WithEvents WF_ORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
-    '''WF_TODOKE コントロール。
+    '''WF_KASANORG コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TODOKE As Global.System.Web.UI.WebControls.DropDownList
-    
-    '''<summary>
-    '''WF_DEPARTURE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_DEPARTURE As Global.System.Web.UI.WebControls.DropDownList
+    Protected WithEvents WF_KASANORG As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
     '''ChkDelDataFlg コントロール。

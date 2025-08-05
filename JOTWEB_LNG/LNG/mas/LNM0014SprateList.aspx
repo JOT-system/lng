@@ -83,13 +83,18 @@
                                         <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0"/>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
+                                        <strong class="flex-shrink-0">加算先部門</strong>
+                                        <asp:DropDownList ID="WF_KASANORG" runat="server" class="form-select rounded-0"/>
+                                    </div>
+                                    <!-- コメント-2025/07/30(分類追加対応のため) -->
+<%--                                    <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">届先</strong>
                                         <asp:DropDownList ID="WF_TODOKE" runat="server" class="form-select rounded-0"/>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2">
+                                    </div>--%>
+<%--                                    <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">出荷地</strong>
                                         <asp:DropDownList ID="WF_DEPARTURE" runat="server" class="form-select rounded-0"/>
-                                    </div>
+                                    </div>--%>
                                     <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
                                 </div>
                             </div>

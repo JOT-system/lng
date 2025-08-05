@@ -57,7 +57,16 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ORG_L As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_KASANORG_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_KASANORG_L As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_TODOKE_L コントロール。
     '''</summary>
@@ -194,58 +203,58 @@ Partial Public Class LNM0014WRKINC
     Public WithEvents WF_SEL_TODOKENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_GROUPSORTNO コントロール。
+    '''WF_SEL_BIGCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_GROUPSORTNO As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_BIGCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_GROUPID コントロール。
+    '''WF_SEL_BIGCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_GROUPID As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_BIGCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_GROUPNAME コントロール。
+    '''WF_SEL_MIDCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_GROUPNAME As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_MIDCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_DETAILSORTNO コントロール。
+    '''WF_SEL_MIDCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DETAILSORTNO As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_MIDCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_DETAILID コントロール。
+    '''WF_SEL_SMALLCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DETAILID As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_SMALLCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_SEL_DETAILNAME コントロール。
+    '''WF_SEL_SMALLCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DETAILNAME As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_SMALLCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_SEL_TANKA コントロール。
@@ -390,7 +399,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_MEISAICATEGORYID As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ACCOUNTCODE コントロール。
     '''</summary>
@@ -399,7 +408,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ACCOUNTCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ACCOUNTNAME コントロール。
     '''</summary>
@@ -408,7 +417,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ACCOUNTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTCODE コントロール。
     '''</summary>
@@ -417,7 +426,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_SEGMENTNAME コントロール。
     '''</summary>
@@ -426,7 +435,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_SEGMENTNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_JOTPERCENTAGE コントロール。
     '''</summary>
@@ -435,7 +444,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_JOTPERCENTAGE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_ENEXPERCENTAGE コントロール。
     '''</summary>
@@ -444,7 +453,7 @@ Partial Public Class LNM0014WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_ENEXPERCENTAGE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_BIKOU1 コントロール。
     '''</summary>

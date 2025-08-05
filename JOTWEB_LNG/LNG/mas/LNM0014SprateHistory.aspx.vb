@@ -254,13 +254,13 @@ Public Class LNM0014SprateHistory
         '　検索説明
         '     条件指定に従い該当データを予算分類変更履歴から取得する
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" Select                                                                                               ")
-        SQLStr.AppendLine("     1                                                                            AS 'SELECT'                 ")
-        SQLStr.AppendLine("   , 0                                                                            AS HIDDEN                   ")
-        SQLStr.AppendLine("   , 0                                                                            AS LINECNT                  ")
-        SQLStr.AppendLine("   , ''                                                                           AS OPERATION                ")
+        SQLStr.AppendLine(" Select                                                                                      ")
+        SQLStr.AppendLine("     1                                                                AS 'SELECT'            ")
+        SQLStr.AppendLine("   , 0                                                                AS HIDDEN              ")
+        SQLStr.AppendLine("   , 0                                                                AS LINECNT             ")
+        SQLStr.AppendLine("   , ''                                                               AS OPERATION           ")
         SQLStr.AppendLine("   , UPDTIMSTP                                                        AS UPDTIMSTP           ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(DELFLG), '')                                                    AS DELFLG                   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(DELFLG), '')                                      AS DELFLG              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TARGETYM), '')                                    AS TARGETYM            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TORICODE), '')                                    AS TORICODE            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(TORINAME), '')                                    AS TORINAME            ")
@@ -268,14 +268,22 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(ORGNAME), '')                                     AS ORGNAME             ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGCODE), '')                                AS KASANORGCODE        ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(KASANORGNAME), '')                                AS KASANORGNAME        ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKECODE), '')                                  AS TODOKECODE          ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKENAME), '')                                  AS TODOKENAME          ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPSORTNO), '')                                 AS GROUPSORTNO         ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPID), '')                                     AS GROUPID             ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPNAME), '')                                   AS GROUPNAME           ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILSORTNO), '')                                AS DETAILSORTNO        ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILID), '')                                    AS DETAILID            ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILNAME), '')                                  AS DETAILNAME          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BIGCATECODE), '')                                 AS BIGCATECODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(BIGCATENAME), '')                                 AS BIGCATENAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(MIDCATECODE), '')                                 AS MIDCATECODE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(MIDCATENAME), '')                                 AS MIDCATENAME         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SMALLCATECODE), '')                               AS SMALLCATECODE       ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(SMALLCATENAME), '')                               AS SMALLCATENAME       ")
+#Region "コメント-2025/08/04(分類追加対応のため)"
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKECODE), '')                                  AS TODOKECODE          ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(TODOKENAME), '')                                  AS TODOKENAME          ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPSORTNO), '')                                 AS GROUPSORTNO         ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPID), '')                                     AS GROUPID             ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(GROUPNAME), '')                                   AS GROUPNAME           ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILSORTNO), '')                                AS DETAILSORTNO        ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILID), '')                                    AS DETAILID            ")
+        'SQLStr.AppendLine("   , COALESCE(RTRIM(DETAILNAME), '')                                  AS DETAILNAME          ")
+#End Region
         SQLStr.AppendLine("   , COALESCE(RTRIM(TANKA), '')                                       AS TANKA               ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(QUANTITY), '')                                    AS QUANTITY            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(CALCUNIT), '')                                    AS CALCUNIT            ")
@@ -303,66 +311,83 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(BIKOU3), '')                                      AS BIKOU3              ")
 
         '画面表示用
-        'グループソート順
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPSORTNO), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(GROUPSORTNO,0)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRGROUPSORTNO                                                                                 ")
-        'グループID
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPID), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(GROUPID,0)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRGROUPID                                                                                 ")
-        '明細ソート順
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILSORTNO), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DETAILSORTNO,0)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRDETAILSORTNO                                                                                 ")
-        '明細ID
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILID), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DETAILID,0)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRDETAILID                                                                                 ")
+        '大分類コード
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(BIGCATECODE), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(BIGCATECODE,0)                                                            ")
+        SQLStr.AppendLine("     END AS SCRBIGCATECODE                                                                   ")
+        '中分類コード
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(MIDCATECODE), '') = '' THEN ''                                     ")
+        SQLStr.AppendLine("      ELSE  FORMAT(MIDCATECODE,0)                                                            ")
+        SQLStr.AppendLine("     END AS SCRMIDCATECODE                                                                   ")
+        '小分類コード
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SMALLCATECODE), '') = '' THEN ''                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SMALLCATECODE,0)                                                          ")
+        SQLStr.AppendLine("     END AS SCRSMALLCATECODE                                                                 ")
+#Region "コメント-2025/08/04(分類追加対応のため)"
+        ''グループソート順
+        'SQLStr.AppendLine("   , CASE                                                                                            ")
+        'SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPSORTNO), '') = '' THEN ''                                                   ")
+        'SQLStr.AppendLine("      ELSE  FORMAT(GROUPSORTNO,0)                                                                          ")
+        'SQLStr.AppendLine("     END AS SCRGROUPSORTNO                                                                                 ")
+        ''グループID
+        'SQLStr.AppendLine("   , CASE                                                                                            ")
+        'SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GROUPID), '') = '' THEN ''                                                   ")
+        'SQLStr.AppendLine("      ELSE  FORMAT(GROUPID,0)                                                                          ")
+        'SQLStr.AppendLine("     END AS SCRGROUPID                                                                                 ")
+        ''明細ソート順
+        'SQLStr.AppendLine("   , CASE                                                                                            ")
+        'SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILSORTNO), '') = '' THEN ''                                                   ")
+        'SQLStr.AppendLine("      ELSE  FORMAT(DETAILSORTNO,0)                                                                          ")
+        'SQLStr.AppendLine("     END AS SCRDETAILSORTNO                                                                                 ")
+        ''明細ID
+        'SQLStr.AppendLine("   , CASE                                                                                            ")
+        'SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DETAILID), '') = '' THEN ''                                                   ")
+        'SQLStr.AppendLine("      ELSE  FORMAT(DETAILID,0)                                                                          ")
+        'SQLStr.AppendLine("     END AS SCRDETAILID                                                                                 ")
+#End Region
         '単価
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,2)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRTANKA                                                                                 ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(TANKA), '') = '' THEN ''                                           ")
+        SQLStr.AppendLine("      ELSE  FORMAT(TANKA,2)                                                                  ")
+        SQLStr.AppendLine("     END AS SCRTANKA                                                                         ")
         '数量
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(QUANTITY), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(QUANTITY,2)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRQUANTITY                                                                                 ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(QUANTITY), '') = '' THEN ''                                        ")
+        SQLStr.AppendLine("      ELSE  FORMAT(QUANTITY,2)                                                               ")
+        SQLStr.AppendLine("     END AS SCRQUANTITY                                                                      ")
         '走行距離
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(MILEAGE), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(MILEAGE,2)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRMILEAGE                                                                                 ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(MILEAGE), '') = '' THEN ''                                         ")
+        SQLStr.AppendLine("      ELSE  FORMAT(MILEAGE,2)                                                                ")
+        SQLStr.AppendLine("     END AS SCRMILEAGE                                                                       ")
         '輸送回数
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SHIPPINGCOUNT), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(SHIPPINGCOUNT,0)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRSHIPPINGCOUNT                                                                                 ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(SHIPPINGCOUNT), '') = '' THEN ''                                   ")
+        SQLStr.AppendLine("      ELSE  FORMAT(SHIPPINGCOUNT,0)                                                          ")
+        SQLStr.AppendLine("     END AS SCRSHIPPINGCOUNT                                                                 ")
         '燃費
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                                   ")
-        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,2)                                                                          ")
-        SQLStr.AppendLine("     END AS SCRNENPI                                                                                 ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(NENPI), '') = '' THEN ''                                           ")
+        SQLStr.AppendLine("      ELSE  FORMAT(NENPI,2)                                                                  ")
+        SQLStr.AppendLine("     END AS SCRNENPI                                                                         ")
         '実勢軽油価格
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                                      ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,2)                                                             ")
-        SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                                    ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICECURRENT), '') = '' THEN ''                              ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICECURRENT,2)                                                     ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICECURRENT                                                            ")
         '基準経由価格
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                                     ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,2)                                                            ")
-        SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                                   ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELPRICESTANDARD), '') = '' THEN ''                             ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELPRICESTANDARD,2)                                                    ")
+        SQLStr.AppendLine("     END AS SCRDIESELPRICESTANDARD                                                           ")
         '燃料使用量
-        SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELCONSUMPTION), '') = '' THEN ''                                     ")
-        SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                            ")
-        SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                                   ")
+        SQLStr.AppendLine("   , CASE                                                                                    ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(DIESELCONSUMPTION), '') = '' THEN ''                               ")
+        SQLStr.AppendLine("      ELSE  FORMAT(DIESELCONSUMPTION,2)                                                      ")
+        SQLStr.AppendLine("     END AS SCRDIESELCONSUMPTION                                                             ")
 
         '表示フラグ
         SQLStr.AppendLine("   , ''                                                                       AS SCRDISPLAYFLG        ")
@@ -393,7 +418,7 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("   , DATE_FORMAT(MODIFYYMD, '%Y/%m/%d %T')                                     AS MODIFYYMD                 ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(MODIFYUSER), '')                                           AS MODIFYUSER                ")
         SQLStr.AppendLine(" FROM                                                                                                          ")
-        SQLStr.AppendLine("     LNG.LNT0015_SPRATEHIST                                                                                     ")
+        SQLStr.AppendLine("     LNG.LNT0015_SPRATEHIST2                                                                                    ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -410,8 +435,13 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine("    ,TARGETYM                                                           ")
         SQLStr.AppendLine("    ,TORICODE                                                           ")
         SQLStr.AppendLine("    ,ORGCODE                                                            ")
-        SQLStr.AppendLine("    ,GROUPID                                                            ")
-        SQLStr.AppendLine("    ,DETAILID                                                           ")
+        SQLStr.AppendLine("    ,BIGCATECODE                                                        ")
+        SQLStr.AppendLine("    ,MIDCATECODE                                                        ")
+        SQLStr.AppendLine("    ,SMALLCATECODE                                                      ")
+#Region "コメント-2025/08/04(分類追加対応のため)"
+        'SQLStr.AppendLine("    ,GROUPID                                                            ")
+        'SQLStr.AppendLine("    ,DETAILID                                                           ")
+#End Region
         SQLStr.AppendLine("    ,MODIFYKBN                                                          ")
 
         Try
@@ -507,7 +537,7 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'yyyy/MM') AS MODIFYYM ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%Y/%m') AS MODIFYYM ")
-        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST2")
         SQLStr.AppendLine(" ORDER BY MODIFYYM DESC ")
 
         Try
@@ -539,10 +569,10 @@ Public Class LNM0014SprateHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST2 SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST2 Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -563,7 +593,7 @@ Public Class LNM0014SprateHistory
         SQLStr.AppendLine(" SELECT DISTINCT ")
         'SQLStr.AppendLine("     FORMAT(MODIFYYMD, 'dd') AS MODIFYDD ")
         SQLStr.AppendLine("     DATE_FORMAT(MODIFYYMD, '%d') AS MODIFYDD ")
-        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST2")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         'SQLStr.AppendLine("    FORMAT(MODIFYYMD, 'yyyy/MM')  = @MODIFYYM                                                         ")
         SQLStr.AppendLine("    DATE_FORMAT(MODIFYYMD, '%Y/%m')  = @MODIFYYM                                                         ")
@@ -593,10 +623,10 @@ Public Class LNM0014SprateHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST2 SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST2 Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -616,7 +646,7 @@ Public Class LNM0014SprateHistory
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT ")
         SQLStr.AppendLine("     MODIFYUSER ")
-        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST ")
+        SQLStr.AppendLine(" FROM LNG.LNT0015_SPRATEHIST2 ")
         SQLStr.AppendLine(" WHERE                                                                                                 ")
         '変更日が指定されている場合
         If Not WF_DDL_MODIFYDD.SelectedValue = "" Then
@@ -658,10 +688,10 @@ Public Class LNM0014SprateHistory
                 End Using
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST SELECT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST2 SELECT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST Select"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0015_SPRATEHIST2 Select"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1002,14 +1032,22 @@ Public Class LNM0014SprateHistory
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.ORGNAME).Value = "部門名称"
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = "加算先部門コード"
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = "加算先部門名称"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = "届先コード"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = "届先名称"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = "グループソート順"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = "グループID"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPNAME).Value = "グループ名"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = "明細ソート順"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = "明細ID"
-        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = "明細名"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATECODE).Value = "大分類コード"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATENAME).Value = "大分類名"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATECODE).Value = "中分類コード"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATENAME).Value = "中分類名"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATECODE).Value = "小分類コード"
+        sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATENAME).Value = "小分類名"
+#Region "コメント-2025/08/04(分類追加対応のため)"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = "届先コード"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = "届先名称"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = "グループソート順"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = "グループID"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPNAME).Value = "グループ名"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = "明細ソート順"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = "明細ID"
+        'sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = "明細名"
+#End Region
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = "単価"
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Value = "数量"
         sheet.Cells(WW_HEADERROW, LNM0014WRKINC.HISTORYEXCELCOL.CALCUNIT).Value = "計算単位"
@@ -1066,41 +1104,68 @@ Public Class LNM0014SprateHistory
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.ORGNAME).Value = Row("ORGNAME") '部門名称
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.KASANORGCODE).Value = Row("KASANORGCODE") '加算先部門コード
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.KASANORGNAME).Value = Row("KASANORGNAME") '加算先部門名称
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
-
-            'グループソート順
-            If Row("GROUPSORTNO") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO")
+            '大分類コード
+            If Row("BIGCATECODE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATECODE).Value = Row("BIGCATECODE")
             Else
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = CDbl(Row("GROUPSORTNO"))
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATECODE).Value = CDbl(Row("BIGCATECODE"))
             End If
+            '大分類名
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATENAME).Value = Row("BIGCATENAME")
 
-            'グループID
-            If Row("GROUPID") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = Row("GROUPID")
+            '中分類コード
+            If Row("MIDCATECODE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATECODE).Value = Row("MIDCATECODE")
             Else
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = CDbl(Row("GROUPID"))
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATECODE).Value = CDbl(Row("MIDCATECODE"))
             End If
+            '中分類名
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATENAME).Value = Row("MIDCATENAME")
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPNAME).Value = Row("GROUPNAME") 'グループ名
-
-            '明細ソート順
-            If Row("DETAILSORTNO") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO")
+            '小分類コード
+            If Row("SMALLCATECODE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATECODE).Value = Row("SMALLCATECODE")
             Else
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = CDbl(Row("DETAILSORTNO"))
+                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATECODE).Value = CDbl(Row("SMALLCATECODE"))
             End If
+            '小分類名
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATENAME).Value = Row("SMALLCATENAME")
+#Region "コメント-2025/08/04(分類追加対応のため)"
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKECODE).Value = Row("TODOKECODE") '届先コード
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TODOKENAME).Value = Row("TODOKENAME") '届先名称
 
-            '明細ID
-            If Row("DETAILID") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = Row("DETAILID")
-            Else
-                sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = CDbl(Row("DETAILID"))
-            End If
+            ''グループソート順
+            'If Row("GROUPSORTNO") = "" Then
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = Row("GROUPSORTNO")
+            'Else
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Value = CDbl(Row("GROUPSORTNO"))
+            'End If
 
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
+            ''グループID
+            'If Row("GROUPID") = "" Then
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = Row("GROUPID")
+            'Else
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Value = CDbl(Row("GROUPID"))
+            'End If
 
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPNAME).Value = Row("GROUPNAME") 'グループ名
+
+            ''明細ソート順
+            'If Row("DETAILSORTNO") = "" Then
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = Row("DETAILSORTNO")
+            'Else
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Value = CDbl(Row("DETAILSORTNO"))
+            'End If
+
+            ''明細ID
+            'If Row("DETAILID") = "" Then
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = Row("DETAILID")
+            'Else
+            '    sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Value = CDbl(Row("DETAILID"))
+            'End If
+
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILNAME).Value = Row("DETAILNAME") '明細名
+#End Region
             '単価
             If Row("TANKA") = "" Then
                 sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Value = Row("TANKA")
@@ -1191,10 +1256,15 @@ Public Class LNM0014SprateHistory
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
 
             '数値形式に変更
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Style = IntStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Style = IntStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Style = IntStyle
-            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.BIGCATECODE).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MIDCATECODE).Style = IntStyle
+            sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.SMALLCATECODE).Style = IntStyle
+#Region "コメント-2025/08/04(分類追加対応のため)"
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPSORTNO).Style = IntStyle
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.GROUPID).Style = IntStyle
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILSORTNO).Style = IntStyle
+            'sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.DETAILID).Style = IntStyle
+#End Region
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.TANKA).Style = DecStyle
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.QUANTITY).Style = DecStyle
             sheet.Cells(WW_ACTIVEROW, LNM0014WRKINC.HISTORYEXCELCOL.MILEAGE).Style = DecStyle

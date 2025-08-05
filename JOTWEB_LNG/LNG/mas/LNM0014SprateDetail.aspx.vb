@@ -73,12 +73,17 @@ Public Class LNM0014SprateDetail
                             WF_ButtonSel_Click()
                         Case "btnClearConfirmOK"        '戻るボタン押下後の確認ダイアログでOK押下
                             WF_CLEAR_ConfirmOkClick()
-                        Case "mspTodokeCodeSingleRowSelected"  '[共通]届先コード選択ポップアップで行選択
+                        Case "mspTodokeCodeSingleRowSelected"       '[共通]届先コード選択ポップアップで行選択
                             RowSelected_mspTodokeCodeSingle()
-                        Case "mspGroupIdSingleRowSelected"  '[共通]グループID選択ポップアップで行選択
-                            RowSelected_mspGroupIdSingle()
-                        Case "mspDetailIdSingleRowSelected"  '[共通]明細ID選択ポップアップで行選択
-                            RowSelected_mspDetailIdSingle()
+                        Case "mspBigcateCodeSingleRowSelected"      '[共通]大分類コード選択ポップアップで行選択
+                            RowSelected_mspBigcateCodeSingle()
+                            'RowSelected_mspGroupIdSingle()
+                        Case "mspMidcateCodeSingleRowSelected"      '[共通]中分類コード選択ポップアップで行選択
+                            RowSelected_mspMidCateCodeSingle()
+
+                        Case "mspSmallcateCodeSingleRowSelected"    '[共通]小分類コード選択ポップアップで行選択
+                            RowSelected_mspSmallCateCodeSingle()
+                            'RowSelected_mspDetailIdSingle()
                         Case "WF_TORIChange"    '取引先コードチェンジ
                             WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
                         Case "WF_ORGChange"    '部門コードチェンジ
@@ -345,26 +350,43 @@ Public Class LNM0014SprateDetail
         '加算先部門コード、名称
         WF_KASANORG.SelectedValue = work.WF_SEL_KASANORGCODE.Text
         WF_KASANORGCODE_TEXT.Text = work.WF_SEL_KASANORGCODE.Text
-        '届先コード
-        TxtTODOKECODE.Text = work.WF_SEL_TODOKECODE.Text
-        '届先名称
-        TxtTODOKENAME.Text = work.WF_SEL_TODOKENAME.Text
-        'グループソート順
-        TxtGROUPSORTNO.Text = work.WF_SEL_GROUPSORTNO.Text
-        'グループID
-        TxtGROUPID.Text = work.WF_SEL_GROUPID.Text
 
-        'グループ名
-        TxtGROUPNAME.Text = work.WF_SEL_GROUPNAME.Text
-        WF_GROUPNAME_SAVE.Value = work.WF_SEL_GROUPNAME.Text
-        '明細ソート順
-        TxtDETAILSORTNO.Text = work.WF_SEL_DETAILSORTNO.Text
-        '明細ID
-        TxtDETAILID.Text = work.WF_SEL_DETAILID.Text
+        '大分類コード
+        TxtBIGCATECODE.Text = work.WF_SEL_BIGCATECODE.Text
+        '大分類名
+        TxtBIGCATENAME.Text = work.WF_SEL_BIGCATENAME.Text
+        WF_BIGCATENAME_SAVE.Value = work.WF_SEL_BIGCATENAME.Text
+        '中分類コード
+        TxtMIDCATECODE.Text = work.WF_SEL_MIDCATECODE.Text
+        '中分類名
+        TxtMIDCATENAME.Text = work.WF_SEL_MIDCATENAME.Text
+        WF_MIDCATENAME_SAVE.Value = work.WF_SEL_MIDCATENAME.Text
+        '小分類コード
+        TxtSMALLCATECODE.Text = work.WF_SEL_SMALLCATECODE.Text
+        '小分類名
+        TxtSMALLCATENAME.Text = work.WF_SEL_SMALLCATENAME.Text
+        WF_SMALLCATENAME_SAVE.Value = work.WF_SEL_SMALLCATENAME.Text
 
-        '明細名
-        TxtDETAILNAME.Text = work.WF_SEL_DETAILNAME.Text
-        WF_DETAILNAME_SAVE.Value = work.WF_SEL_DETAILNAME.Text
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        ''届先コード
+        'TxtTODOKECODE.Text = work.WF_SEL_TODOKECODE.Text
+        ''届先名称
+        'TxtTODOKENAME.Text = work.WF_SEL_TODOKENAME.Text
+        ''グループソート順
+        'TxtGROUPSORTNO.Text = work.WF_SEL_GROUPSORTNO.Text
+        ''グループID
+        'TxtGROUPID.Text = work.WF_SEL_GROUPID.Text
+        ''グループ名
+        'TxtGROUPNAME.Text = work.WF_SEL_GROUPNAME.Text
+        'WF_GROUPNAME_SAVE.Value = work.WF_SEL_GROUPNAME.Text
+        ''明細ソート順
+        'TxtDETAILSORTNO.Text = work.WF_SEL_DETAILSORTNO.Text
+        ''明細ID
+        'TxtDETAILID.Text = work.WF_SEL_DETAILID.Text
+        ''明細名
+        'TxtDETAILNAME.Text = work.WF_SEL_DETAILNAME.Text
+        'WF_DETAILNAME_SAVE.Value = work.WF_SEL_DETAILNAME.Text
+#End Region
 
         '単価
         TxtTANKA.Text = work.WF_SEL_TANKA.Text
@@ -373,11 +395,11 @@ Public Class LNM0014SprateDetail
 
         '計算単位(KEYは固定値マスタのCALCUNITDROPに合わせる)
         Select Case work.WF_SEL_CALCUNIT.Text
-            Case "t" : ddlSelectCALCUNIT.SelectedValue = "1"
-            Case "回" : ddlSelectCALCUNIT.SelectedValue = "2"
-            Case "人" : ddlSelectCALCUNIT.SelectedValue = "3"
-            Case "台" : ddlSelectCALCUNIT.SelectedValue = "4"
-            Case "式" : ddlSelectCALCUNIT.SelectedValue = "9"
+            Case "t", "トン単価" : ddlSelectCALCUNIT.SelectedValue = "1"
+            Case "回", "回数" : ddlSelectCALCUNIT.SelectedValue = "2"
+            Case "人", "人数" : ddlSelectCALCUNIT.SelectedValue = "3"
+            Case "台", "台数" : ddlSelectCALCUNIT.SelectedValue = "4"
+            Case "式", "定数" : ddlSelectCALCUNIT.SelectedValue = "9"
             Case Else : ddlSelectCALCUNIT.SelectedValue = ""
         End Select
 
@@ -426,7 +448,10 @@ Public Class LNM0014SprateDetail
 
         'Disabled制御項目
         'DisabledKeyItem.Value = work.WF_SEL_TORICODE.Text
-        DisabledKeyItem.Value = work.WF_SEL_GROUPID.Text
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'DisabledKeyItem.Value = work.WF_SEL_GROUPID.Text
+#End Region
+        DisabledKeyItem.Value = work.WF_SEL_BIGCATECODE.Text
 
         '表示制御項目
         '情シス、高圧ガス以外の場合
@@ -436,9 +461,14 @@ Public Class LNM0014SprateDetail
             VisibleKeyOrgCode.Value = Master.ROLE_ORG
         End If
 
-        ' グループソート順、明細ソート順、輸送回数を入力するテキストボックスは数値(0～9)のみ可能とする。
-        Me.TxtGROUPSORTNO.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtDETAILSORTNO.Attributes("onkeyPress") = "CheckNum()"
+        ' 大分類コード、中分類コード、小分類コード、輸送回数を入力するテキストボックスは数値(0～9)のみ可能とする。
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'Me.TxtGROUPSORTNO.Attributes("onkeyPress") = "CheckNum()"
+        'Me.TxtDETAILSORTNO.Attributes("onkeyPress") = "CheckNum()"
+#End Region
+        Me.TxtBIGCATECODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtMIDCATECODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtSMALLCATECODE.Attributes("onkeyPress") = "CheckNum()"
         Me.TxtSHIPPINGCOUNT.Attributes("onkeyPress") = "CheckNum()"
 
         ' 入力するテキストボックスは数値(0～9)＋記号(-)のみ可能とする。
@@ -472,7 +502,7 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine(" SELECT DISTINCT ")
         SQLStr.AppendLine("       TORICODE")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine(" WHERE")
         SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
         SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
@@ -510,7 +540,7 @@ Public Class LNM0014SprateDetail
 
         '○ DB更新SQL(特別料金マスタ)
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine("     INSERT INTO LNG.LNM0014_SPRATE          ")
+        SQLStr.AppendLine("     INSERT INTO LNG.LNM0014_SPRATE2         ")
         SQLStr.AppendLine("        (                                    ")
         SQLStr.AppendLine("         DELFLG                              ")
         SQLStr.AppendLine("       , TARGETYM                            ")
@@ -520,14 +550,22 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , ORGNAME                             ")
         SQLStr.AppendLine("       , KASANORGCODE                        ")
         SQLStr.AppendLine("       , KASANORGNAME                        ")
-        SQLStr.AppendLine("       , TODOKECODE                          ")
-        SQLStr.AppendLine("       , TODOKENAME                          ")
-        SQLStr.AppendLine("       , GROUPSORTNO                         ")
-        SQLStr.AppendLine("       , GROUPID                             ")
-        SQLStr.AppendLine("       , GROUPNAME                           ")
-        SQLStr.AppendLine("       , DETAILSORTNO                        ")
-        SQLStr.AppendLine("       , DETAILID                            ")
-        SQLStr.AppendLine("       , DETAILNAME                          ")
+        SQLStr.AppendLine("       , BIGCATECODE                         ")
+        SQLStr.AppendLine("       , BIGCATENAME                         ")
+        SQLStr.AppendLine("       , MIDCATECODE                         ")
+        SQLStr.AppendLine("       , MIDCATENAME                         ")
+        SQLStr.AppendLine("       , SMALLCATECODE                       ")
+        SQLStr.AppendLine("       , SMALLCATENAME                       ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("       , TODOKECODE                          ")
+        'SQLStr.AppendLine("       , TODOKENAME                          ")
+        'SQLStr.AppendLine("       , GROUPSORTNO                         ")
+        'SQLStr.AppendLine("       , GROUPID                             ")
+        'SQLStr.AppendLine("       , GROUPNAME                           ")
+        'SQLStr.AppendLine("       , DETAILSORTNO                        ")
+        'SQLStr.AppendLine("       , DETAILID                            ")
+        'SQLStr.AppendLine("       , DETAILNAME                          ")
+#End Region
         SQLStr.AppendLine("       , TANKA                               ")
         SQLStr.AppendLine("       , QUANTITY                            ")
         SQLStr.AppendLine("       , CALCUNIT                            ")
@@ -558,6 +596,7 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , INITTERMID                          ")
         SQLStr.AppendLine("       , INITPGID                            ")
         SQLStr.AppendLine("       , RECEIVEYMD                          ")
+        SQLStr.AppendLine("       , UPDTIMSTP                           ")
         SQLStr.AppendLine("        )                                    ")
         SQLStr.AppendLine("     VALUES                                  ")
         SQLStr.AppendLine("        (                                    ")
@@ -569,14 +608,22 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("        , @ORGNAME                           ")
         SQLStr.AppendLine("        , @KASANORGCODE                      ")
         SQLStr.AppendLine("        , @KASANORGNAME                      ")
-        SQLStr.AppendLine("        , @TODOKECODE                        ")
-        SQLStr.AppendLine("        , @TODOKENAME                        ")
-        SQLStr.AppendLine("        , @GROUPSORTNO                       ")
-        SQLStr.AppendLine("        , @GROUPID                           ")
-        SQLStr.AppendLine("        , @GROUPNAME                         ")
-        SQLStr.AppendLine("        , @DETAILSORTNO                      ")
-        SQLStr.AppendLine("        , @DETAILID                          ")
-        SQLStr.AppendLine("        , @DETAILNAME                        ")
+        SQLStr.AppendLine("        , @BIGCATECODE                       ")
+        SQLStr.AppendLine("        , @BIGCATENAME                       ")
+        SQLStr.AppendLine("        , @MIDCATECODE                       ")
+        SQLStr.AppendLine("        , @MIDCATENAME                       ")
+        SQLStr.AppendLine("        , @SMALLCATECODE                     ")
+        SQLStr.AppendLine("        , @SMALLCATENAME                     ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("        , @TODOKECODE                        ")
+        'SQLStr.AppendLine("        , @TODOKENAME                        ")
+        'SQLStr.AppendLine("        , @GROUPSORTNO                       ")
+        'SQLStr.AppendLine("        , @GROUPID                           ")
+        'SQLStr.AppendLine("        , @GROUPNAME                         ")
+        'SQLStr.AppendLine("        , @DETAILSORTNO                      ")
+        'SQLStr.AppendLine("        , @DETAILID                          ")
+        'SQLStr.AppendLine("        , @DETAILNAME                        ")
+#End Region
         SQLStr.AppendLine("        , @TANKA                             ")
         SQLStr.AppendLine("        , @QUANTITY                          ")
         SQLStr.AppendLine("        , @CALCUNIT                          ")
@@ -607,6 +654,7 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , @INITTERMID                         ")
         SQLStr.AppendLine("       , @INITPGID                           ")
         SQLStr.AppendLine("       , @RECEIVEYMD                         ")
+        SQLStr.AppendLine("       , @UPDTIMSTP                          ")
         SQLStr.AppendLine("        )                                    ")
         SQLStr.AppendLine("     ON DUPLICATE KEY UPDATE                 ")
         SQLStr.AppendLine("         DELFLG         = @DELFLG            ")
@@ -617,14 +665,22 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , ORGNAME     = @ORGNAME              ")
         SQLStr.AppendLine("       , KASANORGCODE     = @KASANORGCODE    ")
         SQLStr.AppendLine("       , KASANORGNAME     = @KASANORGNAME    ")
-        SQLStr.AppendLine("       , TODOKECODE     = @TODOKECODE        ")
-        SQLStr.AppendLine("       , TODOKENAME     = @TODOKENAME        ")
-        SQLStr.AppendLine("       , GROUPSORTNO     = @GROUPSORTNO      ")
-        SQLStr.AppendLine("       , GROUPID     = @GROUPID                          ")
-        SQLStr.AppendLine("       , GROUPNAME     = @GROUPNAME                      ")
-        SQLStr.AppendLine("       , DETAILSORTNO     = @DETAILSORTNO                ")
-        SQLStr.AppendLine("       , DETAILID     = @DETAILID                        ")
-        SQLStr.AppendLine("       , DETAILNAME     = @DETAILNAME                    ")
+        SQLStr.AppendLine("       , BIGCATECODE     = @BIGCATECODE      ")
+        SQLStr.AppendLine("       , BIGCATENAME     = @BIGCATENAME      ")
+        SQLStr.AppendLine("       , MIDCATECODE     = @MIDCATECODE      ")
+        SQLStr.AppendLine("       , MIDCATENAME     = @MIDCATENAME      ")
+        SQLStr.AppendLine("       , SMALLCATECODE   = @SMALLCATECODE    ")
+        SQLStr.AppendLine("       , SMALLCATENAME   = @SMALLCATENAME    ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("       , TODOKECODE     = @TODOKECODE        ")
+        'SQLStr.AppendLine("       , TODOKENAME     = @TODOKENAME        ")
+        'SQLStr.AppendLine("       , GROUPSORTNO     = @GROUPSORTNO      ")
+        'SQLStr.AppendLine("       , GROUPID     = @GROUPID              ")
+        'SQLStr.AppendLine("       , GROUPNAME     = @GROUPNAME          ")
+        'SQLStr.AppendLine("       , DETAILSORTNO     = @DETAILSORTNO    ")
+        'SQLStr.AppendLine("       , DETAILID     = @DETAILID            ")
+        'SQLStr.AppendLine("       , DETAILNAME     = @DETAILNAME        ")
+#End Region
         SQLStr.AppendLine("       , TANKA     = @TANKA                              ")
         SQLStr.AppendLine("       , QUANTITY     = @QUANTITY                        ")
         SQLStr.AppendLine("       , CALCUNIT     = @CALCUNIT                        ")
@@ -655,6 +711,7 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("       , UPDTERMID      = @UPDTERMID         ")
         SQLStr.AppendLine("       , UPDPGID        = @UPDPGID           ")
         SQLStr.AppendLine("       , RECEIVEYMD     = @RECEIVEYMD        ")
+        SQLStr.AppendLine("       , UPDTIMSTP      = @UPDTIMSTP         ")
 
         '○ 更新ジャーナル出力SQL
         Dim SQLJnl = New StringBuilder
@@ -667,14 +724,22 @@ Public Class LNM0014SprateDetail
         SQLJnl.AppendLine("   , ORGNAME                                ")
         SQLJnl.AppendLine("   , KASANORGCODE                           ")
         SQLJnl.AppendLine("   , KASANORGNAME                           ")
-        SQLJnl.AppendLine("   , TODOKECODE                             ")
-        SQLJnl.AppendLine("   , TODOKENAME                             ")
-        SQLJnl.AppendLine("   , GROUPSORTNO                            ")
-        SQLJnl.AppendLine("   , GROUPID                                ")
-        SQLJnl.AppendLine("   , GROUPNAME                              ")
-        SQLJnl.AppendLine("   , DETAILSORTNO                           ")
-        SQLJnl.AppendLine("   , DETAILID                               ")
-        SQLJnl.AppendLine("   , DETAILNAME                             ")
+        SQLJnl.AppendLine("   , BIGCATECODE                            ")
+        SQLJnl.AppendLine("   , BIGCATENAME                            ")
+        SQLJnl.AppendLine("   , MIDCATECODE                            ")
+        SQLJnl.AppendLine("   , MIDCATENAME                            ")
+        SQLJnl.AppendLine("   , SMALLCATECODE                          ")
+        SQLJnl.AppendLine("   , SMALLCATENAME                          ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLJnl.AppendLine("   , TODOKECODE                             ")
+        'SQLJnl.AppendLine("   , TODOKENAME                             ")
+        'SQLJnl.AppendLine("   , GROUPSORTNO                            ")
+        'SQLJnl.AppendLine("   , GROUPID                                ")
+        'SQLJnl.AppendLine("   , GROUPNAME                              ")
+        'SQLJnl.AppendLine("   , DETAILSORTNO                           ")
+        'SQLJnl.AppendLine("   , DETAILID                               ")
+        'SQLJnl.AppendLine("   , DETAILNAME                             ")
+#End Region
         SQLJnl.AppendLine("   , TANKA                                  ")
         SQLJnl.AppendLine("   , QUANTITY                               ")
         SQLJnl.AppendLine("   , CALCUNIT                               ")
@@ -711,13 +776,18 @@ Public Class LNM0014SprateDetail
         SQLJnl.AppendLine("   , RECEIVEYMD                             ")
         SQLJnl.AppendLine("   , UPDTIMSTP                              ")
         SQLJnl.AppendLine(" FROM                                       ")
-        SQLJnl.AppendLine("     LNG.LNM0014_SPRATE                     ")
+        SQLJnl.AppendLine("     LNG.LNM0014_SPRATE2                    ")
         SQLJnl.AppendLine(" WHERE                                      ")
-        SQLJnl.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLJnl.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLJnl.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLJnl.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
-        SQLJnl.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+        SQLJnl.AppendLine("         COALESCE(TARGETYM, '')       = @TARGETYM ")
+        SQLJnl.AppendLine("    AND  COALESCE(TORICODE, '')       = @TORICODE ")
+        SQLJnl.AppendLine("    AND  COALESCE(ORGCODE, '')        = @ORGCODE ")
+        SQLJnl.AppendLine("    AND  COALESCE(BIGCATECODE, '0')   = @BIGCATECODE ")
+        SQLJnl.AppendLine("    AND  COALESCE(MIDCATECODE, '0')   = @MIDCATECODE ")
+        SQLJnl.AppendLine("    AND  COALESCE(SMALLCATECODE, '0') = @SMALLCATECODE ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLJnl.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        'SQLJnl.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+#End Region
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon), SQLcmdJnl As New MySqlCommand(SQLJnl.ToString, SQLcon)
@@ -730,14 +800,22 @@ Public Class LNM0014SprateDetail
                 Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
                 Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
-                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
-                Dim P_GROUPSORTNO As MySqlParameter = SQLcmd.Parameters.Add("@GROUPSORTNO", MySqlDbType.Decimal, 2)     'グループソート順
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
-                Dim P_GROUPNAME As MySqlParameter = SQLcmd.Parameters.Add("@GROUPNAME", MySqlDbType.VarChar, 100)     'グループ名
-                Dim P_DETAILSORTNO As MySqlParameter = SQLcmd.Parameters.Add("@DETAILSORTNO", MySqlDbType.Decimal, 2)     '明細ソート順
-                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
-                Dim P_DETAILNAME As MySqlParameter = SQLcmd.Parameters.Add("@DETAILNAME", MySqlDbType.VarChar, 100)     '明細名
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)         '大分類コード
+                Dim P_BIGCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATENAME", MySqlDbType.VarChar, 100)       '大分類名
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)         '中分類コード
+                Dim P_MIDCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATENAME", MySqlDbType.VarChar, 100)       '中分類名
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2)     '小分類コード
+                Dim P_SMALLCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATENAME", MySqlDbType.VarChar, 100)   '小分類名
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
+                'Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
+                'Dim P_GROUPSORTNO As MySqlParameter = SQLcmd.Parameters.Add("@GROUPSORTNO", MySqlDbType.Decimal, 2)     'グループソート順
+                'Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                'Dim P_GROUPNAME As MySqlParameter = SQLcmd.Parameters.Add("@GROUPNAME", MySqlDbType.VarChar, 100)     'グループ名
+                'Dim P_DETAILSORTNO As MySqlParameter = SQLcmd.Parameters.Add("@DETAILSORTNO", MySqlDbType.Decimal, 2)     '明細ソート順
+                'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+                'Dim P_DETAILNAME As MySqlParameter = SQLcmd.Parameters.Add("@DETAILNAME", MySqlDbType.VarChar, 100)     '明細名
+#End Region
                 Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal, 10, 2)     '単価
                 Dim P_QUANTITY As MySqlParameter = SQLcmd.Parameters.Add("@QUANTITY", MySqlDbType.Decimal, 10, 2)     '数量
                 Dim P_CALCUNIT As MySqlParameter = SQLcmd.Parameters.Add("@CALCUNIT", MySqlDbType.VarChar, 20)     '計算単位
@@ -772,49 +850,59 @@ Public Class LNM0014SprateDetail
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
                 Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
+                Dim P_UPDTIMSTP As MySqlParameter = SQLcmd.Parameters.Add("@UPDTIMSTP", MySqlDbType.DateTime)     'タイムスタンプ
 
                 ' 更新ジャーナル出力用パラメータ
-                Dim JP_TARGETYM As MySqlParameter = SQLcmdJnl.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim JP_TORICODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim JP_ORGCODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim JP_GROUPID As MySqlParameter = SQLcmdJnl.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
-                Dim JP_DETAILID As MySqlParameter = SQLcmdJnl.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
-
+                Dim JP_TARGETYM As MySqlParameter = SQLcmdJnl.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)           '対象年月
+                Dim JP_TORICODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)          '取引先コード
+                Dim JP_ORGCODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)             '部門コード
+                Dim JP_BIGCATECODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)     '大分類コード
+                Dim JP_MIDCATECODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)     '中分類コード
+                Dim JP_SMALLCATECODE As MySqlParameter = SQLcmdJnl.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2) '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Dim JP_GROUPID As MySqlParameter = SQLcmdJnl.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                'Dim JP_DETAILID As MySqlParameter = SQLcmdJnl.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+#End Region
                 Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
-
                 Dim WW_DateNow As DateTime = Date.Now
 
                 ' DB更新
-                P_DELFLG.Value = LNM0014row("DELFLG")               '削除フラグ
-                P_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
-                P_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
-                P_TORINAME.Value = LNM0014row("TORINAME")           '取引先名称
-                P_ORGCODE.Value = LNM0014row("ORGCODE")           '部門コード
-                P_ORGNAME.Value = LNM0014row("ORGNAME")           '部門名称
-                P_KASANORGCODE.Value = LNM0014row("KASANORGCODE")           '加算先部門コード
-                P_KASANORGNAME.Value = LNM0014row("KASANORGNAME")           '加算先部門名称
-                P_TODOKECODE.Value = LNM0014row("TODOKECODE")           '届先コード
-                P_TODOKENAME.Value = LNM0014row("TODOKENAME")           '届先名称
+                P_DELFLG.Value = LNM0014row("DELFLG")                   '削除フラグ
+                P_TARGETYM.Value = LNM0014row("TARGETYM")               '対象年月
+                P_TORICODE.Value = LNM0014row("TORICODE")               '取引先コード
+                P_TORINAME.Value = LNM0014row("TORINAME")               '取引先名称
+                P_ORGCODE.Value = LNM0014row("ORGCODE")                 '部門コード
+                P_ORGNAME.Value = LNM0014row("ORGNAME")                 '部門名称
+                P_KASANORGCODE.Value = LNM0014row("KASANORGCODE")       '加算先部門コード
+                P_KASANORGNAME.Value = LNM0014row("KASANORGNAME")       '加算先部門名称
 
-                'グループソート順が空(新規)の場合グループIDを入れる
-                If LNM0014row("GROUPSORTNO").ToString = "" Then
-                    P_GROUPSORTNO.Value = LNM0014row("GROUPID")
-                Else
-                    P_GROUPSORTNO.Value = LNM0014row("GROUPSORTNO")
-                End If
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'P_TODOKECODE.Value = LNM0014row("TODOKECODE")           '届先コード
+                'P_TODOKENAME.Value = LNM0014row("TODOKENAME")           '届先名称
+                ''グループソート順が空(新規)の場合グループIDを入れる
+                'If LNM0014row("GROUPSORTNO").ToString = "" Then
+                '    P_GROUPSORTNO.Value = LNM0014row("GROUPID")
+                'Else
+                '    P_GROUPSORTNO.Value = LNM0014row("GROUPSORTNO")
+                'End If
+#End Region
 
-                P_GROUPID.Value = LNM0014row("GROUPID")           'グループID
-                P_GROUPNAME.Value = LNM0014row("GROUPNAME")           'グループ名
+                P_BIGCATECODE.Value = LNM0014row("BIGCATECODE")         '大分類コード
+                P_BIGCATENAME.Value = LNM0014row("BIGCATENAME")         '大分類名
+                P_MIDCATECODE.Value = LNM0014row("MIDCATECODE")         '中分類コード
+                P_MIDCATENAME.Value = LNM0014row("MIDCATENAME")         '中分類名
 
-                '明細ソート順が空(新規)の場合明細IDを入れる
-                If LNM0014row("DETAILSORTNO").ToString = "" Then
-                    P_DETAILSORTNO.Value = LNM0014row("DETAILID")
-                Else
-                    P_DETAILSORTNO.Value = LNM0014row("DETAILSORTNO")
-                End If
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                ''明細ソート順が空(新規)の場合明細IDを入れる
+                'If LNM0014row("DETAILSORTNO").ToString = "" Then
+                '    P_DETAILSORTNO.Value = LNM0014row("DETAILID")
+                'Else
+                '    P_DETAILSORTNO.Value = LNM0014row("DETAILSORTNO")
+                'End If
+#End Region
 
-                P_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
-                P_DETAILNAME.Value = LNM0014row("DETAILNAME")           '明細名
+                P_SMALLCATECODE.Value = LNM0014row("SMALLCATECODE")     '小分類コード
+                P_SMALLCATENAME.Value = LNM0014row("SMALLCATENAME")     '小分類名
 
                 '単価
                 If LNM0014row("TANKA").ToString = "0" Or LNM0014row("TANKA").ToString = "" Then
@@ -825,22 +913,25 @@ Public Class LNM0014SprateDetail
 
                 '数量
                 If LNM0014row("QUANTITY").ToString = "0" Or LNM0014row("QUANTITY").ToString = "" Then
-                    P_QUANTITY.Value = DBNull.Value
+                    P_QUANTITY.Value = 0.00
+                    'P_QUANTITY.Value = DBNull.Value
                 Else
                     P_QUANTITY.Value = LNM0014row("QUANTITY")
                 End If
 
                 '計算単位
-                Select Case LNM0014row("CALCUNIT").ToString
-                    Case "1" : P_CALCUNIT.Value = "t"
-                    Case "2" : P_CALCUNIT.Value = "回"
-                    Case "3" : P_CALCUNIT.Value = "人"
-                    Case "4" : P_CALCUNIT.Value = "台"
-                    Case "9" : P_CALCUNIT.Value = "式"
-                    Case Else : P_CALCUNIT.Value = ""
-                End Select
+                P_CALCUNIT.Value = LNM0014row("CALCUNIT")
+                'Select Case LNM0014row("CALCUNIT").ToString
+                '    Case "1" : P_CALCUNIT.Value = "t"
+                '    Case "2" : P_CALCUNIT.Value = "回"
+                '    Case "3" : P_CALCUNIT.Value = "人"
+                '    Case "4" : P_CALCUNIT.Value = "台"
+                '    Case "9" : P_CALCUNIT.Value = "式"
+                '    Case Else : P_CALCUNIT.Value = ""
+                'End Select
 
-                P_DEPARTURE.Value = LNM0014row("DEPARTURE")           '出荷地
+                '出荷地
+                P_DEPARTURE.Value = LNM0014row("DEPARTURE")
 
                 '走行距離
                 If LNM0014row("MILEAGE").ToString = "0" Or LNM0014row("MILEAGE").ToString = "" Then
@@ -958,16 +1049,18 @@ Public Class LNM0014SprateDetail
                 P_UPDTERMID.Value = Master.USERTERMID               '更新端末
                 P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
                 P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
+                P_UPDTIMSTP.Value = WW_DateNow
 
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
                 ' 更新ジャーナル出力
-                JP_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
-                JP_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
-                JP_ORGCODE.Value = LNM0014row("ORGCODE")           '部門コード
-                JP_GROUPID.Value = LNM0014row("GROUPID")           'グループID
-                JP_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
+                JP_TARGETYM.Value = LNM0014row("TARGETYM")              '対象年月
+                JP_TORICODE.Value = LNM0014row("TORICODE")              '取引先コード
+                JP_ORGCODE.Value = LNM0014row("ORGCODE")                '部門コード
+                JP_BIGCATECODE.Value = LNM0014row("BIGCATECODE")        '大分類コード
+                JP_MIDCATECODE.Value = LNM0014row("MIDCATECODE")        '中分類コード
+                JP_SMALLCATECODE.Value = LNM0014row("SMALLCATECODE")    '小分類コード
 
                 Using SQLdr As MySqlDataReader = SQLcmdJnl.ExecuteReader()
                     If IsNothing(LNM0014UPDtbl) Then
@@ -1034,29 +1127,44 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("    SELECT")
         SQLStr.AppendLine("        TORICODE")
         SQLStr.AppendLine("    FROM")
-        SQLStr.AppendLine("        LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("        LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
-        SQLStr.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+        SQLStr.AppendLine("         COALESCE(TARGETYM, '')       = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')       = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')        = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0')   = @BIGCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(MIDCATECODE, '0')   = @MIDCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SMALLCATECODE, '0') = @SMALLCATECODE ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        'SQLStr.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+#End Region
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
-                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)           '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)          '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)             '部門コード
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)     '大分類コード
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)     '中分類コード
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2) '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+#End Region
 
                 Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
 
                 P_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
                 P_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
-                P_ORGCODE.Value = LNM0014row("ORGCODE")           '部門コード
-                P_GROUPID.Value = LNM0014row("GROUPID")           'グループID
-                P_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
+                P_ORGCODE.Value = LNM0014row("ORGCODE")             '部門コード
+                P_BIGCATECODE.Value = LNM0014row("BIGCATECODE")     '大分類コード
+                P_MIDCATECODE.Value = LNM0014row("MIDCATECODE")     '中分類コード
+                P_SMALLCATECODE.Value = LNM0014row("SMALLCATECODE") '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'P_BIGCATECODE.Value = LNM0014row("GROUPID")           'グループID
+                'P_SMALLCATECODE.Value = LNM0014row("DETAILID")           '明細ID
+#End Region
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -1102,7 +1210,7 @@ Public Class LNM0014SprateDetail
 
         '○ ＤＢ更新
         Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" INSERT INTO LNG.LNT0015_SPRATEHIST ")
+        SQLStr.AppendLine(" INSERT INTO LNG.LNT0015_SPRATEHIST2 ")
         SQLStr.AppendLine("  (  ")
         SQLStr.AppendLine("      TARGETYM  ")
         SQLStr.AppendLine("     ,TORICODE  ")
@@ -1111,14 +1219,22 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     ,ORGNAME  ")
         SQLStr.AppendLine("     ,KASANORGCODE  ")
         SQLStr.AppendLine("     ,KASANORGNAME  ")
-        SQLStr.AppendLine("     ,TODOKECODE  ")
-        SQLStr.AppendLine("     ,TODOKENAME  ")
-        SQLStr.AppendLine("     ,GROUPSORTNO  ")
-        SQLStr.AppendLine("     ,GROUPID  ")
-        SQLStr.AppendLine("     ,GROUPNAME  ")
-        SQLStr.AppendLine("     ,DETAILSORTNO  ")
-        SQLStr.AppendLine("     ,DETAILID  ")
-        SQLStr.AppendLine("     ,DETAILNAME  ")
+        SQLStr.AppendLine("     ,BIGCATECODE  ")
+        SQLStr.AppendLine("     ,BIGCATENAME  ")
+        SQLStr.AppendLine("     ,MIDCATECODE  ")
+        SQLStr.AppendLine("     ,MIDCATENAME  ")
+        SQLStr.AppendLine("     ,SMALLCATECODE  ")
+        SQLStr.AppendLine("     ,SMALLCATENAME  ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("     ,TODOKECODE  ")
+        'SQLStr.AppendLine("     ,TODOKENAME  ")
+        'SQLStr.AppendLine("     ,GROUPSORTNO  ")
+        'SQLStr.AppendLine("     ,GROUPID  ")
+        'SQLStr.AppendLine("     ,GROUPNAME  ")
+        'SQLStr.AppendLine("     ,DETAILSORTNO  ")
+        'SQLStr.AppendLine("     ,DETAILID  ")
+        'SQLStr.AppendLine("     ,DETAILNAME  ")
+#End Region
         SQLStr.AppendLine("     ,TANKA  ")
         SQLStr.AppendLine("     ,QUANTITY  ")
         SQLStr.AppendLine("     ,CALCUNIT  ")
@@ -1162,14 +1278,22 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     ,ORGNAME  ")
         SQLStr.AppendLine("     ,KASANORGCODE  ")
         SQLStr.AppendLine("     ,KASANORGNAME  ")
-        SQLStr.AppendLine("     ,TODOKECODE  ")
-        SQLStr.AppendLine("     ,TODOKENAME  ")
-        SQLStr.AppendLine("     ,GROUPSORTNO  ")
-        SQLStr.AppendLine("     ,GROUPID  ")
-        SQLStr.AppendLine("     ,GROUPNAME  ")
-        SQLStr.AppendLine("     ,DETAILSORTNO  ")
-        SQLStr.AppendLine("     ,DETAILID  ")
-        SQLStr.AppendLine("     ,DETAILNAME  ")
+        SQLStr.AppendLine("     ,BIGCATECODE  ")
+        SQLStr.AppendLine("     ,BIGCATENAME  ")
+        SQLStr.AppendLine("     ,MIDCATECODE  ")
+        SQLStr.AppendLine("     ,MIDCATENAME  ")
+        SQLStr.AppendLine("     ,SMALLCATECODE  ")
+        SQLStr.AppendLine("     ,SMALLCATENAME  ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("     ,TODOKECODE  ")
+        'SQLStr.AppendLine("     ,TODOKENAME  ")
+        'SQLStr.AppendLine("     ,GROUPSORTNO  ")
+        'SQLStr.AppendLine("     ,GROUPID  ")
+        'SQLStr.AppendLine("     ,GROUPNAME  ")
+        'SQLStr.AppendLine("     ,DETAILSORTNO  ")
+        'SQLStr.AppendLine("     ,DETAILID  ")
+        'SQLStr.AppendLine("     ,DETAILNAME  ")
+#End Region
         SQLStr.AppendLine("     ,TANKA  ")
         SQLStr.AppendLine("     ,QUANTITY  ")
         SQLStr.AppendLine("     ,CALCUNIT  ")
@@ -1205,22 +1329,31 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     ,@INITTERMID AS INITTERMID ")
         SQLStr.AppendLine("     ,@INITPGID AS INITPGID ")
         SQLStr.AppendLine("  FROM   ")
-        SQLStr.AppendLine("        LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("        LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
-        SQLStr.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+        SQLStr.AppendLine("         COALESCE(TARGETYM, '')       = @TARGETYM ")
+        SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')       = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')        = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0')   = @BIGCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(MIDCATECODE, '0')   = @MIDCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SMALLCATECODE, '0') = @SMALLCATECODE ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        'SQLStr.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+#End Region
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
-                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
-
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)           '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)          '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)             '部門コード
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)     '大分類コード
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)     '中分類コード
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2) '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+#End Region
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
                 Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
@@ -1236,9 +1369,14 @@ Public Class LNM0014SprateDetail
                 ' DB更新
                 P_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
                 P_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
-                P_ORGCODE.Value = LNM0014row("ORGCODE")           '部門コード
-                P_GROUPID.Value = LNM0014row("GROUPID")           'グループID
-                P_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
+                P_ORGCODE.Value = LNM0014row("ORGCODE")             '部門コード
+                P_BIGCATECODE.Value = LNM0014row("BIGCATECODE")     '大分類コード
+                P_MIDCATECODE.Value = LNM0014row("MIDCATECODE")     '中分類コード
+                P_SMALLCATECODE.Value = LNM0014row("SMALLCATECODE") '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'P_BIGCATECODE.Value = LNM0014row("GROUPID")           'グループID
+                'P_SMALLCATECODE.Value = LNM0014row("DETAILID")           '明細ID
+#End Region
 
                 '操作区分
                 '変更区分が新規の場合
@@ -1253,24 +1391,24 @@ Public Class LNM0014SprateDetail
                     End If
                 End If
 
-                P_MODIFYKBN.Value = WW_MODIFYKBN             '変更区分
-                P_MODIFYYMD.Value = WW_NOW               '変更日時
-                P_MODIFYUSER.Value = Master.USERID               '変更ユーザーＩＤ
+                P_MODIFYKBN.Value = WW_MODIFYKBN                '変更区分
+                P_MODIFYYMD.Value = WW_NOW                      '変更日時
+                P_MODIFYUSER.Value = Master.USERID              '変更ユーザーＩＤ
 
-                P_INITYMD.Value = WW_NOW              '登録年月日
-                P_INITUSER.Value = Master.USERID             '登録ユーザーＩＤ
-                P_INITTERMID.Value = Master.USERTERMID                '登録端末
-                P_INITPGID.Value = Me.GetType().BaseType.Name          '登録プログラムＩＤ
+                P_INITYMD.Value = WW_NOW                        '登録年月日
+                P_INITUSER.Value = Master.USERID                '登録ユーザーＩＤ
+                P_INITTERMID.Value = Master.USERTERMID          '登録端末
+                P_INITPGID.Value = Me.GetType().BaseType.Name   '登録プログラムＩＤ
 
                 SQLcmd.CommandTimeout = 300
                 SQLcmd.ExecuteNonQuery()
 
             End Using
         Catch ex As Exception
-            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST  INSERT")
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0015_SPRATEHIST2  INSERT")
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0015_SPRATEHIST  INSERT"
+            CS0011LOGWrite.INFPOSI = "DB:" + "LNT0015_SPRATEHIST2  INSERT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1383,14 +1521,22 @@ Public Class LNM0014SprateDetail
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
         Master.EraseCharToIgnore(RadioDELFLG.SelectedValue)      '削除フラグ
         Master.EraseCharToIgnore(WF_TARGETYM.Value)  '対象年月
-        Master.EraseCharToIgnore(TxtTODOKECODE.Text)  '届先コード
-        Master.EraseCharToIgnore(TxtTODOKENAME.Text)  '届先名称
-        Master.EraseCharToIgnore(TxtGROUPSORTNO.Text)  'グループソート順
-        Master.EraseCharToIgnore(TxtGROUPID.Text)  'グループID
-        Master.EraseCharToIgnore(TxtGROUPNAME.Text)  'グループ名
-        Master.EraseCharToIgnore(TxtDETAILSORTNO.Text)  '明細ソート順
-        Master.EraseCharToIgnore(TxtDETAILID.Text)  '明細ID
-        Master.EraseCharToIgnore(TxtDETAILNAME.Text)  '明細名
+        Master.EraseCharToIgnore(TxtBIGCATECODE.Text)  '大分類コード
+        Master.EraseCharToIgnore(TxtBIGCATENAME.Text)  '大分類名
+        Master.EraseCharToIgnore(TxtMIDCATECODE.Text)  '中分類コード
+        Master.EraseCharToIgnore(TxtMIDCATENAME.Text)  '中分類名
+        Master.EraseCharToIgnore(TxtSMALLCATECODE.Text)  '小分類コード
+        Master.EraseCharToIgnore(TxtSMALLCATENAME.Text)  '小分類名
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'Master.EraseCharToIgnore(TxtTODOKECODE.Text)  '届先コード
+        'Master.EraseCharToIgnore(TxtTODOKENAME.Text)  '届先名称
+        'Master.EraseCharToIgnore(TxtGROUPSORTNO.Text)  'グループソート順
+        'Master.EraseCharToIgnore(TxtGROUPID.Text)  'グループID
+        'Master.EraseCharToIgnore(TxtGROUPNAME.Text)  'グループ名
+        'Master.EraseCharToIgnore(TxtDETAILSORTNO.Text)  '明細ソート順
+        'Master.EraseCharToIgnore(TxtDETAILID.Text)  '明細ID
+        'Master.EraseCharToIgnore(TxtDETAILNAME.Text)  '明細名
+#End Region
         Master.EraseCharToIgnore(TxtTANKA.Text)  '単価
         Master.EraseCharToIgnore(TxtQUANTITY.Text)  '数量
         Master.EraseCharToIgnore(TxtDEPARTURE.Text)  '出荷地
@@ -1446,15 +1592,23 @@ Public Class LNM0014SprateDetail
 
         '更新の場合
         If Not DisabledKeyItem.Value = "" Then
-            LNM0014INProw("TARGETYM") = work.WF_SEL_TARGETYM.Text         '対象年月
-            LNM0014INProw("TORICODE") = work.WF_SEL_TORICODE.Text     '取引先コード
-            LNM0014INProw("TORINAME") = work.WF_SEL_TORINAME.Text      '取引先名称
-            LNM0014INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text          '部門コード
-            LNM0014INProw("ORGNAME") = work.WF_SEL_ORGNAME.Text           '部門名称
-            LNM0014INProw("GROUPID") = work.WF_SEL_GROUPID.Text           'グループID
-            LNM0014INProw("GROUPNAME") = work.WF_SEL_GROUPNAME.Text           'グループ名
-            LNM0014INProw("DETAILID") = work.WF_SEL_DETAILID.Text           '明細ID
-            LNM0014INProw("DETAILNAME") = work.WF_SEL_DETAILNAME.Text           '明細名
+            LNM0014INProw("TARGETYM") = work.WF_SEL_TARGETYM.Text           '対象年月
+            LNM0014INProw("TORICODE") = work.WF_SEL_TORICODE.Text           '取引先コード
+            LNM0014INProw("TORINAME") = work.WF_SEL_TORINAME.Text           '取引先名称
+            LNM0014INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text             '部門コード
+            LNM0014INProw("ORGNAME") = work.WF_SEL_ORGNAME.Text             '部門名称
+            LNM0014INProw("BIGCATECODE") = work.WF_SEL_BIGCATECODE.Text     '大分類コード
+            LNM0014INProw("BIGCATENAME") = work.WF_SEL_BIGCATENAME.Text     '大分類名
+            LNM0014INProw("MIDCATECODE") = work.WF_SEL_MIDCATECODE.Text     '中分類コード
+            LNM0014INProw("MIDCATENAME") = work.WF_SEL_MIDCATENAME.Text     '中分類名
+            LNM0014INProw("SMALLCATECODE") = work.WF_SEL_SMALLCATECODE.Text '小分類コード
+            LNM0014INProw("SMALLCATENAME") = work.WF_SEL_SMALLCATENAME.Text '小分類名
+#Region "コメント-2025/07/30(分類追加対応のため)"
+            'LNM0014INProw("GROUPID") = work.WF_SEL_GROUPID.Text             'グループID
+            'LNM0014INProw("GROUPNAME") = work.WF_SEL_GROUPNAME.Text         'グループ名
+            'LNM0014INProw("DETAILID") = work.WF_SEL_DETAILID.Text           '明細ID
+            'LNM0014INProw("DETAILNAME") = work.WF_SEL_DETAILNAME.Text       '明細名
+#End Region
         Else
             '対象年月
             If Not WF_TARGETYM.Value = "" Then
@@ -1462,22 +1616,32 @@ Public Class LNM0014SprateDetail
             Else
                 LNM0014INProw("TARGETYM") = WF_TARGETYM.Value
             End If
-            LNM0014INProw("TORICODE") = WF_TORI.SelectedValue            '取引先コード
-            LNM0014INProw("TORINAME") = WF_TORI.SelectedItem            '取引先名称
-            LNM0014INProw("ORGCODE") = WF_ORG.SelectedValue           '部門コード
-            LNM0014INProw("ORGNAME") = WF_ORG.SelectedItem           '部門名称
-            LNM0014INProw("GROUPID") = TxtGROUPID.Text            'グループID
-            LNM0014INProw("GROUPNAME") = TxtGROUPNAME.Text            'グループ名
-            LNM0014INProw("DETAILID") = TxtDETAILID.Text            '明細ID
-            LNM0014INProw("DETAILNAME") = TxtDETAILNAME.Text            '明細名
+            LNM0014INProw("TORICODE") = WF_TORI.SelectedValue       '取引先コード
+            LNM0014INProw("TORINAME") = WF_TORI.SelectedItem        '取引先名称
+            LNM0014INProw("ORGCODE") = WF_ORG.SelectedValue         '部門コード
+            LNM0014INProw("ORGNAME") = WF_ORG.SelectedItem          '部門名称
+            LNM0014INProw("BIGCATECODE") = TxtBIGCATECODE.Text      '大分類コード
+            LNM0014INProw("BIGCATENAME") = TxtBIGCATENAME.Text      '大分類名
+            LNM0014INProw("MIDCATECODE") = TxtMIDCATECODE.Text      '中分類コード
+            LNM0014INProw("MIDCATENAME") = TxtMIDCATENAME.Text      '中分類名
+            LNM0014INProw("SMALLCATECODE") = TxtSMALLCATECODE.Text  '小分類コード
+            LNM0014INProw("SMALLCATENAME") = TxtSMALLCATENAME.Text  '小分類名
+#Region "コメント-2025/07/30(分類追加対応のため)"
+            'LNM0014INProw("GROUPID") = TxtGROUPID.Text              'グループID
+            'LNM0014INProw("GROUPNAME") = TxtGROUPNAME.Text          'グループ名
+            'LNM0014INProw("DETAILID") = TxtDETAILID.Text            '明細ID
+            'LNM0014INProw("DETAILNAME") = TxtDETAILNAME.Text        '明細名
+#End Region
         End If
 
-        LNM0014INProw("KASANORGCODE") = WF_KASANORG.SelectedValue            '加算先部門コード
-        LNM0014INProw("KASANORGNAME") = WF_KASANORG.SelectedItem            '加算先部門名称
-        LNM0014INProw("TODOKECODE") = TxtTODOKECODE.Text            '届先コード
-        LNM0014INProw("TODOKENAME") = TxtTODOKENAME.Text            '届先名称
-        LNM0014INProw("GROUPSORTNO") = TxtGROUPSORTNO.Text            'グループソート順
-        LNM0014INProw("DETAILSORTNO") = TxtDETAILSORTNO.Text            '明細ソート順
+        LNM0014INProw("KASANORGCODE") = WF_KASANORG.SelectedValue   '加算先部門コード
+        LNM0014INProw("KASANORGNAME") = WF_KASANORG.SelectedItem    '加算先部門名称
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'LNM0014INProw("TODOKECODE") = TxtTODOKECODE.Text            '届先コード
+        'LNM0014INProw("TODOKENAME") = TxtTODOKENAME.Text            '届先名称
+        'LNM0014INProw("GROUPSORTNO") = TxtGROUPSORTNO.Text          'グループソート順
+        'LNM0014INProw("DETAILSORTNO") = TxtDETAILSORTNO.Text        '明細ソート順
+#End Region
 
         '単価
         If TxtTANKA.Text = "" Then
@@ -1492,8 +1656,12 @@ Public Class LNM0014SprateDetail
             LNM0014INProw("QUANTITY") = TxtQUANTITY.Text
         End If
 
-        LNM0014INProw("CALCUNIT") = ddlSelectCALCUNIT.SelectedValue            '計算単位
-        LNM0014INProw("DEPARTURE") = TxtDEPARTURE.Text            '出荷地
+        '計算単位
+        LNM0014INProw("CALCUNIT") = ddlSelectCALCUNIT.SelectedItem.Text
+        'LNM0014INProw("CALCUNIT") = ddlSelectCALCUNIT.SelectedValue
+
+        '出荷地
+        LNM0014INProw("DEPARTURE") = TxtDEPARTURE.Text
 
         '走行距離
         If TxtMILEAGE.Text = "" Then
@@ -1598,20 +1766,18 @@ Public Class LNM0014SprateDetail
             If LNM0014row("TARGETYM") = LNM0014INProw("TARGETYM") AndAlso
                 LNM0014row("TORICODE") = LNM0014INProw("TORICODE") AndAlso
                 LNM0014row("ORGCODE") = LNM0014INProw("ORGCODE") AndAlso
-                LNM0014row("GROUPID") = LNM0014INProw("GROUPID") AndAlso
-                LNM0014row("DETAILID") = LNM0014INProw("DETAILID") Then
+                LNM0014row("BIGCATECODE") = LNM0014INProw("BIGCATECODE") AndAlso
+                LNM0014row("MIDCATECODE") = LNM0014INProw("MIDCATECODE") AndAlso
+                LNM0014row("SMALLCATECODE") = LNM0014INProw("SMALLCATECODE") Then
                 ' KEY項目以外の項目の差異をチェック
                 If LNM0014row("DELFLG") = LNM0014INProw("DELFLG") AndAlso
                     LNM0014row("TORINAME") = LNM0014INProw("TORINAME") AndAlso
                     LNM0014row("ORGNAME") = LNM0014INProw("ORGNAME") AndAlso
                     LNM0014row("KASANORGCODE") = LNM0014INProw("KASANORGCODE") AndAlso
                     LNM0014row("KASANORGNAME") = LNM0014INProw("KASANORGNAME") AndAlso
-                    LNM0014row("TODOKECODE") = LNM0014INProw("TODOKECODE") AndAlso
-                    LNM0014row("TODOKENAME") = LNM0014INProw("TODOKENAME") AndAlso
-                    LNM0014row("GROUPSORTNO") = LNM0014INProw("GROUPSORTNO") AndAlso
-                    LNM0014row("GROUPNAME") = LNM0014INProw("GROUPNAME") AndAlso
-                    LNM0014row("DETAILSORTNO") = LNM0014INProw("DETAILSORTNO") AndAlso
-                    LNM0014row("DETAILNAME") = LNM0014INProw("DETAILNAME") AndAlso
+                    LNM0014row("BIGCATENAME") = LNM0014INProw("BIGCATENAME") AndAlso
+                    LNM0014row("MIDCATENAME") = LNM0014INProw("MIDCATENAME") AndAlso
+                    LNM0014row("SMALLCATENAME") = LNM0014INProw("SMALLCATENAME") AndAlso
                     LNM0014row("TANKA") = LNM0014INProw("TANKA") AndAlso
                     LNM0014row("QUANTITY") = LNM0014INProw("QUANTITY") AndAlso
                     LNM0014row("CALCUNIT") = LNM0014INProw("CALCUNIT") AndAlso
@@ -1713,34 +1879,42 @@ Public Class LNM0014SprateDetail
         '○ 画面表示データ保存
         Master.SaveTable(LNM0014tbl, work.WF_SEL_INPTBL.Text)
 
-        TxtSelLineCNT.Text = ""              'LINECNT
-        TxtMapId.Text = "M00001"             '画面ＩＤ
-        WF_TARGETYM.Value = ""                    '対象年月
-        TxtTODOKECODE.Text = ""                    '届先コード
-        TxtTODOKENAME.Text = ""                    '届先名称
-        TxtGROUPSORTNO.Text = ""                    'グループソート順
-        TxtGROUPID.Text = ""                    'グループID
-        TxtGROUPNAME.Text = ""                    'グループ名
-        TxtDETAILSORTNO.Text = ""                    '明細ソート順
-        TxtDETAILID.Text = ""                    '明細ID
-        TxtDETAILNAME.Text = ""                    '明細名
-        TxtTANKA.Text = ""                    '単価
-        TxtQUANTITY.Text = ""                    '数量
-        TxtDEPARTURE.Text = ""                    '出荷地
+        TxtSelLineCNT.Text = ""                 'LINECNT
+        TxtMapId.Text = "M00001"                '画面ＩＤ
+        WF_TARGETYM.Value = ""                  '対象年月
+        TxtBIGCATECODE.Text = ""                '大分類コード
+        TxtBIGCATENAME.Text = ""                '大分類名
+        TxtMIDCATECODE.Text = ""                '中分類コード
+        TxtMIDCATENAME.Text = ""                '中分類名
+        TxtSMALLCATECODE.Text = ""              '小分類コード
+        TxtSMALLCATENAME.Text = ""              '小分類名
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'TxtTODOKECODE.Text = ""                 '届先コード
+        'TxtTODOKENAME.Text = ""                 '届先名称
+        'TxtGROUPSORTNO.Text = ""                'グループソート順
+        'TxtGROUPID.Text = ""                    'グループID
+        'TxtGROUPNAME.Text = ""                  'グループ名
+        'TxtDETAILSORTNO.Text = ""               '明細ソート順
+        'TxtDETAILID.Text = ""                   '明細ID
+        'TxtDETAILNAME.Text = ""                 '明細名
+#End Region
+        TxtTANKA.Text = ""                      '単価
+        TxtQUANTITY.Text = ""                   '数量
+        TxtDEPARTURE.Text = ""                  '出荷地
         TxtMILEAGE.Text = ""                    '走行距離
-        TxtSHIPPINGCOUNT.Text = ""                    '輸送回数
-        TxtNENPI.Text = ""                    '燃費
-        TxtDIESELPRICECURRENT.Text = ""                    '実勢軽油価格
-        TxtDIESELPRICESTANDARD.Text = ""                    '基準経由価格
-        TxtDIESELCONSUMPTION.Text = ""                    '燃料使用量
-        TxtATENACOMPANYNAME.Text = ""                    '宛名会社名
-        TxtATENACOMPANYDEVNAME.Text = ""                    '宛名会社部門名
-        TxtFROMORGNAME.Text = ""                    '請求書発行部店名
-        TxtJOTPERCENTAGE.Text = ""                    '割合JOT
-        TxtENEXPERCENTAGE.Text = ""                    '割合ENEX
-        TxtBIKOU1.Text = ""                    '備考1
-        TxtBIKOU2.Text = ""                    '備考2
-        TxtBIKOU3.Text = ""                    '備考3
+        TxtSHIPPINGCOUNT.Text = ""              '輸送回数
+        TxtNENPI.Text = ""                      '燃費
+        TxtDIESELPRICECURRENT.Text = ""         '実勢軽油価格
+        TxtDIESELPRICESTANDARD.Text = ""        '基準経由価格
+        TxtDIESELCONSUMPTION.Text = ""          '燃料使用量
+        TxtATENACOMPANYNAME.Text = ""           '宛名会社名
+        TxtATENACOMPANYDEVNAME.Text = ""        '宛名会社部門名
+        TxtFROMORGNAME.Text = ""                '請求書発行部店名
+        TxtJOTPERCENTAGE.Text = ""              '割合JOT
+        TxtENEXPERCENTAGE.Text = ""             '割合ENEX
+        TxtBIKOU1.Text = ""                     '備考1
+        TxtBIKOU2.Text = ""                     '備考2
+        TxtBIKOU3.Text = ""                     '備考3
 
     End Sub
 
@@ -1765,24 +1939,34 @@ Public Class LNM0014SprateDetail
                     Case "TxtDelFlg"
                         leftview.Visible = True
                         WW_PrmData = work.CreateFIXParam(Master.USERCAMP, "DELFLG")
-                    Case "TxtTODOKECODE"       '届先コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                    'Case "TxtTODOKECODE"       '届先コード
+                    '    leftview.Visible = False
+                    '    '検索画面
+                    '    DisplayView_mspTodokeCodeSingle()
+                    '    '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
+                    '    WF_LeftboxOpen.Value = ""
+                    '    Exit Sub
+#End Region
+                    Case "TxtBIGCATENAME"       '大分類名
                         leftview.Visible = False
                         '検索画面
-                        DisplayView_mspTodokeCodeSingle()
+                        DisplayView_mspBigcateCodeSingle()
+                        'DisplayView_mspGroupIdSingle()
                         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
                         WF_LeftboxOpen.Value = ""
                         Exit Sub
-                    Case "TxtGROUPNAME"       'グループ名
+                    Case "TxtMIDCATENAME"       '中分類名
                         leftview.Visible = False
                         '検索画面
-                        DisplayView_mspGroupIdSingle()
+                        DisplayView_mspMidCateCodeSingle()
                         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
                         WF_LeftboxOpen.Value = ""
                         Exit Sub
-                    Case "TxtDETAILNAME"       '明細名
+                    Case "TxtSMALLCATENAME"     '小分類名
                         leftview.Visible = False
                         '検索画面
-                        DisplayView_mspDetailIdSingle()
+                        DisplayView_mspSmallCateCodeSingle()
                         '○ 画面左右ボックス非表示は、画面JavaScript(InitLoad)で実行
                         WF_LeftboxOpen.Value = ""
                         Exit Sub
@@ -1811,13 +1995,21 @@ Public Class LNM0014SprateDetail
             'Case "TxtKASANORGCODE"
             '    CODENAME_get("KASANORGCODE", TxtKASANORGCODE.Text, TxtKASANORGNAME.Text, WW_RtnSW)  '加算先部門コード
             '    TxtKASANORGCODE.Focus()
-            Case "TxtTODOKECODE"
-                'CODENAME_get("TODOKECODE", TxtTODOKECODE.Text, TxtTODOKENAME.Text, WW_RtnSW)  '届先コード
-                CODENAME_get("TODOKECODE", TxtTODOKENAME.Text, TxtTODOKECODE.Text, WW_RtnSW)  '届先コード
-                TxtTODOKECODE.Focus()
-            Case "TxtGROUPNAME"
-                CODENAME_get("GROUPNAME", TxtGROUPNAME.Text, TxtGROUPID.Text, WW_RtnSW)  'グループ名
-                TxtGROUPNAME.Focus()
+#Region "コメント-2025/07/30(分類追加対応のため)"
+            'Case "TxtTODOKECODE"
+            '    'CODENAME_get("TODOKECODE", TxtTODOKECODE.Text, TxtTODOKENAME.Text, WW_RtnSW)  '届先コード
+            '    CODENAME_get("TODOKECODE", TxtTODOKENAME.Text, TxtTODOKECODE.Text, WW_RtnSW)  '届先コード
+            '    TxtTODOKECODE.Focus()
+#End Region
+            Case "TxtBIGCATENAME"
+                CODENAME_get("BIGCATENAME", TxtBIGCATENAME.Text, TxtBIGCATECODE.Text, WW_RtnSW)         '大分類名
+                TxtBIGCATENAME.Focus()
+            Case "TxtMIDCATENAME"
+                CODENAME_get("MIDCATENAME", TxtMIDCATENAME.Text, TxtMIDCATECODE.Text, WW_RtnSW)         '中分類名
+                TxtMIDCATENAME.Focus()
+            Case "TxtSMALLCATENAME"
+                CODENAME_get("SMALLCATENAME", TxtSMALLCATENAME.Text, TxtSMALLCATECODE.Text, WW_RtnSW)   '小分類名
+                TxtSMALLCATENAME.Focus()
         End Select
 
         '○ メッセージ表示
@@ -1840,8 +2032,13 @@ Public Class LNM0014SprateDetail
         LNM0014INPtbl.Columns.Add("TARGETYM")
         LNM0014INPtbl.Columns.Add("TORICODE")
         LNM0014INPtbl.Columns.Add("ORGCODE")
-        LNM0014INPtbl.Columns.Add("GROUPID")
-        LNM0014INPtbl.Columns.Add("DETAILID")
+        LNM0014INPtbl.Columns.Add("BIGCATECODE")
+        LNM0014INPtbl.Columns.Add("MIDCATECODE")
+        LNM0014INPtbl.Columns.Add("SMALLCATECODE")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'LNM0014INPtbl.Columns.Add("GROUPID")
+        'LNM0014INPtbl.Columns.Add("DETAILID")
+#End Region
         LNM0014INPtbl.Columns.Add("DELFLG")
 
         Dim row As DataRow
@@ -1849,8 +2046,13 @@ Public Class LNM0014SprateDetail
         row("TARGETYM") = work.WF_SEL_TARGETYM.Text
         row("TORICODE") = work.WF_SEL_TORICODE.Text
         row("ORGCODE") = work.WF_SEL_ORGCODE.Text
-        row("GROUPID") = work.WF_SEL_GROUPID.Text
-        row("DETAILID") = work.WF_SEL_DETAILID.Text
+        row("BIGCATECODE") = work.WF_SEL_BIGCATECODE.Text
+        row("MIDCATECODE") = work.WF_SEL_MIDCATECODE.Text
+        row("SMALLCATECODE") = work.WF_SEL_SMALLCATECODE.Text
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'row("GROUPID") = work.WF_SEL_GROUPID.Text
+        'row("DETAILID") = work.WF_SEL_DETAILID.Text
+#End Region
         row("DELFLG") = C_DELETE_FLG.DELETE
         LNM0014INPtbl.Rows.Add(row)
 
@@ -1885,8 +2087,9 @@ Public Class LNM0014SprateDetail
                 If LNM0014INProw("TARGETYM") = LNM0014row("TARGETYM") AndAlso
                     LNM0014INProw("TORICODE") = LNM0014row("TORICODE") AndAlso
                     LNM0014INProw("ORGCODE") = LNM0014row("ORGCODE") AndAlso
-                    LNM0014INProw("GROUPID") = LNM0014row("GROUPID") AndAlso
-                    LNM0014INProw("DETAILID") = LNM0014row("DETAILID") Then
+                    LNM0014INProw("BIGCATECODE") = LNM0014row("BIGCATECODE") AndAlso
+                    LNM0014INProw("MIDCATECODE") = LNM0014row("MIDCATECODE") AndAlso
+                    LNM0014INProw("SMALLCATECODE") = LNM0014row("SMALLCATECODE") Then
                     ' 画面入力テーブル項目設定              
                     LNM0014row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
                     LNM0014row("DELFLG") = LNM0014INProw("DELFLG")
@@ -1912,7 +2115,7 @@ Public Class LNM0014SprateDetail
         '○ 対象データ更新
         Dim SQLStr As New StringBuilder
         SQLStr.Append(" UPDATE                                      ")
-        SQLStr.Append("     LNG.LNM0014_SPRATE                       ")
+        SQLStr.Append("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.Append(" SET                                         ")
         SQLStr.Append("     DELFLG               = '1'              ")
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
@@ -1920,34 +2123,45 @@ Public Class LNM0014SprateDetail
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
-        SQLStr.Append("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.Append("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLStr.Append("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
-        SQLStr.Append("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+        SQLStr.Append("         COALESCE(TARGETYM, '')       = @TARGETYM ")
+        SQLStr.Append("    AND  COALESCE(TORICODE, '')       = @TORICODE ")
+        SQLStr.Append("    AND  COALESCE(ORGCODE, '')        = @ORGCODE ")
+        SQLStr.Append("    AND  COALESCE(BIGCATECODE, '0')   = @BIGCATECODE ")
+        SQLStr.Append("    AND  COALESCE(MIDCATECODE, '0')   = @MIDCATECODE ")
+        SQLStr.Append("    AND  COALESCE(SMALLCATECODE, '0') = @SMALLCATECODE ")
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'SQLStr.Append("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        'SQLStr.Append("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
+#End Region
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
-                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
-                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)         '更新年月日
-                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)         '更新ユーザーＩＤ
-                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)         '更新端末
-                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)         '更新プログラムＩＤ
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)           '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)          '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)             '部門コード
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)     '大分類コード
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)     '中分類コード
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2) '小分類コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
+#End Region
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)                 '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)            '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)        '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)            '更新プログラムＩＤ
 
                 Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
                 P_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
                 P_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
-                P_ORGCODE.Value = LNM0014row("ORGCODE")           '部門コード
-                P_GROUPID.Value = LNM0014row("GROUPID")           'グループID
-                P_DETAILID.Value = LNM0014row("DETAILID")           '明細ID
-                P_UPDYMD.Value = WW_NOW                '更新年月日
-                P_UPDUSER.Value = Master.USERID                '更新ユーザーＩＤ
-                P_UPDTERMID.Value = Master.USERTERMID                '更新端末
-                P_UPDPGID.Value = Me.GetType().BaseType.Name          '更新プログラムＩＤ
+                P_ORGCODE.Value = LNM0014row("ORGCODE")             '部門コード
+                P_BIGCATECODE.Value = LNM0014row("BIGCATECODE")     '大分類コード
+                P_MIDCATECODE.Value = LNM0014row("MIDCATECODE")     '中分類コード
+                P_SMALLCATECODE.Value = LNM0014row("SMALLCATECODE") '小分類コード
+                P_UPDYMD.Value = WW_NOW                             '更新年月日
+                P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID               '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
 
                 '登録
                 SQLcmd.CommandTimeout = 300
@@ -2047,100 +2261,216 @@ Public Class LNM0014SprateDetail
     ''' 届先選択ポップアップで行選択
     ''' </summary>
     Protected Sub RowSelected_mspTodokeCodeSingle()
+#Region "コメント-2025/07/30(分類追加対応のため)"
+        'Dim selData = Me.mspTodokeCodeSingle.SelectedSingleItem
 
-        Dim selData = Me.mspTodokeCodeSingle.SelectedSingleItem
+        ''○ 変更した項目の名称をセット
+        'Select Case WF_FIELD.Value
+
+        '    Case TxtTODOKECODE.ID
+        '        Me.TxtTODOKECODE.Text = selData("TODOKECODE").ToString '届先コード
+        '        Me.TxtTODOKENAME.Text = selData("TODOKENAME").ToString '届先名
+        '        Me.TxtTODOKECODE.Focus()
+        'End Select
+
+        ''ポップアップの非表示
+        'Me.mspTodokeCodeSingle.HidePopUp()
+#End Region
+    End Sub
+
+    ''' <summary>
+    ''' 大分類コード検索時処理
+    ''' </summary>
+    Protected Sub DisplayView_mspBigcateCodeSingle()
+
+        Me.mspBigcateCodeSingle.InitPopUp()
+        Me.mspBigcateCodeSingle.SelectionMode = ListSelectionMode.Single
+
+        Me.mspBigcateCodeSingle.SQL = CmnSearchSQL.GetSprateBigcateSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtBIGCATENAME.Text)
+
+        Me.mspBigcateCodeSingle.KeyFieldName = "KEYCODE"
+        Me.mspBigcateCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateBigcateTitle)
+
+        Me.mspBigcateCodeSingle.ShowPopUpList()
+
+    End Sub
+
+    ''' <summary>
+    ''' 大分類コード選択ポップアップで行選択
+    ''' </summary>
+    Protected Sub RowSelected_mspBigcateCodeSingle()
+
+        Dim selData = Me.mspBigcateCodeSingle.SelectedSingleItem
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
 
-            Case TxtTODOKECODE.ID
-                Me.TxtTODOKECODE.Text = selData("TODOKECODE").ToString '届先コード
-                Me.TxtTODOKENAME.Text = selData("TODOKENAME").ToString '届先名
-                Me.TxtTODOKECODE.Focus()
+            Case TxtBIGCATENAME.ID
+                Me.TxtBIGCATECODE.Text = selData("BIGCATECODE").ToString    '大分類コード
+                Me.TxtBIGCATENAME.Text = selData("BIGCATENAME").ToString    '大分類名
+                Me.TxtBIGCATENAME.Focus()
         End Select
 
         'ポップアップの非表示
-        Me.mspTodokeCodeSingle.HidePopUp()
+        Me.mspBigcateCodeSingle.HidePopUp()
 
     End Sub
 
     ''' <summary>
-    ''' グループID検索時処理
+    ''' 中分類コード検索時処理
     ''' </summary>
-    Protected Sub DisplayView_mspGroupIdSingle()
+    Protected Sub DisplayView_mspMidCateCodeSingle()
 
-        Me.mspGroupIdSingle.InitPopUp()
-        Me.mspGroupIdSingle.SelectionMode = ListSelectionMode.Single
+        Me.mspMidcateCodeSingle.InitPopUp()
+        Me.mspMidcateCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspGroupIdSingle.SQL = CmnSearchSQL.GetSprateGroupSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPNAME.Text)
+        Me.mspMidcateCodeSingle.SQL = CmnSearchSQL.GetSprateMidcateSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtBIGCATECODE.Text, TxtMIDCATENAME.Text)
 
-        Me.mspGroupIdSingle.KeyFieldName = "KEYCODE"
-        Me.mspGroupIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateGroupTitle)
+        Me.mspMidcateCodeSingle.KeyFieldName = "KEYCODE"
+        Me.mspMidcateCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateMidCateTitle)
 
-        Me.mspGroupIdSingle.ShowPopUpList()
+        Me.mspMidcateCodeSingle.ShowPopUpList()
 
     End Sub
 
     ''' <summary>
-    ''' グループID選択ポップアップで行選択
+    ''' 中分類コード選択ポップアップで行選択
     ''' </summary>
-    Protected Sub RowSelected_mspGroupIdSingle()
+    Protected Sub RowSelected_mspMidCateCodeSingle()
 
-        Dim selData = Me.mspGroupIdSingle.SelectedSingleItem
+        Dim selData = Me.mspMidcateCodeSingle.SelectedSingleItem
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
 
-            Case TxtGROUPNAME.ID
-                Me.TxtGROUPID.Text = selData("GROUPID").ToString 'グループID
-                Me.TxtGROUPNAME.Text = selData("GROUPNAME").ToString 'グループ名
-                Me.TxtGROUPSORTNO.Text = selData("GROUPSORTNO").ToString 'グループソート順
-                Me.TxtGROUPNAME.Focus()
+            Case TxtMIDCATENAME.ID
+                Me.TxtMIDCATECODE.Text = selData("MIDCATECODE").ToString '中分類コード
+                Me.TxtMIDCATENAME.Text = selData("MIDCATENAME").ToString '中分類名
+                Me.TxtMIDCATENAME.Focus()
         End Select
 
         'ポップアップの非表示
-        Me.mspGroupIdSingle.HidePopUp()
+        Me.mspMidcateCodeSingle.HidePopUp()
 
     End Sub
 
     ''' <summary>
-    ''' 明細ID検索時処理
+    ''' 小分類コード検索時処理
     ''' </summary>
-    Protected Sub DisplayView_mspDetailIdSingle()
+    Protected Sub DisplayView_mspSmallCateCodeSingle()
 
-        Me.mspDetailIdSingle.InitPopUp()
-        Me.mspDetailIdSingle.SelectionMode = ListSelectionMode.Single
+        Me.mspSmallcateCodeSingle.InitPopUp()
+        Me.mspSmallcateCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspDetailIdSingle.SQL = CmnSearchSQL.GetSprateDetailSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPID.Text, TxtDETAILNAME.Text)
+        Me.mspSmallcateCodeSingle.SQL = CmnSearchSQL.GetSprateSmallcateSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtBIGCATECODE.Text, TxtMIDCATECODE.Text, prmSmallCateName:=TxtSMALLCATENAME.Text)
 
-        Me.mspDetailIdSingle.KeyFieldName = "KEYCODE"
-        Me.mspDetailIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateDetailTitle)
+        Me.mspSmallcateCodeSingle.KeyFieldName = "KEYCODE"
+        Me.mspSmallcateCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateSmallCateTitle)
 
-        Me.mspDetailIdSingle.ShowPopUpList()
+        Me.mspSmallcateCodeSingle.ShowPopUpList()
 
     End Sub
 
     ''' <summary>
-    ''' 明細ID選択ポップアップで行選択
+    ''' 小分類コード選択ポップアップで行選択
     ''' </summary>
-    Protected Sub RowSelected_mspDetailIdSingle()
+    Protected Sub RowSelected_mspSmallCateCodeSingle()
 
-        Dim selData = Me.mspDetailIdSingle.SelectedSingleItem
+        Dim selData = Me.mspSmallcateCodeSingle.SelectedSingleItem
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
 
-            Case TxtDETAILNAME.ID
-                Me.TxtDETAILID.Text = selData("DETAILID").ToString 'グループID
-                Me.TxtDETAILNAME.Text = selData("DETAILNAME").ToString 'グループ名
-                Me.TxtDETAILSORTNO.Text = selData("DETAILSORTNO").ToString 'グループソート順
-                Me.TxtDETAILNAME.Focus()
+            Case TxtSMALLCATENAME.ID
+                Me.TxtSMALLCATECODE.Text = selData("SMALLCATECODE").ToString '小分類コード
+                Me.TxtSMALLCATENAME.Text = selData("SMALLCATENAME").ToString '小分類名
+                Me.TxtSMALLCATENAME.Focus()
         End Select
 
         'ポップアップの非表示
-        Me.mspDetailIdSingle.HidePopUp()
+        Me.mspSmallcateCodeSingle.HidePopUp()
 
     End Sub
+
+#Region "コメント-2025/07/30(分類追加対応のため)"
+    '''' <summary>
+    '''' グループID検索時処理
+    '''' </summary>
+    'Protected Sub DisplayView_mspGroupIdSingle()
+
+    '    Me.mspGroupIdSingle.InitPopUp()
+    '    Me.mspGroupIdSingle.SelectionMode = ListSelectionMode.Single
+
+    '    Me.mspGroupIdSingle.SQL = CmnSearchSQL.GetSprateGroupSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPNAME.Text)
+
+    '    Me.mspGroupIdSingle.KeyFieldName = "KEYCODE"
+    '    Me.mspGroupIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateGroupTitle)
+
+    '    Me.mspGroupIdSingle.ShowPopUpList()
+
+    'End Sub
+
+    '''' <summary>
+    '''' グループID選択ポップアップで行選択
+    '''' </summary>
+    'Protected Sub RowSelected_mspGroupIdSingle()
+
+    '    Dim selData = Me.mspGroupIdSingle.SelectedSingleItem
+
+    '    '○ 変更した項目の名称をセット
+    '    Select Case WF_FIELD.Value
+
+    '        Case TxtGROUPNAME.ID
+    '            Me.TxtGROUPID.Text = selData("GROUPID").ToString 'グループID
+    '            Me.TxtGROUPNAME.Text = selData("GROUPNAME").ToString 'グループ名
+    '            Me.TxtGROUPSORTNO.Text = selData("GROUPSORTNO").ToString 'グループソート順
+    '            Me.TxtGROUPNAME.Focus()
+    '    End Select
+
+    '    'ポップアップの非表示
+    '    Me.mspGroupIdSingle.HidePopUp()
+
+    'End Sub
+
+    '''' <summary>
+    '''' 明細ID検索時処理
+    '''' </summary>
+    'Protected Sub DisplayView_mspDetailIdSingle()
+
+    '    Me.mspDetailIdSingle.InitPopUp()
+    '    Me.mspDetailIdSingle.SelectionMode = ListSelectionMode.Single
+
+    '    Me.mspDetailIdSingle.SQL = CmnSearchSQL.GetSprateDetailSQL(WF_TORI.SelectedValue, WF_ORG.SelectedValue, TxtGROUPID.Text, TxtDETAILNAME.Text)
+
+    '    Me.mspDetailIdSingle.KeyFieldName = "KEYCODE"
+    '    Me.mspDetailIdSingle.DispFieldList.AddRange(CmnSearchSQL.GetSprateDetailTitle)
+
+    '    Me.mspDetailIdSingle.ShowPopUpList()
+
+    'End Sub
+
+    '''' <summary>
+    '''' 明細ID選択ポップアップで行選択
+    '''' </summary>
+    'Protected Sub RowSelected_mspDetailIdSingle()
+
+    '    Dim selData = Me.mspDetailIdSingle.SelectedSingleItem
+
+    '    '○ 変更した項目の名称をセット
+    '    Select Case WF_FIELD.Value
+
+    '        Case TxtDETAILNAME.ID
+    '            Me.TxtDETAILID.Text = selData("DETAILID").ToString 'グループID
+    '            Me.TxtDETAILNAME.Text = selData("DETAILNAME").ToString 'グループ名
+    '            Me.TxtDETAILSORTNO.Text = selData("DETAILSORTNO").ToString 'グループソート順
+    '            Me.TxtDETAILNAME.Focus()
+    '    End Select
+
+    '    'ポップアップの非表示
+    '    Me.mspDetailIdSingle.HidePopUp()
+
+    'End Sub
+#End Region
 
     ' ******************************************************************************
     ' ***  共通処理                                                              ***
@@ -2269,78 +2599,107 @@ Public Class LNM0014SprateDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            ' 届先コード(バリデーションチェック)
-            Master.CheckField(Master.USERCAMP, "TODOKECODE", LNM0014INProw("TODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ' 大分類名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "BIGCATENAME", LNM0014INProw("BIGCATENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
-                WW_CheckMES1 = "・届先コードエラーです。"
+                WW_CheckMES1 = "・大分類名エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            ' 届先名称(バリデーションチェック)
-            Master.CheckField(Master.USERCAMP, "TODOKENAME", LNM0014INProw("TODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ' 中分類名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "MIDCATENAME", LNM0014INProw("MIDCATENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
-                WW_CheckMES1 = "・届先名称エラーです。"
+                WW_CheckMES1 = "・中分類名エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            '' グループソート順(バリデーションチェック)
-            'Master.CheckField(Master.USERCAMP, "GROUPSORTNO", LNM0014INProw("GROUPSORTNO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            'If Not isNormal(WW_CS0024FCheckerr) Then
-            '    WW_CheckMES1 = "・グループソート順エラーです。"
-            '    WW_CheckMES2 = WW_CS0024FCheckReport
-            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            '    WW_LineErr = "ERR"
-            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            'End If
-            '' グループID(バリデーションチェック)
-            'Master.CheckField(Master.USERCAMP, "GROUPID", LNM0014INProw("GROUPID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            'If Not isNormal(WW_CS0024FCheckerr) Then
-            '    WW_CheckMES1 = "・グループIDエラーです。"
-            '    WW_CheckMES2 = WW_CS0024FCheckReport
-            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-            '    WW_LineErr = "ERR"
-            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            'End If
-            ' グループ名(バリデーションチェック)
-            Master.CheckField(Master.USERCAMP, "GROUPNAME", LNM0014INProw("GROUPNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ' 小分類名(バリデーションチェック)
+            Master.CheckField(Master.USERCAMP, "SMALLCATENAME", LNM0014INProw("SMALLCATENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
-                WW_CheckMES1 = "・グループ名エラーです。"
+                WW_CheckMES1 = "・小分類名エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            '' 明細ソート順(バリデーションチェック)
-            'Master.CheckField(Master.USERCAMP, "DETAILSORTNO", LNM0014INProw("DETAILSORTNO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+#Region "コメント-2025/07/30(分類追加対応のため)"
+            '' 届先コード(バリデーションチェック)
+            'Master.CheckField(Master.USERCAMP, "TODOKECODE", LNM0014INProw("TODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             'If Not isNormal(WW_CS0024FCheckerr) Then
-            '    WW_CheckMES1 = "・明細ソート順エラーです。"
+            '    WW_CheckMES1 = "・届先コードエラーです。"
             '    WW_CheckMES2 = WW_CS0024FCheckReport
             '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             '    WW_LineErr = "ERR"
             '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             'End If
-            '' 明細ID(バリデーションチェック)
-            'Master.CheckField(Master.USERCAMP, "DETAILID", LNM0014INProw("DETAILID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            '' 届先名称(バリデーションチェック)
+            'Master.CheckField(Master.USERCAMP, "TODOKENAME", LNM0014INProw("TODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             'If Not isNormal(WW_CS0024FCheckerr) Then
-            '    WW_CheckMES1 = "・明細IDエラーです。"
+            '    WW_CheckMES1 = "・届先名称エラーです。"
             '    WW_CheckMES2 = WW_CS0024FCheckReport
             '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
             '    WW_LineErr = "ERR"
             '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             'End If
-            ' 明細名(バリデーションチェック)
-            Master.CheckField(Master.USERCAMP, "DETAILNAME", LNM0014INProw("DETAILNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-            If Not isNormal(WW_CS0024FCheckerr) Then
-                WW_CheckMES1 = "・明細名エラーです。"
-                WW_CheckMES2 = WW_CS0024FCheckReport
-                WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
-                WW_LineErr = "ERR"
-                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-            End If
+            ''' グループソート順(バリデーションチェック)
+            ''Master.CheckField(Master.USERCAMP, "GROUPSORTNO", LNM0014INProw("GROUPSORTNO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ''If Not isNormal(WW_CS0024FCheckerr) Then
+            ''    WW_CheckMES1 = "・グループソート順エラーです。"
+            ''    WW_CheckMES2 = WW_CS0024FCheckReport
+            ''    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            ''    WW_LineErr = "ERR"
+            ''    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ''End If
+            ''' グループID(バリデーションチェック)
+            ''Master.CheckField(Master.USERCAMP, "GROUPID", LNM0014INProw("GROUPID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ''If Not isNormal(WW_CS0024FCheckerr) Then
+            ''    WW_CheckMES1 = "・グループIDエラーです。"
+            ''    WW_CheckMES2 = WW_CS0024FCheckReport
+            ''    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            ''    WW_LineErr = "ERR"
+            ''    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ''End If
+            '' グループ名(バリデーションチェック)
+            'Master.CheckField(Master.USERCAMP, "GROUPNAME", LNM0014INProw("GROUPNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            'If Not isNormal(WW_CS0024FCheckerr) Then
+            '    WW_CheckMES1 = "・グループ名エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCheckReport
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    WW_LineErr = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+            ''' 明細ソート順(バリデーションチェック)
+            ''Master.CheckField(Master.USERCAMP, "DETAILSORTNO", LNM0014INProw("DETAILSORTNO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ''If Not isNormal(WW_CS0024FCheckerr) Then
+            ''    WW_CheckMES1 = "・明細ソート順エラーです。"
+            ''    WW_CheckMES2 = WW_CS0024FCheckReport
+            ''    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            ''    WW_LineErr = "ERR"
+            ''    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ''End If
+            ''' 明細ID(バリデーションチェック)
+            ''Master.CheckField(Master.USERCAMP, "DETAILID", LNM0014INProw("DETAILID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            ''If Not isNormal(WW_CS0024FCheckerr) Then
+            ''    WW_CheckMES1 = "・明細IDエラーです。"
+            ''    WW_CheckMES2 = WW_CS0024FCheckReport
+            ''    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            ''    WW_LineErr = "ERR"
+            ''    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            ''End If
+            '' 明細名(バリデーションチェック)
+            'Master.CheckField(Master.USERCAMP, "DETAILNAME", LNM0014INProw("DETAILNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+            'If Not isNormal(WW_CS0024FCheckerr) Then
+            '    WW_CheckMES1 = "・明細名エラーです。"
+            '    WW_CheckMES2 = WW_CS0024FCheckReport
+            '    WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
+            '    WW_LineErr = "ERR"
+            '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            'End If
+#End Region
             ' 単価(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "TANKA", LNM0014INProw("TANKA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
@@ -2598,24 +2957,25 @@ Public Class LNM0014SprateDetail
             End If
 
             ' 排他チェック
-            If Not String.IsNullOrEmpty(work.WF_SEL_GROUPID.Text) Then
+            If Not String.IsNullOrEmpty(work.WF_SEL_BIGCATECODE.Text) Then
                 Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                     ' DataBase接続
                     SQLcon.Open()
                     ' 排他チェック
                     work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text,
                                     work.WF_SEL_TARGETYM.Text, work.WF_SEL_TORICODE.Text, work.WF_SEL_ORGCODE.Text,
-                                    work.WF_SEL_GROUPID.Text, work.WF_SEL_DETAILID.Text)
+                                    work.WF_SEL_BIGCATECODE.Text, work.WF_SEL_MIDCATECODE.Text, work.WF_SEL_SMALLCATECODE.Text)
                 End Using
 
                 If Not isNormal(WW_DBDataCheck) Then
-                    WW_CheckMES1 = "・排他エラー（対象年月 & 取引先コード & 部門コード & グループID & 明細ID）"
+                    WW_CheckMES1 = "・排他エラー（対象年月 & 取引先コード & 部門コード & 大分類コード & 中分類コード & 小分類コード）"
                     WW_CheckMES2 = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR &
                                            "([" & LNM0014INProw("TARGETYM") & "]" &
                                            "([" & LNM0014INProw("TORICODE") & "]" &
                                            "([" & LNM0014INProw("ORGCODE") & "]" &
-                                           "([" & LNM0014INProw("GROUPID") & "]" &
-                                           " [" & LNM0014INProw("DETAILID") & "])"
+                                           "([" & LNM0014INProw("BIGCATECODE") & "]" &
+                                           "([" & LNM0014INProw("MIDCATECODE") & "]" &
+                                           " [" & LNM0014INProw("SMALLCATECODE") & "])"
                     WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                     WW_LineErr = "ERR"
                     O_RTN = C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
@@ -2701,20 +3061,18 @@ Public Class LNM0014SprateDetail
                 If LNM0014row("TARGETYM") = LNM0014INProw("TARGETYM") AndAlso
                     LNM0014row("TORICODE") = LNM0014INProw("TORICODE") AndAlso
                     LNM0014row("ORGCODE") = LNM0014INProw("ORGCODE") AndAlso
-                    LNM0014row("GROUPID") = LNM0014INProw("GROUPID") AndAlso
-                    LNM0014row("DETAILID") = LNM0014INProw("DETAILID") Then
+                    LNM0014row("BIGCATECODE") = LNM0014INProw("BIGCATECODE") AndAlso
+                    LNM0014row("MIDCATECODE") = LNM0014INProw("MIDCATECODE") AndAlso
+                    LNM0014row("SMALLCATECODE") = LNM0014INProw("SMALLCATECODE") Then
                     ' KEY項目以外の項目の差異をチェック
                     If LNM0014row("DELFLG") = LNM0014INProw("DELFLG") AndAlso
                         LNM0014row("TORINAME") = LNM0014INProw("TORINAME") AndAlso
                         LNM0014row("ORGNAME") = LNM0014INProw("ORGNAME") AndAlso
                         LNM0014row("KASANORGCODE") = LNM0014INProw("KASANORGCODE") AndAlso
                         LNM0014row("KASANORGNAME") = LNM0014INProw("KASANORGNAME") AndAlso
-                        LNM0014row("TODOKECODE") = LNM0014INProw("TODOKECODE") AndAlso
-                        LNM0014row("TODOKENAME") = LNM0014INProw("TODOKENAME") AndAlso
-                        LNM0014row("GROUPSORTNO") = LNM0014INProw("GROUPSORTNO") AndAlso
-                        LNM0014row("GROUPNAME") = LNM0014INProw("GROUPNAME") AndAlso
-                        LNM0014row("DETAILSORTNO") = LNM0014INProw("DETAILSORTNO") AndAlso
-                        LNM0014row("DETAILNAME") = LNM0014INProw("DETAILNAME") AndAlso
+                        LNM0014row("BIGCATENAME") = LNM0014INProw("BIGCATENAME") AndAlso
+                        LNM0014row("MIDCATENAME") = LNM0014INProw("MIDCATENAME") AndAlso
+                        LNM0014row("SMALLCATENAME") = LNM0014INProw("SMALLCATENAME") AndAlso
                         LNM0014row("TANKA") = LNM0014INProw("TANKA") AndAlso
                         LNM0014row("QUANTITY") = LNM0014INProw("QUANTITY") AndAlso
                         LNM0014row("CALCUNIT") = LNM0014INProw("CALCUNIT") AndAlso
@@ -2772,13 +3130,18 @@ Public Class LNM0014SprateDetail
                 Dim WW_DBDataCheck As String = ""
 
                 Select Case True
-                    Case LNM0014INPtbl.Rows(0)("GROUPID").ToString = "" 'グループIDが無い場合
-                        'グループIDを生成
-                        LNM0014INPtbl.Rows(0)("GROUPID") = LNM0014WRKINC.GenerateGroupId(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
-                        LNM0014INPtbl.Rows(0)("DETAILID") = "1"
-                    Case LNM0014INPtbl.Rows(0)("DETAILID").ToString = "" '明細IDが無い場合
-                        LNM0014INPtbl.Rows(0)("DETAILID") = LNM0014WRKINC.GenerateDetailId(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
-                    Case Else 'グループID、明細IDが設定されている場合は何もしない
+                    Case LNM0014INPtbl.Rows(0)("BIGCATECODE").ToString = ""     '大分類コードが無い場合
+                        '大分類コードを生成
+                        LNM0014INPtbl.Rows(0)("BIGCATECODE") = LNM0014WRKINC.GenerateBigcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
+                        LNM0014INPtbl.Rows(0)("MIDCATECODE") = "1"
+                        LNM0014INPtbl.Rows(0)("SMALLCATECODE") = "1"
+                    Case LNM0014INPtbl.Rows(0)("MIDCATECODE").ToString = ""     '中分類コードが無い場合
+                        '中分類コードを生成
+                        LNM0014INPtbl.Rows(0)("MIDCATECODE") = LNM0014WRKINC.GenerateMidcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
+                    Case LNM0014INPtbl.Rows(0)("SMALLCATECODE").ToString = ""   '小分類コードが無い場合
+                        '小分類コードを生成
+                        LNM0014INPtbl.Rows(0)("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
+                    Case Else '大分類コード、中分類コード、小分類コードが設定されている場合は何もしない
                 End Select
 
                 '変更チェック
@@ -2823,8 +3186,9 @@ Public Class LNM0014SprateDetail
                 If LNM0014INProw("TARGETYM") = LNM0014row("TARGETYM") AndAlso
                     LNM0014INProw("TORICODE") = LNM0014row("TORICODE") AndAlso
                     LNM0014INProw("ORGCODE") = LNM0014row("ORGCODE") AndAlso
-                    LNM0014INProw("GROUPID") = LNM0014row("GROUPID") AndAlso
-                    LNM0014INProw("DETAILID") = LNM0014row("DETAILID") Then
+                    LNM0014INProw("BIGCATECODE") = LNM0014row("BIGCATECODE") AndAlso
+                    LNM0014INProw("MIDCATECODE") = LNM0014row("MIDCATECODE") AndAlso
+                    LNM0014INProw("SMALLCATECODE") = LNM0014row("SMALLCATECODE") Then
                     ' 画面入力テーブル項目設定
                     LNM0014INProw("LINECNT") = LNM0014row("LINECNT")
                     LNM0014INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -2882,10 +3246,16 @@ Public Class LNM0014SprateDetail
                     work.CODENAMEGetTORI(SQLcon, WW_NAMEht)
                 Case "KASANORGCODE"        '加算先部門コード
                     work.CODENAMEGetKASANORG(SQLcon, WW_NAMEht)
-                Case "TODOKECODE"        '加算先部門コード
-                    work.CODENAMEGetTODOKE(SQLcon, WW_NAMEht)
-                Case "GROUPNAME"        'グループ名
-                    work.IDGetGROUP(SQLcon, WW_NAMEht)
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Case "TODOKECODE"        '届先コード
+                '    work.CODENAMEGetTODOKE(SQLcon, WW_NAMEht)
+#End Region
+                Case "BIGCATENAME"          '大分類名
+                    work.IDGetBIGCATE(SQLcon, WW_NAMEht)
+                Case "MIDCATENAME"          '中分類名
+                    work.IDGetMIDCATE(SQLcon, WW_NAMEht)
+                Case "SMALLCATENAME"        '小分類名
+                    work.IDGetSMALLCATE(SQLcon, WW_NAMEht)
             End Select
         End Using
 
@@ -2903,11 +3273,21 @@ Public Class LNM0014SprateDetail
                     If WW_NAMEht.ContainsKey(I_VALUE) Then
                         O_TEXT = WW_NAMEht(I_VALUE)
                     End If
-                Case "TODOKECODE"         '届先コード
+#Region "コメント-2025/07/30(分類追加対応のため)"
+                'Case "TODOKECODE"         '届先コード
+                '    If WW_NAMEht.ContainsKey(I_VALUE) Then
+                '        O_TEXT = WW_NAMEht(I_VALUE)
+                '    End If
+#End Region
+                Case "BIGCATENAME"        '大分類コード
                     If WW_NAMEht.ContainsKey(I_VALUE) Then
                         O_TEXT = WW_NAMEht(I_VALUE)
                     End If
-                Case "GROUPNAME"         'グループ名
+                Case "MIDCATENAME"        '中分類コード
+                    If WW_NAMEht.ContainsKey(I_VALUE) Then
+                        O_TEXT = WW_NAMEht(I_VALUE)
+                    End If
+                Case "SMALLCATENAME"      '小分類コード
                     If WW_NAMEht.ContainsKey(I_VALUE) Then
                         O_TEXT = WW_NAMEht(I_VALUE)
                     End If

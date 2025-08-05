@@ -122,7 +122,8 @@
                                     <asp:Label ID="WF_KASANORGCODE_TEXT" runat="server" CssClass="WF_TEXT_LEFT_LABEL"></asp:Label>
                                 </span>
                             </p>
-                            <p id="KEY_LINE_11">
+                                <!-- コメント-2025/07/30(分類追加対応のため) -->
+<%--                            <p id="KEY_LINE_11">
                                 <!-- 届先名称 -->
                                 <span>
                                     <asp:Label ID="WF_TODOKECODE_L" runat="server" Text="届先名称" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -133,13 +134,49 @@
                                         <asp:TextBox ID="TxtTODOKECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="6"></asp:TextBox>
                                     </a>
                                 </span>
-                            </p>
+                            </p>--%>
 
                             <asp:Panel ID="pnlYusouArea" runat="server">
                                 <p id="YUSOU_LINE_1">
                                     <asp:Label ID="WF_YUSOU_L" runat="server" Text="●輸送費明細(その他明細)に出力する名称" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </p>
                                <p id="YUSOU_LINE_2">
+                                    <span class="ef magnifier">
+                                        <!-- 大分類名 -->
+                                        <asp:Label ID="WF_BIGCATENAME_L" runat="server" Text="大分類名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <a class="ef" id="WF_GROUP" ondblclick="Field_DBclick('TxtBIGCATENAME', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtBIGCATENAME');">
+                                            <asp:TextBox ID="TxtBIGCATENAME" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="100"></asp:TextBox>
+                                        </a>
+                                        <!-- 大分類コード -->
+                                        <asp:Label ID="WF_BIGCATECODE_L" runat="server" Text="大分類コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <asp:TextBox ID="TxtBIGCATECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                                    </span>
+                                </p>
+                                <p id="YUSOU_LINE_3">
+                                    <span class="ef magnifier">
+                                        <!-- 中分類名 -->
+                                        <asp:Label ID="WF_MIDCATENAME_L" runat="server" Text="中分類名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <a class="ef" id="WF_MIDCATE" ondblclick="Field_DBclick('TxtMIDCATENAME', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtMIDCATENAME');">
+                                            <asp:TextBox ID="TxtMIDCATENAME" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="100"></asp:TextBox>
+                                        </a>
+                                       <!-- 中分類コード -->
+                                       <asp:Label ID="WF_MIDCATECODE_L" runat="server" Text="中分類コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                       <asp:TextBox ID="TxtMIDCATECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                                    </span>
+                                </p>
+                                <p id="YUSOU_LINE_4">
+                                    <span class="ef magnifier">
+                                        <!-- 小分類名 -->
+                                        <asp:Label ID="WF_SMALLCATENAME_L" runat="server" Text="小分類名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                        <a class="ef" id="WF_SMALLCATE" ondblclick="Field_DBclick('TxtSMALLCATENAME', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('TxtSMALLCATENAME');">
+                                            <asp:TextBox ID="TxtSMALLCATENAME" runat="server" CssClass="boxIcon" onblur="MsgClear();" MaxLength="100"></asp:TextBox>
+                                        </a>
+                                       <!-- 小分類コード -->
+                                       <asp:Label ID="WF_SMALLCATECODE_L" runat="server" Text="小分類コード" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                       <asp:TextBox ID="TxtSMALLCATECODE" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
+                                    </span>
+                                </p>
+<%--                               <p id="YUSOU_LINE_2">
                                     <span class="ef magnifier">
                                         <!-- グループ名 -->
                                         <asp:Label ID="WF_GROUPNAME_L" runat="server" Text="明細グループ名" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -150,8 +187,8 @@
                                         <asp:Label ID="WF_GROUPSORTNO_L" runat="server" Text="グループソート順" CssClass="WF_TEXT_LEFT"></asp:Label>
                                         <asp:TextBox ID="TxtGROUPSORTNO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                                     </span>
-                                </p>
-                                <p id="YUSOU_LINE_3">
+                                </p>--%>
+<%--                                <p id="YUSOU_LINE_3">
                                     <span class="ef magnifier">
                                         <!-- 明細名 -->
                                         <asp:Label ID="WF_DETAILNAME_L" runat="server" Text="明細名" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -162,24 +199,24 @@
                                        <asp:Label ID="WF_DETAILSORTNO_L" runat="server" Text="明細ソート順" CssClass="WF_TEXT_LEFT"></asp:Label>
                                        <asp:TextBox ID="TxtDETAILSORTNO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                                     </span>
-                                </p>
+                                </p>--%>
                             </asp:Panel>
 
-                            <p id="KEY_LINE_14" style="display:none;">
+<%--                            <p id="KEY_LINE_14" style="display:none;">
                                 <!-- グループID -->
                                 <span>
                                     <asp:Label ID="WF_GROUPID_L" runat="server" Text="グループID" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtGROUPID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                                 </span>
-                            </p>
+                            </p>--%>
  
-                            <p id="KEY_LINE_17" style="display:none;">
+<%--                            <p id="KEY_LINE_17" style="display:none;">
                                 <!-- 明細ID -->
                                 <span>
                                     <asp:Label ID="WF_DETAILID_L" runat="server" Text="明細ID" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtDETAILID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="2"></asp:TextBox>
                                 </span>
-                            </p>
+                            </p>--%>
 
                             <p id="KEY_LINE_19">
                                 <!-- 単価 -->
@@ -421,6 +458,13 @@
     <!-- multiSelect レイアウト -->
     <!-- 届先コード単一選択 -->
     <MSINC:multiselect runat="server" id="mspTodokeCodeSingle" />
+    <!-- 大分類コード単一選択 -->
+    <MSINC:multiselect runat="server" id="mspBigcateCodeSingle" />
+    <!-- 中分類コード単一選択 -->
+    <MSINC:multiselect runat="server" id="mspMidcateCodeSingle" />
+    <!-- 小分類コード単一選択 -->
+    <MSINC:multiselect runat="server" id="mspSmallcateCodeSingle" />
+
     <!-- グループID単一選択 -->
     <MSINC:multiselect runat="server" id="mspGroupIdSingle" />
     <!-- 明細ID単一選択 -->
@@ -476,8 +520,11 @@
         <input id="WF_TARGETYM_SAVE" runat="server" value="" type="text" />
         <input id="WF_TORI_SAVE" runat="server" value="" type="text" />
         <input id="WF_ORG_SAVE" runat="server" value="" type="text" />  
-        <input id="WF_GROUPNAME_SAVE" runat="server" value="" type="text" />          
-        <input id="WF_DETAILNAME_SAVE" runat="server" value="" type="text" />  
+        <input id="WF_BIGCATENAME_SAVE" runat="server" value="" type="text" />          
+        <input id="WF_MIDCATENAME_SAVE" runat="server" value="" type="text" />  
+        <input id="WF_SMALLCATENAME_SAVE" runat="server" value="" type="text" />  
+<%--        <input id="WF_GROUPNAME_SAVE" runat="server" value="" type="text" />          --%>
+<%--        <input id="WF_DETAILNAME_SAVE" runat="server" value="" type="text" />  --%>
 
         <!-- 縦スクロール位置 -->
         <input id="WF_scrollY" runat="server" value="0" type="text" />

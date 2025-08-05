@@ -464,7 +464,7 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("          TORICODE                                                                                   ")
         SQLStr.AppendLine("          ,ORGCODE                                                                                   ")
         SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          LNG.LNM0014_SPRATE                                                                         ")
+        SQLStr.AppendLine("          LNG.LNM0014_SPRATE2                                                                         ")
         SQLStr.AppendLine("      WHERE                                                                                          ")
         SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("      AND TARGETYM = @TAISHOYM                                                                       ")

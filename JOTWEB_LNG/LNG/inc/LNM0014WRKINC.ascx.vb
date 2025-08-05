@@ -37,14 +37,20 @@ Public Class LNM0014WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TODOKECODE   '届先コード
-        TODOKENAME   '届先名称
-        GROUPSORTNO   'グループソート順
-        GROUPID   'グループID
-        GROUPNAME   'グループ名
-        DETAILSORTNO   '明細ソート順
-        DETAILID   '明細ID
-        DETAILNAME   '明細名
+        BIGCATECODE     '大分類コード
+        BIGCATENAME     '大分類名
+        MIDCATECODE     '中分類コード
+        MIDCATENAME     '中分類名
+        SMALLCATECODE   '小分類コード
+        SMALLCATENAME   '小分類名
+        'TODOKECODE   '届先コード
+        'TODOKENAME   '届先名称
+        'GROUPSORTNO   'グループソート順
+        'GROUPID   'グループID
+        'GROUPNAME   'グループ名
+        'DETAILSORTNO   '明細ソート順
+        'DETAILID   '明細ID
+        'DETAILNAME   '明細名
         TANKA   '単価
         QUANTITY   '数量
         CALCUNIT   '計算単位
@@ -89,14 +95,22 @@ Public Class LNM0014WRKINC
         ORGNAME   '部門名称
         KASANORGCODE   '加算先部門コード
         KASANORGNAME   '加算先部門名称
-        TODOKECODE   '届先コード
-        TODOKENAME   '届先名称
-        GROUPSORTNO   'グループソート順
-        GROUPID   'グループID
-        GROUPNAME   'グループ名
-        DETAILSORTNO   '明細ソート順
-        DETAILID   '明細ID
-        DETAILNAME   '明細名
+        BIGCATECODE   '大分類コード
+        BIGCATENAME   '大分類名
+        MIDCATECODE   '中分類コード
+        MIDCATENAME   '中分類名
+        SMALLCATECODE   '小分類コード
+        SMALLCATENAME   '小分類名
+#Region "コメント-2025/08/04(分類追加対応のため)"
+        'TODOKECODE   '届先コード
+        'TODOKENAME   '届先名称
+        'GROUPSORTNO   'グループソート順
+        'GROUPID   'グループID
+        'GROUPNAME   'グループ名
+        'DETAILSORTNO   '明細ソート順
+        'DETAILID   '明細ID
+        'DETAILNAME   '明細名
+#End Region
         TANKA   '単価
         QUANTITY   '数量
         CALCUNIT   '計算単位
@@ -222,7 +236,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
         SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 LNM0014                                                                      ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -293,7 +307,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("       LNM0014.ORGCODE AS ORGCODE                                                                    ")
         SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(LNM0014.ORGNAME,' ',''),'　',''),'EX','EX ') AS ORGNAME               ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 LNM0014                                                                      ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -362,7 +376,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("       LNM0014.KASANORGCODE AS KASANORGCODE                                                          ")
         SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(COALESCE(RTRIM(LNM0014.KASANORGNAME), ''),' ',''),'　',''),'EX','EX ') AS KASANORGNAME ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 LNM0014                                                                      ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -418,76 +432,78 @@ Public Class LNM0014WRKINC
 
     End Function
 
-    ''' <summary>
-    ''' ドロップダウンリスト届先データ取得
-    ''' </summary>
-    ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
-    ''' <returns></returns>
-    Public Shared Function getDowpDownTodokeList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
-        Dim retList As New DropDownList
-        Dim CS0050Session As New CS0050SESSION
-        Dim SQLStr As New StringBuilder
+#Region "コメント-2025/07/30(分類追加対応のため)"
+    '''' <summary>
+    '''' ドロップダウンリスト届先データ取得
+    '''' </summary>
+    '''' <param name="I_MAPID">MAPID</param>
+    '''' <param name="I_ORGCODE">部門コード</param>
+    '''' <returns></returns>
+    'Public Shared Function getDowpDownTodokeList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    '    Dim retList As New DropDownList
+    '    Dim CS0050Session As New CS0050SESSION
+    '    Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       TODOKECODE AS TODOKECODE                                                                      ")
-        SQLStr.AppendLine("      ,TODOKENAME AS TODOKENAME                                                                      ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
-        SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     COALESCE(RTRIM(LNM0014.TODOKENAME), '') <> ''                                                   ")
-        SQLStr.AppendLine(" ORDER BY                                                                       ")
-        SQLStr.AppendLine("     LNM0014.TODOKECODE                                                         ")
+    '    SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+    '    SQLStr.AppendLine("       TODOKECODE AS TODOKECODE                                                                      ")
+    '    SQLStr.AppendLine("      ,TODOKENAME AS TODOKENAME                                                                      ")
+    '    SQLStr.AppendLine(" FROM                                                                                                ")
+    '    SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
+    '    SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+    '    SQLStr.AppendLine("    (                                                                                                ")
+    '    SQLStr.AppendLine("      SELECT                                                                                         ")
+    '    SQLStr.AppendLine("          CODE                                                                                       ")
+    '    SQLStr.AppendLine("      FROM                                                                                           ")
+    '    SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+    '    SQLStr.AppendLine("      WHERE                                                                                          ")
+    '    SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+    '    SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+    '    SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+    '    SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+    '    SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+    '    SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
+    '    SQLStr.AppendLine(" WHERE                                                                                               ")
+    '    SQLStr.AppendLine("     COALESCE(RTRIM(LNM0014.TODOKENAME), '') <> ''                                                   ")
+    '    SQLStr.AppendLine(" ORDER BY                                                                       ")
+    '    SQLStr.AppendLine("     LNM0014.TODOKECODE                                                         ")
 
-        Try
-            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
-              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
-                sqlCon.Open()
-                MySqlConnection.ClearPool(sqlCon)
-                With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
-                End With
-                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
-                    If sqlDr.HasRows = False Then
-                        Return retList
-                    End If
-                    Dim WW_Tbl = New DataTable
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To sqlDr.FieldCount - 1
-                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
-                    Next
-                    '○ テーブル検索結果をテーブル格納
-                    WW_Tbl.Load(sqlDr)
-                    If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
-                        Dim listBlankItm As New ListItem("全て表示", "")
-                        retList.Items.Add(listBlankItm)
-                    End If
-                    For Each WW_ROW As DataRow In WW_Tbl.Rows
-                        Dim listItm As New ListItem(WW_ROW("TODOKENAME"), WW_ROW("TODOKECODE"))
-                        retList.Items.Add(listItm)
-                    Next
-                End Using
-            End Using
-        Catch ex As Exception
-            Throw ex '呼び出し元の例外にスロー
-        End Try
+    '    Try
+    '        Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+    '          sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+    '            sqlCon.Open()
+    '            MySqlConnection.ClearPool(sqlCon)
+    '            With sqlCmd.Parameters
+    '                .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+    '            End With
+    '            Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+    '                If sqlDr.HasRows = False Then
+    '                    Return retList
+    '                End If
+    '                Dim WW_Tbl = New DataTable
+    '                '○ フィールド名とフィールドの型を取得
+    '                For index As Integer = 0 To sqlDr.FieldCount - 1
+    '                    WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+    '                Next
+    '                '○ テーブル検索結果をテーブル格納
+    '                WW_Tbl.Load(sqlDr)
+    '                If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+    '                    Dim listBlankItm As New ListItem("全て表示", "")
+    '                    retList.Items.Add(listBlankItm)
+    '                End If
+    '                For Each WW_ROW As DataRow In WW_Tbl.Rows
+    '                    Dim listItm As New ListItem(WW_ROW("TODOKENAME"), WW_ROW("TODOKECODE"))
+    '                    retList.Items.Add(listItm)
+    '                Next
+    '            End Using
+    '        End Using
+    '    Catch ex As Exception
+    '        Throw ex '呼び出し元の例外にスロー
+    '    End Try
 
-        Return retList
+    '    Return retList
 
-    End Function
+    'End Function
+#End Region
 
     ''' <summary>
     ''' ドロップダウンリスト出荷地データ取得
@@ -503,7 +519,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       DEPARTURE AS DEPARTURE                                                                        ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE LNM0014                                                                      ")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 LNM0014                                                                      ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -815,7 +831,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE")
         SQLStr.AppendLine("      ,RTRIM(TORINAME) AS TORINAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -855,7 +871,7 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("       KASANORGCODE AS KASANORGCODE")
         SQLStr.AppendLine("      ,RTRIM(KASANORGNAME) AS KASANORGNAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -881,21 +897,63 @@ Public Class LNM0014WRKINC
 
     End Sub
 
+#Region "コメント-2025/07/30(分類追加対応のため)"
+    '''' <summary>
+    '''' 名称取得(届先名)
+    '''' </summary>
+    '''' <param name="SQLcon"></param>
+    '''' <param name="O_NAMEht">届先名格納HT</param>
+    'Public Sub CODENAMEGetTODOKE(ByVal SQLcon As MySqlConnection,
+    '                               ByRef O_NAMEht As Hashtable)
+
+    '    '○ 対象データ取得
+    '    Dim SQLStr = New StringBuilder
+    '    SQLStr.AppendLine(" SELECT DISTINCT")
+    '    SQLStr.AppendLine("       TODOKECODE AS TODOKECODE")
+    '    SQLStr.AppendLine("      ,RTRIM(TODOKENAME) AS TODOKENAME")
+    '    SQLStr.AppendLine(" FROM")
+    '    SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+
+    '    Try
+    '        Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+    '            Dim WW_Tbl = New DataTable
+    '            Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+    '                '○ フィールド名とフィールドの型を取得
+    '                For index As Integer = 0 To SQLdr.FieldCount - 1
+    '                    WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+    '                Next
+    '                '○ テーブル検索結果をテーブル格納
+    '                WW_Tbl.Load(SQLdr)
+    '            End Using
+    '            'ハッシュテーブルにコードと名称を格納
+    '            For Each WW_Row As DataRow In WW_Tbl.Rows
+    '                '届先コード、届先名格納
+    '                If Not O_NAMEht.ContainsKey(WW_Row("TODOKECODE")) Then
+    '                    O_NAMEht.Add(WW_Row("TODOKECODE"), WW_Row("TODOKENAME"))
+    '                End If
+    '            Next
+    '        End Using
+    '    Catch ex As Exception
+    '    End Try
+
+    'End Sub
+#End Region
+
     ''' <summary>
-    ''' 名称取得(届先名)
+    ''' ID取得(大分類コード)
     ''' </summary>
     ''' <param name="SQLcon"></param>
-    ''' <param name="O_NAMEht">届先名格納HT</param>
-    Public Sub CODENAMEGetTODOKE(ByVal SQLcon As MySqlConnection,
-                                   ByRef O_NAMEht As Hashtable)
+    ''' <param name="O_NAMEht">大分類コード格納HT</param>
+    Public Sub IDGetBIGCATE(ByVal SQLcon As MySqlConnection,
+                            ByRef O_NAMEht As Hashtable)
 
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       TODOKECODE AS TODOKECODE")
-        SQLStr.AppendLine("      ,RTRIM(TODOKENAME) AS TODOKENAME")
+        SQLStr.AppendLine("       BIGCATECODE AS BIGCATECODE")
+        SQLStr.AppendLine("      ,RTRIM(BIGCATENAME) AS BIGCATENAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -910,9 +968,9 @@ Public Class LNM0014WRKINC
                 End Using
                 'ハッシュテーブルにコードと名称を格納
                 For Each WW_Row As DataRow In WW_Tbl.Rows
-                    '届先コード、届先名格納
-                    If Not O_NAMEht.ContainsKey(WW_Row("TODOKECODE")) Then
-                        O_NAMEht.Add(WW_Row("TODOKECODE"), WW_Row("TODOKENAME"))
+                    '大分類コード、大分類名格納
+                    If Not O_NAMEht.ContainsKey(WW_Row("BIGCATENAME")) Then
+                        O_NAMEht.Add(WW_Row("BIGCATENAME"), WW_Row("BIGCATECODE"))
                     End If
                 Next
             End Using
@@ -922,20 +980,20 @@ Public Class LNM0014WRKINC
     End Sub
 
     ''' <summary>
-    ''' ID取得(グループID)
+    ''' ID取得(中分類コード)
     ''' </summary>
     ''' <param name="SQLcon"></param>
-    ''' <param name="O_NAMEht">グループID格納HT</param>
-    Public Sub IDGetGROUP(ByVal SQLcon As MySqlConnection,
-                                   ByRef O_NAMEht As Hashtable)
+    ''' <param name="O_NAMEht">中分類コード格納HT</param>
+    Public Sub IDGetMIDCATE(ByVal SQLcon As MySqlConnection,
+                            ByRef O_NAMEht As Hashtable)
 
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       GROUPID AS GROUPID")
-        SQLStr.AppendLine("      ,RTRIM(GROUPNAME) AS GROUPNAME")
+        SQLStr.AppendLine("       MIDCATECODE AS MIDCATECODE")
+        SQLStr.AppendLine("      ,RTRIM(MIDCATENAME) AS MIDCATENAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -950,9 +1008,9 @@ Public Class LNM0014WRKINC
                 End Using
                 'ハッシュテーブルにコードと名称を格納
                 For Each WW_Row As DataRow In WW_Tbl.Rows
-                    '届先コード、届先名格納
-                    If Not O_NAMEht.ContainsKey(WW_Row("GROUPNAME")) Then
-                        O_NAMEht.Add(WW_Row("GROUPNAME"), WW_Row("GROUPID"))
+                    '大分類コード、大分類名格納
+                    If Not O_NAMEht.ContainsKey(WW_Row("MIDCATENAME")) Then
+                        O_NAMEht.Add(WW_Row("MIDCATENAME"), WW_Row("MIDCATECODE"))
                     End If
                 Next
             End Using
@@ -960,6 +1018,88 @@ Public Class LNM0014WRKINC
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' ID取得(小分類コード)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="O_NAMEht">中分類コード格納HT</param>
+    Public Sub IDGetSMALLCATE(ByVal SQLcon As MySqlConnection,
+                              ByRef O_NAMEht As Hashtable)
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT DISTINCT")
+        SQLStr.AppendLine("       SMALLCATECODE AS SMALLCATECODE")
+        SQLStr.AppendLine("      ,RTRIM(SMALLCATENAME) AS SMALLCATENAME")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+                End Using
+                'ハッシュテーブルにコードと名称を格納
+                For Each WW_Row As DataRow In WW_Tbl.Rows
+                    '小分類コード、小分類名格納
+                    If Not O_NAMEht.ContainsKey(WW_Row("SMALLCATENAME")) Then
+                        O_NAMEht.Add(WW_Row("SMALLCATENAME"), WW_Row("SMALLCATECODE"))
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+        End Try
+
+    End Sub
+
+#Region "コメント-2025/07/30(分類追加対応のため)"
+    '''' <summary>
+    '''' ID取得(グループID)
+    '''' </summary>
+    '''' <param name="SQLcon"></param>
+    '''' <param name="O_NAMEht">グループID格納HT</param>
+    'Public Sub IDGetGROUP(ByVal SQLcon As MySqlConnection,
+    '                               ByRef O_NAMEht As Hashtable)
+
+    '    '○ 対象データ取得
+    '    Dim SQLStr = New StringBuilder
+    '    SQLStr.AppendLine(" SELECT DISTINCT")
+    '    SQLStr.AppendLine("       GROUPID AS GROUPID")
+    '    SQLStr.AppendLine("      ,RTRIM(GROUPNAME) AS GROUPNAME")
+    '    SQLStr.AppendLine(" FROM")
+    '    SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+
+    '    Try
+    '        Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+    '            Dim WW_Tbl = New DataTable
+    '            Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+    '                '○ フィールド名とフィールドの型を取得
+    '                For index As Integer = 0 To SQLdr.FieldCount - 1
+    '                    WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+    '                Next
+    '                '○ テーブル検索結果をテーブル格納
+    '                WW_Tbl.Load(SQLdr)
+    '            End Using
+    '            'ハッシュテーブルにコードと名称を格納
+    '            For Each WW_Row As DataRow In WW_Tbl.Rows
+    '                '届先コード、届先名格納
+    '                If Not O_NAMEht.ContainsKey(WW_Row("GROUPNAME")) Then
+    '                    O_NAMEht.Add(WW_Row("GROUPNAME"), WW_Row("GROUPID"))
+    '                End If
+    '            Next
+    '        End Using
+    '    Catch ex As Exception
+    '    End Try
+
+    'End Sub
+#End Region
 
     ''' <summary>
     ''' 操作権限のある組織コード取得
@@ -1012,13 +1152,13 @@ Public Class LNM0014WRKINC
     End Sub
 
     ''' <summary>
-    ''' グループID生成
+    ''' 大分類コード生成
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="WW_ROW"></param>
-    Public Shared Function GenerateGroupId(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+    Public Shared Function GenerateBigcateCode(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
 
-        GenerateGroupId = "1"
+        GenerateBigcateCode = "1"
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -1026,21 +1166,17 @@ Public Class LNM0014WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT ")
-        SQLStr.AppendLine("       MAX(GROUPID) AS GROUPID")
+        SQLStr.AppendLine("       MAX(BIGCATECODE) AS BIGCATECODE")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine(" WHERE")
-        'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '') = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')  = @ORGCODE ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)  '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-
-                'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
                 P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
 
@@ -1055,13 +1191,13 @@ Public Class LNM0014WRKINC
 
                     If WW_Tbl.Rows.Count >= 1 Then
                         '1加算
-                        GenerateGroupId = (CInt(WW_Tbl.Rows(0)("GROUPID").ToString) + 1).ToString
+                        GenerateBigcateCode = (CInt(WW_Tbl.Rows(0)("BIGCATECODE").ToString) + 1).ToString
                     End If
                 End Using
             End Using
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE2(BIGCATECODE) SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1071,13 +1207,13 @@ Public Class LNM0014WRKINC
     End Function
 
     ''' <summary>
-    ''' 明細ID生成
+    ''' 中分類コード生成
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <param name="WW_ROW"></param>
-    Public Shared Function GenerateDetailId(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+    Public Shared Function GenerateMidcateCode(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
 
-        GenerateDetailId = "1"
+        GenerateMidcateCode = "1"
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -1085,26 +1221,83 @@ Public Class LNM0014WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT ")
-        SQLStr.AppendLine("       MAX(DETAILID) AS DETAILID")
+        SQLStr.AppendLine("       MAX(MIDCATECODE) AS MIDCATECODE")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine(" WHERE")
-        'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
-        SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')     = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')      = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0') = @BIGCATECODE ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)      '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)         '部門コード
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2) '大分類コード
+                P_TORICODE.Value = WW_ROW("TORICODE")       '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")         '部門コード
+                P_BIGCATECODE.Value = WW_ROW("BIGCATECODE") '大分類コード
 
-                'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
-                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                P_GROUPID.Value = WW_ROW("GROUPID")           'グループID
+                Dim WW_Tbl = New DataTable
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(SQLdr)
+
+                    If WW_Tbl.Rows.Count >= 1 AndAlso WW_ROW("MIDCATENAME").ToString() <> "" Then
+                        '1加算
+                        GenerateMidcateCode = (CInt(WW_Tbl.Rows(0)("MIDCATECODE").ToString) + 1).ToString
+                    Else
+                        'そのまま
+                        GenerateMidcateCode = (CInt(WW_Tbl.Rows(0)("MIDCATECODE").ToString)).ToString
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE2(MIDCATECODE) SELECT"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+            Exit Function
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' 小分類コード生成
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <param name="WW_ROW"></param>
+    Public Shared Function GenerateSmallcateCode(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+
+        GenerateSmallcateCode = "1"
+
+        Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+        O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" SELECT ")
+        SQLStr.AppendLine("       MAX(SMALLCATECODE) AS SMALLCATECODE")
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("         COALESCE(TORICODE, '')     = @TORICODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')      = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0') = @BIGCATECODE ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)      '取引先コード
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)         '部門コード
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2) '大分類コード
+                P_TORICODE.Value = WW_ROW("TORICODE")       '取引先コード
+                P_ORGCODE.Value = WW_ROW("ORGCODE")         '部門コード
+                P_BIGCATECODE.Value = WW_ROW("BIGCATECODE") '大分類コード
 
                 Dim WW_Tbl = New DataTable
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1117,13 +1310,13 @@ Public Class LNM0014WRKINC
 
                     If WW_Tbl.Rows.Count >= 1 Then
                         '1加算
-                        GenerateDetailId = (CInt(WW_Tbl.Rows(0)("DETAILID").ToString) + 1).ToString
+                        GenerateSmallcateCode = (CInt(WW_Tbl.Rows(0)("SMALLCATECODE").ToString) + 1).ToString
                     End If
                 End Using
             End Using
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE2(SMALLCATECODE) SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
@@ -1131,6 +1324,129 @@ Public Class LNM0014WRKINC
             Exit Function
         End Try
     End Function
+
+#Region "コメント-2025/07/30(分類追加対応のため)"
+    '''' <summary>
+    '''' グループID生成
+    '''' </summary>
+    '''' <param name="SQLcon"></param>
+    '''' <param name="WW_ROW"></param>
+    'Public Shared Function GenerateGroupId(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+
+    '    GenerateGroupId = "1"
+
+    '    Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    '    O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
+
+    '    '○ 対象データ取得
+    '    Dim SQLStr = New StringBuilder
+    '    SQLStr.AppendLine(" SELECT ")
+    '    SQLStr.AppendLine("       MAX(GROUPID) AS GROUPID")
+    '    SQLStr.AppendLine(" FROM")
+    '    SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+    '    SQLStr.AppendLine(" WHERE")
+    '    'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+    '    SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+    '    SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+
+    '    Try
+    '        Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+    '            'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+    '            Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+    '            Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+
+    '            'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+    '            P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+    '            P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+
+    '            Dim WW_Tbl = New DataTable
+    '            Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+    '                '○ フィールド名とフィールドの型を取得
+    '                For index As Integer = 0 To SQLdr.FieldCount - 1
+    '                    WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+    '                Next
+    '                '○ テーブル検索結果をテーブル格納
+    '                WW_Tbl.Load(SQLdr)
+
+    '                If WW_Tbl.Rows.Count >= 1 Then
+    '                    '1加算
+    '                    GenerateGroupId = (CInt(WW_Tbl.Rows(0)("GROUPID").ToString) + 1).ToString
+    '                End If
+    '            End Using
+    '        End Using
+    '    Catch ex As Exception
+    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+    '        CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE SELECT"
+    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWrite.TEXT = ex.ToString()
+    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+    '        Exit Function
+    '    End Try
+    'End Function
+
+    '''' <summary>
+    '''' 明細ID生成
+    '''' </summary>
+    '''' <param name="SQLcon"></param>
+    '''' <param name="WW_ROW"></param>
+    'Public Shared Function GenerateDetailId(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
+
+    '    GenerateDetailId = "1"
+
+    '    Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
+    '    O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
+
+    '    '○ 対象データ取得
+    '    Dim SQLStr = New StringBuilder
+    '    SQLStr.AppendLine(" SELECT ")
+    '    SQLStr.AppendLine("       MAX(DETAILID) AS DETAILID")
+    '    SQLStr.AppendLine(" FROM")
+    '    SQLStr.AppendLine("     LNG.LNM0014_SPRATE")
+    '    SQLStr.AppendLine(" WHERE")
+    '    'SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
+    '    SQLStr.AppendLine("         COALESCE(TORICODE, '')             = @TORICODE ")
+    '    SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
+    '    SQLStr.AppendLine("    AND  COALESCE(GROUPID, '0')             = @GROUPID ")
+
+    '    Try
+    '        Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+    '            'Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
+    '            Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
+    '            Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
+    '            Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.Decimal, 2)     'グループID
+
+    '            'P_TARGETYM.Value = WW_ROW("TARGETYM")           '対象年月
+    '            P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
+    '            P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
+    '            P_GROUPID.Value = WW_ROW("GROUPID")           'グループID
+
+    '            Dim WW_Tbl = New DataTable
+    '            Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+    '                '○ フィールド名とフィールドの型を取得
+    '                For index As Integer = 0 To SQLdr.FieldCount - 1
+    '                    WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+    '                Next
+    '                '○ テーブル検索結果をテーブル格納
+    '                WW_Tbl.Load(SQLdr)
+
+    '                If WW_Tbl.Rows.Count >= 1 Then
+    '                    '1加算
+    '                    GenerateDetailId = (CInt(WW_Tbl.Rows(0)("DETAILID").ToString) + 1).ToString
+    '                End If
+    '            End Using
+    '        End Using
+    '    Catch ex As Exception
+    '        CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
+    '        CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE SELECT"
+    '        CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+    '        CS0011LOGWrite.TEXT = ex.ToString()
+    '        CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+    '        CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
+    '        Exit Function
+    '    End Try
+    'End Function
+#End Region
 
     ''' <summary>
     ''' 会社コード取得のパラメータ設定
@@ -1176,11 +1492,12 @@ Public Class LNM0014WRKINC
     ''' <param name="I_TARGETYM">対象年月</param>
     ''' <param name="I_TORICODE">取引先コード</param>
     ''' <param name="I_ORGCODE">部門コード</param>
-    ''' <param name="I_GROUPID">グループID</param>
-    ''' <param name="I_DETAILID">明細ID</param>
+    ''' <param name="I_BIGCATECODE">大分類コード</param>
+    ''' <param name="I_MIDCATECODE">中分類コード</param>
+    ''' <param name="I_SMALLCATECODE">小分類コード</param>
     Public Sub HaitaCheck(ByVal SQLcon As MySqlConnection, ByRef O_MESSAGENO As String, ByVal I_TIMESTAMP As String,
                           ByVal I_TARGETYM As String, ByVal I_TORICODE As String, ByVal I_ORGCODE As String,
-                          ByVal I_GROUPID As String, ByVal I_DETAILID As String)
+                          ByVal I_BIGCATECODE As String, ByVal I_MIDCATECODE As String, ByVal I_SMALLCATECODE As String)
 
         Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
         O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
@@ -1190,27 +1507,30 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine(" SELECT                                      ")
         SQLStr.AppendLine("    UPDTIMSTP                                ")
         SQLStr.AppendLine(" FROM                                        ")
-        SQLStr.AppendLine("     LNG.LNM0014_SPRATE                      ")
+        SQLStr.AppendLine("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.AppendLine(" WHERE                                       ")
         SQLStr.AppendLine("       TARGETYM  = @TARGETYM                 ")
         SQLStr.AppendLine("   AND TORICODE  = @TORICODE                 ")
         SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND GROUPID  = @GROUPID                   ")
-        SQLStr.AppendLine("   AND DETAILID  = @DETAILID                 ")
+        SQLStr.AppendLine("   AND BIGCATECODE  = @BIGCATECODE           ")
+        SQLStr.AppendLine("   AND MIDCATECODE  = @MIDCATECODE           ")
+        SQLStr.AppendLine("   AND SMALLCATECODE  = @SMALLCATECODE       ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)   '対象年月
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)  '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_GROUPID As MySqlParameter = SQLcmd.Parameters.Add("@GROUPID", MySqlDbType.VarChar, 2)     'グループID
-                Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.VarChar, 2)   '明細ID
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.VarChar, 2)     '大分類コード
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.VarChar, 2)     '中分類コード
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.VarChar, 2) '小分類コード
 
                 P_TARGETYM.Value = I_TARGETYM           '対象年月
                 P_TORICODE.Value = I_TORICODE           '取引先コード
                 P_ORGCODE.Value = I_ORGCODE             '部門コード
-                P_GROUPID.Value = I_GROUPID             'グループID
-                P_DETAILID.Value = I_DETAILID           '明細ID
+                P_BIGCATECODE.Value = I_BIGCATECODE     '大分類コード
+                P_MIDCATECODE.Value = I_MIDCATECODE     '中分類コード
+                P_SMALLCATECODE.Value = I_SMALLCATECODE '小分類コード
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 

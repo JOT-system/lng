@@ -60,7 +60,7 @@ p {
 
 .calendararea {
     display: inline-block;
-    width: 190px !important;
+    width: 170px !important;
 }
 
 #ListCount {
@@ -73,7 +73,7 @@ p {
 }
 
 #WF_TORI, #WF_ORG, #WF_TODOKE, #WF_DEPARTURE {
-    width: 100px !important;
+    width: 140px !important;
     margin-right:10px;
 }
 

@@ -10,6 +10,7 @@
     <asp:TextBox ID="WF_SEL_TARGETYM_L" runat="server"></asp:TextBox>               <!-- 対象年月 -->
     <asp:TextBox ID="WF_SEL_TORI_L" runat="server"></asp:TextBox>                   <!-- 取引先コード -->
     <asp:TextBox ID="WF_SEL_ORG_L" runat="server"></asp:TextBox>                    <!-- 部門コード -->
+    <asp:TextBox ID="WF_SEL_KASANORG_L" runat="server"></asp:TextBox>               <!-- 加算先部門コード -->
     <asp:TextBox ID="WF_SEL_TODOKE_L" runat="server"></asp:TextBox>                 <!-- 届先コード -->
     <asp:TextBox ID="WF_SEL_DEPARTURE_L" runat="server"></asp:TextBox>              <!-- 出荷場所コード -->
     <asp:TextBox ID="WF_SEL_CHKDELDATAFLG_L" runat="server"></asp:TextBox>          <!-- 削除フラグ -->
@@ -27,12 +28,20 @@
     <asp:TextBox ID="WF_SEL_KASANORGNAME" runat="server"></asp:TextBox>            <!-- 加算先部門名称 -->
     <asp:TextBox ID="WF_SEL_TODOKECODE" runat="server"></asp:TextBox>              <!-- 届先コード -->
     <asp:TextBox ID="WF_SEL_TODOKENAME" runat="server"></asp:TextBox>              <!-- 届先名称 -->
-    <asp:TextBox ID="WF_SEL_GROUPSORTNO" runat="server"></asp:TextBox>             <!-- グループソート順 -->
-    <asp:TextBox ID="WF_SEL_GROUPID" runat="server"></asp:TextBox>                 <!-- グループID -->
-    <asp:TextBox ID="WF_SEL_GROUPNAME" runat="server"></asp:TextBox>               <!-- グループ名 -->
-    <asp:TextBox ID="WF_SEL_DETAILSORTNO" runat="server"></asp:TextBox>            <!-- 明細ソート順 -->
-    <asp:TextBox ID="WF_SEL_DETAILID" runat="server"></asp:TextBox>                <!-- 明細ID -->
-    <asp:TextBox ID="WF_SEL_DETAILNAME" runat="server"></asp:TextBox>              <!-- 明細名 -->
+<%--    <asp:TextBox ID="WF_SEL_GROUPSORTNO" runat="server"></asp:TextBox>             <!-- グループソート順 -->--%>
+<%--    <asp:TextBox ID="WF_SEL_GROUPID" runat="server"></asp:TextBox>                 <!-- グループID -->--%>
+<%--    <asp:TextBox ID="WF_SEL_GROUPNAME" runat="server"></asp:TextBox>               <!-- グループ名 -->--%>
+<%--    <asp:TextBox ID="WF_SEL_DETAILSORTNO" runat="server"></asp:TextBox>            <!-- 明細ソート順 -->--%>
+<%--    <asp:TextBox ID="WF_SEL_DETAILID" runat="server"></asp:TextBox>                <!-- 明細ID -->--%>
+<%--    <asp:TextBox ID="WF_SEL_DETAILNAME" runat="server"></asp:TextBox>              <!-- 明細名 -->--%>
+
+    <asp:TextBox ID="WF_SEL_BIGCATECODE" runat="server"></asp:TextBox>             <!-- 大分類コード -->
+    <asp:TextBox ID="WF_SEL_BIGCATENAME" runat="server"></asp:TextBox>             <!-- 大分類名 -->
+    <asp:TextBox ID="WF_SEL_MIDCATECODE" runat="server"></asp:TextBox>             <!-- 中分類コード -->
+    <asp:TextBox ID="WF_SEL_MIDCATENAME" runat="server"></asp:TextBox>             <!-- 中分類名 -->
+    <asp:TextBox ID="WF_SEL_SMALLCATECODE" runat="server"></asp:TextBox>           <!-- 小分類コード -->
+    <asp:TextBox ID="WF_SEL_SMALLCATENAME" runat="server"></asp:TextBox>           <!-- 小分類名 -->
+
     <asp:TextBox ID="WF_SEL_TANKA" runat="server"></asp:TextBox>                   <!-- 単価 -->
     <asp:TextBox ID="WF_SEL_QUANTITY" runat="server"></asp:TextBox>                <!-- 数量 -->
     <asp:TextBox ID="WF_SEL_CALCUNIT" runat="server"></asp:TextBox>                <!-- 計算単位 -->

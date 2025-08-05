@@ -212,33 +212,6 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_KASANORGCODE_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_TODOKECODE_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_TODOKECODE_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtTODOKENAME コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTODOKENAME As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''TxtTODOKECODE コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtTODOKECODE As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
     '''pnlYusouArea コントロール。
     '''</summary>
     '''<remarks>
@@ -257,112 +230,112 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_YUSOU_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''WF_GROUPNAME_L コントロール。
+    '''WF_BIGCATENAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GROUPNAME_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGCATENAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtGROUPNAME コントロール。
+    '''TxtBIGCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtGROUPNAME As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtBIGCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_GROUPSORTNO_L コントロール。
+    '''WF_BIGCATECODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GROUPSORTNO_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_BIGCATECODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtGROUPSORTNO コントロール。
+    '''TxtBIGCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtGROUPSORTNO As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtBIGCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DETAILNAME_L コントロール。
+    '''WF_MIDCATENAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DETAILNAME_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDCATENAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDETAILNAME コントロール。
+    '''TxtMIDCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDETAILNAME As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtMIDCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DETAILSORTNO_L コントロール。
+    '''WF_MIDCATECODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DETAILSORTNO_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_MIDCATECODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDETAILSORTNO コントロール。
+    '''TxtMIDCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDETAILSORTNO As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtMIDCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_GROUPID_L コントロール。
+    '''WF_SMALLCATENAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GROUPID_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SMALLCATENAME_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtGROUPID コントロール。
+    '''TxtSMALLCATENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtGROUPID As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtSMALLCATENAME As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
-    '''WF_DETAILID_L コントロール。
+    '''WF_SMALLCATECODE_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DETAILID_L As Global.System.Web.UI.WebControls.Label
+    Protected WithEvents WF_SMALLCATECODE_L As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
-    '''TxtDETAILID コントロール。
+    '''TxtSMALLCATECODE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents TxtDETAILID As Global.System.Web.UI.WebControls.TextBox
+    Protected WithEvents TxtSMALLCATECODE As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''WF_TANKA_L コントロール。
@@ -896,6 +869,33 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents mspTodokeCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
     
     '''<summary>
+    '''mspBigcateCodeSingle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mspBigcateCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
+    
+    '''<summary>
+    '''mspMidcateCodeSingle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mspMidcateCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
+    
+    '''<summary>
+    '''mspSmallcateCodeSingle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents mspSmallcateCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
+    
+    '''<summary>
     '''mspGroupIdSingle コントロール。
     '''</summary>
     '''<remarks>
@@ -1112,22 +1112,31 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_ORG_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_GROUPNAME_SAVE コントロール。
+    '''WF_BIGCATENAME_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_GROUPNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_BIGCATENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_DETAILNAME_SAVE コントロール。
+    '''WF_MIDCATENAME_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DETAILNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_MIDCATENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_SMALLCATENAME_SAVE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_SMALLCATENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_scrollY コントロール。

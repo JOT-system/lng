@@ -20,34 +20,63 @@ window.onload = function () {
         document.getElementById('WF_TARGETYM').value = document.getElementById('WF_TARGETYM_SAVE').value;
         document.getElementById('WF_TORI').value = document.getElementById('WF_TORI_SAVE').value;
         document.getElementById('WF_ORG').value = document.getElementById('WF_ORG_SAVE').value;
-        document.getElementById('TxtGROUPNAME').value = document.getElementById('WF_GROUPNAME_SAVE').value;
-        document.getElementById('TxtDETAILNAME').value = document.getElementById('WF_DETAILNAME_SAVE').value;
+        document.getElementById('TxtBIGCATENAME').value = document.getElementById('WF_BIGCATENAME_SAVE').value;
+        document.getElementById('TxtMIDCATENAME').value = document.getElementById('WF_MIDCATENAME_SAVE').value;
+        document.getElementById('TxtSMALLCATENAME').value = document.getElementById('WF_SMALLCATENAME_SAVE').value;
+        //コメント-2025/08/01(分類追加対応のため) START
+        //document.getElementById('TxtGROUPNAME').value = document.getElementById('WF_GROUPNAME_SAVE').value;
+        //document.getElementById('TxtDETAILNAME').value = document.getElementById('WF_DETAILNAME_SAVE').value;
+        //コメント-2025/08/01(分類追加対応のため) END
 
         document.getElementById('WF_TARGETYM').disabled = true;
         document.getElementById('WF_TORI').disabled = true;
         document.getElementById('WF_ORG').disabled = true;
 
-        document.getElementById('TxtGROUPNAMEcommonIcon').style.display = "none";
-        document.getElementById('TxtGROUPNAME').disabled = true;
-        document.getElementById('TxtDETAILNAMEcommonIcon').style.display = "none";
-        document.getElementById('TxtDETAILNAME').disabled = true;
+        document.getElementById('TxtBIGCATENAMEcommonIcon').style.display = "none";
+        document.getElementById('TxtBIGCATENAME').disabled = true;
+        document.getElementById('TxtMIDCATENAMEcommonIcon').style.display = "none";
+        document.getElementById('TxtMIDCATENAME').disabled = true;
+        document.getElementById('TxtSMALLCATENAMEcommonIcon').style.display = "none";
+        document.getElementById('TxtSMALLCATENAME').disabled = true;
+        //コメント-2025/08/01(分類追加対応のため) START
+        //document.getElementById('TxtGROUPNAMEcommonIcon').style.display = "none";
+        //document.getElementById('TxtGROUPNAME').disabled = true;
+        //document.getElementById('TxtDETAILNAMEcommonIcon').style.display = "none";
+        //document.getElementById('TxtDETAILNAME').disabled = true;
+        //コメント-2025/08/01(分類追加対応のため) END
 
         document.getElementById('WF_TARGETYM').style.backgroundColor = "#F2F2F2";
         document.getElementById('WF_TORI').style.backgroundColor = "#F2F2F2";
         document.getElementById('WF_ORG').style.backgroundColor = "#F2F2F2";
-        document.getElementById('TxtGROUPNAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('TxtDETAILNAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('TxtBIGCATENAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('TxtMIDCATENAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('TxtSMALLCATENAME').style.backgroundColor = "#F2F2F2";
+        //コメント-2025/08/01(分類追加対応のため) START
+        //document.getElementById('TxtGROUPNAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('TxtDETAILNAME').style.backgroundColor = "#F2F2F2";
+        //コメント-2025/08/01(分類追加対応のため) END
 
     };
 
     //ポップアップメッセージ
-    document.getElementById("pnlYusouArea").title = "明細グループ名\n" +
-        "　・・・共通する明細名を束ねたい場合に使用してください。\n" +
-        "　　　　束ねる必要が無い場合は、こちらを明細名としてご使用ください。\n" +
+    document.getElementById("pnlYusouArea").title = "大分類名\n" +
+        "　・・・共通する大分類名を束ねたい場合に使用してください。\n" +
+        "　　　　束ねる必要が無い場合は、こちらを大分類名としてご使用ください。\n" +
         "\n" +
-        "明細名\n" +
-        "　・・・グループで束ねたい場合に使用してください。\n" +
-        "　　　　束ねる必要が無い場合はグループ名を使用し、こちらは入力不要です。"; 
+        "中分類名\n" +
+        "　・・・中分類で束ねたい場合に使用してください。\n" +
+        "　　　　束ねる必要が無い場合は大分類名を使用し、こちらは入力不要です。\n" +
+        "\n" +
+        "小分類名\n" +
+        "　・・・小分類で束ねたい場合に使用してください。\n";
+        //"　　　　束ねる必要が無い場合は大分類名(または中分類名)を使用し、こちらは入力不要です。"; 
+    //document.getElementById("pnlYusouArea").title = "明細グループ名\n" +
+    //    "　・・・共通する明細名を束ねたい場合に使用してください。\n" +
+    //    "　　　　束ねる必要が無い場合は、こちらを明細名としてご使用ください。\n" +
+    //    "\n" +
+    //    "明細名\n" +
+    //    "　・・・グループで束ねたい場合に使用してください。\n" +
+    //    "　　　　束ねる必要が無い場合はグループ名を使用し、こちらは入力不要です。"; 
 
     let wkmessage1 = "JOT手数料として収受する割合(JOT収入分)をパーセンテージで入力してください。\n" +
         "JOTとENEXの割合は、合計100%となるようにしてください。";
