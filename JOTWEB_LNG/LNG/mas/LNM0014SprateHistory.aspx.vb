@@ -72,27 +72,12 @@ Public Class LNM0014SprateHistory
                         Case "WF_ButtonLAST"            '最終頁ボタン押下
                             WF_ButtonLAST_Click()
                         Case "WF_SelectMODIFYYMChange"  '変更年月フィールドチェンジ
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()       'DataBase接続
-                                '変更日取得
-                                MODIFYDDGet(SQLcon)
-                                '変更ユーザ取得
-                                MODIFYUSERGet(SQLcon)
-                            End Using
+                            WF_SelectMODIFYYM_CHANGE()
                         Case "WF_SelectMODIFYDDChange"  '変更日フィールドチェンジ
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()       'DataBase接続
-                                '変更ユーザ取得
-                                MODIFYUSERGet(SQLcon)
-                            End Using
-                        Case "WF_ButtonMODIFYVIEW"  '表示するボタン押下
-                            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                                SQLcon.Open()  ' DataBase接続
-                                MAPDataGet(SQLcon)
-                                Master.SaveTable(LNM0014tbl)
-                                '〇 一覧の件数を取得
-                                Me.ListCount.Text = "件数：" + LNM0014tbl.Rows.Count.ToString()
-                            End Using
+                            WF_SelectMODIFYDD_CHANGE()
+                        Case "WF_SelectMODIFYUSERChange",   '変更ユーザーフィールドチェンジ
+                             "WF_ButtonMODIFYVIEW"          '表示するボタン押下
+                            WF_WF_ButtonMODIFY_VIEW()
                     End Select
 
                     '○ 一覧再表示処理
@@ -829,6 +814,53 @@ Public Class LNM0014SprateHistory
 
     End Sub
 
+    ''' <summary>
+    ''' 変更年月フィールドチェンジ
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectMODIFYYM_CHANGE()
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            '変更日取得
+            MODIFYDDGet(SQLcon)
+            '変更ユーザ取得
+            MODIFYUSERGet(SQLcon)
+        End Using
+
+        '〇表示するボタン押下時処理
+        WF_WF_ButtonMODIFY_VIEW()
+
+    End Sub
+
+    ''' <summary>
+    ''' 変更年月フィールドチェンジ
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectMODIFYDD_CHANGE()
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()       'DataBase接続
+            '変更ユーザ取得
+            MODIFYUSERGet(SQLcon)
+        End Using
+
+        '〇表示するボタン押下時処理
+        WF_WF_ButtonMODIFY_VIEW()
+
+    End Sub
+
+    ''' <summary>
+    ''' 表示するボタン押下時処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_WF_ButtonMODIFY_VIEW()
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+            MAPDataGet(SQLcon)
+            Master.SaveTable(LNM0014tbl)
+            '〇 一覧の件数を取得
+            Me.ListCount.Text = "件数：" + LNM0014tbl.Rows.Count.ToString()
+        End Using
+    End Sub
 #Region "ﾀﾞｳﾝﾛｰﾄﾞ"
 
     ''' <summary>

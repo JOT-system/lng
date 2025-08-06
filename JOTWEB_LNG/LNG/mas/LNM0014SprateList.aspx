@@ -76,15 +76,15 @@
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">荷主</strong>
-                                        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0"/>
+                                        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectTORIChange');" />
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">部門</strong>
-                                        <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0"/>
+                                        <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectORGChange');" />
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">加算先部門</strong>
-                                        <asp:DropDownList ID="WF_KASANORG" runat="server" class="form-select rounded-0"/>
+                                        <asp:DropDownList ID="WF_KASANORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectKASANORGChange');" />
                                     </div>
                                     <!-- コメント-2025/07/30(分類追加対応のため) -->
 <%--                                    <div class="d-flex align-items-center gap-2">
@@ -96,6 +96,7 @@
                                         <asp:DropDownList ID="WF_DEPARTURE" runat="server" class="form-select rounded-0"/>
                                     </div>--%>
                                     <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
+                                    <input type="button" id="WF_ButtonRelease" class="btn-sticky" value="解除"  onclick="ButtonClick('WF_ButtonRelease');" />
                                 </div>
                             </div>
                         </div>

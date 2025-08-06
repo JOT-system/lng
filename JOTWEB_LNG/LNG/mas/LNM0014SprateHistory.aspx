@@ -50,7 +50,7 @@
                                 <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更日</label>
                                 <asp:DropDownList ID="WF_DDL_MODIFYDD" runat="server" onchange="ButtonClick('WF_SelectMODIFYDDChange');" />
                                 <label class="WF_TEXT_LEFT" style="margin-left:10px;">変更ユーザー </label>
-                                <asp:DropDownList ID="WF_DDL_MODIFYUSER" runat="server"/>
+                                <asp:DropDownList ID="WF_DDL_MODIFYUSER" runat="server" onchange="ButtonClick('WF_SelectMODIFYUSERChange');" />
                             </div>
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonMODIFYVIEW" class="btn-sticky" value="表示する" onclick="ButtonClick('WF_ButtonMODIFYVIEW');" />

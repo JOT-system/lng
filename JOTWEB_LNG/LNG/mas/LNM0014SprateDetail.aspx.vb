@@ -57,21 +57,21 @@ Public Class LNM0014SprateDetail
                     Master.RecoverTable(LNM0014tbl, work.WF_SEL_INPTBL.Text)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonUPDATE"          '更新ボタン押下
+                        Case "WF_ButtonUPDATE"              '更新ボタン押下
                             WF_UPDATE_Click()
-                        Case "WF_ButtonCLEAR", "LNM0014L"  '戻るボタン押下（LNM0014Lは、パンくずより）
+                        Case "WF_ButtonCLEAR", "LNM0014L"   '戻るボタン押下（LNM0014Lは、パンくずより）
                             WF_CLEAR_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        Case "WF_Field_DBClick"             'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_LeftBoxSelectClick"    'フィールドチェンジ
+                        Case "WF_LeftBoxSelectClick"        'フィールドチェンジ
                             WF_FIELD_Change()
-                        Case "WF_ButtonSel"             '(左ボックス)選択ボタン押下
+                        Case "WF_ButtonSel"                 '(左ボックス)選択ボタン押下
                             WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        Case "WF_ButtonCan"                 '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        Case "WF_ListboxDBclick"            '左ボックスダブルクリック
                             WF_ButtonSel_Click()
-                        Case "btnClearConfirmOK"        '戻るボタン押下後の確認ダイアログでOK押下
+                        Case "btnClearConfirmOK"            '戻るボタン押下後の確認ダイアログでOK押下
                             WF_CLEAR_ConfirmOkClick()
                         Case "mspTodokeCodeSingleRowSelected"       '[共通]届先コード選択ポップアップで行選択
                             RowSelected_mspTodokeCodeSingle()
@@ -84,13 +84,13 @@ Public Class LNM0014SprateDetail
                         Case "mspSmallcateCodeSingleRowSelected"    '[共通]小分類コード選択ポップアップで行選択
                             RowSelected_mspSmallCateCodeSingle()
                             'RowSelected_mspDetailIdSingle()
-                        Case "WF_TORIChange"    '取引先コードチェンジ
+                        Case "WF_TORIChange"                '取引先コードチェンジ
                             WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
-                        Case "WF_ORGChange"    '部門コードチェンジ
+                        Case "WF_ORGChange"                 '部門コードチェンジ
                             WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
-                        Case "WF_KASANORGChange"    '加算先部門コードチェンジ
+                        Case "WF_KASANORGChange"            '加算先部門コードチェンジ
                             WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
-                        Case "WF_SelectCALENDARChange" 'カレンダーチェンジ
+                        Case "WF_SelectCALENDARChange"      'カレンダーチェンジ
                             WF_ACCOUNTCODE_TEXT.Text = ""
                             WF_SEGMENTCODE_TEXT.Text = ""
                             '勘定科目
@@ -396,9 +396,10 @@ Public Class LNM0014SprateDetail
         '計算単位(KEYは固定値マスタのCALCUNITDROPに合わせる)
         Select Case work.WF_SEL_CALCUNIT.Text
             Case "t", "トン単価" : ddlSelectCALCUNIT.SelectedValue = "1"
-            Case "回", "回数" : ddlSelectCALCUNIT.SelectedValue = "2"
+            Case "ラ", "ラウンド単価" : ddlSelectCALCUNIT.SelectedValue = "2"
             Case "人", "人数" : ddlSelectCALCUNIT.SelectedValue = "3"
             Case "台", "台数" : ddlSelectCALCUNIT.SelectedValue = "4"
+            Case "回", "回数" : ddlSelectCALCUNIT.SelectedValue = "5"
             Case "式", "定数" : ddlSelectCALCUNIT.SelectedValue = "9"
             Case Else : ddlSelectCALCUNIT.SelectedValue = ""
         End Select
@@ -466,23 +467,23 @@ Public Class LNM0014SprateDetail
         'Me.TxtGROUPSORTNO.Attributes("onkeyPress") = "CheckNum()"
         'Me.TxtDETAILSORTNO.Attributes("onkeyPress") = "CheckNum()"
 #End Region
-        Me.TxtBIGCATECODE.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtMIDCATECODE.Attributes("onkeyPress") = "CheckNum()"
-        Me.TxtSMALLCATECODE.Attributes("onkeyPress") = "CheckNum()"
+        Me.TxtBIGCATECODE.Attributes("onkeyPress") = "CheckNum()"           '大分類コード
+        Me.TxtMIDCATECODE.Attributes("onkeyPress") = "CheckNum()"           '中分類コード
+        Me.TxtSMALLCATECODE.Attributes("onkeyPress") = "CheckNum()"         '小分類コード
         Me.TxtSHIPPINGCOUNT.Attributes("onkeyPress") = "CheckNum()"
 
         ' 入力するテキストボックスは数値(0～9)＋記号(-)のみ可能とする。
-        Me.TxtTANKA.Attributes("onkeyPress") = "CheckTel()"             '単価
+        Me.TxtTANKA.Attributes("onkeyPress") = "CheckTel()"                 '単価
 
         ' 入力するテキストボックスは数値(0～9)＋記号(.)のみ可能とする。
         Me.TxtQUANTITY.Attributes("onkeyPress") = "CheckDeci()"             '数量
-        Me.TxtMILEAGE.Attributes("onkeyPress") = "CheckDeci()"             '走行距離
-        Me.TxtNENPI.Attributes("onkeyPress") = "CheckDeci()"             '燃費
-        Me.TxtDIESELPRICECURRENT.Attributes("onkeyPress") = "CheckDeci()"             '実勢軽油価格
-        Me.TxtDIESELPRICESTANDARD.Attributes("onkeyPress") = "CheckDeci()"             '基準経由価格
-        Me.TxtDIESELCONSUMPTION.Attributes("onkeyPress") = "CheckDeci()"             '燃料使用量
-        Me.TxtJOTPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"       '割合JOT
-        Me.TxtENEXPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"      '割合ENEX
+        Me.TxtMILEAGE.Attributes("onkeyPress") = "CheckDeci()"              '走行距離
+        Me.TxtNENPI.Attributes("onkeyPress") = "CheckDeci()"                '燃費
+        Me.TxtDIESELPRICECURRENT.Attributes("onkeyPress") = "CheckDeci()"   '実勢軽油価格
+        Me.TxtDIESELPRICESTANDARD.Attributes("onkeyPress") = "CheckDeci()"  '基準経由価格
+        Me.TxtDIESELCONSUMPTION.Attributes("onkeyPress") = "CheckDeci()"    '燃料使用量
+        Me.TxtJOTPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"        '割合JOT
+        Me.TxtENEXPERCENTAGE.Attributes("onkeyPress") = "CheckDeci()"       '割合ENEX
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -505,7 +506,7 @@ Public Class LNM0014SprateDetail
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE2 ")
         SQLStr.AppendLine(" WHERE")
         SQLStr.AppendLine("        ORGCODE  = @ORGCODE                   ")
-        SQLStr.AppendLine("   AND  DELFLG  = '0'                         ")
+        SQLStr.AppendFormat("   AND  DELFLG  = '{0}' ", C_DELETE_FLG.ALIVE)
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -792,20 +793,20 @@ Public Class LNM0014SprateDetail
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon), SQLcmdJnl As New MySqlCommand(SQLJnl.ToString, SQLcon)
                 ' DB更新用パラメータ
-                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
-                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)     '対象年月
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)     '取引先コード
-                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)     '取引先名称
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)     '部門コード
-                Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)     '部門名称
-                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)     '加算先部門コード
-                Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)     '加算先部門名称
-                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)         '大分類コード
-                Dim P_BIGCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATENAME", MySqlDbType.VarChar, 100)       '大分類名
-                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)         '中分類コード
-                Dim P_MIDCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATENAME", MySqlDbType.VarChar, 100)       '中分類名
-                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2)     '小分類コード
-                Dim P_SMALLCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATENAME", MySqlDbType.VarChar, 100)   '小分類名
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                               '削除フラグ
+                Dim P_TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)                           '対象年月
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10)                          '取引先コード
+                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar, 50)                          '取引先名称
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6)                             '部門コード
+                Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar, 20)                            '部門名称
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar, 6)                   '加算先部門コード
+                Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar, 20)                  '加算先部門名称
+                Dim P_BIGCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATECODE", MySqlDbType.Decimal, 2)                     '大分類コード
+                Dim P_BIGCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@BIGCATENAME", MySqlDbType.VarChar, 100)                   '大分類名
+                Dim P_MIDCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATECODE", MySqlDbType.Decimal, 2)                     '中分類コード
+                Dim P_MIDCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@MIDCATENAME", MySqlDbType.VarChar, 100)                   '中分類名
+                Dim P_SMALLCATECODE As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATECODE", MySqlDbType.Decimal, 2)                 '小分類コード
+                Dim P_SMALLCATENAME As MySqlParameter = SQLcmd.Parameters.Add("@SMALLCATENAME", MySqlDbType.VarChar, 100)               '小分類名
 #Region "コメント-2025/07/30(分類追加対応のため)"
                 'Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar, 6)     '届先コード
                 'Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar, 20)     '届先名称
@@ -816,41 +817,41 @@ Public Class LNM0014SprateDetail
                 'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
                 'Dim P_DETAILNAME As MySqlParameter = SQLcmd.Parameters.Add("@DETAILNAME", MySqlDbType.VarChar, 100)     '明細名
 #End Region
-                Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal, 10, 2)     '単価
-                Dim P_QUANTITY As MySqlParameter = SQLcmd.Parameters.Add("@QUANTITY", MySqlDbType.Decimal, 10, 2)     '数量
-                Dim P_CALCUNIT As MySqlParameter = SQLcmd.Parameters.Add("@CALCUNIT", MySqlDbType.VarChar, 20)     '計算単位
-                Dim P_DEPARTURE As MySqlParameter = SQLcmd.Parameters.Add("@DEPARTURE", MySqlDbType.VarChar, 50)     '出荷地
-                Dim P_MILEAGE As MySqlParameter = SQLcmd.Parameters.Add("@MILEAGE", MySqlDbType.Decimal, 10, 2)     '走行距離
-                Dim P_SHIPPINGCOUNT As MySqlParameter = SQLcmd.Parameters.Add("@SHIPPINGCOUNT", MySqlDbType.Decimal, 3)     '輸送回数
-                Dim P_NENPI As MySqlParameter = SQLcmd.Parameters.Add("@NENPI", MySqlDbType.Decimal, 5, 2)     '燃費
-                Dim P_DIESELPRICECURRENT As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICECURRENT", MySqlDbType.Decimal, 5, 2)     '実勢軽油価格
-                Dim P_DIESELPRICESTANDARD As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESTANDARD", MySqlDbType.Decimal, 5, 2)     '基準経由価格
+                Dim P_TANKA As MySqlParameter = SQLcmd.Parameters.Add("@TANKA", MySqlDbType.Decimal, 10, 2)                             '単価
+                Dim P_QUANTITY As MySqlParameter = SQLcmd.Parameters.Add("@QUANTITY", MySqlDbType.Decimal, 10, 2)                       '数量
+                Dim P_CALCUNIT As MySqlParameter = SQLcmd.Parameters.Add("@CALCUNIT", MySqlDbType.VarChar, 20)                          '計算単位
+                Dim P_DEPARTURE As MySqlParameter = SQLcmd.Parameters.Add("@DEPARTURE", MySqlDbType.VarChar, 50)                        '出荷地
+                Dim P_MILEAGE As MySqlParameter = SQLcmd.Parameters.Add("@MILEAGE", MySqlDbType.Decimal, 10, 2)                         '走行距離
+                Dim P_SHIPPINGCOUNT As MySqlParameter = SQLcmd.Parameters.Add("@SHIPPINGCOUNT", MySqlDbType.Decimal, 3)                 '輸送回数
+                Dim P_NENPI As MySqlParameter = SQLcmd.Parameters.Add("@NENPI", MySqlDbType.Decimal, 5, 2)                              '燃費
+                Dim P_DIESELPRICECURRENT As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICECURRENT", MySqlDbType.Decimal, 5, 2)    '実勢軽油価格
+                Dim P_DIESELPRICESTANDARD As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESTANDARD", MySqlDbType.Decimal, 5, 2)  '基準経由価格
                 Dim P_DIESELCONSUMPTION As MySqlParameter = SQLcmd.Parameters.Add("@DIESELCONSUMPTION", MySqlDbType.Decimal, 10, 2)     '燃料使用量
-                Dim P_DISPLAYFLG As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYFLG", MySqlDbType.VarChar, 1)     '表示フラグ
-                Dim P_ASSESSMENTFLG As MySqlParameter = SQLcmd.Parameters.Add("@ASSESSMENTFLG", MySqlDbType.VarChar, 1)     '鑑分けフラグ
-                Dim P_ATENACOMPANYNAME As MySqlParameter = SQLcmd.Parameters.Add("@ATENACOMPANYNAME", MySqlDbType.VarChar, 50)     '宛名会社名
-                Dim P_ATENACOMPANYDEVNAME As MySqlParameter = SQLcmd.Parameters.Add("@ATENACOMPANYDEVNAME", MySqlDbType.VarChar, 50)     '宛名会社部門名
-                Dim P_FROMORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@FROMORGNAME", MySqlDbType.VarChar, 50)     '請求書発行部店名
-                Dim P_MEISAICATEGORYID As MySqlParameter = SQLcmd.Parameters.Add("@MEISAICATEGORYID", MySqlDbType.VarChar, 1)     '明細区分
-                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)     '勘定科目コード
-                Dim P_ACCOUNTNAME As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTNAME", MySqlDbType.VarChar, 100)     '勘定科目名
-                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)     'セグメントコード
-                Dim P_SEGMENTNAME As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTNAME", MySqlDbType.VarChar, 100)     'セグメント名
-                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合JOT
-                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
-                Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 100)     '備考1
-                Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 100)     '備考2
-                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 100)     '備考3
-                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
-                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
-                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
-                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)     '登録プログラムＩＤ
-                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)     '更新年月日
-                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)     '更新ユーザーＩＤ
-                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
-                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
-                Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
-                Dim P_UPDTIMSTP As MySqlParameter = SQLcmd.Parameters.Add("@UPDTIMSTP", MySqlDbType.DateTime)     'タイムスタンプ
+                Dim P_DISPLAYFLG As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYFLG", MySqlDbType.VarChar, 1)                       '表示フラグ
+                Dim P_ASSESSMENTFLG As MySqlParameter = SQLcmd.Parameters.Add("@ASSESSMENTFLG", MySqlDbType.VarChar, 1)                 '鑑分けフラグ
+                Dim P_ATENACOMPANYNAME As MySqlParameter = SQLcmd.Parameters.Add("@ATENACOMPANYNAME", MySqlDbType.VarChar, 50)          '宛名会社名
+                Dim P_ATENACOMPANYDEVNAME As MySqlParameter = SQLcmd.Parameters.Add("@ATENACOMPANYDEVNAME", MySqlDbType.VarChar, 50)    '宛名会社部門名
+                Dim P_FROMORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@FROMORGNAME", MySqlDbType.VarChar, 50)                    '請求書発行部店名
+                Dim P_MEISAICATEGORYID As MySqlParameter = SQLcmd.Parameters.Add("@MEISAICATEGORYID", MySqlDbType.VarChar, 1)           '明細区分
+                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)                     '勘定科目コード
+                Dim P_ACCOUNTNAME As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTNAME", MySqlDbType.VarChar, 100)                   '勘定科目名
+                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)                     'セグメントコード
+                Dim P_SEGMENTNAME As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTNAME", MySqlDbType.VarChar, 100)                   'セグメント名
+                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)              '割合JOT
+                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)            '割合ENEX
+                Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 100)                             '備考1
+                Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 100)                             '備考2
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 100)                             '備考3
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)                               '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)                          '登録ユーザーＩＤ
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)                      '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)                          '登録プログラムＩＤ
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)                                 '更新年月日
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)                            '更新ユーザーＩＤ
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)                        '更新端末
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)                            '更新プログラムＩＤ
+                Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)                         '集信日時
+                Dim P_UPDTIMSTP As MySqlParameter = SQLcmd.Parameters.Add("@UPDTIMSTP", MySqlDbType.DateTime)                           'タイムスタンプ
 
                 ' 更新ジャーナル出力用パラメータ
                 Dim JP_TARGETYM As MySqlParameter = SQLcmdJnl.Parameters.Add("@TARGETYM", MySqlDbType.VarChar, 6)           '対象年月
@@ -975,8 +976,11 @@ Public Class LNM0014SprateDetail
                     P_DIESELCONSUMPTION.Value = LNM0014row("DIESELCONSUMPTION")
                 End If
 
-                P_DISPLAYFLG.Value = LNM0014row("DISPLAYFLG")           '表示フラグ
-                P_ASSESSMENTFLG.Value = LNM0014row("ASSESSMENTFLG")           '鑑分けフラグ
+                '表示フラグ
+                P_DISPLAYFLG.Value = LNM0014row("DISPLAYFLG")
+
+                '鑑分けフラグ
+                P_ASSESSMENTFLG.Value = LNM0014row("ASSESSMENTFLG")
 
                 '宛名会社名
                 '鑑分けフラグ1かつ宛名会社名が未設定の場合
@@ -1002,7 +1006,8 @@ Public Class LNM0014SprateDetail
                     P_FROMORGNAME.Value = LNM0014row("FROMORGNAME")           '請求書発行部店名
                 End If
 
-                P_MEISAICATEGORYID.Value = LNM0014row("MEISAICATEGORYID")           '明細区分
+                '明細区分
+                P_MEISAICATEGORYID.Value = LNM0014row("MEISAICATEGORYID")
 
                 '勘定科目コード
                 If LNM0014row("ACCOUNTCODE").ToString = "" Then
@@ -1011,7 +1016,8 @@ Public Class LNM0014SprateDetail
                     P_ACCOUNTCODE.Value = LNM0014row("ACCOUNTCODE")
                 End If
 
-                P_ACCOUNTNAME.Value = LNM0014row("ACCOUNTNAME")           '勘定科目名
+                '勘定科目名
+                P_ACCOUNTNAME.Value = LNM0014row("ACCOUNTNAME")
 
                 'セグメントコード
                 If LNM0014row("SEGMENTCODE").ToString = "" Then
@@ -1020,7 +1026,8 @@ Public Class LNM0014SprateDetail
                     P_SEGMENTCODE.Value = LNM0014row("SEGMENTCODE")
                 End If
 
-                P_SEGMENTNAME.Value = LNM0014row("SEGMENTNAME")           'セグメント名
+                'セグメント名
+                P_SEGMENTNAME.Value = LNM0014row("SEGMENTNAME")
 
                 '割合JOT
                 If LNM0014row("JOTPERCENTAGE").ToString = "" Then
@@ -1036,19 +1043,31 @@ Public Class LNM0014SprateDetail
                     P_ENEXPERCENTAGE.Value = LNM0014row("ENEXPERCENTAGE")
                 End If
 
-                P_BIKOU1.Value = LNM0014row("BIKOU1")           '備考1
-                P_BIKOU2.Value = LNM0014row("BIKOU2")           '備考2
-                P_BIKOU3.Value = LNM0014row("BIKOU3")           '備考3
+                '備考1
+                P_BIKOU1.Value = LNM0014row("BIKOU1")
+                '備考2
+                P_BIKOU2.Value = LNM0014row("BIKOU2")
+                '備考3
+                P_BIKOU3.Value = LNM0014row("BIKOU3")
 
-                P_INITYMD.Value = WW_DateNow                        '登録年月日
-                P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
-                P_INITTERMID.Value = Master.USERTERMID              '登録端末
-                P_INITPGID.Value = Me.GetType().BaseType.Name       '登録プログラムＩＤ
-                P_UPDYMD.Value = WW_DateNow                         '更新年月日
-                P_UPDUSER.Value = Master.USERID                     '更新ユーザーＩＤ
-                P_UPDTERMID.Value = Master.USERTERMID               '更新端末
-                P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
-                P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
+                '登録年月日
+                P_INITYMD.Value = WW_DateNow
+                '登録ユーザーＩＤ
+                P_INITUSER.Value = Master.USERID
+                '登録端末
+                P_INITTERMID.Value = Master.USERTERMID
+                '登録プログラムＩＤ
+                P_INITPGID.Value = Me.GetType().BaseType.Name
+                '更新年月日
+                P_UPDYMD.Value = WW_DateNow
+                '更新ユーザーＩＤ
+                P_UPDUSER.Value = Master.USERID
+                '更新端末
+                P_UPDTERMID.Value = Master.USERTERMID
+                '更新プログラムＩＤ
+                P_UPDPGID.Value = Me.GetType().BaseType.Name
+                '集信日時
+                P_RECEIVEYMD.Value = C_DEFAULT_YMD
                 P_UPDTIMSTP.Value = WW_DateNow
 
                 SQLcmd.CommandTimeout = 300
@@ -1356,13 +1375,13 @@ Public Class LNM0014SprateDetail
 #End Region
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
-                Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)         '変更日時
-                Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)         '変更ユーザーＩＤ
+                Dim P_MODIFYYMD As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYYMD", MySqlDbType.DateTime)           '変更日時
+                Dim P_MODIFYUSER As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYUSER", MySqlDbType.VarChar, 20)      '変更ユーザーＩＤ
 
-                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)         '登録年月日
-                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)         '登録ユーザーＩＤ
-                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)         '登録端末
-                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)               '登録年月日
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)          '登録ユーザーＩＤ
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)      '登録端末
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)          '登録プログラムＩＤ
 
                 Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
 
@@ -1384,7 +1403,7 @@ Public Class LNM0014SprateDetail
                     P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.NEWDATA).ToString
                 Else
                     '削除データの場合
-                    If LNM0014tbl.Rows(0)("DELFLG") = "0" And LNM0014row("DELFLG") = "1" Then
+                    If LNM0014tbl.Rows(0)("DELFLG") = C_DELETE_FLG.ALIVE And LNM0014row("DELFLG") = C_DELETE_FLG.DELETE Then
                         P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.DELDATA).ToString
                     Else
                         P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.UPDDATA).ToString
@@ -1519,14 +1538,14 @@ Public Class LNM0014SprateDetail
         O_RTN = C_MESSAGE_NO.NORMAL
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
-        Master.EraseCharToIgnore(RadioDELFLG.SelectedValue)      '削除フラグ
-        Master.EraseCharToIgnore(WF_TARGETYM.Value)  '対象年月
-        Master.EraseCharToIgnore(TxtBIGCATECODE.Text)  '大分類コード
-        Master.EraseCharToIgnore(TxtBIGCATENAME.Text)  '大分類名
-        Master.EraseCharToIgnore(TxtMIDCATECODE.Text)  '中分類コード
-        Master.EraseCharToIgnore(TxtMIDCATENAME.Text)  '中分類名
-        Master.EraseCharToIgnore(TxtSMALLCATECODE.Text)  '小分類コード
-        Master.EraseCharToIgnore(TxtSMALLCATENAME.Text)  '小分類名
+        Master.EraseCharToIgnore(RadioDELFLG.SelectedValue)     '削除フラグ
+        Master.EraseCharToIgnore(WF_TARGETYM.Value)             '対象年月
+        Master.EraseCharToIgnore(TxtBIGCATECODE.Text)           '大分類コード
+        Master.EraseCharToIgnore(TxtBIGCATENAME.Text)           '大分類名
+        Master.EraseCharToIgnore(TxtMIDCATECODE.Text)           '中分類コード
+        Master.EraseCharToIgnore(TxtMIDCATENAME.Text)           '中分類名
+        Master.EraseCharToIgnore(TxtSMALLCATECODE.Text)         '小分類コード
+        Master.EraseCharToIgnore(TxtSMALLCATENAME.Text)         '小分類名
 #Region "コメント-2025/07/30(分類追加対応のため)"
         'Master.EraseCharToIgnore(TxtTODOKECODE.Text)  '届先コード
         'Master.EraseCharToIgnore(TxtTODOKENAME.Text)  '届先名称
@@ -1537,21 +1556,21 @@ Public Class LNM0014SprateDetail
         'Master.EraseCharToIgnore(TxtDETAILID.Text)  '明細ID
         'Master.EraseCharToIgnore(TxtDETAILNAME.Text)  '明細名
 #End Region
-        Master.EraseCharToIgnore(TxtTANKA.Text)  '単価
-        Master.EraseCharToIgnore(TxtQUANTITY.Text)  '数量
-        Master.EraseCharToIgnore(TxtDEPARTURE.Text)  '出荷地
-        Master.EraseCharToIgnore(TxtMILEAGE.Text)  '走行距離
-        Master.EraseCharToIgnore(TxtSHIPPINGCOUNT.Text)  '輸送回数
-        Master.EraseCharToIgnore(TxtNENPI.Text)  '燃費
-        Master.EraseCharToIgnore(TxtDIESELPRICECURRENT.Text)  '実勢軽油価格
-        Master.EraseCharToIgnore(TxtDIESELPRICESTANDARD.Text)  '基準経由価格
-        Master.EraseCharToIgnore(TxtDIESELCONSUMPTION.Text)  '燃料使用量
-        Master.EraseCharToIgnore(TxtATENACOMPANYNAME.Text)  '宛名会社名
-        Master.EraseCharToIgnore(TxtATENACOMPANYDEVNAME.Text)  '宛名会社部門名
-        Master.EraseCharToIgnore(TxtFROMORGNAME.Text)  '請求書発行部店名
-        Master.EraseCharToIgnore(TxtBIKOU1.Text)  '備考1
-        Master.EraseCharToIgnore(TxtBIKOU2.Text)  '備考2
-        Master.EraseCharToIgnore(TxtBIKOU3.Text)  '備考3
+        Master.EraseCharToIgnore(TxtTANKA.Text)                 '単価
+        Master.EraseCharToIgnore(TxtQUANTITY.Text)              '数量
+        Master.EraseCharToIgnore(TxtDEPARTURE.Text)             '出荷地
+        Master.EraseCharToIgnore(TxtMILEAGE.Text)               '走行距離
+        Master.EraseCharToIgnore(TxtSHIPPINGCOUNT.Text)         '輸送回数
+        Master.EraseCharToIgnore(TxtNENPI.Text)                 '燃費
+        Master.EraseCharToIgnore(TxtDIESELPRICECURRENT.Text)    '実勢軽油価格
+        Master.EraseCharToIgnore(TxtDIESELPRICESTANDARD.Text)   '基準経由価格
+        Master.EraseCharToIgnore(TxtDIESELCONSUMPTION.Text)     '燃料使用量
+        Master.EraseCharToIgnore(TxtATENACOMPANYNAME.Text)      '宛名会社名
+        Master.EraseCharToIgnore(TxtATENACOMPANYDEVNAME.Text)   '宛名会社部門名
+        Master.EraseCharToIgnore(TxtFROMORGNAME.Text)           '請求書発行部店名
+        Master.EraseCharToIgnore(TxtBIKOU1.Text)                '備考1
+        Master.EraseCharToIgnore(TxtBIKOU2.Text)                '備考2
+        Master.EraseCharToIgnore(TxtBIKOU3.Text)                '備考3
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
         If String.IsNullOrEmpty(TxtSelLineCNT.Text) AndAlso
@@ -1705,8 +1724,8 @@ Public Class LNM0014SprateDetail
             LNM0014INProw("DIESELCONSUMPTION") = TxtDIESELCONSUMPTION.Text
         End If
 
-        LNM0014INProw("DISPLAYFLG") = RadioDISPLAYFLG.SelectedValue            '表示フラグ
-        LNM0014INProw("ASSESSMENTFLG") = RadioASSESSMENTFLG.SelectedValue            '鑑分けフラグ
+        LNM0014INProw("DISPLAYFLG") = RadioDISPLAYFLG.SelectedValue                 '表示フラグ
+        LNM0014INProw("ASSESSMENTFLG") = RadioASSESSMENTFLG.SelectedValue           '鑑分けフラグ
 
         '宛名会社名
         If Not TxtATENACOMPANYNAME.Text = "" And Not WF_ATENALISTSELECT.Value = "" Then
@@ -1720,27 +1739,27 @@ Public Class LNM0014SprateDetail
             LNM0014INProw("ATENACOMPANYNAME") = TxtATENACOMPANYNAME.Text
         End If
 
-        LNM0014INProw("ATENACOMPANYDEVNAME") = TxtATENACOMPANYDEVNAME.Text            '宛名会社部門名
-        LNM0014INProw("FROMORGNAME") = TxtFROMORGNAME.Text            '請求書発行部店名
-        LNM0014INProw("MEISAICATEGORYID") = ddlMEISAICATEGORYID.SelectedValue            '明細区分
+        LNM0014INProw("ATENACOMPANYDEVNAME") = TxtATENACOMPANYDEVNAME.Text          '宛名会社部門名
+        LNM0014INProw("FROMORGNAME") = TxtFROMORGNAME.Text                          '請求書発行部店名
+        LNM0014INProw("MEISAICATEGORYID") = ddlMEISAICATEGORYID.SelectedValue       '明細区分
 
-        LNM0014INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue           '勘定科目コード
-        LNM0014INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem            '勘定科目名
+        LNM0014INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue                     '勘定科目コード
+        LNM0014INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem                      '勘定科目名
 
         If Not WF_ACCOUNT.SelectedValue = "" Then
-            LNM0014INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue           'セグメントコード
-            LNM0014INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem            'セグメント名
+            LNM0014INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue                 'セグメントコード
+            LNM0014INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem                  'セグメント名
         Else
-            LNM0014INProw("SEGMENTCODE") = ""           'セグメントコード
-            LNM0014INProw("SEGMENTNAME") = ""            'セグメント名
+            LNM0014INProw("SEGMENTCODE") = ""                                       'セグメントコード
+            LNM0014INProw("SEGMENTNAME") = ""                                       'セグメント名
         End If
 
-        LNM0014INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text            '割合JOT
-        LNM0014INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text            '割合ENEX
+        LNM0014INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text                      '割合JOT
+        LNM0014INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text                    '割合ENEX
 
-        LNM0014INProw("BIKOU1") = TxtBIKOU1.Text            '備考1
-        LNM0014INProw("BIKOU2") = TxtBIKOU2.Text            '備考2
-        LNM0014INProw("BIKOU3") = TxtBIKOU3.Text            '備考3
+        LNM0014INProw("BIKOU1") = TxtBIKOU1.Text                                    '備考1
+        LNM0014INProw("BIKOU2") = TxtBIKOU2.Text                                    '備考2
+        LNM0014INProw("BIKOU3") = TxtBIKOU3.Text                                    '備考3
 
         '○ チェック用テーブルに登録する
         LNM0014INPtbl.Rows.Add(LNM0014INProw)
@@ -1798,8 +1817,8 @@ Public Class LNM0014SprateDetail
                     LNM0014row("ACCOUNTNAME") = LNM0014INProw("ACCOUNTNAME") AndAlso                                '勘定科目名
                     LNM0014row("SEGMENTCODE") = LNM0014INProw("SEGMENTCODE") AndAlso                                'セグメントコード
                     LNM0014row("SEGMENTNAME") = LNM0014INProw("SEGMENTNAME") AndAlso                                'セグメント名
-                    LNM0014row("JOTPERCENTAGE") = LNM0014INProw("JOTPERCENTAGE") AndAlso                                '割合JOT
-                    LNM0014row("ENEXPERCENTAGE") = LNM0014INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
+                    LNM0014row("JOTPERCENTAGE") = LNM0014INProw("JOTPERCENTAGE") AndAlso                            '割合JOT
+                    LNM0014row("ENEXPERCENTAGE") = LNM0014INProw("ENEXPERCENTAGE") AndAlso                          '割合ENEX
                     LNM0014row("BIKOU1") = LNM0014INProw("BIKOU1") AndAlso
                     LNM0014row("BIKOU2") = LNM0014INProw("BIKOU2") AndAlso
                     LNM0014row("BIKOU3") = LNM0014INProw("BIKOU3") Then
@@ -2117,7 +2136,7 @@ Public Class LNM0014SprateDetail
         SQLStr.Append(" UPDATE                                      ")
         SQLStr.Append("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.Append(" SET                                         ")
-        SQLStr.Append("     DELFLG               = '1'              ")
+        SQLStr.AppendFormat("     DELFLG               = '{0}' ", C_DELETE_FLG.DELETE)
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
         SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")

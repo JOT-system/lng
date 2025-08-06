@@ -225,9 +225,12 @@ Public Class LNM0014WRKINC
     ''' ドロップダウンリスト荷主データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ROLEORGCODE">ロール</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                               Optional ByVal I_TORICODE As String = Nothing,
+                                               Optional ByVal I_ORGCODE As String = Nothing,
+                                               Optional ByVal I_KASANORGCODE As String = Nothing) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -250,6 +253,22 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
+
+        SQLStr.AppendLine(" WHERE                ")
+        SQLStr.AppendFormat("     DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0014.TORICODE                                                           ")
 
@@ -259,7 +278,7 @@ Public Class LNM0014WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -273,7 +292,7 @@ Public Class LNM0014WRKINC
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
                     If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
-                        If AdminCheck(I_ORGCODE) Then
+                        If AdminCheck(I_ROLEORGCODE) Then
                             Dim listBlankItm As New ListItem("全て表示", "")
                             retList.Items.Add(listBlankItm)
                         End If
@@ -296,9 +315,13 @@ Public Class LNM0014WRKINC
     ''' ドロップダウンリスト部門データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ROLEORGCODE">ロール</param>
+    ''' <param name="I_TORICODE">取引先コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                              Optional ByVal I_TORICODE As String = Nothing,
+                                              Optional ByVal I_ORGCODE As String = Nothing,
+                                              Optional ByVal I_KASANORGCODE As String = Nothing) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -321,6 +344,21 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine(" WHERE                ")
+        SQLStr.AppendFormat("     DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0014.ORGCODE                                                           ")
 
@@ -330,7 +368,7 @@ Public Class LNM0014WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -365,9 +403,13 @@ Public Class LNM0014WRKINC
     ''' ドロップダウンリスト加算先部門データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
+    ''' <param name="I_ROLEORGCODE">ロール</param>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                                   Optional ByVal I_TORICODE As String = Nothing,
+                                                   Optional ByVal I_ORGCODE As String = Nothing,
+                                                   Optional ByVal I_KASANORGCODE As String = Nothing) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -392,6 +434,19 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     COALESCE(RTRIM(LNM0014.KASANORGCODE), '') <> ''                                                 ")
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0014.KASANORGCODE                                                           ")
 
@@ -401,7 +456,7 @@ Public Class LNM0014WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then

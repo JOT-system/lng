@@ -97,15 +97,25 @@ Public Class LNM0014SprateList
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
-                        Case "WF_ButtonExtract" '検索ボタン押下時
+                        Case "WF_SelectCALENDARChange"  '対象年月(変更)時
+                            MapInitialize()
+                        Case "WF_SelectTORIChange",     '荷主(変更)時
+                             "WF_SelectORGChange",      '部門(変更)時
+                             "WF_SelectKASANORGChange"  '加算先部門(変更)時
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
+                        Case "WF_ButtonExtract"         '検索ボタン押下時
                             GridViewInitialize()
+                        Case "WF_ButtonRelease"         '解除ボタンクリック
+                            MapInitialize()
                         Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
                             Me.WF_ButtonPAGE_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
+                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
                         Not WF_ButtonClick.Value = "WF_ButtonExtract" And
+                        Not WF_ButtonClick.Value = "WF_ButtonRelease" And
                         Not WF_ButtonClick.Value = "WF_ButtonPAGE" And
                         Not WF_ButtonClick.Value = "WF_ButtonFIRST" And
                         Not WF_ButtonClick.Value = "WF_ButtonPREVIOUS" And
@@ -651,7 +661,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
         SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendFormat("      AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0014.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
@@ -694,7 +704,9 @@ Public Class LNM0014SprateList
 
         '削除フラグ
         If Not ChkDelDataFlg.Checked Then
-            SQLStr.AppendLine(" AND  LNM0014.DELFLG = '0'                                                  ")
+            SQLStr.AppendFormat(" AND  LNM0014.DELFLG = '{0}' ", C_DELETE_FLG.ALIVE)
+        Else
+            SQLStr.AppendFormat(" AND  LNM0014.DELFLG = '{0}' ", C_DELETE_FLG.DELETE)
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -930,6 +942,100 @@ Public Class LNM0014SprateList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
         Server.Transfer("~/LNG/mas/LNM0014SprateHistory.aspx")
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">荷主(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■荷主(情報)取得
+        Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■加算先部門(情報)取得
+        Dim selectKASANORG As String = WF_KASANORG.SelectedValue
+        Dim selectindexKASANORG As Integer = WF_KASANORG.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '荷主(変更)時
+            Case "WF_SelectTORIChange"
+                selectORG = ""              '-- 部門(表示)初期化
+                selectindexORG = 0          '-- 部門(INDEX)初期化
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+            '部門(変更)時
+            Case "WF_SelectORGChange"
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+            '加算先部門(変更)時
+            Case "WF_SelectKASANORGChange"
+        End Select
+
+        '〇荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG)
+        '★ドロップダウンリスト選択(荷主)の場合
+        If retToriList.Items(0).Text <> "全て表示" Then
+            WF_TORI.Items.Add(New ListItem("全て表示", ""))
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(荷主)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        WF_TORI.SelectedIndex = selectindexTORI
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG)
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items(0).Text <> "全て表示" Then
+            WF_ORG.Items.Add(New ListItem("全て表示", ""))
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        WF_ORG.SelectedIndex = selectindexORG
+
+        '〇加算先部門
+        Me.WF_KASANORG.Items.Clear()
+        Dim retKASANOrgList As New DropDownList
+        retKASANOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG)
+        '★ドロップダウンリスト選択(加算先部門)の場合
+        If retKASANOrgList.Items(0).Text <> "全て表示" Then
+            WF_KASANORG.Items.Add(New ListItem("全て表示", ""))
+            selectindexKASANORG = 1
+        End If
+        '★ドロップダウンリスト再作成(加算先部門)
+        For index As Integer = 0 To retKASANOrgList.Items.Count - 1
+            WF_KASANORG.Items.Add(New ListItem(retKASANOrgList.Items(index).Text, retKASANOrgList.Items(index).Value))
+        Next
+        WF_KASANORG.SelectedIndex = selectindexKASANORG
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期化処理
+    ''' </summary>
+    Private Sub MapInitialize()
+        'ドロップダウン生成処理
+        createListBox()
+
+        'GridViewデータ設定
+        GridViewInitialize()
+
     End Sub
 
     ''' <summary>
@@ -1326,7 +1432,7 @@ Public Class LNM0014SprateList
         SQLStr.Append(" UPDATE                                      ")
         SQLStr.Append("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.Append(" SET                                         ")
-        SQLStr.Append("     DELFLG               = '0'              ")
+        SQLStr.AppendFormat("     DELFLG               = '{0}' ", C_DELETE_FLG.ALIVE)
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
         SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
@@ -2246,12 +2352,12 @@ Public Class LNM0014SprateList
                     Case Row("BIGCATECODE").ToString = "0"      '大分類コードが無い場合
                         '大分類コードを生成
                         Row("BIGCATECODE") = LNM0014WRKINC.GenerateBigcateCode(SQLcon, Row, WW_DBDataCheck)
-                        Row("MIDCATECODE") = "1"
-                        Row("SMALLCATECODE") = "1"
+                        'Row("MIDCATECODE") = "1"
+                        'Row("SMALLCATECODE") = "1"
                     Case Row("MIDCATECODE").ToString = "0"      '中分類コードが無い場合
                         '中分類コードを生成
                         Row("MIDCATECODE") = LNM0014WRKINC.GenerateMidcateCode(SQLcon, Row, WW_DBDataCheck)
-                        Row("SMALLCATECODE") = "1"
+                        'Row("SMALLCATECODE") = "1"
                     Case Row("SMALLCATECODE").ToString = "0"    '小分類コードが無い場合
                         '小分類コードを生成
                         Row("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, Row, WW_DBDataCheck)
@@ -2263,7 +2369,7 @@ Public Class LNM0014SprateList
                         'Case Row("DETAILID").ToString = "0"  '明細IDが無い場合
                         '    Row("DETAILID") = LNM0014WRKINC.GenerateDetailId(SQLcon, Row, WW_DBDataCheck)
 #End Region
-                    Case Else 'グループID、明細IDが設定されている場合は何もしない
+                    Case Else '大分類, 中分類, 小分類が設定されている場合は何もしない
                 End Select
 
                 'テーブルに同一データが存在しない場合
@@ -2444,13 +2550,14 @@ Public Class LNM0014SprateList
                     Case Row("BIGCATECODE").ToString = "0" '大分類コードが無い場合
                         '大分類コードを生成
                         Row("BIGCATECODE") = LNM0014WRKINC.GenerateBigcateCode(SQLcon, Row, WW_DBDataCheck)
-                        Row("MIDCATECODE") = "1"
-                        Row("SMALLCATECODE") = "1"
+                        'Row("MIDCATECODE") = "1"
+                        'Row("SMALLCATECODE") = "1"
                     Case Row("MIDCATECODE").ToString = "0" '中分類コードが無い場合
                         '中分類コードを生成
                         Row("MIDCATECODE") = LNM0014WRKINC.GenerateMidcateCode(SQLcon, Row, WW_DBDataCheck)
-                        Row("SMALLCATECODE") = "1"
+                        'Row("SMALLCATECODE") = "1"
                     Case Row("SMALLCATECODE").ToString = "0" '小分類コードが無い場合
+                        '小分類コードを生成
                         Row("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, Row, WW_DBDataCheck)
 #Region "コメント-2025/07/30(分類追加対応のため)"
                         'Case Row("GROUPID").ToString = "0" 'グループIDが無い場合
@@ -2460,7 +2567,7 @@ Public Class LNM0014SprateList
                         'Case Row("DETAILID").ToString = "0" '明細IDが無い場合
                         '    Row("DETAILID") = LNM0014WRKINC.GenerateDetailId(SQLcon, Row, WW_DBDataCheck)
 #End Region
-                    Case Else 'グループID、明細IDが設定されている場合は何もしない
+                    Case Else '大分類, 中分類, 小分類が設定されている場合は何もしない
                 End Select
 
                 'テーブルに同一データが存在しない場合
@@ -2519,7 +2626,7 @@ Public Class LNM0014SprateList
 
                     '件数カウント
                     Select Case True
-                        Case Row("DELFLG") = "1" '削除の場合
+                        Case Row("DELFLG") = C_DELETE_FLG.DELETE            '削除の場合
                             WW_UplDelCnt += 1
                         Case WW_MODIFYKBN = LNM0014WRKINC.MODIFYKBN.NEWDATA '新規の場合
                             WW_UplInsCnt += 1
@@ -3115,16 +3222,16 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("         COALESCE(TARGETYM, '')             = @TARGETYM ")
         SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')             = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(TORINAME, '')             = @TORINAME ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')             = @ORGNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')             = @KASANORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')             = @KASANORGNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0')   = @BIGCATECODE ")
-        SQLStr.AppendLine("    AND  COALESCE(BIGCATENAME, '')    = @BIGCATENAME ")
-        SQLStr.AppendLine("    AND  COALESCE(MIDCATECODE, '0')   = @MIDCATECODE ")
-        SQLStr.AppendLine("    AND  COALESCE(MIDCATENAME, '')    = @MIDCATENAME ")
-        SQLStr.AppendLine("    AND  COALESCE(SMALLCATECODE, '0') = @SMALLCATECODE ")
-        SQLStr.AppendLine("    AND  COALESCE(SMALLCATENAME, '')  = @SMALLCATENAME ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')              = @ORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ORGNAME, '')              = @ORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')         = @KASANORGCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(KASANORGNAME, '')         = @KASANORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATECODE, '0')         = @BIGCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIGCATENAME, '')          = @BIGCATENAME ")
+        SQLStr.AppendLine("    AND  COALESCE(MIDCATECODE, '0')         = @MIDCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(MIDCATENAME, '')          = @MIDCATENAME ")
+        SQLStr.AppendLine("    AND  COALESCE(SMALLCATECODE, '0')       = @SMALLCATECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SMALLCATENAME, '')        = @SMALLCATENAME ")
 #Region "コメント-2025/07/30(分類追加対応のため)"
         'SQLStr.AppendLine("    AND  COALESCE(TODOKECODE, '')             = @TODOKECODE ")
         'SQLStr.AppendLine("    AND  COALESCE(TODOKENAME, '')             = @TODOKENAME ")
@@ -3135,32 +3242,32 @@ Public Class LNM0014SprateList
         'SQLStr.AppendLine("    AND  COALESCE(DETAILID, '0')             = @DETAILID ")
         'SQLStr.AppendLine("    AND  COALESCE(DETAILNAME, '')             = @DETAILNAME ")
 #End Region
-        SQLStr.AppendLine("    AND  COALESCE(TANKA, '0')             = @TANKA ")
-        SQLStr.AppendLine("    AND  COALESCE(QUANTITY, '0')             = @QUANTITY ")
+        SQLStr.AppendLine("    AND  COALESCE(TANKA, '0')               = @TANKA ")
+        SQLStr.AppendLine("    AND  COALESCE(QUANTITY, '0')            = @QUANTITY ")
         SQLStr.AppendLine("    AND  COALESCE(CALCUNIT, '')             = @CALCUNIT ")
-        SQLStr.AppendLine("    AND  COALESCE(DEPARTURE, '')             = @DEPARTURE ")
+        SQLStr.AppendLine("    AND  COALESCE(DEPARTURE, '')            = @DEPARTURE ")
         SQLStr.AppendLine("    AND  COALESCE(MILEAGE, '0')             = @MILEAGE ")
-        SQLStr.AppendLine("    AND  COALESCE(SHIPPINGCOUNT, '0')             = @SHIPPINGCOUNT ")
-        SQLStr.AppendLine("    AND  COALESCE(NENPI, '0')             = @NENPI ")
-        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICECURRENT, '0')             = @DIESELPRICECURRENT ")
-        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESTANDARD, '0')             = @DIESELPRICESTANDARD ")
-        SQLStr.AppendLine("    AND  COALESCE(DIESELCONSUMPTION, '0')             = @DIESELCONSUMPTION ")
-        SQLStr.AppendLine("    AND  COALESCE(DISPLAYFLG, '')             = @DISPLAYFLG ")
-        SQLStr.AppendLine("    AND  COALESCE(ASSESSMENTFLG, '')             = @ASSESSMENTFLG ")
-        SQLStr.AppendLine("    AND  COALESCE(ATENACOMPANYNAME, '')             = @ATENACOMPANYNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(ATENACOMPANYDEVNAME, '')             = @ATENACOMPANYDEVNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(FROMORGNAME, '')             = @FROMORGNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(MEISAICATEGORYID, '')             = @MEISAICATEGORYID ")
-        SQLStr.AppendLine("    AND  COALESCE(ACCOUNTCODE, '0')             = @ACCOUNTCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ACCOUNTNAME, '')             = @ACCOUNTNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(SEGMENTCODE, '0')             = @SEGMENTCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(SEGMENTNAME, '')             = @SEGMENTNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(JOTPERCENTAGE, '')             = @JOTPERCENTAGE ")
-        SQLStr.AppendLine("    AND  COALESCE(ENEXPERCENTAGE, '')             = @ENEXPERCENTAGE ")
-        SQLStr.AppendLine("    AND  COALESCE(BIKOU1, '')             = @BIKOU1 ")
-        SQLStr.AppendLine("    AND  COALESCE(BIKOU2, '')             = @BIKOU2 ")
-        SQLStr.AppendLine("    AND  COALESCE(BIKOU3, '')             = @BIKOU3 ")
-        SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')             = @DELFLG ")
+        SQLStr.AppendLine("    AND  COALESCE(SHIPPINGCOUNT, '0')       = @SHIPPINGCOUNT ")
+        SQLStr.AppendLine("    AND  COALESCE(NENPI, '0')               = @NENPI ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICECURRENT, '0')  = @DIESELPRICECURRENT ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESTANDARD, '0') = @DIESELPRICESTANDARD ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELCONSUMPTION, '0')   = @DIESELCONSUMPTION ")
+        SQLStr.AppendLine("    AND  COALESCE(DISPLAYFLG, '')           = @DISPLAYFLG ")
+        SQLStr.AppendLine("    AND  COALESCE(ASSESSMENTFLG, '')        = @ASSESSMENTFLG ")
+        SQLStr.AppendLine("    AND  COALESCE(ATENACOMPANYNAME, '')     = @ATENACOMPANYNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(ATENACOMPANYDEVNAME, '')  = @ATENACOMPANYDEVNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(FROMORGNAME, '')          = @FROMORGNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(MEISAICATEGORYID, '')     = @MEISAICATEGORYID ")
+        SQLStr.AppendLine("    AND  COALESCE(ACCOUNTCODE, '0')         = @ACCOUNTCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(ACCOUNTNAME, '')          = @ACCOUNTNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(SEGMENTCODE, '0')         = @SEGMENTCODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SEGMENTNAME, '')          = @SEGMENTNAME ")
+        SQLStr.AppendLine("    AND  COALESCE(JOTPERCENTAGE, '')        = @JOTPERCENTAGE ")
+        SQLStr.AppendLine("    AND  COALESCE(ENEXPERCENTAGE, '')       = @ENEXPERCENTAGE ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU1, '')               = @BIKOU1 ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU2, '')               = @BIKOU2 ")
+        SQLStr.AppendLine("    AND  COALESCE(BIKOU3, '')               = @BIKOU3 ")
+        SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')               = @DELFLG ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -3406,7 +3513,7 @@ Public Class LNM0014SprateList
         SQLStr.Append(" UPDATE                                      ")
         SQLStr.Append("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.Append(" SET                                         ")
-        SQLStr.Append("     DELFLG               = '1'              ")
+        SQLStr.AppendFormat("     DELFLG               = '{0}' ", C_DELETE_FLG.DELETE)
         SQLStr.Append("   , UPDYMD               = @UPDYMD          ")
         SQLStr.Append("   , UPDUSER              = @UPDUSER         ")
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
@@ -3536,6 +3643,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("     ,INITUSER  ")
         SQLStr.AppendLine("     ,INITTERMID  ")
         SQLStr.AppendLine("     ,INITPGID  ")
+        SQLStr.AppendLine("     ,UPDTIMSTP ")
         SQLStr.AppendLine("   )  ")
         SQLStr.AppendLine("   VALUES  ")
         SQLStr.AppendLine("   (  ")
@@ -3592,6 +3700,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("     ,@INITUSER  ")
         SQLStr.AppendLine("     ,@INITTERMID  ")
         SQLStr.AppendLine("     ,@INITPGID  ")
+        SQLStr.AppendLine("     ,@UPDTIMSTP ")
         SQLStr.AppendLine("   )   ")
         SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
         SQLStr.AppendLine("      TARGETYM =  @TARGETYM")
@@ -3647,6 +3756,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER ")
         SQLStr.AppendLine("     ,UPDTERMID =  @UPDTERMID ")
         SQLStr.AppendLine("     ,UPDPGID =  @UPDPGID ")
+        SQLStr.AppendLine("     ,UPDTIMSTP = @UPDTIMSTP ")
         SQLStr.AppendLine("    ;  ")
 
         Try
@@ -3709,6 +3819,7 @@ Public Class LNM0014SprateList
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)     '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)     '更新プログラムＩＤ
                 Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)     '集信日時
+                Dim P_UPDTIMSTP As MySqlParameter = SQLcmd.Parameters.Add("@UPDTIMSTP", MySqlDbType.DateTime)     'タイムスタンプ
 
                 'DB更新
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
@@ -3759,7 +3870,8 @@ Public Class LNM0014SprateList
 
                 '数量
                 If WW_ROW("QUANTITY").ToString = "0" Or WW_ROW("QUANTITY").ToString = "" Then
-                    P_QUANTITY.Value = DBNull.Value
+                    P_QUANTITY.Value = 0.00
+                    'P_QUANTITY.Value = DBNull.Value
                 Else
                     P_QUANTITY.Value = WW_ROW("QUANTITY")
                 End If
@@ -3883,6 +3995,7 @@ Public Class LNM0014SprateList
                 P_UPDTERMID.Value = Master.USERTERMID               '更新端末
                 P_UPDPGID.Value = Me.GetType().BaseType.Name        '更新プログラムＩＤ
                 P_RECEIVEYMD.Value = C_DEFAULT_YMD                  '集信日時
+                P_UPDTIMSTP.Value = WW_DATENOW
 
                 '登録
                 SQLcmd.CommandTimeout = 300
@@ -4010,6 +4123,15 @@ Public Class LNM0014SprateList
         Master.CheckField(Master.USERCAMP, "BIGCATENAME", WW_ROW("BIGCATENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・大分類名エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '中分類名(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "MIDCATENAME", WW_ROW("MIDCATENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・中分類名エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
             WW_LineErr = "ERR"
@@ -4658,7 +4780,7 @@ Public Class LNM0014SprateList
                     P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.NEWDATA).ToString
                 Else
                     '削除データの場合
-                    If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = "1" Then
+                    If WW_BEFDELFLG = "0" And WW_ROW("DELFLG") = C_DELETE_FLG.DELETE Then
                         P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.DELDATA).ToString
                     Else
                         P_OPERATEKBN.Value = CInt(LNM0014WRKINC.OPERATEKBN.UPDDATA).ToString
