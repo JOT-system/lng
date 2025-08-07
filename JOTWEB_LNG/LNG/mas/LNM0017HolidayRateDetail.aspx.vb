@@ -266,7 +266,7 @@ Public Class LNM0017HolidayRateDetail
         WF_TORICODE_TEXT.Text = work.WF_SEL_TORICODE.Text
         WF_TORICODE.Text = work.WF_SEL_TORINAME.Text
         WF_TORICODE_TEXT_SAVE.Value = work.WF_SEL_TORICODE.Text
-        WF_TORINAME_SAVE.Value = work.WF_SEL_TORINAME.Text
+        WF_TORICODE_SAVE.Value = work.WF_SEL_TORINAME.Text
 
         'ユニークID
         WF_ID.Text = work.WF_SEL_ID.Text
@@ -834,7 +834,7 @@ Public Class LNM0017HolidayRateDetail
 
         '○ 画面(Repeaterヘッダー情報)の使用禁止文字排除
         Master.EraseCharToIgnore(RadioDELFLG.SelectedValue)      '削除フラグ
-        Master.EraseCharToIgnore(WF_TORICODE.Text)               '取引先コード
+        Master.EraseCharToIgnore(WF_TORICODE_TEXT.Text)          '取引先コード
         Master.EraseCharToIgnore(WF_ORDERORGCODE.Text)           '受注受付部署コード
         Master.EraseCharToIgnore(WF_ORDERORGCATEGORY.Text)       '受注受付部署判定区分
         Master.EraseCharToIgnore(WF_SHUKABASHO.Text)             '出荷場所コード
@@ -890,8 +890,11 @@ Public Class LNM0017HolidayRateDetail
             LNM0017INProw("ID") = 0                                     'ID
         End If
 
-        LNM0017INProw("TORICODE") = WF_TORICODE.SelectedValue                           '取引先コード
-        LNM0017INProw("TORINAME") = WF_TORICODE.SelectedItem                            '取引先名称
+        LNM0017INProw("TORICODE") = WF_TORICODE_TEXT.Text                               '取引先コード
+        Dim Tori As ListItem = WF_TORICODE.Items.FindByValue(WF_TORICODE_TEXT.Text)
+        If Tori IsNot Nothing Then
+            LNM0017INProw("TORINAME") = Tori.Text                                       '取引先名称
+        End If
         LNM0017INProw("ORDERORGCODE") = WF_ORDERORGCODE.SelectedValue                   '受注受付部署コード
         LNM0017INProw("ORDERORGNAME") = WF_ORDERORGCODE.SelectedItem                    '受注受付部署名称
         LNM0017INProw("ORDERORGCATEGORY") = WF_ORDERORGCATEGORY.SelectedValue           '受注受付部署判定区分

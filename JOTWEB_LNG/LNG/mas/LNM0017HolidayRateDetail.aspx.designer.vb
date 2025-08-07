@@ -626,13 +626,13 @@ Partial Public Class LNM0017HolidayRateDetail
     Protected WithEvents WF_TARGETYM_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
-    '''WF_TORINAME_SAVE コントロール。
+    '''WF_TORICODE_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_TORINAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    Protected WithEvents WF_TORICODE_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''WF_TORICODE_TEXT_SAVE コントロール。

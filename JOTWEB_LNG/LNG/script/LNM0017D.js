@@ -18,7 +18,14 @@ window.onload = function () {
         document.getElementById('WF_ButtonUPDATE').value = "登録";
     } else {
         //値復元
-        document.getElementById('WF_TORICODE').value = document.getElementById('WF_TORICODE_SAVE').value;
+
+        const dropdown = document.getElementById("WF_TORICODE");
+        for (let i = 0; i < dropdown.options.length; i++) {
+            if (dropdown.options[i].text === document.getElementById('WF_TORICODE_SAVE').value) {
+                dropdown.selectedIndex = i;
+                break;
+            }
+        }
         document.getElementById('WF_TORICODE_TEXT').value = document.getElementById('WF_TORICODE_TEXT_SAVE').value; 
 
         document.getElementById('WF_TORICODE').disabled = true; 
