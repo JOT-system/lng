@@ -282,6 +282,112 @@ Public Class CmnLng
     End Function
 
     ''' <summary>
+    ''' ドロップダウンリスト(軽油価格参照先) データ取得
+    ''' </summary>
+    ''' <param name="blnBlank">空白追加フラグ</param>
+    ''' <returns></returns>
+    Public Shared Function getDropDownDieselPriceList(Optional ByVal blnBlank As Boolean = False, Optional ByVal blnCtnFlg As Boolean = False) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim sqlStat As New StringBuilder
+
+        sqlStat.AppendLine("SELECT")
+        sqlStat.AppendLine("       DEISELPRICESITEID as CODE")
+        sqlStat.AppendLine("      ,DEISELPRICESITENAME as NAME")
+        sqlStat.AppendLine("  FROM LNG.LNM0020_DIESELPRICESITE ")
+        sqlStat.AppendLine(" WHERE")
+        sqlStat.AppendLine("     DELFLG = @DELFLG")
+        sqlStat.AppendLine(" GROUP BY DEISELPRICESITEID, DEISELPRICESITENAME")
+        sqlStat.AppendLine(" ORDER BY DEISELPRICESITEID")
+
+        Try
+            '空白行判定
+            If blnBlank = True Then
+                Dim listBlankItm As New ListItem("", "")
+                retList.Items.Add(listBlankItm)
+            End If
+
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = BaseDllConst.C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    While sqlDr.Read
+                        Dim listItm As New ListItem(Convert.ToString(sqlDr("NAME")), Convert.ToString(sqlDr("CODE")))
+                        retList.Items.Add(listItm)
+                    End While
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
+    ''' ドロップダウンリスト(軽油価格参照先区分) データ取得
+    ''' </summary>
+    ''' <param name="blnBlank">空白追加フラグ</param>
+    ''' <returns></returns>
+    Public Shared Function getDropDownDieselPriceKbList(ByVal prmDieselPriceID As String, Optional ByVal blnBlank As Boolean = False, Optional ByVal blnCtnFlg As Boolean = False) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim sqlStat As New StringBuilder
+
+        sqlStat.AppendLine("SELECT")
+        sqlStat.AppendLine("       DEISELPRICESITEBRANCH as CODE")
+        sqlStat.AppendLine("      ,DEISELPRICESITEKBNNAME as NAME")
+        sqlStat.AppendLine("  FROM LNG.LNM0020_DIESELPRICESITE ")
+        sqlStat.AppendLine(" WHERE")
+        sqlStat.AppendLine("     DELFLG = @DELFLG")
+        sqlStat.AppendLine(" AND DEISELPRICESITEID = @DEISELPRICESITEID")
+        sqlStat.AppendLine(" GROUP BY DEISELPRICESITEBRANCH, DEISELPRICESITEKBNNAME")
+        sqlStat.AppendLine(" ORDER BY DEISELPRICESITEBRANCH")
+
+        Try
+            '空白行判定
+            If blnBlank = True Then
+                Dim listBlankItm As New ListItem("", "")
+                retList.Items.Add(listBlankItm)
+            End If
+
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@DEISELPRICESITEID", MySqlDbType.VarChar).Value = prmDieselPriceID
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = BaseDllConst.C_DELETE_FLG.ALIVE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    While sqlDr.Read
+                        Dim listItm As New ListItem(Convert.ToString(sqlDr("NAME")), Convert.ToString(sqlDr("CODE")))
+                        retList.Items.Add(listItm)
+                    End While
+                End Using
+            End Using
+
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
     ''' ドロップダウンリスト(組織コード用) データ取得
     ''' </summary>
     ''' <param name="blnBlank">空白追加フラグ</param>

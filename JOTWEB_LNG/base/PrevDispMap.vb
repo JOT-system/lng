@@ -361,6 +361,19 @@ Public Module PrevDispMap
         Public Const LNM0017H As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATEHISTORY_ASPX"
 
         ''' <summary>
+        ''' 軽油価格参照先管理マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const LNM0020L As String = "ASP.LNG_MAS_LNM0020DIESELPRICESITELIST_ASPX"
+        ''' <summary>
+        ''' 軽油価格参照先管理マスタメンテナンス（詳細）
+        ''' </summary>
+        Public Const LNM0020D As String = "ASP.LNG_MAS_LNM0020DIESELPRICESITEDETAIL_ASPX"
+        ''' <summary>
+        ''' 軽油価格参照先管理スタメンテナンス（履歴）
+        ''' </summary>
+        Public Const LNM0020H As String = "ASP.LNG_MAS_LNM0020DIESELPRICESITEHISTORY_ASPX"
+
+        ''' <summary>
         ''' 品目マスタメンテナンス（検索）
         ''' </summary>
         Public Const LNM0021S As String = "ASP.LNG_MAS_LNM0021ITEMSEARCH_ASPX"
