@@ -705,8 +705,8 @@ Public Class LNM0014SprateList
         '削除フラグ
         If Not ChkDelDataFlg.Checked Then
             SQLStr.AppendFormat(" AND  LNM0014.DELFLG = '{0}' ", C_DELETE_FLG.ALIVE)
-        Else
-            SQLStr.AppendFormat(" AND  LNM0014.DELFLG = '{0}' ", C_DELETE_FLG.DELETE)
+            'Else
+            '    SQLStr.AppendFormat(" AND  LNM0014.DELFLG = '{0}' ", C_DELETE_FLG.DELETE)
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
