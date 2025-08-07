@@ -241,10 +241,13 @@
     <Content Include="LNG\css\LNM0006H.css" />
     <Content Include="LNG\css\LNM0006L.css" />
     <Content Include="LNG\css\LNM0006S.css" />
+    <Content Include="LNG\css\LNM0020H.css" />
+    <Content Include="LNG\css\LNM0020D.css" />
     <Content Include="LNG\css\LNM0017D.css" />
     <Content Include="LNG\css\LNM0007D.css" />
     <Content Include="LNG\css\LNM0017H.css" />
     <Content Include="LNG\css\LNM0007H.css" />
+    <Content Include="LNG\css\LNM0020L.css" />
     <Content Include="LNG\css\LNM0017L.css" />
     <Content Include="LNG\css\LNM0007L.css" />
     <Content Include="LNG\css\LNM0014D.css" />
@@ -310,6 +313,7 @@
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0020WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0017WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0007WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0014WRKINC.ascx" />
@@ -321,10 +325,13 @@
     <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaList.aspx" />
+    <Content Include="LNG\mas\LNM0020DieselPriceSiteHistory.aspx" />
+    <Content Include="LNG\mas\LNM0020DieselPriceSiteDetail.aspx" />
     <Content Include="LNG\mas\LNM0017HolidayRateDetail.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiDetail.aspx" />
     <Content Include="LNG\mas\LNM0017HolidayRateHistory.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiHistory.aspx" />
+    <Content Include="LNG\mas\LNM0020DieselPriceSiteList.aspx" />
     <Content Include="LNG\mas\LNM0017HolidayRateList.aspx" />
     <Content Include="LNG\mas\LNM0007KoteihiList.aspx" />
     <Content Include="LNG\mas\LNM0014SprateDetail.aspx" />
@@ -338,10 +345,13 @@
     <Content Include="LNG\script\LNM0006H.js" />
     <Content Include="LNG\script\LNM0006L.js" />
     <Content Include="LNG\script\LNM0006S.js" />
+    <Content Include="LNG\script\LNM0020H.js" />
+    <Content Include="LNG\script\LNM0020D.js" />
     <Content Include="LNG\script\LNM0017D.js" />
     <Content Include="LNG\script\LNM0007D.js" />
     <Content Include="LNG\script\LNM0017H.js" />
     <Content Include="LNG\script\LNM0007H.js" />
+    <Content Include="LNG\script\LNM0020L.js" />
     <Content Include="LNG\script\LNM0017L.js" />
     <Content Include="LNG\script\LNM0007L.js" />
     <Content Include="LNG\script\LNM0014D.js" />
@@ -568,6 +578,13 @@
       <DependentUpon>LNM0006WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNM0020WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0020WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0020WRKINC.ascx.vb">
+      <DependentUpon>LNM0020WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\inc\LNM0017WRKINC.ascx.designer.vb">
       <DependentUpon>LNM0017WRKINC.ascx</DependentUpon>
     </Compile>
@@ -648,6 +665,20 @@
       <DependentUpon>LNM0006TankaList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteHistory.aspx.designer.vb">
+      <DependentUpon>LNM0020DieselPriceSiteHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteHistory.aspx.vb">
+      <DependentUpon>LNM0020DieselPriceSiteHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteDetail.aspx.designer.vb">
+      <DependentUpon>LNM0020DieselPriceSiteDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteDetail.aspx.vb">
+      <DependentUpon>LNM0020DieselPriceSiteDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\mas\LNM0017HolidayRateDetail.aspx.designer.vb">
       <DependentUpon>LNM0017HolidayRateDetail.aspx</DependentUpon>
     </Compile>
@@ -674,6 +705,13 @@
     </Compile>
     <Compile Include="LNG\mas\LNM0007KoteihiHistory.aspx.vb">
       <DependentUpon>LNM0007KoteihiHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteList.aspx.designer.vb">
+      <DependentUpon>LNM0020DieselPriceSiteList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0020DieselPriceSiteList.aspx.vb">
+      <DependentUpon>LNM0020DieselPriceSiteList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNM0017HolidayRateList.aspx.designer.vb">

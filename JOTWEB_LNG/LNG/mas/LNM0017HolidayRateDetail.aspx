@@ -258,7 +258,7 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 値保持 -->
         <input id="WF_TARGETYM_SAVE" runat="server" value="" type="text" />
-        <input id="WF_TORINAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_TORICODE_SAVE" runat="server" value="" type="text" />
         <input id="WF_TORICODE_TEXT_SAVE" runat="server" value="" type="text" />
         <input id="WF_ORG_SAVE" runat="server" value="" type="text" />
         <input id="WF_SEASONKBN_SAVE" runat="server" value="" type="text" />

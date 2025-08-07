@@ -13,26 +13,25 @@ window.onload = function () {
     //変更不可判断キーに値が入っていない場合
     if (DisabledKeyItem == "") {
         //名称を変更する
-        document.getElementById('PAGE_NAME1').innerText = "休日割増単価マスタ（登録）";
-        document.getElementById('PAGE_NAME2').innerText = "休日割増単価マスタ登録";
+        document.getElementById('PAGE_NAME1').innerText = "軽油価格参照先マスタ（登録）";
+        document.getElementById('PAGE_NAME2').innerText = "軽油価格参照先マスタ登録";
         document.getElementById('WF_ButtonUPDATE').value = "登録";
     } else {
         //値復元
+        document.getElementById('WF_DEISELPRICESITENAME').value = document.getElementById('WF_DEISELPRICESITENAME_SAVE').value;
+        document.getElementById('WF_DEISELPRICESITEID').value = document.getElementById('WF_DEISELPRICESITEID_SAVE').value; 
+        document.getElementById('WF_DEISELPRICESITEKBNNAME').value = document.getElementById('WF_DEISELPRICESITEKBNNAME_SAVE').value; 
+        document.getElementById('WF_DEISELPRICESITEBRANCH').value = document.getElementById('WF_DEISELPRICESITEBRANCH_SAVE').value; 
 
-        const dropdown = document.getElementById("WF_TORICODE");
-        for (let i = 0; i < dropdown.options.length; i++) {
-            if (dropdown.options[i].text === document.getElementById('WF_TORICODE_SAVE').value) {
-                dropdown.selectedIndex = i;
-                break;
-            }
-        }
-        document.getElementById('WF_TORICODE_TEXT').value = document.getElementById('WF_TORICODE_TEXT_SAVE').value; 
+        document.getElementById('WF_DEISELPRICESITENAME').disabled = true; 
+        document.getElementById('WF_DEISELPRICESITEID').disabled = true; 
+        document.getElementById('WF_DEISELPRICESITEKBNNAME').disabled = true; 
+        document.getElementById('WF_DEISELPRICESITEBRANCH').disabled = true; 
 
-        document.getElementById('WF_TORICODE').disabled = true; 
-        document.getElementById('WF_TORICODE_TEXT').disabled = true; 
-
-        document.getElementById('WF_TORICODE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_TORICODE_TEXT').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DEISELPRICESITENAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DEISELPRICESITEID').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DEISELPRICESITEKBNNAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DEISELPRICESITEBRANCH').style.backgroundColor = "#F2F2F2";
     }
 };
 
