@@ -266,12 +266,12 @@ Public Class LNM0020DieselPriceSiteHistory
         SQLStr.AppendLine("   , 0                                               AS LINECNT               ")
         SQLStr.AppendLine("   , ''                                              AS OPERATION             ")
         SQLStr.AppendLine("   , LNT33.UPDTIMSTP                                 AS UPDTIMSTP             ")
-        SQLStr.AppendLine("   , LNT33.DEISELPRICESITEID                         AS DEISELPRICESITEID     ")
-        SQLStr.AppendLine("   , LNT33.DEISELPRICESITEBRANCH                     AS DEISELPRICESITEBRANCH ")
-        SQLStr.AppendLine("   , LNT33.DEISELPRICESITENAME                       AS DEISELPRICESITENAME   ")
-        SQLStr.AppendLine("   , LNT33.DEISELPRICESITEKBNNAME                    AS DEISELPRICESITEKBNNAME")
+        SQLStr.AppendLine("   , LNT33.DIESELPRICESITEID                         AS DIESELPRICESITEID     ")
+        SQLStr.AppendLine("   , LNT33.DIESELPRICESITEBRANCH                     AS DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("   , LNT33.DIESELPRICESITENAME                       AS DIESELPRICESITENAME   ")
+        SQLStr.AppendLine("   , LNT33.DIESELPRICESITEKBNNAME                    AS DIESELPRICESITEKBNNAME")
         SQLStr.AppendLine("   , LNT33.DISPLAYNAME                               AS DISPLAYNAME           ")
-        SQLStr.AppendLine("   , LNT33.DEISELPRICESITEURL                        AS DEISELPRICESITEURL    ")
+        SQLStr.AppendLine("   , LNT33.DIESELPRICESITEURL                        AS DIESELPRICESITEURL    ")
         SQLStr.AppendLine("   , LNT33.DELFLG                                    AS DELFLG                ")
 
         SQLStr.AppendLine("   , CASE                 ")
@@ -306,8 +306,8 @@ Public Class LNM0020DieselPriceSiteHistory
 
         SQLStr.AppendLine(" ORDER BY                                                                     ")
         SQLStr.AppendLine("    MODIFYYMD DESC                                                            ")
-        SQLStr.AppendLine("    ,DEISELPRICESITEID                                                        ")
-        SQLStr.AppendLine("    ,DEISELPRICESITEBRANCH                                                    ")
+        SQLStr.AppendLine("    ,DIESELPRICESITEID                                                        ")
+        SQLStr.AppendLine("    ,DIESELPRICESITEBRANCH                                                    ")
         SQLStr.AppendLine("    ,MODIFYKBN                                                                ")
 
         Try
@@ -859,12 +859,12 @@ Public Class LNM0020DieselPriceSiteHistory
         sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = "変更USER"
 
         sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DELFLG).Value = "削除フラグ"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEID).Value = "実勢軽油価格参照先ID"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEBRANCH).Value = "実勢軽油価格参照先ID枝番"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITENAME).Value = "実勢軽油価格参照先名"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEKBNNAME).Value = "実勢軽油価格参照先区分名"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEID).Value = "実勢軽油価格参照先ID"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEBRANCH).Value = "実勢軽油価格参照先ID枝番"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITENAME).Value = "実勢軽油価格参照先名"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEKBNNAME).Value = "実勢軽油価格参照先区分名"
         sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DISPLAYNAME).Value = "画面表示名称"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEURL).Value = "実勢軽油価格参照先URL"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEURL).Value = "実勢軽油価格参照先URL"
 
     End Sub
 
@@ -886,12 +886,12 @@ Public Class LNM0020DieselPriceSiteHistory
             sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.MODIFYUSER).Value = Row("MODIFYUSER") '変更USER
 
             sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEID).Value = Row("DEISELPRICESITEID") '実勢軽油価格参照先ID
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEBRANCH).Value = Row("DEISELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITENAME).Value = Row("DEISELPRICESITENAME") '実勢軽油価格参照先名
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEKBNNAME).Value = Row("DEISELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEID).Value = Row("DIESELPRICESITEID") '実勢軽油価格参照先ID
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEBRANCH).Value = Row("DIESELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITENAME).Value = Row("DIESELPRICESITENAME") '実勢軽油価格参照先名
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEKBNNAME).Value = Row("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
             sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DISPLAYNAME).Value = Row("DISPLAYNAME") '画面表示名称
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DEISELPRICESITEURL).Value = Row("DEISELPRICESITEURL") '実勢軽油価格参照先URL
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.HISTORYEXCELCOL.DIESELPRICESITEURL).Value = Row("DIESELPRICESITEURL") '実勢軽油価格参照先URL
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0020WRKINC.MODIFYKBN.AFTDATA Then

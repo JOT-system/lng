@@ -84,21 +84,21 @@
                             <p id="TYPE_B_LINE_4">
                                 <!-- 実勢軽油価格参照先ID -->
                                 <span>
-                                    <asp:Label ID="WF_DEISELPRICESITEID_L" runat="server" Text="参照先名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:TextBox ID="WF_DEISELPRICESITENAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" onBlur="ButtonClick('WF_DEISELPRICESITEChange');" ></asp:TextBox>
-                                    <asp:TextBox ID="WF_DEISELPRICESITEID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
+                                    <asp:Label ID="WF_DIESELPRICESITEID_L" runat="server" Text="参照先名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:TextBox ID="WF_DIESELPRICESITENAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" onBlur="ButtonClick('WF_DIESELPRICESITEChange');" ></asp:TextBox>
+                                    <asp:TextBox ID="WF_DIESELPRICESITEID" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
                                 </span>
                                 <a style="display:none;">
-                                    <asp:DropDownList ID="WF_DEISELPRICE" runat="server" class="form-select rounded-0" />
-                                    <datalist id="WF_DEISELPRICE_DL" runat="server"></datalist>
+                                    <asp:DropDownList ID="WF_DIESELPRICE" runat="server" class="form-select rounded-0" />
+                                    <datalist id="WF_DIESELPRICE_DL" runat="server"></datalist>
                                 </a>
                             </p>
                             <p id="TYPE_B_LINE_5">
                                 <!-- 実勢軽油価格参照先ID枝番 -->
                                 <span>
-                                    <asp:Label ID="WF_DEISELPRICESITEBRANCH_L" runat="server" Text="区分名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
-                                    <asp:TextBox ID="WF_DEISELPRICESITEKBNNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" ></asp:TextBox>
-                                    <asp:TextBox ID="WF_DEISELPRICESITEBRANCH" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
+                                    <asp:Label ID="WF_DIESELPRICESITEBRANCH_L" runat="server" Text="区分名" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:TextBox ID="WF_DIESELPRICESITEKBNNAME" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50" ></asp:TextBox>
+                                    <asp:TextBox ID="WF_DIESELPRICESITEBRANCH" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
                                 </span>
                             </p>
                             <p id="TYPE_B_LINE_6">
@@ -111,8 +111,8 @@
                             <p id="TYPE_B_LINE_8">
                                 <!-- 実勢軽油価格参照先URL -->
                                 <span>
-                                    <asp:Label ID="WF_DEISELPRICESITEURL_L" runat="server" Text="サイトＵＲＬ" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="WF_DEISELPRICESITEURL" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="true"></asp:TextBox>
+                                    <asp:Label ID="WF_DIESELPRICESITEURL_L" runat="server" Text="サイトＵＲＬ" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="WF_DIESELPRICESITEURL" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="true"></asp:TextBox>
                                 </span>
                             </p>
                             <div class="Operation">
@@ -186,10 +186,10 @@
         <!-- 権限 -->
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- 値保持 -->
-        <input id="WF_DEISELPRICESITENAME_SAVE" runat="server" value="" type="text" />
-        <input id="WF_DEISELPRICESITEID_SAVE" runat="server" value="" type="text" />
-        <input id="WF_DEISELPRICESITEKBNNAME_SAVE" runat="server" value="" type="text" />
-        <input id="WF_DEISELPRICESITEBRANCH_SAVE" runat="server" value="" type="text" />
+        <input id="WF_DIESELPRICESITENAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_DIESELPRICESITEID_SAVE" runat="server" value="" type="text" />
+        <input id="WF_DIESELPRICESITEKBNNAME_SAVE" runat="server" value="" type="text" />
+        <input id="WF_DIESELPRICESITEBRANCH_SAVE" runat="server" value="" type="text" />
 
         <!-- 縦スクロール位置 -->
         <input id="WF_scrollY" runat="server" value="0" type="text" />

@@ -28,12 +28,12 @@ Public Class LNM0020WRKINC
     ''' <remarks></remarks>
     Public Enum INOUTEXCELCOL
         DELFLG   '削除フラグ
-        DEISELPRICESITEID   '実勢軽油価格参照先ID
-        DEISELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
-        DEISELPRICESITENAME   '実勢軽油価格参照先名
-        DEISELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
+        DIESELPRICESITEID   '実勢軽油価格参照先ID
+        DIESELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
+        DIESELPRICESITENAME   '実勢軽油価格参照先名
+        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
         DISPLAYNAME   '画面表示名称
-        DEISELPRICESITEURL   '実勢軽油価格参照先URL
+        DIESELPRICESITEURL   '実勢軽油価格参照先URL
     End Enum
 
     ''' <summary>
@@ -46,12 +46,12 @@ Public Class LNM0020WRKINC
         MODIFYYMD   '変更日時
         MODIFYUSER   '変更USER
         DELFLG   '削除フラグ
-        DEISELPRICESITEID   '実勢軽油価格参照先ID
-        DEISELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
-        DEISELPRICESITENAME   '実勢軽油価格参照先名
-        DEISELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
+        DIESELPRICESITEID   '実勢軽油価格参照先ID
+        DIESELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
+        DIESELPRICESITENAME   '実勢軽油価格参照先名
+        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
         DISPLAYNAME   '画面表示名称
-        DEISELPRICESITEURL   '実勢軽油価格参照先URL
+        DIESELPRICESITEURL   '実勢軽油価格参照先URL
     End Enum
 
     '操作区分
@@ -265,8 +265,8 @@ Public Class LNM0020WRKINC
         SQLStr.AppendLine(" FROM                                        ")
         SQLStr.AppendLine("     LNG.LNM0020_DIESELPRICESITE             ")
         SQLStr.AppendLine(" WHERE                                       ")
-        SQLStr.AppendLine("     DEISELPRICESITEID       = @ID           ")
-        SQLStr.AppendLine(" AND DEISELPRICESITEBRANCH   = @BRANCH       ")
+        SQLStr.AppendLine("     DIESELPRICESITEID       = @ID           ")
+        SQLStr.AppendLine(" AND DIESELPRICESITEBRANCH   = @BRANCH       ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -330,7 +330,7 @@ Public Class LNM0020WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT                                             ")
-        SQLStr.AppendLine("    MAX(DEISELPRICESITEID) + 1 AS ID                ")
+        SQLStr.AppendLine("    MAX(DIESELPRICESITEID) + 1 AS ID                ")
         SQLStr.AppendLine(" FROM LNG.LNM0020_DIESELPRICESITE                   ")
 
         Try
@@ -380,10 +380,10 @@ Public Class LNM0020WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT                                             ")
-        SQLStr.AppendLine("    MAX(DEISELPRICESITEBRANCH) + 1 AS BRANCH        ")
+        SQLStr.AppendLine("    MAX(DIESELPRICESITEBRANCH) + 1 AS BRANCH        ")
         SQLStr.AppendLine(" FROM LNG.LNM0020_DIESELPRICESITE                   ")
         SQLStr.AppendLine(" WHERE                                              ")
-        SQLStr.AppendLine("     DEISELPRICESITEID       = @ID                  ")
+        SQLStr.AppendLine("     DIESELPRICESITEID       = @ID                  ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)

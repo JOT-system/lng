@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class LNM0020WRKINC
-
+    
     '''<summary>
     '''WF_SEL_CAMPCODE コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_CAMPCODE As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_LINECNT コントロール。
     '''</summary>
@@ -32,40 +32,40 @@ Partial Public Class LNM0020WRKINC
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEID_L コントロール。
+    '''WF_SEL_DIESELPRICESITEID_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEID_L As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEID_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEBRANCH_L コントロール。
+    '''WF_SEL_DIESELPRICESITEBRANCH_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEBRANCH_L As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEBRANCH_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITENAME_L コントロール。
+    '''WF_SEL_DIESELPRICESITENAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITENAME_L As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITENAME_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEKBNNAME_L コントロール。
+    '''WF_SEL_DIESELPRICESITEKBNNAME_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEKBNNAME_L As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEKBNNAME_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_DISPLAYNAME_L コントロール。
@@ -77,49 +77,49 @@ Partial Public Class LNM0020WRKINC
     Public WithEvents WF_SEL_DISPLAYNAME_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEURL_L コントロール。
+    '''WF_SEL_DIESELPRICESITEURL_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEURL_L As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEURL_L As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEID コントロール。
+    '''WF_SEL_DIESELPRICESITEID コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEID As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEID As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEBRANCH コントロール。
+    '''WF_SEL_DIESELPRICESITEBRANCH コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEBRANCH As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEBRANCH As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITENAME コントロール。
+    '''WF_SEL_DIESELPRICESITENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITENAME As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITENAME As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEKBNNAME コントロール。
+    '''WF_SEL_DIESELPRICESITEKBNNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEKBNNAME As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEKBNNAME As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_DISPLAYNAME コントロール。
@@ -131,13 +131,13 @@ Partial Public Class LNM0020WRKINC
     Public WithEvents WF_SEL_DISPLAYNAME As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
-    '''WF_SEL_DEISELPRICESITEURL コントロール。
+    '''WF_SEL_DIESELPRICESITEURL コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Public WithEvents WF_SEL_DEISELPRICESITEURL As Global.System.Web.UI.WebControls.TextBox
+    Public WithEvents WF_SEL_DIESELPRICESITEURL As Global.System.Web.UI.WebControls.TextBox
 
     '''<summary>
     '''WF_SEL_DELFLG コントロール。
@@ -147,7 +147,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_TIMESTAMP コントロール。
     '''</summary>
@@ -156,7 +156,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TIMESTAMP As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_INPTBL コントロール。
     '''</summary>
@@ -165,7 +165,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DETAIL_UPDATE_MESSAGE コントロール。
     '''</summary>
