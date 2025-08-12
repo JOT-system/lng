@@ -137,9 +137,15 @@ Public Class LNM0007WRKINC
     ''' ドロップダウンリスト荷主データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ROLEORGCODE">組織コード</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_SEASONKBN">季節料金判定区分</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                               Optional ByVal I_TORICODE As String = Nothing,
+                                               Optional ByVal I_ORGCODE As String = Nothing,
+                                               Optional ByVal I_SEASONKBN As String = Nothing) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -162,6 +168,25 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0007.ORGCODE = LNS0005.CODE                                                             ")
+
+        SQLStr.AppendLine(" WHERE 1=1 ")
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            'If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '    SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            'Else
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            'End If
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_SEASONKBN) AndAlso I_SEASONKBN <> "" Then
+            SQLStr.AppendFormat(" AND SEASONKBN = '{0}' ", I_SEASONKBN)
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0007.TORICODE                                                           ")
 
@@ -171,7 +196,7 @@ Public Class LNM0007WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -185,7 +210,7 @@ Public Class LNM0007WRKINC
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
                     If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
-                        If AdminCheck(I_ORGCODE) Then
+                        If AdminCheck(I_ROLEORGCODE) Then
                             Dim listBlankItm As New ListItem("全て表示", "")
                             retList.Items.Add(listBlankItm)
                         End If
@@ -208,9 +233,15 @@ Public Class LNM0007WRKINC
     ''' ドロップダウンリスト部門データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ROLEORGCODE">組織コード</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_SEASONKBN">季節料金判定区分</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                              Optional ByVal I_TORICODE As String = Nothing,
+                                              Optional ByVal I_ORGCODE As String = Nothing,
+                                              Optional ByVal I_SEASONKBN As String = Nothing) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -233,6 +264,25 @@ Public Class LNM0007WRKINC
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
         SQLStr.AppendLine("      ON  LNM0007.ORGCODE = LNS0005.CODE                                                             ")
+
+        SQLStr.AppendLine(" WHERE 1=1 ")
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            Else
+                SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            End If
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_SEASONKBN) AndAlso I_SEASONKBN <> "" Then
+            SQLStr.AppendFormat(" AND SEASONKBN = '{0}' ", I_SEASONKBN)
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0007.ORGCODE                                                           ")
 
@@ -242,7 +292,7 @@ Public Class LNM0007WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -274,10 +324,108 @@ Public Class LNM0007WRKINC
     End Function
 
     ''' <summary>
+    ''' ドロップダウンリスト季節料金判定区分データ取得
+    ''' </summary>
+    ''' <param name="I_MAPID">MAPID</param>
+    ''' <param name="I_ROLEORGCODE">組織コード</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_SEASONKBN">季節料金判定区分</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownSeasonList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
+                                                 Optional ByVal I_TORICODE As String = Nothing,
+                                                 Optional ByVal I_ORGCODE As String = Nothing,
+                                                 Optional ByVal I_SEASONKBN As String = Nothing) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       LNM0007.SEASONKBN AS SEASONKBN ")
+        SQLStr.AppendLine("      ,CASE ")
+        SQLStr.AppendLine("       WHEN SEASONKBN='1' THEN '夏季料金' ")
+        SQLStr.AppendLine("       WHEN SEASONKBN='2' THEN '冬季料金' ")
+        SQLStr.AppendLine("       ELSE '通年' ")
+        SQLStr.AppendLine("       END AS SEASONKBNNAME ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0007_FIXED LNM0007                                                                      ")
+        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          CODE                                                                                       ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+        SQLStr.AppendLine("      ON  LNM0007.ORGCODE = LNS0005.CODE                                                             ")
+
+        SQLStr.AppendLine(" WHERE 1=1 ")
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            Else
+                SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            End If
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_SEASONKBN) AndAlso I_SEASONKBN <> "" Then
+            SQLStr.AppendFormat(" AND SEASONKBN = '{0}' ", I_SEASONKBN)
+        End If
+
+        SQLStr.AppendLine(" ORDER BY ")
+        SQLStr.AppendLine("     LNM0007.SEASONKBN ")
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+                        Dim listBlankItm As New ListItem("全て表示", "")
+                        retList.Items.Add(listBlankItm)
+                    End If
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        Dim listItm As New ListItem(WW_ROW("SEASONKBNNAME"), WW_ROW("SEASONKBN"))
+                        retList.Items.Add(listItm)
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
     ''' ドロップダウンリスト加算先部門データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ORGCODE">組織コード</param>
     ''' <returns></returns>
     Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
         Dim retList As New DropDownList

@@ -101,15 +101,25 @@ Public Class LNM0007KoteihiList
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
-                        Case "WF_ButtonExtract" '検索ボタン押下時
+                        Case "WF_SelectCALENDARChange"  '対象年月(変更)時
+                            MapInitialize(WF_ButtonClick.Value)
+                        Case "WF_SelectTORIChange",     '荷主(変更)時
+                             "WF_SelectORGChange",      '部門(変更)時
+                             "WF_SelectSEASONChange"    '季節料金判定区分(変更)時
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
+                        Case "WF_ButtonExtract"         '検索ボタン押下時
                             GridViewInitialize()
+                        Case "WF_ButtonRelease"         '解除ボタンクリック
+                            MapInitialize(WF_ButtonClick.Value)
                         Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
                             Me.WF_ButtonPAGE_Click()
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
+                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
                         Not WF_ButtonClick.Value = "WF_ButtonExtract" And
+                        Not WF_ButtonClick.Value = "WF_ButtonRelease" And
                         Not WF_ButtonClick.Value = "WF_ButtonPAGE" And
                         Not WF_ButtonClick.Value = "WF_ButtonFIRST" And
                         Not WF_ButtonClick.Value = "WF_ButtonPREVIOUS" And
@@ -200,7 +210,7 @@ Public Class LNM0007KoteihiList
     ''' ドロップダウン生成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub createListBox()
+    Protected Sub createListBox(Optional ByVal resVal As String = Nothing)
         '荷主
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
@@ -216,6 +226,18 @@ Public Class LNM0007KoteihiList
         For index As Integer = 0 To retOrgList.Items.Count - 1
             WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
         Next
+
+        '-- 対象年月(変更)時 OR 解除ボタン押下
+        If resVal = "WF_SelectCALENDARChange" OrElse resVal = "WF_ButtonRelease" Then
+            '〇季節料金判定区分
+            Me.WF_SEASON.Items.Clear()
+            Dim retSeasonList As New DropDownList
+            retSeasonList = LNM0007WRKINC.getDowpDownSeasonList(Master.MAPID, Master.ROLE_ORG)
+            '★ドロップダウンリスト再作成(季節料金判定区分)
+            For index As Integer = 0 To retSeasonList.Items.Count - 1
+                WF_SEASON.Items.Add(New ListItem(retSeasonList.Items(index).Text, retSeasonList.Items(index).Value))
+            Next
+        End If
 
     End Sub
 
@@ -285,6 +307,18 @@ Public Class LNM0007KoteihiList
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
         leftmenu.ROLEMENU = Master.ROLE_MENU
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期化処理
+    ''' </summary>
+    Private Sub MapInitialize(Optional ByVal resVal As String = Nothing)
+        'ドロップダウン生成処理
+        createListBox(resVal)
+
+        'GridViewデータ設定
+        GridViewInitialize()
 
     End Sub
 
@@ -562,7 +596,12 @@ Public Class LNM0007KoteihiList
 
         '取引先コード
         If Not String.IsNullOrEmpty(WF_TORI.SelectedValue) Then
-            SQLStr.AppendLine(" AND  LNM0007.TORICODE = @TORICODE                                          ")
+            'SQLStr.AppendLine(" AND  LNM0007.TORICODE = @TORICODE                                          ")
+            If WF_TORI.SelectedValue = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr.AppendFormat(" AND LNM0007.TORICODE IN (@TORICODE,'{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
+            Else
+                SQLStr.AppendLine(" AND  LNM0007.TORICODE = @TORICODE ")
+            End If
         End If
 
         '部門コード
@@ -769,6 +808,88 @@ Public Class LNM0007KoteihiList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
         Server.Transfer("~/LNG/mas/LNM0007KoteihiHistory.aspx")
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">荷主(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),季節料金(変更)時(WF_SelectSEASONChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■荷主(情報)取得
+        Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■季節料金判定区分(情報)取得
+        Dim selectSEASON As String = WF_SEASON.SelectedValue
+        Dim selectindexSEASON As Integer = WF_SEASON.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '荷主(変更)時
+            Case "WF_SelectTORIChange"
+                selectORG = ""              '-- 部門(表示)初期化
+                selectindexORG = 0          '-- 部門(INDEX)初期化
+                selectSEASON = ""           '-- 季節料金判定区分(表示)初期化
+                selectindexSEASON = 0       '-- 季節料金判定区分(INDEX)初期化
+            '部門(変更)時
+            Case "WF_SelectORGChange"
+                selectSEASON = ""           '-- 季節料金判定区分(表示)初期化
+                selectindexSEASON = 0       '-- 季節料金判定区分(INDEX)初期化
+            '季節料金判定区分(変更)時
+            Case "WF_SelectKASANORGChange"
+        End Select
+
+        '〇荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
+        '★ドロップダウンリスト選択(荷主)の場合
+        If retToriList.Items(0).Text <> "全て表示" Then
+            WF_TORI.Items.Add(New ListItem("全て表示", ""))
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(荷主)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        WF_TORI.SelectedIndex = selectindexTORI
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items(0).Text <> "全て表示" Then
+            WF_ORG.Items.Add(New ListItem("全て表示", ""))
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        WF_ORG.SelectedIndex = selectindexORG
+
+        '〇季節料金判定区分
+        Me.WF_SEASON.Items.Clear()
+        Dim retSeasonList As New DropDownList
+        retSeasonList = LNM0007WRKINC.getDowpDownSeasonList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
+        '★ドロップダウンリスト選択(季節料金判定区分)の場合
+        If retSeasonList.Items(0).Text <> "全て表示" Then
+            WF_SEASON.Items.Add(New ListItem("全て表示", ""))
+            selectindexSEASON = 1
+        End If
+        '★ドロップダウンリスト再作成(季節料金判定区分)
+        For index As Integer = 0 To retSeasonList.Items.Count - 1
+            WF_SEASON.Items.Add(New ListItem(retSeasonList.Items(index).Text, retSeasonList.Items(index).Value))
+        Next
+        WF_SEASON.SelectedIndex = selectindexSEASON
+
     End Sub
 
     ''' <summary>

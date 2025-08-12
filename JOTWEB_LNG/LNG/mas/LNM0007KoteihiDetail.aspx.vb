@@ -1303,11 +1303,12 @@ Public Class LNM0007KoteihiDetail
         ' 既存レコードとの比較
         For Each LNM0007row As DataRow In LNM0007tbl.Rows
             ' KEY項目が等しい時
-            If LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso                                '取引先コード
-                LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso                                '部門コード
-                LNM0007row("TARGETYM") = LNM0007INProw("TARGETYM") AndAlso                                '対象年月
-                LNM0007row("SYABARA") = LNM0007INProw("SYABARA") AndAlso                                '車腹
-                LNM0007row("SEASONKBN") = LNM0007INProw("SEASONKBN") Then                                '季節料金判定区分
+            If LNM0007row("TORICODE") = LNM0007INProw("TORICODE") AndAlso                       '取引先コード
+                LNM0007row("ORGCODE") = LNM0007INProw("ORGCODE") AndAlso                        '部門コード
+                LNM0007row("TARGETYM") = LNM0007INProw("TARGETYM") AndAlso                      '対象年月
+                LNM0007row("SYABAN") = LNM0007INProw("SYABAN") AndAlso                          '車番
+                LNM0007row("SYABARA") = LNM0007INProw("SYABARA") AndAlso                        '車腹
+                LNM0007row("SEASONKBN") = LNM0007INProw("SEASONKBN") Then                       '季節料金判定区分
                 ' KEY項目以外の項目の差異をチェック
                 If LNM0007row("DELFLG") = LNM0007INProw("DELFLG") AndAlso
                     LNM0007row("TORINAME") = LNM0007INProw("TORINAME") AndAlso                                '取引先名称

@@ -226,6 +226,9 @@ Public Class LNM0014WRKINC
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
     ''' <param name="I_ROLEORGCODE">ロール</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_KASANORGCODE">加算先部門</param>
     ''' <returns></returns>
     Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
                                                Optional ByVal I_TORICODE As String = Nothing,
@@ -258,7 +261,11 @@ Public Class LNM0014WRKINC
         SQLStr.AppendFormat("     DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            'If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '    SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            'Else
             SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            'End If
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
@@ -316,7 +323,9 @@ Public Class LNM0014WRKINC
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
     ''' <param name="I_ROLEORGCODE">ロール</param>
-    ''' <param name="I_TORICODE">取引先コード</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_KASANORGCODE">加算先部門</param>
     ''' <returns></returns>
     Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
                                               Optional ByVal I_TORICODE As String = Nothing,
@@ -348,7 +357,11 @@ Public Class LNM0014WRKINC
         SQLStr.AppendFormat("     DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            Else
+                SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            End If
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
@@ -404,7 +417,9 @@ Public Class LNM0014WRKINC
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
     ''' <param name="I_ROLEORGCODE">ロール</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_TORICODE">荷主</param>
+    ''' <param name="I_ORGCODE">部門</param>
+    ''' <param name="I_KASANORGCODE">加算先部門</param>
     ''' <returns></returns>
     Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String,
                                                    Optional ByVal I_TORICODE As String = Nothing,
@@ -436,7 +451,11 @@ Public Class LNM0014WRKINC
         SQLStr.AppendLine("     COALESCE(RTRIM(LNM0014.KASANORGCODE), '') <> ''                                                 ")
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0110600000 Then
+                SQLStr.AppendFormat(" AND TORICODE IN ('{0}','{1}') ", I_TORICODE, BaseDllConst.CONST_TORICODE_0238900000)
+            Else
+                SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+            End If
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then

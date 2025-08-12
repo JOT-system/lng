@@ -61,7 +61,7 @@ p {
 
 .calendararea {
     display: inline-block;
-    width: 190px !important;
+    width: 170px !important;
 }
 
 #ListCount {
@@ -73,7 +73,17 @@ p {
     display: flex;
 }
 
-#WF_TORI, #WF_ORG, #WF_SEASON {
+#WF_TORI {
+    width: 165px !important;
+    margin-right: 10px;
+}
+
+#WF_ORG {
+    width: 160px !important;
+    margin-right: 10px;
+}
+
+#WF_SEASON {
     width: 100px !important;
     margin-right: 10px;
 }
