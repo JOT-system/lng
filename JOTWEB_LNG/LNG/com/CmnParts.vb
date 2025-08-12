@@ -3327,6 +3327,131 @@ Public Class CmnParts
     End Sub
 
     ''' <summary>
+    ''' 実績データ(変換マスタ)陸事番号(比較)取得用SQL
+    ''' </summary>
+    Public Sub SelectCOMP_TANKNUMBER(ByVal I_TORICODE As String, ByVal I_ORDERORGCODE As String,
+                                     ByRef I_dtTank As DataTable,
+                                     Optional ByRef O_dtCOMP_TANKNUMBER As DataTable = Nothing)
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    VIW0005.ZISSEKI_TORICODE "
+        SQLStr &= "  , VIW0005.ZISSEKI_TORINAME "
+        SQLStr &= "  , VIW0005.ZISSEKI_ORDERORGCODE "
+        SQLStr &= "  , VIW0005.ZISSEKI_ORDERORGNAME "
+        SQLStr &= "  , VIW0005.ZISSEKI_SYAGATA "
+        SQLStr &= "  , VIW0005.ZISSEKI_TANKNUMBER "
+        SQLStr &= "  , VIW0005.ZISSEKI_GYOMUTANKNUM "
+        SQLStr &= "  , VIW0005.ZISSEKI_ZISSEKI "
+        SQLStr &= "  , VIW0005.TORICODE "
+        SQLStr &= "  , VIW0005.TORINAME "
+        SQLStr &= "  , VIW0005.ORDERORGCODE "
+        SQLStr &= "  , VIW0005.ORDERORGNAME "
+        SQLStr &= "  , VIW0005.TANKNUMBER "
+        SQLStr &= "  , VIW0005.SYAGATA "
+        SQLStr &= "  , VIW0005.GYOMUTANKNUM "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.VIW0005_COMP_TANKNUMBER VIW0005 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= " VIW0005.ZISSEKI_TANKNUMBER <> '' "
+        SQLStr &= String.Format(" AND VIW0005.ZISSEKI_TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND VIW0005.ZISSEKI_ORDERORGCODE = '{0}' ", I_ORDERORGCODE)
+
+        Try
+            '〇SQL結果取得
+            O_dtCOMP_TANKNUMBER = SelectSearch(SQLStr)
+            '★結果が0件の場合はSKIP
+            If O_dtCOMP_TANKNUMBER.Rows.Count = 0 Then Exit Sub
+
+            For Each dtCOMP_TANKNUMBERrow As DataRow In O_dtCOMP_TANKNUMBER.Rows
+                Dim cmpTanknumber As String = dtCOMP_TANKNUMBERrow("ZISSEKI_TANKNUMBER").ToString()
+                Dim cmpGyomuTanknum As String = dtCOMP_TANKNUMBERrow("ZISSEKI_GYOMUTANKNUM").ToString()
+                Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTanknumber)
+
+                If I_dtTank.Select(condition).Count > 0 Then
+                    Continue For
+                End If
+
+                For Each dtTankrow As DataRow In I_dtTank.Select("KEYCODE01=''", "KEYCODE10")
+                    dtTankrow("KEYCODE01") = cmpTanknumber
+                    Exit For
+                Next
+
+            Next
+        Catch ex As Exception
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 実績データ(変換マスタ)届先(比較)取得用SQL
+    ''' </summary>
+    Public Sub SelectCOMP_TODOKE(ByVal I_TORICODE As String, ByVal I_ORDERORGCODE As String,
+                                 ByVal I_dtTodoke As DataTable,
+                                 Optional ByRef O_dtCOMP_TODOKE As DataTable = Nothing)
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "    VIW0005.ZISSEKI_TORICODE "
+        SQLStr &= "  , VIW0005.ZISSEKI_TORINAME "
+        SQLStr &= "  , VIW0005.ZISSEKI_ORDERORGCODE "
+        SQLStr &= "  , VIW0005.ZISSEKI_ORDERORGNAME "
+        SQLStr &= "  , VIW0005.ZISSEKI_TODOKECODE "
+        SQLStr &= "  , VIW0005.ZISSEKI_TODOKENAME "
+        SQLStr &= "  , VIW0005.ZISSEKI_ZISSEKI "
+        SQLStr &= "  , VIW0005.TORICODE "
+        SQLStr &= "  , VIW0005.TORINAME "
+        SQLStr &= "  , VIW0005.ORDERORGCODE "
+        SQLStr &= "  , VIW0005.ORDERORGNAME "
+        SQLStr &= "  , VIW0005.TODOKECODE "
+        SQLStr &= "  , VIW0005.TODOKENAME "
+
+        '-- FROM
+        SQLStr &= " FROM LNG.VIW0005_COMP_TODOKE VIW0005 "
+
+        '-- WHERE
+        SQLStr &= " WHERE "
+        SQLStr &= " VIW0005.ZISSEKI_TODOKECODE <> '' "
+        SQLStr &= String.Format(" AND VIW0005.ZISSEKI_TORICODE = '{0}' ", I_TORICODE)
+        SQLStr &= String.Format(" AND VIW0005.ZISSEKI_ORDERORGCODE = '{0}' ", I_ORDERORGCODE)
+
+        Try
+            '〇SQL結果取得
+            O_dtCOMP_TODOKE = SelectSearch(SQLStr)
+            '★結果が0件の場合はSKIP
+            If O_dtCOMP_TODOKE.Rows.Count = 0 Then Exit Sub
+
+            For Each dtCOMP_TODOKErow As DataRow In O_dtCOMP_TODOKE.Rows
+                Dim cmpTodokeCode As String = dtCOMP_TODOKErow("ZISSEKI_TODOKECODE").ToString()
+                Dim cmpTodokeName As String = dtCOMP_TODOKErow("ZISSEKI_TODOKENAME").ToString()
+                Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTodokeCode)
+
+                If I_dtTodoke.Select(condition).Count > 0 Then
+                    Continue For
+                End If
+
+                For Each dtTodokerow As DataRow In I_dtTodoke.Select("VALUE02='1'", "KEYCODE03")
+                    If dtTodokerow("KEYCODE01").ToString().Substring(0, 5) = "99999" Then
+                        Continue For
+                    End If
+
+                    dtTodokerow("KEYCODE01") = cmpTodokeCode
+                    dtTodokerow("KEYCODE02") = cmpTodokeName
+                    dtTodokerow("VALUE01") = cmpTodokeName
+                    dtTodokerow("VALUE06") = cmpTodokeName
+                    Exit For
+                Next
+
+            Next
+        Catch ex As Exception
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' マスタ検索処理
     ''' </summary>
     ''' <param name="I_CODE"></param>

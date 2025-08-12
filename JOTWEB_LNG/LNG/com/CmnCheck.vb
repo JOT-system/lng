@@ -79,8 +79,10 @@ Public Class CmnCheck
             SQLcon.Open()  ' DataBase接続
             '--〇変換マスタ(陸事番号マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
+            'CMNPTS.SelectCOMP_TANKNUMBER(arrToriCode(0), arrToriCode(1), dtEneosTank)
             '--〇変換マスタ(届先出荷場所車庫マスタ)
             CMNPTS.SelectCONVERTMaster(SQLcon, eneosTodokeClass, dtEneosTodoke)
+            'CMNPTS.SelectCOMP_TODOKE(arrToriCode(0), arrToriCode(1), dtEneosTodoke)
             '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", eneosTodokeClass, LNT0001Tanktbl)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", eneosTodokeClass, LNT0001Tanktbl)
