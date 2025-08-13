@@ -74,8 +74,18 @@ p {
 }
 
 
-#WF_TORI, #WF_ORG, #WF_DEPARTURE {
-    width: 100px !important;
+#WF_TORI {
+    width: 155px !important;
+    margin-right: 10px;
+}
+
+#WF_ORG {
+    width: 155px !important;
+    margin-right: 10px;
+}
+
+#WF_DEPARTURE {
+    width: 240px !important;
     margin-right: 10px;
 }
 

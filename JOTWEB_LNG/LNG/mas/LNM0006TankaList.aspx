@@ -68,7 +68,7 @@
                                     <strong class="flex-shrink-0">対象日</strong>
                                         <b class="calendararea">
                                             <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                                <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS"  data-input>
+                                                <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
                                                 <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
                                                     <span class="material-symbols-outlined">calendar_month</span>
                                                 </span>
@@ -77,11 +77,11 @@
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">荷主</strong>
-                                        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TORIChange');" />
+                                        <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectTORIChange');" />
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0">部門</strong>
-                                        <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0"/>
+                                        <asp:DropDownList ID="WF_ORG" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectORGChange');" />
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="divItem">
@@ -91,8 +91,8 @@
                                             </a>
                                         </div>
                                     </div>
-
                                     <input type="button" id="WF_ButtonExtract" class="btn-sticky btn-search" value="検索" onclick="ButtonClick('WF_ButtonExtract');" />
+                                    <input type="button" id="WF_ButtonRelease" class="btn-sticky" value="解除"  onclick="ButtonClick('WF_ButtonRelease');" />
                                 </div>
                             </div>
                         </div>
@@ -102,7 +102,7 @@
                                 <div class="actionButtonBox">
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0" id="WF_DEPARTURE_LABEL">出荷地</strong>
-                                        <asp:DropDownList ID="WF_DEPARTURE" runat="server" class="form-select rounded-0"/>
+                                        <asp:DropDownList ID="WF_DEPARTURE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SelectDEPARTUREChange');" />
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <strong class="flex-shrink-0" id="WF_SHABAN">車番</strong>

@@ -98,24 +98,35 @@ Public Class LNM0006TankaList
                             GridViewInitialize()
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
-                        Case "WF_ButtonExtract" '検索ボタン押下時
+                        Case "WF_SelectCALENDARChange"  '対象年月(変更)時
+                            MapInitialize()
+                        Case "WF_SelectTORIChange",     '荷主(変更)時
+                             "WF_SelectORGChange",      '部門(変更)時
+                             "WF_SelectDEPARTUREChange" '出荷(変更)時
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
+                        Case "WF_ButtonExtract"         '検索ボタン押下時
                             GridViewInitialize()
+                        Case "WF_ButtonRelease"         '解除ボタンクリック
+                            MapInitialize(resVal:=WF_ButtonClick.Value)
+                            'WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
                             Me.WF_ButtonPAGE_Click()
-                        Case "WF_TORIChange" '荷主チェンジ
-                            Me.WF_TODOKE.Items.Clear()
-                            If Not WF_TORI.SelectedValue = "" Then
-                                Dim retTodokeList As New DropDownList
-                                retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_TORI.SelectedValue)
-                                For index As Integer = 0 To retTodokeList.Items.Count - 1
-                                    WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
-                                Next
-                            End If
+                            'Case "WF_TORIChange"            '荷主チェンジ
+                            '    Me.WF_TODOKE.Items.Clear()
+                            '    If Not WF_TORI.SelectedValue = "" Then
+                            '        Dim retTodokeList As New DropDownList
+                            '        retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_TORI.SelectedValue)
+                            '        For index As Integer = 0 To retTodokeList.Items.Count - 1
+                            '            WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+                            '        Next
+                            '    End If
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonUPLOAD" And
+                        Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" And
                         Not WF_ButtonClick.Value = "WF_ButtonExtract" And
+                        Not WF_ButtonClick.Value = "WF_ButtonRelease" And
                         Not WF_ButtonClick.Value = "WF_ButtonPAGE" And
                         Not WF_ButtonClick.Value = "WF_ButtonFIRST" And
                         Not WF_ButtonClick.Value = "WF_ButtonPREVIOUS" And
@@ -179,6 +190,7 @@ Public Class LNM0006TankaList
         rightview.Initialize("")
 
         '○ ドロップダウンリスト生成
+        WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
         createListBox()
 
         '○ 画面の値設定
@@ -206,11 +218,11 @@ Public Class LNM0006TankaList
     ''' ドロップダウン生成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub createListBox()
+    Protected Sub createListBox(Optional ByVal resVal As String = Nothing)
         '荷主
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
-        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
@@ -218,15 +230,26 @@ Public Class LNM0006TankaList
         '部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
         For index As Integer = 0 To retOrgList.Items.Count - 1
             WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
         Next
 
+        '★解除ボタン押下
+        If resVal = "WF_ButtonRelease" Then
+            '届先
+            Me.WF_TODOKE.Items.Clear()
+            'Dim retTodokeList As New DropDownList
+            'retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
+            'For index As Integer = 0 To retTodokeList.Items.Count - 1
+            '    WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+            'Next
+        End If
+
         '出荷地
         Me.WF_DEPARTURE.Items.Clear()
         Dim retDepartureList As New DropDownList
-        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG)
+        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
         For index As Integer = 0 To retDepartureList.Items.Count - 1
             WF_DEPARTURE.Items.Add(New ListItem(retDepartureList.Items(index).Text, retDepartureList.Items(index).Value))
         Next
@@ -794,6 +817,111 @@ Public Class LNM0006TankaList
     ''' <remarks></remarks>
     Protected Sub WF_ButtonHISTORY_Click()
         Server.Transfer("~/LNG/mas/LNM0006TankaHistory.aspx")
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">荷主(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),届先(変更)時(WF_SelectTODOKEChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■荷主(情報)取得
+        Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■出荷(情報)取得
+        Dim selectDEPARTURE As String = WF_DEPARTURE.SelectedValue
+        Dim selectindexDEPARTURE As Integer = WF_DEPARTURE.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '荷主(変更)時
+            Case "WF_SelectTORIChange"
+                selectORG = ""              '-- 部門(表示)初期化
+                selectindexORG = 0          '-- 部門(INDEX)初期化
+                selectDEPARTURE = ""        '-- 出荷(表示)初期化
+                selectindexDEPARTURE = 0    '-- 出荷(INDEX)初期化
+            '部門(変更)時
+            Case "WF_SelectORGChange"
+                selectDEPARTURE = ""        '-- 出荷(表示)初期化
+                selectindexDEPARTURE = 0    '-- 出荷(INDEX)初期化
+            '出荷(変更)時
+            Case "WF_SelectDEPARTUREChange"
+
+        End Select
+
+        '〇荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
+        '★ドロップダウンリスト選択(荷主)の場合
+        If retToriList.Items(0).Text <> "全て表示" Then
+            WF_TORI.Items.Add(New ListItem("全て表示", ""))
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(荷主)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        WF_TORI.SelectedIndex = selectindexTORI
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items(0).Text <> "全て表示" Then
+            WF_ORG.Items.Add(New ListItem("全て表示", ""))
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        WF_ORG.SelectedIndex = selectindexORG
+
+        '〇届先
+        Me.WF_TODOKE.Items.Clear()
+        If Not WF_TORI.SelectedValue = "" Then
+            Dim retTodokeList As New DropDownList
+            retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SHUKABASHO:=selectDEPARTURE)
+            For index As Integer = 0 To retTodokeList.Items.Count - 1
+                WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+            Next
+        End If
+
+        '〇出荷
+        Me.WF_DEPARTURE.Items.Clear()
+        Dim retDepartureList As New DropDownList
+        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SHUKABASHO:=selectDEPARTURE)
+        '★ドロップダウンリスト選択(出荷)の場合
+        If retDepartureList.Items(0).Text <> "全て表示" Then
+            WF_DEPARTURE.Items.Add(New ListItem("全て表示", ""))
+            selectindexDEPARTURE = 1
+        End If
+        '★ドロップダウンリスト再作成(出荷)
+        For index As Integer = 0 To retDepartureList.Items.Count - 1
+            WF_DEPARTURE.Items.Add(New ListItem(retDepartureList.Items(index).Text, retDepartureList.Items(index).Value))
+        Next
+        WF_DEPARTURE.SelectedIndex = selectindexDEPARTURE
+
+    End Sub
+
+    ''' <summary>
+    ''' 画面初期化処理
+    ''' </summary>
+    Private Sub MapInitialize(Optional ByVal resVal As String = Nothing)
+        'ドロップダウン生成処理
+        createListBox(resVal:=WF_ButtonClick.Value)
+
+        'GridViewデータ設定
+        GridViewInitialize()
+
     End Sub
 
     ''' <summary>

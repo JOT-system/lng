@@ -232,7 +232,7 @@ Public Class LNM0006TankaDetail
         Me.WF_TORI.Items.Add("")
 
         Dim retToriList As New DropDownList
-        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
@@ -249,7 +249,7 @@ Public Class LNM0006TankaDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
@@ -285,7 +285,7 @@ Public Class LNM0006TankaDetail
         Me.WF_AVOCADOSHUKA.Items.Add("")
 
         Dim retAvocadoshukaiList As New DropDownList
-        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG)
+        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
         For index As Integer = 0 To retAvocadoshukaiList.Items.Count - 1
             WF_AVOCADOSHUKA.Items.Add(New ListItem(retAvocadoshukaiList.Items(index).Text, retAvocadoshukaiList.Items(index).Value))
         Next
@@ -303,7 +303,7 @@ Public Class LNM0006TankaDetail
         Me.WF_AVOCADOTODOKE.Items.Add("")
 
         Dim retAvocadotodokeList As New DropDownList
-        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG)
+        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
         For index As Integer = 0 To retAvocadotodokeList.Items.Count - 1
             WF_AVOCADOTODOKE.Items.Add(New ListItem(retAvocadotodokeList.Items(index).Text, retAvocadotodokeList.Items(index).Value))
         Next
