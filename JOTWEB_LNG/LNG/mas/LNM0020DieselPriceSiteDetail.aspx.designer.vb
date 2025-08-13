@@ -12,7 +12,7 @@ Option Explicit On
 
 
 Partial Public Class LNM0020DieselPriceSiteDetail
-    
+
     '''<summary>
     '''leftmenu コントロール。
     '''</summary>
@@ -21,7 +21,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
-    
+
     '''<summary>
     '''WF_MAPID_L コントロール。
     '''</summary>
@@ -30,7 +30,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPID_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''TxtMapId コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtMapId As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_MAPID_TEXT コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPID_TEXT As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_SEL_LINECNT_L コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SEL_LINECNT_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''TxtSelLineCNT コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtSelLineCNT As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_DELFLG_L コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DELFLG_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''RadioDELFLG コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents RadioDELFLG As Global.System.Web.UI.WebControls.RadioButtonList
-    
+
     '''<summary>
     '''WF_CAMPCODE_L コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_CAMPCODE_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''TxtCampCode コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtCampCode As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''LblCampCodeName コントロール。
     '''</summary>
@@ -111,79 +111,79 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents LblCampCodeName As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
-    '''WF_DEISELPRICESITEID_L コントロール。
+    '''WF_DIESELPRICESITEID_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEID_L As Global.System.Web.UI.WebControls.Label
-    
+    Protected WithEvents WF_DIESELPRICESITEID_L As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_DEISELPRICESITENAME コントロール。
+    '''WF_DIESELPRICESITENAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITENAME As Global.System.Web.UI.WebControls.TextBox
-    
+    Protected WithEvents WF_DIESELPRICESITENAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_DEISELPRICESITEID コントロール。
+    '''WF_DIESELPRICESITEID コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEID As Global.System.Web.UI.WebControls.TextBox
-    
+    Protected WithEvents WF_DIESELPRICESITEID As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_DEISELPRICE コントロール。
+    '''WF_DIESELPRICE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICE As Global.System.Web.UI.WebControls.DropDownList
-    
+    Protected WithEvents WF_DIESELPRICE As Global.System.Web.UI.WebControls.DropDownList
+
     '''<summary>
-    '''WF_DEISELPRICE_DL コントロール。
+    '''WF_DIESELPRICE_DL コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICE_DL As Global.System.Web.UI.HtmlControls.HtmlGenericControl
-    
+    Protected WithEvents WF_DIESELPRICE_DL As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+
     '''<summary>
-    '''WF_DEISELPRICESITEBRANCH_L コントロール。
+    '''WF_DIESELPRICESITEBRANCH_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEBRANCH_L As Global.System.Web.UI.WebControls.Label
-    
+    Protected WithEvents WF_DIESELPRICESITEBRANCH_L As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_DEISELPRICESITEKBNNAME コントロール。
+    '''WF_DIESELPRICESITEKBNNAME コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEKBNNAME As Global.System.Web.UI.WebControls.TextBox
-    
+    Protected WithEvents WF_DIESELPRICESITEKBNNAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
-    '''WF_DEISELPRICESITEBRANCH コントロール。
+    '''WF_DIESELPRICESITEBRANCH コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEBRANCH As Global.System.Web.UI.WebControls.TextBox
-    
+    Protected WithEvents WF_DIESELPRICESITEBRANCH As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_DISPLAYNAME_L コントロール。
     '''</summary>
@@ -192,7 +192,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DISPLAYNAME_L As Global.System.Web.UI.WebControls.Label
-    
+
     '''<summary>
     '''WF_DISPLAYNAME コントロール。
     '''</summary>
@@ -201,25 +201,25 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_DISPLAYNAME As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
-    '''WF_DEISELPRICESITEURL_L コントロール。
+    '''WF_DIESELPRICESITEURL_L コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEURL_L As Global.System.Web.UI.WebControls.Label
-    
+    Protected WithEvents WF_DIESELPRICESITEURL_L As Global.System.Web.UI.WebControls.Label
+
     '''<summary>
-    '''WF_DEISELPRICESITEURL コントロール。
+    '''WF_DIESELPRICESITEURL コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEURL As Global.System.Web.UI.WebControls.TextBox
-    
+    Protected WithEvents WF_DIESELPRICESITEURL As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''rightview コントロール。
     '''</summary>
@@ -228,7 +228,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents rightview As Global.JOTWEB_LNG.GRIS0004RightBox
-    
+
     '''<summary>
     '''leftview コントロール。
     '''</summary>
@@ -237,7 +237,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents leftview As Global.JOTWEB_LNG.GRIS0005LeftBox
-    
+
     '''<summary>
     '''work コントロール。
     '''</summary>
@@ -246,7 +246,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents work As Global.JOTWEB_LNG.LNM0020WRKINC
-    
+
     '''<summary>
     '''mspShukabashoSingle コントロール。
     '''</summary>
@@ -255,7 +255,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents mspShukabashoSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
+
     '''<summary>
     '''mspTodokeCodeSingle コントロール。
     '''</summary>
@@ -264,7 +264,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents mspTodokeCodeSingle As Global.JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
-    
+
     '''<summary>
     '''DisabledKeyItem コントロール。
     '''</summary>
@@ -273,7 +273,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents DisabledKeyItem As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''DisabledKeyOrgCount コントロール。
     '''</summary>
@@ -282,7 +282,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents DisabledKeyOrgCount As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''DisabledKeyToriCount コントロール。
     '''</summary>
@@ -291,7 +291,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents DisabledKeyToriCount As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_GridDBclick コントロール。
     '''</summary>
@@ -300,7 +300,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridDBclick As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_GridPosition コントロール。
     '''</summary>
@@ -309,7 +309,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GridPosition As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_FIELD コントロール。
     '''</summary>
@@ -318,7 +318,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_FIELD_REP コントロール。
     '''</summary>
@@ -327,7 +327,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_FIELD_REP As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_SELectedIndex コントロール。
     '''</summary>
@@ -336,7 +336,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_SELectedIndex As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftMViewChange コントロール。
     '''</summary>
@@ -345,7 +345,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftMViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_LeftboxOpen コントロール。
     '''</summary>
@@ -354,7 +354,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_LeftboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightViewChange コントロール。
     '''</summary>
@@ -363,7 +363,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightViewChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_RightboxOpen コントロール。
     '''</summary>
@@ -372,7 +372,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_RightboxOpen As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_PrintURL コントロール。
     '''</summary>
@@ -381,7 +381,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_PrintURL As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_BOXChange コントロール。
     '''</summary>
@@ -390,7 +390,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_BOXChange As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_ButtonClick コントロール。
     '''</summary>
@@ -399,7 +399,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_ButtonClick As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_BeforeMAPID コントロール。
     '''</summary>
@@ -408,7 +408,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_BeforeMAPID As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''WF_MAPpermitcode コントロール。
     '''</summary>
@@ -417,43 +417,43 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_MAPpermitcode As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
-    '''WF_DEISELPRICESITENAME_SAVE コントロール。
+    '''WF_DIESELPRICESITENAME_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Protected WithEvents WF_DIESELPRICESITENAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
-    '''WF_DEISELPRICESITEID_SAVE コントロール。
+    '''WF_DIESELPRICESITEID_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEID_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Protected WithEvents WF_DIESELPRICESITEID_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
-    '''WF_DEISELPRICESITEKBNNAME_SAVE コントロール。
+    '''WF_DIESELPRICESITEKBNNAME_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEKBNNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Protected WithEvents WF_DIESELPRICESITEKBNNAME_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
-    '''WF_DEISELPRICESITEBRANCH_SAVE コントロール。
+    '''WF_DIESELPRICESITEBRANCH_SAVE コントロール。
     '''</summary>
     '''<remarks>
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_DEISELPRICESITEBRANCH_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+    Protected WithEvents WF_DIESELPRICESITEBRANCH_SAVE As Global.System.Web.UI.HtmlControls.HtmlInputText
+
     '''<summary>
     '''WF_scrollY コントロール。
     '''</summary>
@@ -462,7 +462,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_scrollY As Global.System.Web.UI.HtmlControls.HtmlInputText
-    
+
     '''<summary>
     '''Master プロパティ。
     '''</summary>
@@ -471,7 +471,7 @@ Partial Public Class LNM0020DieselPriceSiteDetail
     '''</remarks>
     Public Shadows ReadOnly Property Master() As JOTWEB_LNG.LNGMasterPage
         Get
-            Return CType(MyBase.Master,JOTWEB_LNG.LNGMasterPage)
+            Return CType(MyBase.Master, JOTWEB_LNG.LNGMasterPage)
         End Get
     End Property
 End Class

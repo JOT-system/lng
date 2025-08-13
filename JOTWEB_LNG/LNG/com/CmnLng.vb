@@ -292,13 +292,13 @@ Public Class CmnLng
         Dim sqlStat As New StringBuilder
 
         sqlStat.AppendLine("SELECT")
-        sqlStat.AppendLine("       DEISELPRICESITEID as CODE")
-        sqlStat.AppendLine("      ,DEISELPRICESITENAME as NAME")
+        sqlStat.AppendLine("       DIESELPRICESITEID as CODE")
+        sqlStat.AppendLine("      ,DIESELPRICESITENAME as NAME")
         sqlStat.AppendLine("  FROM LNG.LNM0020_DIESELPRICESITE ")
         sqlStat.AppendLine(" WHERE")
         sqlStat.AppendLine("     DELFLG = @DELFLG")
-        sqlStat.AppendLine(" GROUP BY DEISELPRICESITEID, DEISELPRICESITENAME")
-        sqlStat.AppendLine(" ORDER BY DEISELPRICESITEID")
+        sqlStat.AppendLine(" GROUP BY DIESELPRICESITEID, DIESELPRICESITENAME")
+        sqlStat.AppendLine(" ORDER BY DIESELPRICESITEID")
 
         Try
             '空白行判定
@@ -344,14 +344,14 @@ Public Class CmnLng
         Dim sqlStat As New StringBuilder
 
         sqlStat.AppendLine("SELECT")
-        sqlStat.AppendLine("       DEISELPRICESITEBRANCH as CODE")
-        sqlStat.AppendLine("      ,DEISELPRICESITEKBNNAME as NAME")
+        sqlStat.AppendLine("       DIESELPRICESITEBRANCH as CODE")
+        sqlStat.AppendLine("      ,DIESELPRICESITEKBNNAME as NAME")
         sqlStat.AppendLine("  FROM LNG.LNM0020_DIESELPRICESITE ")
         sqlStat.AppendLine(" WHERE")
         sqlStat.AppendLine("     DELFLG = @DELFLG")
-        sqlStat.AppendLine(" AND DEISELPRICESITEID = @DEISELPRICESITEID")
-        sqlStat.AppendLine(" GROUP BY DEISELPRICESITEBRANCH, DEISELPRICESITEKBNNAME")
-        sqlStat.AppendLine(" ORDER BY DEISELPRICESITEBRANCH")
+        sqlStat.AppendLine(" AND DIESELPRICESITEID = @DIESELPRICESITEID")
+        sqlStat.AppendLine(" GROUP BY DIESELPRICESITEBRANCH, DIESELPRICESITEKBNNAME")
+        sqlStat.AppendLine(" ORDER BY DIESELPRICESITEBRANCH")
 
         Try
             '空白行判定
@@ -365,7 +365,7 @@ Public Class CmnLng
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@DEISELPRICESITEID", MySqlDbType.VarChar).Value = prmDieselPriceID
+                    .Add("@DIESELPRICESITEID", MySqlDbType.VarChar).Value = prmDieselPriceID
                     .Add("@DELFLG", MySqlDbType.VarChar).Value = BaseDllConst.C_DELETE_FLG.ALIVE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()

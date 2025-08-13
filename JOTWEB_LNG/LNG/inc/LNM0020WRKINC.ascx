@@ -7,20 +7,20 @@
     <asp:TextBox ID="WF_SEL_LINECNT" runat="server"></asp:TextBox>                  <!-- 選択行 -->
 
     <!-- 一覧用 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEID_L" runat="server"></asp:TextBox>      <!-- 実勢軽油価格参照先ID -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEBRANCH_L" runat="server"></asp:TextBox>  <!-- 実勢軽油価格参照先ID枝番 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITENAME_L" runat="server"></asp:TextBox>    <!-- 実勢軽油価格参照先名 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEKBNNAME_L" runat="server"></asp:TextBox> <!-- 実勢軽油価格参照先区分名 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEID_L" runat="server"></asp:TextBox>      <!-- 実勢軽油価格参照先ID -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEBRANCH_L" runat="server"></asp:TextBox>  <!-- 実勢軽油価格参照先ID枝番 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITENAME_L" runat="server"></asp:TextBox>    <!-- 実勢軽油価格参照先名 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEKBNNAME_L" runat="server"></asp:TextBox> <!-- 実勢軽油価格参照先区分名 -->
     <asp:TextBox ID="WF_SEL_DISPLAYNAME_L" runat="server"></asp:TextBox>            <!-- 画面表示名称 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEURL_L" runat="server"></asp:TextBox>     <!-- 実勢軽油価格参照先URL -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEURL_L" runat="server"></asp:TextBox>     <!-- 実勢軽油価格参照先URL -->
 
     <!-- 登録・更新用 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEID" runat="server"></asp:TextBox>        <!-- 実勢軽油価格参照先ID -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEBRANCH" runat="server"></asp:TextBox>    <!-- 実勢軽油価格参照先ID枝番 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITENAME" runat="server"></asp:TextBox>      <!-- 実勢軽油価格参照先名 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEKBNNAME" runat="server"></asp:TextBox>   <!-- 実勢軽油価格参照先区分名 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEID" runat="server"></asp:TextBox>        <!-- 実勢軽油価格参照先ID -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEBRANCH" runat="server"></asp:TextBox>    <!-- 実勢軽油価格参照先ID枝番 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITENAME" runat="server"></asp:TextBox>      <!-- 実勢軽油価格参照先名 -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEKBNNAME" runat="server"></asp:TextBox>   <!-- 実勢軽油価格参照先区分名 -->
     <asp:TextBox ID="WF_SEL_DISPLAYNAME" runat="server"></asp:TextBox>              <!-- 画面表示名称 -->
-    <asp:TextBox ID="WF_SEL_DEISELPRICESITEURL" runat="server"></asp:TextBox>       <!-- 実勢軽油価格参照先URL -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICESITEURL" runat="server"></asp:TextBox>       <!-- 実勢軽油価格参照先URL -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
 
     <asp:TextBox ID="WF_SEL_TIMESTAMP" runat="server"></asp:TextBox>                <!-- タイムスタンプ -->

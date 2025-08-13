@@ -18,20 +18,20 @@ window.onload = function () {
         document.getElementById('WF_ButtonUPDATE').value = "登録";
     } else {
         //値復元
-        document.getElementById('WF_DEISELPRICESITENAME').value = document.getElementById('WF_DEISELPRICESITENAME_SAVE').value;
-        document.getElementById('WF_DEISELPRICESITEID').value = document.getElementById('WF_DEISELPRICESITEID_SAVE').value; 
-        document.getElementById('WF_DEISELPRICESITEKBNNAME').value = document.getElementById('WF_DEISELPRICESITEKBNNAME_SAVE').value; 
-        document.getElementById('WF_DEISELPRICESITEBRANCH').value = document.getElementById('WF_DEISELPRICESITEBRANCH_SAVE').value; 
+        document.getElementById('WF_DIESELPRICESITENAME').value = document.getElementById('WF_DIESELPRICESITENAME_SAVE').value;
+        document.getElementById('WF_DIESELPRICESITEID').value = document.getElementById('WF_DIESELPRICESITEID_SAVE').value; 
+        document.getElementById('WF_DIESELPRICESITEKBNNAME').value = document.getElementById('WF_DIESELPRICESITEKBNNAME_SAVE').value; 
+        document.getElementById('WF_DIESELPRICESITEBRANCH').value = document.getElementById('WF_DIESELPRICESITEBRANCH_SAVE').value; 
 
-        document.getElementById('WF_DEISELPRICESITENAME').disabled = true; 
-        document.getElementById('WF_DEISELPRICESITEID').disabled = true; 
-        document.getElementById('WF_DEISELPRICESITEKBNNAME').disabled = true; 
-        document.getElementById('WF_DEISELPRICESITEBRANCH').disabled = true; 
+        document.getElementById('WF_DIESELPRICESITENAME').disabled = true; 
+        document.getElementById('WF_DIESELPRICESITEID').disabled = true; 
+        document.getElementById('WF_DIESELPRICESITEKBNNAME').disabled = true; 
+        document.getElementById('WF_DIESELPRICESITEBRANCH').disabled = true; 
 
-        document.getElementById('WF_DEISELPRICESITENAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_DEISELPRICESITEID').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_DEISELPRICESITEKBNNAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_DEISELPRICESITEBRANCH').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DIESELPRICESITENAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DIESELPRICESITEID').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DIESELPRICESITEKBNNAME').style.backgroundColor = "#F2F2F2";
+        document.getElementById('WF_DIESELPRICESITEBRANCH').style.backgroundColor = "#F2F2F2";
     }
 };
 

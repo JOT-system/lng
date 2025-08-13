@@ -300,12 +300,12 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("   , 0                                               AS LINECNT               ")
         SQLStr.AppendLine("   , ''                                              AS OPERATION             ")
         SQLStr.AppendLine("   , LNM20.UPDTIMSTP                                 AS UPDTIMSTP             ")
-        SQLStr.AppendLine("   , LNM20.DEISELPRICESITEID                         AS DEISELPRICESITEID     ")
-        SQLStr.AppendLine("   , LNM20.DEISELPRICESITEBRANCH                     AS DEISELPRICESITEBRANCH ")
-        SQLStr.AppendLine("   , LNM20.DEISELPRICESITENAME                       AS DEISELPRICESITENAME   ")
-        SQLStr.AppendLine("   , LNM20.DEISELPRICESITEKBNNAME                    AS DEISELPRICESITEKBNNAME")
+        SQLStr.AppendLine("   , LNM20.DIESELPRICESITEID                         AS DIESELPRICESITEID     ")
+        SQLStr.AppendLine("   , LNM20.DIESELPRICESITEBRANCH                     AS DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("   , LNM20.DIESELPRICESITENAME                       AS DIESELPRICESITENAME   ")
+        SQLStr.AppendLine("   , LNM20.DIESELPRICESITEKBNNAME                    AS DIESELPRICESITEKBNNAME")
         SQLStr.AppendLine("   , LNM20.DISPLAYNAME                               AS DISPLAYNAME           ")
-        SQLStr.AppendLine("   , LNM20.DEISELPRICESITEURL                        AS DEISELPRICESITEURL    ")
+        SQLStr.AppendLine("   , LNM20.DIESELPRICESITEURL                        AS DIESELPRICESITEURL    ")
         SQLStr.AppendLine("   , LNM20.DELFLG                                    AS DELFLG                ")
         SQLStr.AppendLine(" FROM                                                                         ")
         SQLStr.AppendLine("     LNG.LNM0020_DIESELPRICESITE LNM20                                        ")
@@ -316,8 +316,8 @@ Public Class LNM0020DieselPriceSiteList
             SQLStr.AppendLine(" AND  LNM20.DELFLG = '0'                                                  ")
         End If
         SQLStr.AppendLine(" ORDER BY                                                                     ")
-        SQLStr.AppendLine("     LNM20.DEISELPRICESITEID                                                  ")
-        SQLStr.AppendLine("    ,LNM20.DEISELPRICESITEBRANCH                                              ")
+        SQLStr.AppendLine("     LNM20.DIESELPRICESITEID                                                  ")
+        SQLStr.AppendLine("    ,LNM20.DIESELPRICESITEBRANCH                                              ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -363,12 +363,12 @@ Public Class LNM0020DieselPriceSiteList
         work.WF_SEL_LINECNT.Text = ""                                             '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)    '削除
 
-        work.WF_SEL_DEISELPRICESITEID.Text = ""                                   '実勢軽油価格参照先ID
-        work.WF_SEL_DEISELPRICESITEBRANCH.Text = ""                               '実勢軽油価格参照先ID枝番
-        work.WF_SEL_DEISELPRICESITENAME.Text = ""                                 '実勢軽油価格参照先名
-        work.WF_SEL_DEISELPRICESITEKBNNAME.Text = ""                              '実勢軽油価格参照先区分名
+        work.WF_SEL_DIESELPRICESITEID.Text = ""                                   '実勢軽油価格参照先ID
+        work.WF_SEL_DIESELPRICESITEBRANCH.Text = ""                               '実勢軽油価格参照先ID枝番
+        work.WF_SEL_DIESELPRICESITENAME.Text = ""                                 '実勢軽油価格参照先名
+        work.WF_SEL_DIESELPRICESITEKBNNAME.Text = ""                              '実勢軽油価格参照先区分名
         work.WF_SEL_DISPLAYNAME.Text = ""                                         '画面表示名称
-        work.WF_SEL_DEISELPRICESITEURL.Text = ""                                  '実勢軽油価格参照先URL
+        work.WF_SEL_DIESELPRICESITEURL.Text = ""                                  '実勢軽油価格参照先URL
 
         work.WF_SEL_TIMESTAMP.Text = ""         　                                'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                               '詳細画面更新メッセージ
@@ -587,12 +587,12 @@ Public Class LNM0020DieselPriceSiteList
 
         work.WF_SEL_LINECNT.Text = LNM0020tbl.Rows(WW_LineCNT)("LINECNT")                                   '選択行
 
-        work.WF_SEL_DEISELPRICESITEID.Text = LNM0020tbl.Rows(WW_LineCNT)("DEISELPRICESITEID")               '実勢軽油価格参照先ID
-        work.WF_SEL_DEISELPRICESITEBRANCH.Text = LNM0020tbl.Rows(WW_LineCNT)("DEISELPRICESITEBRANCH")       '実勢軽油価格参照先ID枝番
-        work.WF_SEL_DEISELPRICESITENAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DEISELPRICESITENAME")           '実勢軽油価格参照先名
-        work.WF_SEL_DEISELPRICESITEKBNNAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DEISELPRICESITEKBNNAME")     '実勢軽油価格参照先区分名
+        work.WF_SEL_DIESELPRICESITEID.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITEID")               '実勢軽油価格参照先ID
+        work.WF_SEL_DIESELPRICESITEBRANCH.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITEBRANCH")       '実勢軽油価格参照先ID枝番
+        work.WF_SEL_DIESELPRICESITENAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITENAME")           '実勢軽油価格参照先名
+        work.WF_SEL_DIESELPRICESITEKBNNAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITEKBNNAME")     '実勢軽油価格参照先区分名
         work.WF_SEL_DISPLAYNAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DISPLAYNAME")                           '画面表示名称
-        work.WF_SEL_DEISELPRICESITEURL.Text = LNM0020tbl.Rows(WW_LineCNT)("DEISELPRICESITEURL")             '実勢軽油価格参照先URL
+        work.WF_SEL_DIESELPRICESITEURL.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITEURL")             '実勢軽油価格参照先URL
 
         work.WF_SEL_DELFLG.Text = LNM0020tbl.Rows(WW_LineCNT)("DELFLG")          '削除フラグ
         work.WF_SEL_TIMESTAMP.Text = LNM0020tbl.Rows(WW_LineCNT)("UPDTIMSTP")    'タイムスタンプ
@@ -612,7 +612,7 @@ Public Class LNM0020DieselPriceSiteList
             ' DataBase接続
             SQLcon.Open()
             ' 排他チェック
-            work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text, work.WF_SEL_DEISELPRICESITEID.Text, work.WF_SEL_DEISELPRICESITEBRANCH.Text)
+            work.HaitaCheck(SQLcon, WW_DBDataCheck, work.WF_SEL_TIMESTAMP.Text, work.WF_SEL_DIESELPRICESITEID.Text, work.WF_SEL_DIESELPRICESITEBRANCH.Text)
         End Using
 
         If Not isNormal(WW_DBDataCheck) Then
@@ -646,20 +646,20 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
-        SQLStr.Append("     DEISELPRICESITEID    = @DEISELPRICESITEID ")
-        SQLStr.Append(" AND DEISELPRICESITEBRANCH= @DEISELPRICESITEBRANCH ")
+        SQLStr.Append("     DIESELPRICESITEID    = @DIESELPRICESITEID ")
+        SQLStr.Append(" AND DIESELPRICESITEBRANCH= @DIESELPRICESITEBRANCH ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)                  '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)          '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)                  '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)          '実勢軽油価格参照先ID枝番
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)             '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)        '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)    '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)        '更新プログラムＩＤ
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")                       '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")               '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")                       '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")               '実勢軽油価格参照先ID枝番
                 P_UPDYMD.Value = WW_NOW                         '更新年月日
                 P_UPDUSER.Value = Master.USERID                 '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID           '更新端末
@@ -689,16 +689,16 @@ Public Class LNM0020DieselPriceSiteList
         SQLStrTimStp.Append(" FROM                                                  ")
         SQLStrTimStp.Append("     LNG.LNM0020_DIESELPRICESITE                       ")
         SQLStrTimStp.Append(" WHERE                                                 ")
-        SQLStrTimStp.Append("     DEISELPRICESITEID    = @DEISELPRICESITEID         ")
-        SQLStrTimStp.Append(" AND DEISELPRICESITEBRANCH= @DEISELPRICESITEBRANCH     ")
+        SQLStrTimStp.Append("     DIESELPRICESITEID    = @DIESELPRICESITEID         ")
+        SQLStrTimStp.Append(" AND DIESELPRICESITEBRANCH= @DIESELPRICESITEBRANCH     ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStrTimStp.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)                  '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)          '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)                  '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)          '実勢軽油価格参照先ID枝番
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")                       '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")               '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")                       '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")               '実勢軽油価格参照先ID枝番
 
                 Dim WW_Tbl = New DataTable
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -937,14 +937,14 @@ Public Class LNM0020DieselPriceSiteList
     Public Sub SetREQUNNECEHATCHING(ByVal sheet As IWorksheet)
         '入力必須列網掛け
         sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DELFLG).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '削除フラグ
-        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITENAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実勢軽油価格参照先名
+        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITENAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実勢軽油価格参照先名
 
         '入力不要列網掛け
-        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEKBNNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先区分名
-        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID
-        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID枝番
+        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEKBNNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先区分名
+        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID
+        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID枝番
         sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DISPLAYNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '画面表示名称
-        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEURL).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先URL
+        sheet.Columns(LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEURL).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先URL
 
         '1,2行の網掛けは消す
         sheet.Rows(0).Interior.ColorIndex = 0
@@ -995,12 +995,12 @@ Public Class LNM0020DieselPriceSiteList
         Dim WW_HEADERROW As Integer = 2
 
         sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DELFLG).Value = "（必須）削除フラグ"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID).Value = "実勢軽油価格参照先ID"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH).Value = "実勢軽油価格参照先ID枝番"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITENAME).Value = "（必須）実勢軽油価格参照先名"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEKBNNAME).Value = "実勢軽油価格参照先区分名"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Value = "実勢軽油価格参照先ID"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Value = "実勢軽油価格参照先ID枝番"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITENAME).Value = "（必須）実勢軽油価格参照先名"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEKBNNAME).Value = "実勢軽油価格参照先区分名"
         sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DISPLAYNAME).Value = "画面表示名称"
-        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEURL).Value = "実勢軽油価格参照先URL"
+        sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEURL).Value = "実勢軽油価格参照先URL"
 
         Dim WW_TEXT As String = ""
         Dim WW_TEXTLIST = New StringBuilder
@@ -1026,8 +1026,8 @@ Public Class LNM0020DieselPriceSiteList
             WW_TEXTLIST.AppendLine("新規追加の場合、")
             WW_TEXTLIST.AppendLine("実勢軽油価格参照先IDを空白にしてください。")
             WW_TEXT = WW_TEXTLIST.ToString
-            sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID).AddComment(WW_TEXT)
-            With sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID).Comment.Shape
+            sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Comment.Shape
                 .Width = 200
                 .Height = 40
             End With
@@ -1037,8 +1037,8 @@ Public Class LNM0020DieselPriceSiteList
             WW_TEXTLIST.AppendLine("新規追加の場合、")
             WW_TEXTLIST.AppendLine("実勢軽油価格参照先ID枝番を空白にしてください。")
             WW_TEXT = WW_TEXTLIST.ToString
-            sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH).AddComment(WW_TEXT)
-            With sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH).Comment.Shape
+            sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).AddComment(WW_TEXT)
+            With sheet.Cells(WW_HEADERROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Comment.Shape
                 .Width = 200
                 .Height = 40
             End With
@@ -1121,12 +1121,12 @@ Public Class LNM0020DieselPriceSiteList
         For Each Row As DataRow In LNM0020tbl.Rows
             '値
             sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID).Value = Row("DEISELPRICESITEID") '実勢軽油価格参照先ID
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH).Value = Row("DEISELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITENAME).Value = Row("DEISELPRICESITENAME") '実勢軽油価格参照先名
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEKBNNAME).Value = Row("DEISELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Value = Row("DIESELPRICESITEID") '実勢軽油価格参照先ID
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Value = Row("DIESELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITENAME).Value = Row("DIESELPRICESITENAME") '実勢軽油価格参照先名
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEKBNNAME).Value = Row("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
             sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DISPLAYNAME).Value = Row("DISPLAYNAME") '画面表示名称
-            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEURL).Value = Row("DEISELPRICESITEURL") '実勢軽油価格参照先URL
+            sheet.Cells(WW_ACTIVEROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEURL).Value = Row("DIESELPRICESITEURL") '実勢軽油価格参照先URL
 
             WW_ACTIVEROW += 1
         Next
@@ -1549,12 +1549,12 @@ Public Class LNM0020DieselPriceSiteList
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT ")
         SQLStr.AppendLine("   0   AS LINECNT ")
-        SQLStr.AppendLine("        ,DEISELPRICESITEID  ")
-        SQLStr.AppendLine("        ,DEISELPRICESITEBRANCH  ")
-        SQLStr.AppendLine("        ,DEISELPRICESITENAME  ")
-        SQLStr.AppendLine("        ,DEISELPRICESITEKBNNAME  ")
+        SQLStr.AppendLine("        ,DIESELPRICESITEID  ")
+        SQLStr.AppendLine("        ,DIESELPRICESITEBRANCH  ")
+        SQLStr.AppendLine("        ,DIESELPRICESITENAME  ")
+        SQLStr.AppendLine("        ,DIESELPRICESITEKBNNAME  ")
         SQLStr.AppendLine("        ,DISPLAYNAME  ")
-        SQLStr.AppendLine("        ,DEISELPRICESITEURL  ")
+        SQLStr.AppendLine("        ,DIESELPRICESITEURL  ")
         SQLStr.AppendLine("        ,DELFLG  ")
         SQLStr.AppendLine(" FROM LNG.LNM0020_DIESELPRICESITE ")
         SQLStr.AppendLine(" LIMIT 0 ")
@@ -1617,36 +1617,36 @@ Public Class LNM0020DieselPriceSiteList
 
                 '◆データセット
                 '実勢軽油価格参照先ID
-                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEID))
-                WW_DATATYPE = DataTypeHT("DEISELPRICESITEID")
-                LNM0020Exceltblrow("DEISELPRICESITEID") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先ID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEID))
+                WW_DATATYPE = DataTypeHT("DIESELPRICESITEID")
+                LNM0020Exceltblrow("DIESELPRICESITEID") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先ID", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                 End If
 
                 '実勢軽油価格参照先ID枝番
-                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEBRANCH))
-                WW_DATATYPE = DataTypeHT("DEISELPRICESITEBRANCH")
-                LNM0020Exceltblrow("DEISELPRICESITEBRANCH") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先ID枝番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH))
+                WW_DATATYPE = DataTypeHT("DIESELPRICESITEBRANCH")
+                LNM0020Exceltblrow("DIESELPRICESITEBRANCH") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先ID枝番", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                 End If
 
                 '実勢軽油価格参照先名
-                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITENAME))
-                WW_DATATYPE = DataTypeHT("DEISELPRICESITENAME")
-                LNM0020Exceltblrow("DEISELPRICESITENAME") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITENAME))
+                WW_DATATYPE = DataTypeHT("DIESELPRICESITENAME")
+                LNM0020Exceltblrow("DIESELPRICESITENAME") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                 End If
 
                 '実勢軽油価格参照先区分名
-                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEKBNNAME))
-                WW_DATATYPE = DataTypeHT("DEISELPRICESITEKBNNAME")
-                LNM0020Exceltblrow("DEISELPRICESITEKBNNAME") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先区分名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEKBNNAME))
+                WW_DATATYPE = DataTypeHT("DIESELPRICESITEKBNNAME")
+                LNM0020Exceltblrow("DIESELPRICESITEKBNNAME") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先区分名", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
@@ -1662,9 +1662,9 @@ Public Class LNM0020DieselPriceSiteList
                 End If
 
                 '実勢軽油価格参照先URL
-                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DEISELPRICESITEURL))
-                WW_DATATYPE = DataTypeHT("DEISELPRICESITEURL")
-                LNM0020Exceltblrow("DEISELPRICESITEURL") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先URL", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0020WRKINC.INOUTEXCELCOL.DIESELPRICESITEURL))
+                WW_DATATYPE = DataTypeHT("DIESELPRICESITEURL")
+                LNM0020Exceltblrow("DIESELPRICESITEURL") = LNM0020WRKINC.DataConvert("実勢軽油価格参照先URL", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
@@ -1707,34 +1707,34 @@ Public Class LNM0020DieselPriceSiteList
 
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine("    Select")
-        SQLStr.AppendLine("        DEISELPRICESITEID")
+        SQLStr.AppendLine("        DIESELPRICESITEID")
         SQLStr.AppendLine("    FROM")
         SQLStr.AppendLine("        LNG.LNM0020_DIESELPRICESITE")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         COALESCE(DEISELPRICESITEID, '')                  = @DEISELPRICESITEID ")
-        SQLStr.AppendLine("    AND  COALESCE(DEISELPRICESITEBRANCH, '')              = @DEISELPRICESITEBRANCH ")
-        SQLStr.AppendLine("    AND  COALESCE(DEISELPRICESITENAME, '')                = @DEISELPRICESITENAME ")
-        SQLStr.AppendLine("    AND  COALESCE(DEISELPRICESITEKBNNAME, '')             = @DEISELPRICESITEKBNNAME ")
+        SQLStr.AppendLine("         COALESCE(DIESELPRICESITEID, '')                  = @DIESELPRICESITEID ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESITEBRANCH, '')              = @DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESITENAME, '')                = @DIESELPRICESITENAME ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESITEKBNNAME, '')             = @DIESELPRICESITEKBNNAME ")
         SQLStr.AppendLine("    AND  COALESCE(DISPLAYNAME, '')                        = @DISPLAYNAME ")
-        SQLStr.AppendLine("    AND  COALESCE(DEISELPRICESITEURL, '')                 = @DEISELPRICESITEURL ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESITEURL, '')                 = @DIESELPRICESITEURL ")
         SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')                             = @DELFLG ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
-                Dim P_DEISELPRICESITENAME As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITENAME", MySqlDbType.VarChar)        '実勢軽油価格参照先名
-                Dim P_DEISELPRICESITEKBNNAME As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEKBNNAME", MySqlDbType.VarChar)  '実勢軽油価格参照先区分名
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITENAME As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITENAME", MySqlDbType.VarChar)        '実勢軽油価格参照先名
+                Dim P_DIESELPRICESITEKBNNAME As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEKBNNAME", MySqlDbType.VarChar)  '実勢軽油価格参照先区分名
                 Dim P_DISPLAYNAME As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYNAME", MySqlDbType.VarChar)                        '画面表示名称
-                Dim P_DEISELPRICESITEURL As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEURL", MySqlDbType.VarChar, 1)       '実勢軽油価格参照先URL
+                Dim P_DIESELPRICESITEURL As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEURL", MySqlDbType.VarChar, 1)       '実勢軽油価格参照先URL
                 Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)     '削除フラグ
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")                     '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
-                P_DEISELPRICESITENAME.Value = WW_ROW("DEISELPRICESITENAME")                 '実勢軽油価格参照先名
-                P_DEISELPRICESITEKBNNAME.Value = WW_ROW("DEISELPRICESITEKBNNAME")           '実勢軽油価格参照先区分名
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")                     '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITENAME.Value = WW_ROW("DIESELPRICESITENAME")                 '実勢軽油価格参照先名
+                P_DIESELPRICESITEKBNNAME.Value = WW_ROW("DIESELPRICESITEKBNNAME")           '実勢軽油価格参照先区分名
                 P_DISPLAYNAME.Value = WW_ROW("DISPLAYNAME")                                 '画面表示名称
-                P_DEISELPRICESITEURL.Value = WW_ROW("DEISELPRICESITEURL")                   '実勢軽油価格参照先URL
+                P_DIESELPRICESITEURL.Value = WW_ROW("DIESELPRICESITEURL")                   '実勢軽油価格参照先URL
                 P_DELFLG.Value = WW_ROW("DELFLG")                                           '削除フラグ
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -1779,7 +1779,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '一意キーが未入力の場合処理を終了する
-        If WW_ROW("DEISELPRICESITEID") = "" AndAlso WW_ROW("DEISELPRICESITEBRANCH") = "" Then
+        If WW_ROW("DIESELPRICESITEID") = "" AndAlso WW_ROW("DIESELPRICESITEBRANCH") = "" Then
             Exit Function
         End If
 
@@ -1790,16 +1790,16 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("    FROM")
         SQLStr.AppendLine("        LNG.LNM0020_DIESELPRICESITE")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("        DEISELPRICESITEID      = @DEISELPRICESITEID    ")
-        SQLStr.AppendLine("    AND DEISELPRICESITEBRANCH  = @DEISELPRICESITEBRANCH")
+        SQLStr.AppendLine("        DIESELPRICESITEID      = @DIESELPRICESITEID    ")
+        SQLStr.AppendLine("    AND DIESELPRICESITEBRANCH  = @DIESELPRICESITEBRANCH")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")             '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")             '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -1856,20 +1856,20 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.Append("   , UPDTERMID            = @UPDTERMID       ")
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
-        SQLStr.AppendLine("        DEISELPRICESITEID      = @DEISELPRICESITEID    ")
-        SQLStr.AppendLine("    AND DEISELPRICESITEBRANCH  = @DEISELPRICESITEBRANCH")
+        SQLStr.AppendLine("        DIESELPRICESITEID      = @DIESELPRICESITEID    ")
+        SQLStr.AppendLine("    AND DIESELPRICESITEBRANCH  = @DIESELPRICESITEBRANCH")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)             '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)        '更新ユーザーＩＤ
                 Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar, 20)    '更新端末
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)        '更新プログラムＩＤ
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")             '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")             '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
                 P_UPDYMD.Value = WW_DATENOW                             '更新年月日
                 P_UPDUSER.Value = Master.USERID                         '更新ユーザーＩＤ
                 P_UPDTERMID.Value = Master.USERTERMID                   '更新端末
@@ -1903,12 +1903,12 @@ Public Class LNM0020DieselPriceSiteList
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine("  INSERT INTO LNG.LNM0020_DIESELPRICESITE")
         SQLStr.AppendLine("   (  ")
-        SQLStr.AppendLine("      DEISELPRICESITEID  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEBRANCH  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITENAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEKBNNAME  ")
+        SQLStr.AppendLine("      DIESELPRICESITEID  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEBRANCH  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITENAME  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEKBNNAME  ")
         SQLStr.AppendLine("     ,DISPLAYNAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEURL  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEURL  ")
         SQLStr.AppendLine("     ,DELFLG  ")
         SQLStr.AppendLine("     ,INITYMD  ")
         SQLStr.AppendLine("     ,INITUSER  ")
@@ -1917,12 +1917,12 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("   )  ")
         SQLStr.AppendLine("   VALUES  ")
         SQLStr.AppendLine("   (  ")
-        SQLStr.AppendLine("      @DEISELPRICESITEID  ")
-        SQLStr.AppendLine("     ,@DEISELPRICESITEBRANCH  ")
-        SQLStr.AppendLine("     ,@DEISELPRICESITENAME  ")
-        SQLStr.AppendLine("     ,@DEISELPRICESITEKBNNAME  ")
+        SQLStr.AppendLine("      @DIESELPRICESITEID  ")
+        SQLStr.AppendLine("     ,@DIESELPRICESITEBRANCH  ")
+        SQLStr.AppendLine("     ,@DIESELPRICESITENAME  ")
+        SQLStr.AppendLine("     ,@DIESELPRICESITEKBNNAME  ")
         SQLStr.AppendLine("     ,@DISPLAYNAME  ")
-        SQLStr.AppendLine("     ,@DEISELPRICESITEURL  ")
+        SQLStr.AppendLine("     ,@DIESELPRICESITEURL  ")
         SQLStr.AppendLine("     ,@DELFLG  ")
         SQLStr.AppendLine("     ,@INITYMD  ")
         SQLStr.AppendLine("     ,@INITUSER  ")
@@ -1930,12 +1930,12 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("     ,@INITPGID  ")
         SQLStr.AppendLine("   )   ")
         SQLStr.AppendLine("  ON DUPLICATE KEY UPDATE  ")
-        SQLStr.AppendLine("      DEISELPRICESITEBRANCH =  @DEISELPRICESITEBRANCH")
-        SQLStr.AppendLine("     ,DEISELPRICESITEID =  @DEISELPRICESITEID")
-        SQLStr.AppendLine("     ,DEISELPRICESITENAME =  @DEISELPRICESITENAME")
-        SQLStr.AppendLine("     ,DEISELPRICESITEKBNNAME =  @DEISELPRICESITEKBNNAME")
+        SQLStr.AppendLine("      DIESELPRICESITEBRANCH =  @DIESELPRICESITEBRANCH")
+        SQLStr.AppendLine("     ,DIESELPRICESITEID =  @DIESELPRICESITEID")
+        SQLStr.AppendLine("     ,DIESELPRICESITENAME =  @DIESELPRICESITENAME")
+        SQLStr.AppendLine("     ,DIESELPRICESITEKBNNAME =  @DIESELPRICESITEKBNNAME")
         SQLStr.AppendLine("     ,DISPLAYNAME =  @DISPLAYNAME")
-        SQLStr.AppendLine("     ,DEISELPRICESITEURL =  @DEISELPRICESITEURL")
+        SQLStr.AppendLine("     ,DIESELPRICESITEURL =  @DIESELPRICESITEURL")
         SQLStr.AppendLine("     ,DELFLG =  @DELFLG")
         SQLStr.AppendLine("     ,UPDYMD =  @UPDYMD")
         SQLStr.AppendLine("     ,UPDUSER =  @UPDUSER")
@@ -1946,12 +1946,12 @@ Public Class LNM0020DieselPriceSiteList
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
-                Dim P_DEISELPRICESITENAME As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITENAME", MySqlDbType.VarChar)        '実勢軽油価格参照先名
-                Dim P_DEISELPRICESITEKBNNAME As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEKBNNAME", MySqlDbType.VarChar)  '実勢軽油価格参照先区分名
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITENAME As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITENAME", MySqlDbType.VarChar)        '実勢軽油価格参照先名
+                Dim P_DIESELPRICESITEKBNNAME As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEKBNNAME", MySqlDbType.VarChar)  '実勢軽油価格参照先区分名
                 Dim P_DISPLAYNAME As MySqlParameter = SQLcmd.Parameters.Add("@DISPLAYNAME", MySqlDbType.VarChar)                        '画面表示名称
-                Dim P_DEISELPRICESITEURL As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEURL", MySqlDbType.VarChar)          '実勢軽油価格参照先URL
+                Dim P_DIESELPRICESITEURL As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEURL", MySqlDbType.VarChar)          '実勢軽油価格参照先URL
                 Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                               '削除フラグ
                 Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)                               '登録年月日
                 Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)                          '登録ユーザーＩＤ
@@ -1967,27 +1967,27 @@ Public Class LNM0020DieselPriceSiteList
                 ' ユニークID取得
                 Dim WW_DBDataCheck As String = ""
                 Dim WW_ID As String = "01"
-                If String.IsNullOrEmpty(WW_ROW("DEISELPRICESITEID")) Then
+                If String.IsNullOrEmpty(WW_ROW("DIESELPRICESITEID")) Then
                     work.GetMaxID(SQLcon, WW_DBDataCheck, WW_ID)
                     If isNormal(WW_DBDataCheck) Then
-                        WW_ROW("DEISELPRICESITEID") = WW_ID                         '実勢軽油価格参照先ID
-                        WW_ROW("DEISELPRICESITEBRANCH") = "01"                      '実勢軽油価格参照先ID枝番
+                        WW_ROW("DIESELPRICESITEID") = WW_ID                         '実勢軽油価格参照先ID
+                        WW_ROW("DIESELPRICESITEBRANCH") = "01"                      '実勢軽油価格参照先ID枝番
                     End If
                 End If
                 Dim WW_BRANCH As String = "01"
-                If String.IsNullOrEmpty(WW_ROW("DEISELPRICESITEBRANCH")) Then
-                    work.GetMaxBRANCH(SQLcon, WW_ROW("DEISELPRICESITEID"), WW_DBDataCheck, WW_BRANCH)
+                If String.IsNullOrEmpty(WW_ROW("DIESELPRICESITEBRANCH")) Then
+                    work.GetMaxBRANCH(SQLcon, WW_ROW("DIESELPRICESITEID"), WW_DBDataCheck, WW_BRANCH)
                     If isNormal(WW_DBDataCheck) Then
-                        WW_ROW("DEISELPRICESITEBRANCH") = WW_BRANCH                 '実勢軽油価格参照先ID枝番
+                        WW_ROW("DIESELPRICESITEBRANCH") = WW_BRANCH                 '実勢軽油価格参照先ID枝番
                     End If
                 End If
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")             '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
-                P_DEISELPRICESITENAME.Value = WW_ROW("DEISELPRICESITENAME")         '実勢軽油価格参照先名
-                P_DEISELPRICESITEKBNNAME.Value = WW_ROW("DEISELPRICESITEKBNNAME")   '実勢軽油価格参照先区分名
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")             '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITENAME.Value = WW_ROW("DIESELPRICESITENAME")         '実勢軽油価格参照先名
+                P_DIESELPRICESITEKBNNAME.Value = WW_ROW("DIESELPRICESITEKBNNAME")   '実勢軽油価格参照先区分名
                 P_DISPLAYNAME.Value = WW_ROW("DISPLAYNAME")                         '画面表示名称
-                P_DEISELPRICESITEURL.Value = WW_ROW("DEISELPRICESITEURL")           '実勢軽油価格参照先URL
+                P_DIESELPRICESITEURL.Value = WW_ROW("DIESELPRICESITEURL")           '実勢軽油価格参照先URL
                 P_DELFLG.Value = WW_ROW("DELFLG")                                   '削除フラグ
 
                 P_INITYMD.Value = WW_DATENOW                                '登録年月日
@@ -2060,7 +2060,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '実勢軽油価格参照先ID(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "DEISELPRICESITEID", WW_ROW("DEISELPRICESITEID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "DIESELPRICESITEID", WW_ROW("DIESELPRICESITEID"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・実勢軽油価格参照先IDエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2070,7 +2070,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '実勢軽油価格参照先ID枝番(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "DEISELPRICESITEBRANCH", WW_ROW("DEISELPRICESITEBRANCH"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "DIESELPRICESITEBRANCH", WW_ROW("DIESELPRICESITEBRANCH"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・実勢軽油価格参照先ID枝番エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2080,7 +2080,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '実勢軽油価格参照先名(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "DEISELPRICESITENAME", WW_ROW("DEISELPRICESITENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "DIESELPRICESITENAME", WW_ROW("DIESELPRICESITENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・実勢軽油価格参照先名エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2090,7 +2090,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '実勢軽油価格参照先区分名(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "DEISELPRICESITEKBNNAME", WW_ROW("DEISELPRICESITEKBNNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "DIESELPRICESITEKBNNAME", WW_ROW("DIESELPRICESITEKBNNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・実勢軽油価格参照先区分名エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2110,7 +2110,7 @@ Public Class LNM0020DieselPriceSiteList
         End If
 
         '実勢軽油価格参照先URL(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "DEISELPRICESITEURL", WW_ROW("DEISELPRICESITEURL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        Master.CheckField(Master.USERCAMP, "DIESELPRICESITEURL", WW_ROW("DIESELPRICESITEURL"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・実勢軽油価格参照先URLエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
@@ -2159,22 +2159,22 @@ Public Class LNM0020DieselPriceSiteList
         '軽油価格参照先マスタに同一キーのデータが存在するか確認する。
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine("    SELECT")
-        SQLStr.AppendLine("        DEISELPRICESITEID")
-        SQLStr.AppendLine("       ,DEISELPRICESITEBRANCH")
+        SQLStr.AppendLine("        DIESELPRICESITEID")
+        SQLStr.AppendLine("       ,DIESELPRICESITEBRANCH")
         SQLStr.AppendLine("       ,DELFLG")
         SQLStr.AppendLine("    FROM")
         SQLStr.AppendLine("        LNG.LNM0020_DIESELPRICESITE")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         DEISELPRICESITEID              = @DEISELPRICESITEID ")
-        SQLStr.AppendLine("    AND  DEISELPRICESITEBRANCH          = @DEISELPRICESITEBRANCH ")
+        SQLStr.AppendLine("         DIESELPRICESITEID              = @DIESELPRICESITEID ")
+        SQLStr.AppendLine("    AND  DIESELPRICESITEBRANCH          = @DIESELPRICESITEBRANCH ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)    '実勢軽油価格参照先ID枝番
 
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")                     '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")                     '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -2229,12 +2229,12 @@ Public Class LNM0020DieselPriceSiteList
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" INSERT INTO LNG.LNT0033_DIESELPRICESITEHIST ")
         SQLStr.AppendLine("  (  ")
-        SQLStr.AppendLine("      DEISELPRICESITEID  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEBRANCH  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITENAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEKBNNAME  ")
+        SQLStr.AppendLine("      DIESELPRICESITEID  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEBRANCH  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITENAME  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEKBNNAME  ")
         SQLStr.AppendLine("     ,DISPLAYNAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEURL  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEURL  ")
         SQLStr.AppendLine("     ,OPERATEKBN  ")
         SQLStr.AppendLine("     ,MODIFYKBN  ")
         SQLStr.AppendLine("     ,MODIFYYMD  ")
@@ -2246,12 +2246,12 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("     ,INITPGID  ")
         SQLStr.AppendLine("  )  ")
         SQLStr.AppendLine("  SELECT  ")
-        SQLStr.AppendLine("      DEISELPRICESITEID  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEBRANCH  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITENAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEKBNNAME  ")
+        SQLStr.AppendLine("      DIESELPRICESITEID  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEBRANCH  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITENAME  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEKBNNAME  ")
         SQLStr.AppendLine("     ,DISPLAYNAME  ")
-        SQLStr.AppendLine("     ,DEISELPRICESITEURL  ")
+        SQLStr.AppendLine("     ,DIESELPRICESITEURL  ")
         SQLStr.AppendLine("     ,@OPERATEKBN AS OPERATEKBN ")
         SQLStr.AppendLine("     ,@MODIFYKBN AS MODIFYKBN ")
         SQLStr.AppendLine("     ,@MODIFYYMD AS MODIFYYMD ")
@@ -2264,13 +2264,13 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("  FROM   ")
         SQLStr.AppendLine("        LNG.LNM0020_DIESELPRICESITE")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         DEISELPRICESITEID             = @DEISELPRICESITEID ")
-        SQLStr.AppendLine("    AND  DEISELPRICESITEBRANCH         = @DEISELPRICESITEBRANCH ")
+        SQLStr.AppendLine("         DIESELPRICESITEID             = @DIESELPRICESITEID ")
+        SQLStr.AppendLine("    AND  DIESELPRICESITEBRANCH         = @DIESELPRICESITEBRANCH ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_DEISELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEID", MySqlDbType.VarChar)                            '実勢軽油価格参照先ID
-                Dim P_DEISELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DEISELPRICESITEBRANCH", MySqlDbType.VarChar)                    '実勢軽油価格参照先ID枝番
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar)                            '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar)                    '実勢軽油価格参照先ID枝番
 
                 Dim P_OPERATEKBN As MySqlParameter = SQLcmd.Parameters.Add("@OPERATEKBN", MySqlDbType.VarChar, 1)       '操作区分
                 Dim P_MODIFYKBN As MySqlParameter = SQLcmd.Parameters.Add("@MODIFYKBN", MySqlDbType.VarChar, 1)         '変更区分
@@ -2283,8 +2283,8 @@ Public Class LNM0020DieselPriceSiteList
                 Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar, 40)         '登録プログラムＩＤ
 
                 ' DB更新
-                P_DEISELPRICESITEID.Value = WW_ROW("DEISELPRICESITEID")                     '実勢軽油価格参照先ID
-                P_DEISELPRICESITEBRANCH.Value = WW_ROW("DEISELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")                     '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")             '実勢軽油価格参照先ID枝番
 
                 '操作区分
                 '変更区分が新規の場合
