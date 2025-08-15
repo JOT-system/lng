@@ -528,6 +528,7 @@ Public Class CS0054KintoneApi
         Public Property 届先略名 As NormalStruct
         Public Property 届先取引先コード As NormalStruct
         Public Property 届先取引先名称 As NormalStruct
+        Public Property 届先契約先名称 As NormalStruct                 '2025/08/14 追加
         Public Property 届先住所 As NormalStruct
         Public Property 届先電話番号 As NormalStruct
         Public Property 届先Googleマップ As NormalStruct
@@ -545,6 +546,7 @@ Public Class CS0054KintoneApi
         Public Property 出荷場所略名 As NormalStruct
         Public Property 出荷場所取引先コード As NormalStruct
         Public Property 出荷場所取引先名称 As NormalStruct
+        Public Property 出荷場所契約先名称 As NormalStruct           '2025/08/14 追加
         Public Property 出荷場所住所 As NormalStruct
         Public Property 出荷場所電話番号 As NormalStruct
         Public Property 出荷場所Googleマップ As NormalStruct
@@ -610,13 +612,15 @@ Public Class CS0054KintoneApi
         Public Property 文字色_カレンダー画面メモ As NormalStruct
         Public Property 表示内容_カレンダー画面メモ As NormalStruct
         Public Property 業務車番_カレンダー画面メモ As NormalStruct
-        Public Property 表示用終了日_カレンダー画面メモ As NormalStruct
+        'Public Property 退社見込み時間_カレンダー画面メモ As NormalStruct      '2025/08/14 追加予定
+        'Public Property 表示用終了日_カレンダー画面メモ As NormalStruct       '2025/08/14 削除
         Public Property 業務車番 As NormalStruct
         Public Property 用車先 As NormalStruct
         Public Property レコードタイトル用 As NormalStruct
         Public Property 出庫日 As NormalStruct
         Public Property 帰庫日 As NormalStruct
         Public Property 帰庫時間 As NormalStruct
+        'Public Property 距離 As NormalStruct                          '2025/08/14 追加予定
         Public Property 乗務員備考1 As NormalStruct
         Public Property 表示順_乗務員 As NormalStruct                 '2025/06/30 追加
         Public Property 乗務員備考2 As NormalStruct
@@ -624,13 +628,20 @@ Public Class CS0054KintoneApi
         Public Property 副乗務員備考2 As NormalStruct
         Public Property 表示順_副乗務員 As NormalStruct               '2025/06/30 追加
         Public Property 出勤時間_副乗務員 As NormalStruct
+        'Public Property 乗務不可車型_副乗務員 As NormalStruct         '2025/08/14 追加予定
         Public Property 乗務員選択_カレンダー画面メモ As NormalStruct
+        'Public Property 勤怠分類_カレンダー画面メモ As NormalStruct   '2025/08/14 追加予定
+        'Public Property 出社時間_カレンダー画面メモ As NormalStruct   '2025/08/14 追加予定
+        'Public Property 届先選択_カレンダー画面メモ As NormalStruct   '2025/08/14 追加予定
         Public Property 社員番号_カレンダー画面メモ As NormalStruct
         Public Property 内容詳細_カレンダー画面メモ As NormalStruct
         Public Property 車腹単位 As NormalStruct
-        Public Property 退勤時間 As NormalStruct
-        Public Property 退勤時間_副乗務員 As NormalStruct
-        Public Property kViewer用タイトル As NormalStruct
+        Public Property 退勤見込み時間 As NormalStruct                 '2025/08/14 名称変更
+        'Public Property マルヨ As NormalStruct                         '2025/08/14 追加予定
+        Public Property 退勤見込み時間_副乗務員 As NormalStruct        '2025/08/14 名称変更
+        'Public Property マルヨ_副乗務員 As NormalStruct                '2025/08/14 追加予定
+        Public Property kViewer用タイトル_届先名なし As NormalStruct   '2025/08/14 名称変更
+        'Public Property kViewer用タイトル_届先名あり As NormalStruct   '2025/08/14 追加予定
         Public Property kViewer用受注数量 As NormalStruct
         Public Property kViewer用実績数量 As NormalStruct
         Public Property kViewer用乗務員情報 As NormalStruct
@@ -692,7 +703,7 @@ Public Class CS0054KintoneApi
         Public Property ひらがな_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property 一連指定番号_トラクタ_カレンダー画面メモ As NormalStruct
         Public Property オーダー開始日 As NormalStruct
-        Public Property 表示用オーダー終了日 As NormalStruct
+        'Public Property 表示用オーダー終了日 As NormalStruct             '2025/08/14 削除
         Public Property オーダー終了日 As NormalStruct
         Public Property 更新者 As ValNestStruct
         Public Property 作成者 As ValNestStruct

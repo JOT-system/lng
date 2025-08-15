@@ -2517,7 +2517,8 @@ Public Class LNT0001ZissekiIntake
                             CALENDERMEMO7.Value = updRow("文字色_カレンダー画面メモ")   '文字色_カレンダー画面メモ
                             CALENDERMEMO8.Value = updRow("表示内容_カレンダー画面メモ")  '表示内容_カレンダー画面メモ
                             CALENDERMEMO9.Value = updRow("業務車番_カレンダー画面メモ")  '業務車番_カレンダー画面メモ
-                            CALENDERMEMO10.Value = updRow("表示用終了日_カレンダー画面メモ")   '表示用終了日_カレンダー画面メモ
+                            'CALENDERMEMO10.Value = updRow("表示用終了日_カレンダー画面メモ")   '表示用終了日_カレンダー画面メモ　2025/08/14 削除
+                            CALENDERMEMO10.Value = ""   '表示用終了日_カレンダー画面メモ　2025/08/14 変更
                             GYOMUTANKNUM.Value = updRow("業務車番") '業務車番
                             YOUSYA.Value = updRow("用車先")    '用車先
                             RECOTITLE.Value = updRow("レコードタイトル用")   'レコードタイトル用
@@ -2543,9 +2544,12 @@ Public Class LNT0001ZissekiIntake
                             CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
                             CALENDERMEMO13.Value = updRow("内容詳細_カレンダー画面メモ") '内容詳細_カレンダー画面メモ
                             SYABARATANNI.Value = updRow("車腹単位") '車腹単位
-                            TAIKINTIME.Value = updRow("退勤時間")   '退勤時間
-                            SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員
-                            KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル
+                            'TAIKINTIME.Value = updRow("退勤時間")   '退勤時間　2025/08/14 削除
+                            TAIKINTIME.Value = updRow("退勤見込み時間")   '退勤見込み時間　2025/08/14 更新
+                            'SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員　2025/08/14 削除
+                            SUBTIKINTIME.Value = updRow("退勤見込み時間_副乗務員")    '退勤時間_副乗務員　2025/08/14 更新
+                            'KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル　2025/08/14 削除
+                            KVTITLE.Value = updRow("kViewer用タイトル_届先名なし")  'kViewer用タイトル　2025/08/14 更新
                             KVZYUTYU.Value = updRow("kViewer用受注数量") 'kViewer用受注数量
                             KVZISSEKI.Value = updRow("kViewer用実績数量")    'kViewer用実績数量
                             KVCREW.Value = updRow("kViewer用乗務員情報")  'kViewer用乗務員情報
@@ -2616,11 +2620,14 @@ Public Class LNT0001ZissekiIntake
                             Else
                                 ORDENDATE.Value = updRow("オーダー終了日") 'オーダー終了日
                             End If
-                            If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
-                                OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
-                            Else
-                                OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
-                            End If
+                            '2025/08/14 UPDATE
+                            'If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
+                            '    OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
+                            'Else
+                            '    OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
+                            'End If
+                            OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
+                            '2025/08/14 UPDATE
                             If iTbl.Columns.Contains("L配更新キー") Then
                                 LUPDKEY.Value = updRow("L配更新キー")    'L配更新キー
                             Else
