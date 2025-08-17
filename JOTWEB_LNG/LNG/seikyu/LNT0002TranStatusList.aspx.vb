@@ -219,7 +219,7 @@ Public Class LNT0002TranStatusList
         If Context.Handler.ToString().ToUpper() = C_PREV_MAP_LIST.LNT0001AJ Then
 
             ' 調整画面からの遷移
-            Master.RecoverTable(LNT0002tbl, work.WF_SEL_INPTBL.Text)
+            'Master.RecoverTable(LNT0002tbl, work.WF_SEL_INPTBL.Text)
             WF_TaishoYm.Value = Left(work.WF_SEL_TARGETYM.Text, 7)
         Else
             ' サブメニューからの画面遷移
@@ -1531,6 +1531,8 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.TODOKENAMES, '')                        AS TODOKENAMES			" _
             & "     ,coalesce(LT1.TORICODE, '')                           AS TORICODE				" _
             & "     ,coalesce(LT1.TORINAME, '')                           AS TORINAME				" _
+            & "     ,coalesce(LT1.TORICODE_AVOCADO, '')                   AS TORICODE_AVOCADO				" _
+            & "     ,coalesce(LT1.TODOKECONTNAME, '')                     AS TODOKECONTNAME				" _
             & "     ,coalesce(LT1.TODOKEADDR, '')                         AS TODOKEADDR			" _
             & "     ,coalesce(LT1.TODOKETEL, '')                          AS TODOKETEL			" _
             & "     ,coalesce(LT1.TODOKEMAP, '')                          AS TODOKEMAP			" _
@@ -1539,15 +1541,13 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.TODOKEBIKO1, '')                        AS TODOKEBIKO1			" _
             & "     ,coalesce(LT1.TODOKEBIKO2, '')                        AS TODOKEBIKO2			" _
             & "     ,coalesce(LT1.TODOKEBIKO3, '')                        AS TODOKEBIKO3			" _
-            & "     ,coalesce(LT1.TODOKECOLOR1, '')                       AS TODOKECOLOR1			" _
-            & "     ,coalesce(LT1.TODOKECOLOR2, '')                       AS TODOKECOLOR2			" _
-            & "     ,coalesce(LT1.TODOKECOLOR3, '')                       AS TODOKECOLOR3			" _
             & "     ,coalesce(LT1.SHUKASLCT, '')                          AS SHUKASLCT			" _
             & "     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			" _
             & "     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			" _
             & "     ,coalesce(LT1.SHUKANAMES, '')                         AS SHUKANAMES			" _
             & "     ,coalesce(LT1.SHUKATORICODE, '')                      AS SHUKATORICODE		" _
             & "     ,coalesce(LT1.SHUKATORINAME, '')                      AS SHUKATORINAME		" _
+            & "     ,coalesce(LT1.SHUKACONTNAME, '')                      AS SHUKACONTNAME		" _
             & "     ,coalesce(LT1.SHUKAADDR, '')                          AS SHUKAADDR			" _
             & "     ,coalesce(LT1.SHUKAADDRTEL, '')                       AS SHUKAADDRTEL			" _
             & "     ,coalesce(LT1.SHUKAMAP, '')                           AS SHUKAMAP				" _
@@ -1556,9 +1556,6 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.SHUKABIKOU1, '')                        AS SHUKABIKOU1			" _
             & "     ,coalesce(LT1.SHUKABIKOU2, '')                        AS SHUKABIKOU2			" _
             & "     ,coalesce(LT1.SHUKABIKOU3, '')                        AS SHUKABIKOU3			" _
-            & "     ,coalesce(LT1.SHUKACOLOR1, '')                        AS SHUKACOLOR1			" _
-            & "     ,coalesce(LT1.SHUKACOLOR2, '')                        AS SHUKACOLOR2			" _
-            & "     ,coalesce(LT1.SHUKACOLOR3, '')                        AS SHUKACOLOR3			" _
             & "     ,coalesce(LT1.SHUKADATE, '')                          AS SHUKADATE			" _
             & "     ,coalesce(LT1.LOADTIME, '')                           AS LOADTIME				" _
             & "     ,coalesce(LT1.LOADTIMEIN, '')                         AS LOADTIMEIN			" _
@@ -1607,34 +1604,26 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.SUBSTAFFSLCT, '')                       AS SUBSTAFFSLCT			" _
             & "     ,coalesce(LT1.SUBSTAFFNAME, '')                       AS SUBSTAFFNAME			" _
             & "     ,coalesce(LT1.SUBSTAFFNUM, '')                        AS SUBSTAFFNUM			" _
-            & "     ,coalesce(LT1.CALENDERMEMO1, '')                      AS CALENDERMEMO1		" _
-            & "     ,coalesce(LT1.CALENDERMEMO2, '')                      AS CALENDERMEMO2		" _
-            & "     ,coalesce(LT1.CALENDERMEMO3, '')                      AS CALENDERMEMO3		" _
-            & "     ,coalesce(LT1.CALENDERMEMO4, '')                      AS CALENDERMEMO4		" _
-            & "     ,coalesce(LT1.CALENDERMEMO5, '')                      AS CALENDERMEMO5		" _
-            & "     ,coalesce(LT1.CALENDERMEMO6, '')                      AS CALENDERMEMO6		" _
-            & "     ,coalesce(LT1.CALENDERMEMO7, '')                      AS CALENDERMEMO7		" _
-            & "     ,coalesce(LT1.CALENDERMEMO8, '')                      AS CALENDERMEMO8		" _
-            & "     ,coalesce(LT1.CALENDERMEMO9, '')                      AS CALENDERMEMO9		" _
-            & "     ,coalesce(LT1.CALENDERMEMO10, '')                     AS CALENDERMEMO10		" _
             & "     ,coalesce(LT1.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM			" _
             & "     ,coalesce(LT1.YOUSYA, '')                             AS YOUSYA				" _
             & "     ,coalesce(LT1.RECOTITLE, '')                          AS RECOTITLE			" _
             & "     ,coalesce(LT1.SHUKODATE, '')                          AS SHUKODATE			" _
             & "     ,coalesce(LT1.KIKODATE, '')                           AS KIKODATE				" _
             & "     ,coalesce(LT1.KIKOTIME, '')                           AS KIKOTIME				" _
+            & "     ,coalesce(LT1.DISTANCE, '')                           AS DISTANCE				" _
             & "     ,coalesce(LT1.CREWBIKOU1, '')                         AS CREWBIKOU1			" _
             & "     ,coalesce(LT1.CREWBIKOU2, '')                         AS CREWBIKOU2			" _
             & "     ,coalesce(LT1.SUBCREWBIKOU1, '')                      AS SUBCREWBIKOU1		" _
             & "     ,coalesce(LT1.SUBCREWBIKOU2, '')                      AS SUBCREWBIKOU2		" _
             & "     ,coalesce(LT1.SUBSHUKKINTIME, '')                     AS SUBSHUKKINTIME		" _
-            & "     ,coalesce(LT1.CALENDERMEMO11, '')                     AS CALENDERMEMO11		" _
-            & "     ,coalesce(LT1.CALENDERMEMO12, '')                     AS CALENDERMEMO12		" _
-            & "     ,coalesce(LT1.CALENDERMEMO13, '')                     AS CALENDERMEMO13		" _
+            & "     ,coalesce(LT1.SUBNGSYAGATA, '')                       AS SUBNGSYAGATA		" _
             & "     ,coalesce(LT1.SYABARATANNI, '')                       AS SYABARATANNI			" _
             & "     ,coalesce(LT1.TAIKINTIME, '')                         AS TAIKINTIME			" _
+            & "     ,coalesce(LT1.MARUYO, '')                             AS MARUYO			" _
             & "     ,coalesce(LT1.SUBTIKINTIME, '')                       AS SUBTIKINTIME			" _
+            & "     ,coalesce(LT1.SUBMARUYO, '')                          AS SUBMARUYO			" _
             & "     ,coalesce(LT1.KVTITLE, '')                            AS KVTITLE				" _
+            & "     ,coalesce(LT1.KVTITLETODOKE, '')                      AS KVTITLETODOKE				" _
             & "     ,coalesce(LT1.KVZYUTYU, '')                           AS KVZYUTYU				" _
             & "     ,coalesce(LT1.KVZISSEKI, '')                          AS KVZISSEKI			" _
             & "     ,coalesce(LT1.KVCREW, '')                             AS KVCREW				" _
@@ -1681,20 +1670,6 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.HONTRACTER23, '')                       AS HONTRACTER23			" _
             & "     ,coalesce(LT1.HONTRACTER24, '')                       AS HONTRACTER24			" _
             & "     ,coalesce(LT1.HONTRACTER25, '')                       AS HONTRACTER25			" _
-            & "     ,coalesce(LT1.CALENDERMEMO14, '')                     AS CALENDERMEMO14		" _
-            & "     ,coalesce(LT1.CALENDERMEMO15, '')                     AS CALENDERMEMO15		" _
-            & "     ,coalesce(LT1.CALENDERMEMO16, '')                     AS CALENDERMEMO16		" _
-            & "     ,coalesce(LT1.CALENDERMEMO17, '')                     AS CALENDERMEMO17		" _
-            & "     ,coalesce(LT1.CALENDERMEMO18, '')                     AS CALENDERMEMO18		" _
-            & "     ,coalesce(LT1.CALENDERMEMO19, '')                     AS CALENDERMEMO19		" _
-            & "     ,coalesce(LT1.CALENDERMEMO20, '')                     AS CALENDERMEMO20		" _
-            & "     ,coalesce(LT1.CALENDERMEMO21 , '')                    AS CALENDERMEMO21		" _
-            & "     ,coalesce(LT1.CALENDERMEMO22, '')                     AS CALENDERMEMO22		" _
-            & "     ,coalesce(LT1.CALENDERMEMO23, '')                     AS CALENDERMEMO23		" _
-            & "     ,coalesce(LT1.CALENDERMEMO24, '')                     AS CALENDERMEMO24		" _
-            & "     ,coalesce(LT1.CALENDERMEMO25, '')                     AS CALENDERMEMO25		" _
-            & "     ,coalesce(LT1.CALENDERMEMO26, '')                     AS CALENDERMEMO26		" _
-            & "     ,coalesce(LT1.CALENDERMEMO27, '')                     AS CALENDERMEMO27		" _
             & "     ,coalesce(LT1.BRANCHCODE, '')                         AS BRANCHCODE		" _
             & "     ,coalesce(LT1.UPDATEUSER, '')                         AS UPDATEUSER			" _
             & "     ,coalesce(LT1.CREATEUSER, '')                         AS CREATEUSER			" _
