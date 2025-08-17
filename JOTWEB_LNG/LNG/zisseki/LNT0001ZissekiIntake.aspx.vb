@@ -612,9 +612,6 @@ Public Class LNT0001ZissekiIntake
             & "     ,coalesce(LT28.TODOKEBIKO1, '')                        AS TODOKEBIKO1			" _
             & "     ,coalesce(LT28.TODOKEBIKO2, '')                        AS TODOKEBIKO2			" _
             & "     ,coalesce(LT28.TODOKEBIKO3, '')                        AS TODOKEBIKO3			" _
-            & "     ,coalesce(LT28.TODOKECOLOR1, '')                       AS TODOKECOLOR1			" _
-            & "     ,coalesce(LT28.TODOKECOLOR2, '')                       AS TODOKECOLOR2			" _
-            & "     ,coalesce(LT28.TODOKECOLOR3, '')                       AS TODOKECOLOR3			" _
             & "     ,coalesce(LT28.SHUKASLCT, '')                          AS SHUKASLCT			    " _
             & "     ,coalesce(LT28.SHUKABASHO, '')                         AS SHUKABASHO			    " _
             & "     ,coalesce(LT28.SHUKANAME, '')                          AS SHUKANAME			    " _
@@ -629,9 +626,6 @@ Public Class LNT0001ZissekiIntake
             & "     ,coalesce(LT28.SHUKABIKOU1, '')                        AS SHUKABIKOU1			" _
             & "     ,coalesce(LT28.SHUKABIKOU2, '')                        AS SHUKABIKOU2			" _
             & "     ,coalesce(LT28.SHUKABIKOU3, '')                        AS SHUKABIKOU3			" _
-            & "     ,coalesce(LT28.SHUKACOLOR1, '')                        AS SHUKACOLOR1			" _
-            & "     ,coalesce(LT28.SHUKACOLOR2, '')                        AS SHUKACOLOR2			" _
-            & "     ,coalesce(LT28.SHUKACOLOR3, '')                        AS SHUKACOLOR3			" _
             & "     ,coalesce(LT28.SHUKADATE, '')                          AS SHUKADATE			    " _
             & "     ,coalesce(LT28.LOADTIME, '')                           AS LOADTIME				" _
             & "     ,coalesce(LT28.LOADTIMEIN, '')                         AS LOADTIMEIN			    " _
@@ -677,16 +671,6 @@ Public Class LNT0001ZissekiIntake
             & "     ,coalesce(LT28.SUBSTAFFSLCT, '')                       AS SUBSTAFFSLCT			" _
             & "     ,coalesce(LT28.SUBSTAFFNAME, '')                       AS SUBSTAFFNAME			" _
             & "     ,coalesce(LT28.SUBSTAFFNUM, '')                        AS SUBSTAFFNUM			" _
-            & "     ,coalesce(LT28.CALENDERMEMO1, '')                      AS CALENDERMEMO1		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO2, '')                      AS CALENDERMEMO2		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO3, '')                      AS CALENDERMEMO3		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO4, '')                      AS CALENDERMEMO4		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO5, '')                      AS CALENDERMEMO5		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO6, '')                      AS CALENDERMEMO6		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO7, '')                      AS CALENDERMEMO7		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO8, '')                      AS CALENDERMEMO8		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO9, '')                      AS CALENDERMEMO9		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO10, '')                     AS CALENDERMEMO10		    " _
             & "     ,coalesce(LT28.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM			" _
             & "     ,coalesce(LT28.YOUSYA, '')                             AS YOUSYA				    " _
             & "     ,coalesce(LT28.RECOTITLE, '')                          AS RECOTITLE			    " _
@@ -698,9 +682,6 @@ Public Class LNT0001ZissekiIntake
             & "     ,coalesce(LT28.SUBCREWBIKOU1, '')                      AS SUBCREWBIKOU1		    " _
             & "     ,coalesce(LT28.SUBCREWBIKOU2, '')                      AS SUBCREWBIKOU2		    " _
             & "     ,coalesce(LT28.SUBSHUKKINTIME, '')                     AS SUBSHUKKINTIME		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO11, '')                     AS CALENDERMEMO11		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO12, '')                     AS CALENDERMEMO12		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO13, '')                     AS CALENDERMEMO13		    " _
             & "     ,coalesce(LT28.SYABARATANNI, '')                       AS SYABARATANNI			" _
             & "     ,coalesce(LT28.TAIKINTIME, '')                         AS TAIKINTIME			    " _
             & "     ,coalesce(LT28.SUBTIKINTIME, '')                       AS SUBTIKINTIME			" _
@@ -751,20 +732,6 @@ Public Class LNT0001ZissekiIntake
             & "     ,coalesce(LT28.HONTRACTER23, '')                       AS HONTRACTER23			" _
             & "     ,coalesce(LT28.HONTRACTER24, '')                       AS HONTRACTER24			" _
             & "     ,coalesce(LT28.HONTRACTER25, '')                       AS HONTRACTER25			" _
-            & "     ,coalesce(LT28.CALENDERMEMO14, '')                     AS CALENDERMEMO14		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO15, '')                     AS CALENDERMEMO15		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO16, '')                     AS CALENDERMEMO16		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO17, '')                     AS CALENDERMEMO17		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO18, '')                     AS CALENDERMEMO18		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO19, '')                     AS CALENDERMEMO19		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO20, '')                     AS CALENDERMEMO20		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO21 , '')                    AS CALENDERMEMO21		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO22, '')                     AS CALENDERMEMO22		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO23, '')                     AS CALENDERMEMO23		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO24, '')                     AS CALENDERMEMO24		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO25, '')                     AS CALENDERMEMO25		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO26, '')                     AS CALENDERMEMO26		    " _
-            & "     ,coalesce(LT28.CALENDERMEMO27, '')                     AS CALENDERMEMO27		    " _
             & "     ,coalesce(LT28.UPDATEUSER, '')                         AS UPDATEUSER			    " _
             & "     ,coalesce(LT28.CREATEUSER, '')                         AS CREATEUSER			    " _
             & "     ,coalesce(LT28.UPDATEYMD, '')                          AS UPDATEYMD			    " _
@@ -1497,6 +1464,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TORICODE						            " _
                 & "     , TORINAME						            " _
                 & "     , TORICODE_AVOCADO  			            " _
+                & "     , TODOKECONTNAME  			                " _
                 & "     , TODOKEADDR						        " _
                 & "     , TODOKETEL						            " _
                 & "     , TODOKEMAP						            " _
@@ -1505,15 +1473,13 @@ Public Class LNT0001ZissekiIntake
                 & "     , TODOKEBIKO1						        " _
                 & "     , TODOKEBIKO2						        " _
                 & "     , TODOKEBIKO3						        " _
-                & "     , TODOKECOLOR1						        " _
-                & "     , TODOKECOLOR2						        " _
-                & "     , TODOKECOLOR3						        " _
                 & "     , SHUKASLCT						            " _
                 & "     , SHUKABASHO						        " _
                 & "     , SHUKANAME						            " _
                 & "     , SHUKANAMES						        " _
                 & "     , SHUKATORICODE						        " _
                 & "     , SHUKATORINAME						        " _
+                & "     , SHUKACONTNAME						        " _
                 & "     , SHUKAADDR						            " _
                 & "     , SHUKAADDRTEL						        " _
                 & "     , SHUKAMAP						            " _
@@ -1522,9 +1488,6 @@ Public Class LNT0001ZissekiIntake
                 & "     , SHUKABIKOU1						        " _
                 & "     , SHUKABIKOU2						        " _
                 & "     , SHUKABIKOU3						        " _
-                & "     , SHUKACOLOR1						        " _
-                & "     , SHUKACOLOR2						        " _
-                & "     , SHUKACOLOR3						        " _
                 & "     , REQUIREDTIME						        " _
                 & "     , SHUKADATE						            " _
                 & "     , LOADTIME						            " _
@@ -1573,36 +1536,28 @@ Public Class LNT0001ZissekiIntake
                 & "     , SUBSTAFFSLCT						        " _
                 & "     , SUBSTAFFNAME						        " _
                 & "     , SUBSTAFFNUM						        " _
-                & "     , CALENDERMEMO1						        " _
-                & "     , CALENDERMEMO2						        " _
-                & "     , CALENDERMEMO3						        " _
-                & "     , CALENDERMEMO4						        " _
-                & "     , CALENDERMEMO5						        " _
-                & "     , CALENDERMEMO6						        " _
-                & "     , CALENDERMEMO7						        " _
-                & "     , CALENDERMEMO8						        " _
-                & "     , CALENDERMEMO9						        " _
-                & "     , CALENDERMEMO10						    " _
                 & "     , GYOMUTANKNUM						        " _
                 & "     , YOUSYA						            " _
                 & "     , RECOTITLE						            " _
                 & "     , SHUKODATE						            " _
                 & "     , KIKODATE						            " _
                 & "     , KIKOTIME						            " _
+                & "     , DISTANCE						            " _
                 & "     , CREWBIKOU1						        " _
                 & "     , CREWBIKOU2						        " _
                 & "     , CREWSEQ						            " _
                 & "     , SUBCREWBIKOU1						        " _
                 & "     , SUBCREWBIKOU2						        " _
                 & "     , SUBCREWSEQ						        " _
+                & "     , SUBNGSYAGATA						        " _
                 & "     , SUBSHUKKINTIME						    " _
-                & "     , CALENDERMEMO11						    " _
-                & "     , CALENDERMEMO12						    " _
-                & "     , CALENDERMEMO13						    " _
                 & "     , SYABARATANNI						        " _
                 & "     , TAIKINTIME						        " _
+                & "     , MARUYO						            " _
                 & "     , SUBTIKINTIME						        " _
+                & "     , SUBMARUYO						            " _
                 & "     , KVTITLE						            " _
+                & "     , KVTITLETODOKE 				            " _
                 & "     , KVZYUTYU						            " _
                 & "     , KVZISSEKI						            " _
                 & "     , KVCREW						            " _
@@ -1649,23 +1604,8 @@ Public Class LNT0001ZissekiIntake
                 & "     , HONTRACTER23						        " _
                 & "     , HONTRACTER24						        " _
                 & "     , HONTRACTER25						        " _
-                & "     , CALENDERMEMO14						    " _
-                & "     , CALENDERMEMO15						    " _
-                & "     , CALENDERMEMO16						    " _
-                & "     , CALENDERMEMO17						    " _
-                & "     , CALENDERMEMO18						    " _
-                & "     , CALENDERMEMO19						    " _
-                & "     , CALENDERMEMO20						    " _
-                & "     , CALENDERMEMO21						    " _
-                & "     , CALENDERMEMO22						    " _
-                & "     , CALENDERMEMO23						    " _
-                & "     , CALENDERMEMO24						    " _
-                & "     , CALENDERMEMO25						    " _
-                & "     , CALENDERMEMO26						    " _
-                & "     , CALENDERMEMO27						    " _
                 & "     , ORDSTDATE						            " _
                 & "     , ORDENDATE						            " _
-                & "     , OPENENDATE						        " _
                 & "     , LUPDKEY						            " _
                 & "     , HUPDKEY						            " _
                 & "     , JXORDUPDKEY						        " _
@@ -1717,6 +1657,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , @TORICODE						            " _
                 & "     , @TORINAME						            " _
                 & "     , @TORICODE_AVOCADO				            " _
+                & "     , @TODOKECONTNAME  			                " _
                 & "     , @TODOKEADDR						        " _
                 & "     , @TODOKETEL						        " _
                 & "     , @TODOKEMAP						        " _
@@ -1725,15 +1666,13 @@ Public Class LNT0001ZissekiIntake
                 & "     , @TODOKEBIKO1						        " _
                 & "     , @TODOKEBIKO2						        " _
                 & "     , @TODOKEBIKO3						        " _
-                & "     , @TODOKECOLOR1						        " _
-                & "     , @TODOKECOLOR2						        " _
-                & "     , @TODOKECOLOR3						        " _
                 & "     , @SHUKASLCT						        " _
                 & "     , @SHUKABASHO						        " _
                 & "     , @SHUKANAME						        " _
                 & "     , @SHUKANAMES						        " _
                 & "     , @SHUKATORICODE						    " _
                 & "     , @SHUKATORINAME						    " _
+                & "     , @SHUKACONTNAME						    " _
                 & "     , @SHUKAADDR						        " _
                 & "     , @SHUKAADDRTEL						        " _
                 & "     , @SHUKAMAP						            " _
@@ -1742,9 +1681,6 @@ Public Class LNT0001ZissekiIntake
                 & "     , @SHUKABIKOU1						        " _
                 & "     , @SHUKABIKOU2						        " _
                 & "     , @SHUKABIKOU3						        " _
-                & "     , @SHUKACOLOR1						        " _
-                & "     , @SHUKACOLOR2						        " _
-                & "     , @SHUKACOLOR3						        " _
                 & "     , @REQUIREDTIME						        " _
                 & "     , @SHUKADATE						        " _
                 & "     , @LOADTIME						            " _
@@ -1793,36 +1729,28 @@ Public Class LNT0001ZissekiIntake
                 & "     , @SUBSTAFFSLCT						        " _
                 & "     , @SUBSTAFFNAME						        " _
                 & "     , @SUBSTAFFNUM						        " _
-                & "     , @CALENDERMEMO1						    " _
-                & "     , @CALENDERMEMO2						    " _
-                & "     , @CALENDERMEMO3						    " _
-                & "     , @CALENDERMEMO4						    " _
-                & "     , @CALENDERMEMO5						    " _
-                & "     , @CALENDERMEMO6						    " _
-                & "     , @CALENDERMEMO7						    " _
-                & "     , @CALENDERMEMO8						    " _
-                & "     , @CALENDERMEMO9						    " _
-                & "     , @CALENDERMEMO10						    " _
                 & "     , @GYOMUTANKNUM						        " _
                 & "     , @YOUSYA						            " _
                 & "     , @RECOTITLE						        " _
                 & "     , @SHUKODATE						        " _
                 & "     , @KIKODATE						            " _
                 & "     , @KIKOTIME						            " _
+                & "     , @DISTANCE						            " _
                 & "     , @CREWBIKOU1						        " _
                 & "     , @CREWBIKOU2						        " _
                 & "     , @CREWSEQ						            " _
                 & "     , @SUBCREWBIKOU1						    " _
                 & "     , @SUBCREWBIKOU2						    " _
                 & "     , @SUBCREWSEQ						        " _
+                & "     , @SUBNGSYAGATA						        " _
                 & "     , @SUBSHUKKINTIME						    " _
-                & "     , @CALENDERMEMO11						    " _
-                & "     , @CALENDERMEMO12						    " _
-                & "     , @CALENDERMEMO13						    " _
                 & "     , @SYABARATANNI						        " _
                 & "     , @TAIKINTIME						        " _
+                & "     , @MARUYO						            " _
                 & "     , @SUBTIKINTIME						        " _
+                & "     , @SUBMARUYO						        " _
                 & "     , @KVTITLE						            " _
+                & "     , @KVTITLETODOKE						    " _
                 & "     , @KVZYUTYU						            " _
                 & "     , @KVZISSEKI						        " _
                 & "     , @KVCREW						            " _
@@ -1869,23 +1797,8 @@ Public Class LNT0001ZissekiIntake
                 & "     , @HONTRACTER23						        " _
                 & "     , @HONTRACTER24						        " _
                 & "     , @HONTRACTER25						        " _
-                & "     , @CALENDERMEMO14						    " _
-                & "     , @CALENDERMEMO15						    " _
-                & "     , @CALENDERMEMO16						    " _
-                & "     , @CALENDERMEMO17						    " _
-                & "     , @CALENDERMEMO18						    " _
-                & "     , @CALENDERMEMO19						    " _
-                & "     , @CALENDERMEMO20						    " _
-                & "     , @CALENDERMEMO21						    " _
-                & "     , @CALENDERMEMO22						    " _
-                & "     , @CALENDERMEMO23						    " _
-                & "     , @CALENDERMEMO24						    " _
-                & "     , @CALENDERMEMO25						    " _
-                & "     , @CALENDERMEMO26						    " _
-                & "     , @CALENDERMEMO27						    " _
                 & "     , @ORDSTDATE						        " _
                 & "     , @ORDENDATE						        " _
-                & "     , @OPENENDATE						        " _
                 & "     , @LUPDKEY						            " _
                 & "     , @HUPDKEY						            " _
                 & "     , @JXORDUPDKEY						        " _
@@ -1937,6 +1850,7 @@ Public Class LNT0001ZissekiIntake
                 & "     , TORICODE = @TORICODE						" _
                 & "     , TORINAME = @TORINAME						" _
                 & "     , TORICODE_AVOCADO = @TORICODE_AVOCADO		" _
+                & "     , TODOKECONTNAME = @TODOKECONTNAME		    " _
                 & "     , TODOKEADDR = @TODOKEADDR					" _
                 & "     , TODOKETEL = @TODOKETEL					" _
                 & "     , TODOKEMAP = @TODOKEMAP					" _
@@ -1945,15 +1859,13 @@ Public Class LNT0001ZissekiIntake
                 & "     , TODOKEBIKO1 = @TODOKEBIKO1				" _
                 & "     , TODOKEBIKO2 = @TODOKEBIKO2				" _
                 & "     , TODOKEBIKO3 = @TODOKEBIKO3				" _
-                & "     , TODOKECOLOR1 = @TODOKECOLOR1				" _
-                & "     , TODOKECOLOR2 = @TODOKECOLOR2				" _
-                & "     , TODOKECOLOR3 = @TODOKECOLOR3				" _
                 & "     , SHUKASLCT = @SHUKASLCT					" _
                 & "     , SHUKABASHO = @SHUKABASHO					" _
                 & "     , SHUKANAME = @SHUKANAME					" _
                 & "     , SHUKANAMES = @SHUKANAMES					" _
                 & "     , SHUKATORICODE = @SHUKATORICODE			" _
                 & "     , SHUKATORINAME = @SHUKATORINAME			" _
+                & "     , SHUKACONTNAME = @SHUKACONTNAME			" _
                 & "     , SHUKAADDR = @SHUKAADDR					" _
                 & "     , SHUKAADDRTEL = @SHUKAADDRTEL				" _
                 & "     , SHUKAMAP = @SHUKAMAP						" _
@@ -1962,9 +1874,6 @@ Public Class LNT0001ZissekiIntake
                 & "     , SHUKABIKOU1 = @SHUKABIKOU1				" _
                 & "     , SHUKABIKOU2 = @SHUKABIKOU2				" _
                 & "     , SHUKABIKOU3 = @SHUKABIKOU3				" _
-                & "     , SHUKACOLOR1 = @SHUKACOLOR1				" _
-                & "     , SHUKACOLOR2 = @SHUKACOLOR2				" _
-                & "     , SHUKACOLOR3 = @SHUKACOLOR3				" _
                 & "     , REQUIREDTIME = @REQUIREDTIME				" _
                 & "     , SHUKADATE = @SHUKADATE					" _
                 & "     , LOADTIME = @LOADTIME						" _
@@ -2013,36 +1922,28 @@ Public Class LNT0001ZissekiIntake
                 & "     , SUBSTAFFSLCT = @SUBSTAFFSLCT				" _
                 & "     , SUBSTAFFNAME = @SUBSTAFFNAME				" _
                 & "     , SUBSTAFFNUM = @SUBSTAFFNUM				" _
-                & "     , CALENDERMEMO1 = @CALENDERMEMO1			" _
-                & "     , CALENDERMEMO2 = @CALENDERMEMO2			" _
-                & "     , CALENDERMEMO3 = @CALENDERMEMO3			" _
-                & "     , CALENDERMEMO4 = @CALENDERMEMO4			" _
-                & "     , CALENDERMEMO5 = @CALENDERMEMO5			" _
-                & "     , CALENDERMEMO6 = @CALENDERMEMO6			" _
-                & "     , CALENDERMEMO7 = @CALENDERMEMO7			" _
-                & "     , CALENDERMEMO8 = @CALENDERMEMO8			" _
-                & "     , CALENDERMEMO9 = @CALENDERMEMO9			" _
-                & "     , CALENDERMEMO10 = @CALENDERMEMO10			" _
                 & "     , GYOMUTANKNUM = @GYOMUTANKNUM				" _
                 & "     , YOUSYA = @YOUSYA						    " _
                 & "     , RECOTITLE = @RECOTITLE					" _
                 & "     , SHUKODATE = @SHUKODATE					" _
                 & "     , KIKODATE = @KIKODATE						" _
                 & "     , KIKOTIME = @KIKOTIME						" _
+                & "     , DISTANCE = @DISTANCE						" _
                 & "     , CREWBIKOU1 = @CREWBIKOU1					" _
                 & "     , CREWBIKOU2 = @CREWBIKOU2					" _
                 & "     , CREWSEQ = @CREWSEQ					    " _
                 & "     , SUBCREWBIKOU1 = @SUBCREWBIKOU1			" _
                 & "     , SUBCREWBIKOU2 = @SUBCREWBIKOU2			" _
                 & "     , SUBCREWSEQ = @SUBCREWSEQ					" _
+                & "     , SUBNGSYAGATA = @SUBNGSYAGATA				" _
                 & "     , SUBSHUKKINTIME = @SUBSHUKKINTIME			" _
-                & "     , CALENDERMEMO11 = @CALENDERMEMO11			" _
-                & "     , CALENDERMEMO12 = @CALENDERMEMO12			" _
-                & "     , CALENDERMEMO13 = @CALENDERMEMO13			" _
                 & "     , SYABARATANNI = @SYABARATANNI				" _
                 & "     , TAIKINTIME = @TAIKINTIME					" _
+                & "     , MARUYO = @MARUYO					        " _
                 & "     , SUBTIKINTIME = @SUBTIKINTIME				" _
+                & "     , SUBMARUYO = @SUBMARUYO				    " _
                 & "     , KVTITLE = @KVTITLE						" _
+                & "     , KVTITLETODOKE = @KVTITLETODOKE			" _
                 & "     , KVZYUTYU = @KVZYUTYU						" _
                 & "     , KVZISSEKI = @KVZISSEKI					" _
                 & "     , KVCREW = @KVCREW						    " _
@@ -2089,23 +1990,8 @@ Public Class LNT0001ZissekiIntake
                 & "     , HONTRACTER23 = @HONTRACTER23				" _
                 & "     , HONTRACTER24 = @HONTRACTER24				" _
                 & "     , HONTRACTER25 = @HONTRACTER25				" _
-                & "     , CALENDERMEMO14 = @CALENDERMEMO14			" _
-                & "     , CALENDERMEMO15 = @CALENDERMEMO15			" _
-                & "     , CALENDERMEMO16 = @CALENDERMEMO16			" _
-                & "     , CALENDERMEMO17 = @CALENDERMEMO17			" _
-                & "     , CALENDERMEMO18 = @CALENDERMEMO18			" _
-                & "     , CALENDERMEMO19 = @CALENDERMEMO19			" _
-                & "     , CALENDERMEMO20 = @CALENDERMEMO20			" _
-                & "     , CALENDERMEMO21 = @CALENDERMEMO21			" _
-                & "     , CALENDERMEMO22 = @CALENDERMEMO22			" _
-                & "     , CALENDERMEMO23 = @CALENDERMEMO23			" _
-                & "     , CALENDERMEMO24 = @CALENDERMEMO24			" _
-                & "     , CALENDERMEMO25 = @CALENDERMEMO25			" _
-                & "     , CALENDERMEMO26 = @CALENDERMEMO26			" _
-                & "     , CALENDERMEMO27 = @CALENDERMEMO27			" _
                 & "     , ORDSTDATE = @ORDSTDATE					" _
                 & "     , ORDENDATE = @ORDENDATE					" _
-                & "     , OPENENDATE = @OPENENDATE					" _
                 & "     , LUPDKEY = @LUPDKEY					    " _
                 & "     , HUPDKEY = @HUPDKEY					    " _
                 & "     , JXORDUPDKEY = @JXORDUPDKEY				" _
@@ -2156,6 +2042,7 @@ Public Class LNT0001ZissekiIntake
                         Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)    '届先取引先コード
                         Dim TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)    '届先取引先名称
                         Dim TORICODE_AVOCADO As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE_AVOCADO", MySqlDbType.VarChar)    '届先取引先コード_アボカド
+                        Dim TODOKECONTNAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECONTNAME", MySqlDbType.VarChar)    '届先契約先名称
                         Dim TODOKEADDR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEADDR", MySqlDbType.VarChar)    '届先住所
                         Dim TODOKETEL As MySqlParameter = SQLcmd.Parameters.Add("@TODOKETEL", MySqlDbType.VarChar)  '届先電話番号
                         Dim TODOKEMAP As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEMAP", MySqlDbType.VarChar)  '届先Googleマップ
@@ -2164,15 +2051,13 @@ Public Class LNT0001ZissekiIntake
                         Dim TODOKEBIKO1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO1", MySqlDbType.VarChar)  '届先備考1
                         Dim TODOKEBIKO2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO2", MySqlDbType.VarChar)  '届先備考2
                         Dim TODOKEBIKO3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEBIKO3", MySqlDbType.VarChar)  '届先備考3
-                        Dim TODOKECOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR1", MySqlDbType.VarChar)    '届先カラーコード_背景色
-                        Dim TODOKECOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR2", MySqlDbType.VarChar)    '届先カラーコード_境界色
-                        Dim TODOKECOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECOLOR3", MySqlDbType.VarChar)    '届先カラーコード_文字色
                         Dim SHUKASLCT As MySqlParameter = SQLcmd.Parameters.Add("@SHUKASLCT", MySqlDbType.VarChar)  '出荷場所選択
                         Dim SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar)    '出荷場所コード
                         Dim SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar)  '出荷場所名称
                         Dim SHUKANAMES As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAMES", MySqlDbType.VarChar)    '出荷場所略名
                         Dim SHUKATORICODE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORICODE", MySqlDbType.VarChar)  '出荷場所取引先コード
                         Dim SHUKATORINAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKATORINAME", MySqlDbType.VarChar)  '出荷場所取引先名称
+                        Dim SHUKACONTNAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACONTNAME", MySqlDbType.VarChar)  '出荷場所契約先名称
                         Dim SHUKAADDR As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDR", MySqlDbType.VarChar)  '出荷場所住所
                         Dim SHUKAADDRTEL As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAADDRTEL", MySqlDbType.VarChar)    '出荷場所電話番号
                         Dim SHUKAMAP As MySqlParameter = SQLcmd.Parameters.Add("@SHUKAMAP", MySqlDbType.VarChar)    '出荷場所Googleマップ
@@ -2181,9 +2066,6 @@ Public Class LNT0001ZissekiIntake
                         Dim SHUKABIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU1", MySqlDbType.VarChar)  '出荷場所備考1
                         Dim SHUKABIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU2", MySqlDbType.VarChar)  '出荷場所備考2
                         Dim SHUKABIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABIKOU3", MySqlDbType.VarChar)  '出荷場所備考3
-                        Dim SHUKACOLOR1 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR1", MySqlDbType.VarChar)  '出荷場所カラーコード_背景色
-                        Dim SHUKACOLOR2 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR2", MySqlDbType.VarChar)  '出荷場所カラーコード_境界色
-                        Dim SHUKACOLOR3 As MySqlParameter = SQLcmd.Parameters.Add("@SHUKACOLOR3", MySqlDbType.VarChar)  '出荷場所カラーコード_文字色
                         Dim REQUIREDTIME As MySqlParameter = SQLcmd.Parameters.Add("@REQUIREDTIME", MySqlDbType.VarChar)  '標準所要時間
                         Dim SHUKADATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKADATE", MySqlDbType.Date) '出荷日
                         Dim LOADTIME As MySqlParameter = SQLcmd.Parameters.Add("@LOADTIME", MySqlDbType.VarChar)   '積込時間
@@ -2232,36 +2114,28 @@ Public Class LNT0001ZissekiIntake
                         Dim SUBSTAFFSLCT As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFSLCT", MySqlDbType.VarChar)    '副乗務員選択
                         Dim SUBSTAFFNAME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNAME", MySqlDbType.VarChar)    '氏名_副乗務員
                         Dim SUBSTAFFNUM As MySqlParameter = SQLcmd.Parameters.Add("@SUBSTAFFNUM", MySqlDbType.VarChar)  '社員番号_副乗務員
-                        Dim CALENDERMEMO1 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO1", MySqlDbType.VarChar)  'カレンダー画面メモ表示[ON]
-                        Dim CALENDERMEMO2 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO2", MySqlDbType.VarChar)  '業務車番選択_カレンダー画面メモ
-                        Dim CALENDERMEMO3 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO3", MySqlDbType.VarChar)  '開始日_カレンダー画面メモ
-                        Dim CALENDERMEMO4 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO4", MySqlDbType.VarChar)  '終了日_カレンダー画面メモ
-                        Dim CALENDERMEMO5 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO5", MySqlDbType.VarChar)  '背景色_カレンダー画面メモ
-                        Dim CALENDERMEMO6 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO6", MySqlDbType.VarChar)  '境界色_カレンダー画面メモ
-                        Dim CALENDERMEMO7 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO7", MySqlDbType.VarChar)  '文字色_カレンダー画面メモ
-                        Dim CALENDERMEMO8 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO8", MySqlDbType.VarChar)  '表示内容_カレンダー画面メモ
-                        Dim CALENDERMEMO9 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO9", MySqlDbType.VarChar)  '業務車番_カレンダー画面メモ
-                        Dim CALENDERMEMO10 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO10", MySqlDbType.VarChar)    '表示用終了日_カレンダー画面メモ
                         Dim GYOMUTANKNUM As MySqlParameter = SQLcmd.Parameters.Add("@GYOMUTANKNUM", MySqlDbType.VarChar)    '業務車番
                         Dim YOUSYA As MySqlParameter = SQLcmd.Parameters.Add("@YOUSYA", MySqlDbType.VarChar)    '用車先
                         Dim RECOTITLE As MySqlParameter = SQLcmd.Parameters.Add("@RECOTITLE", MySqlDbType.VarChar)  'レコードタイトル用
                         Dim SHUKODATE As MySqlParameter = SQLcmd.Parameters.Add("@SHUKODATE", MySqlDbType.Date)   '出庫日
                         Dim KIKODATE As MySqlParameter = SQLcmd.Parameters.Add("@KIKODATE", MySqlDbType.Date)   '帰庫日
                         Dim KIKOTIME As MySqlParameter = SQLcmd.Parameters.Add("@KIKOTIME", MySqlDbType.VarChar)   '帰庫時間
+                        Dim DISTANCE As MySqlParameter = SQLcmd.Parameters.Add("@DISTANCE", MySqlDbType.Decimal)   '距離
                         Dim CREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU1", MySqlDbType.VarChar)    '乗務員備考1
                         Dim CREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@CREWBIKOU2", MySqlDbType.VarChar)    '乗務員備考2
                         Dim CREWSEQ As MySqlParameter = SQLcmd.Parameters.Add("@CREWSEQ", MySqlDbType.VarChar)    '表示順_乗務員
                         Dim SUBCREWBIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU1", MySqlDbType.VarChar)  '副乗務員備考1
                         Dim SUBCREWBIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWBIKOU2", MySqlDbType.VarChar)  '副乗務員備考2
                         Dim SUBCREWSEQ As MySqlParameter = SQLcmd.Parameters.Add("@SUBCREWSEQ", MySqlDbType.VarChar)    '表示順_副乗務員
-                        Dim SUBSHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSHUKKINTIME", MySqlDbType.VarChar)   '出勤時間_副乗務員
-                        Dim CALENDERMEMO11 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO11", MySqlDbType.VarChar)    '乗務員選択_カレンダー画面メモ
-                        Dim CALENDERMEMO12 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO12", MySqlDbType.VarChar)    '社員番号_カレンダー画面メモ
-                        Dim CALENDERMEMO13 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO13", MySqlDbType.VarChar)    '内容詳細_カレンダー画面メモ
+                        Dim SUBNGSYAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SUBNGSYAGATA", MySqlDbType.VarChar)    '表示順_副乗務員
+                        Dim SUBSHUKKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBSHUKKINTIME", MySqlDbType.VarChar)   '乗務不可車型_副乗務員
                         Dim SYABARATANNI As MySqlParameter = SQLcmd.Parameters.Add("@SYABARATANNI", MySqlDbType.VarChar)    '車腹単位
-                        Dim TAIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@TAIKINTIME", MySqlDbType.VarChar)   '退勤時間
-                        Dim SUBTIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBTIKINTIME", MySqlDbType.VarChar)   '退勤時間_副乗務員
-                        Dim KVTITLE As MySqlParameter = SQLcmd.Parameters.Add("@KVTITLE", MySqlDbType.VarChar)  'kViewer用タイトル
+                        Dim TAIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@TAIKINTIME", MySqlDbType.VarChar)   '退勤見込み時間
+                        Dim MARUYO As MySqlParameter = SQLcmd.Parameters.Add("@MARUYO", MySqlDbType.Decimal)   'マルヨ
+                        Dim SUBTIKINTIME As MySqlParameter = SQLcmd.Parameters.Add("@SUBTIKINTIME", MySqlDbType.VarChar)   '退勤見込み時間_副乗務員
+                        Dim SUBMARUYO As MySqlParameter = SQLcmd.Parameters.Add("@SUBMARUYO", MySqlDbType.Decimal)   'マルヨ_副乗務員
+                        Dim KVTITLE As MySqlParameter = SQLcmd.Parameters.Add("@KVTITLE", MySqlDbType.VarChar)  'kViewer用タイトル_届先名なし
+                        Dim KVTITLETODOKE As MySqlParameter = SQLcmd.Parameters.Add("@KVTITLETODOKE", MySqlDbType.VarChar)  'kViewer用タイトル_届先名あり
                         Dim KVZYUTYU As MySqlParameter = SQLcmd.Parameters.Add("@KVZYUTYU", MySqlDbType.VarChar)    'kViewer用受注数量
                         Dim KVZISSEKI As MySqlParameter = SQLcmd.Parameters.Add("@KVZISSEKI", MySqlDbType.VarChar)  'kViewer用実績数量
                         Dim KVCREW As MySqlParameter = SQLcmd.Parameters.Add("@KVCREW", MySqlDbType.VarChar)    'kViewer用乗務員情報
@@ -2308,23 +2182,8 @@ Public Class LNT0001ZissekiIntake
                         Dim HONTRACTER23 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER23", MySqlDbType.VarChar)    '車両備考1_本トラクタ
                         Dim HONTRACTER24 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER24", MySqlDbType.VarChar)    '車両備考2_本トラクタ
                         Dim HONTRACTER25 As MySqlParameter = SQLcmd.Parameters.Add("@HONTRACTER25", MySqlDbType.VarChar)    '車両備考3_本トラクタ
-                        Dim CALENDERMEMO14 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO14", MySqlDbType.VarChar)    '用車先_カレンダー画面メモ
-                        Dim CALENDERMEMO15 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO15", MySqlDbType.VarChar)    '車型_カレンダー画面メモ
-                        Dim CALENDERMEMO16 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO16", MySqlDbType.VarChar)    '陸事番号_カレンダー画面メモ
-                        Dim CALENDERMEMO17 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO17", MySqlDbType.VarChar)    '車腹_カレンダー画面メモ
-                        Dim CALENDERMEMO18 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO18", MySqlDbType.VarChar)    '車腹単位_カレンダー画面メモ
-                        Dim CALENDERMEMO19 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO19", MySqlDbType.VarChar)    '陸運局_カレンダー画面メモ
-                        Dim CALENDERMEMO20 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO20", MySqlDbType.VarChar)    '分類番号_カレンダー画面メモ
-                        Dim CALENDERMEMO21 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO21", MySqlDbType.VarChar)    'ひらがな_カレンダー画面メモ
-                        Dim CALENDERMEMO22 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO22", MySqlDbType.VarChar)    '一連指定番号_カレンダー画面メモ
-                        Dim CALENDERMEMO23 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO23", MySqlDbType.VarChar)    '陸事番号_トラクタ_カレンダー画面メモ
-                        Dim CALENDERMEMO24 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO24", MySqlDbType.VarChar)    '陸運局_トラクタ_カレンダー画面メモ
-                        Dim CALENDERMEMO25 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO25", MySqlDbType.VarChar)    '分類番号_トラクタ_カレンダー画面メモ
-                        Dim CALENDERMEMO26 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO26", MySqlDbType.VarChar)    'ひらがな_トラクタ_カレンダー画面メモ
-                        Dim CALENDERMEMO27 As MySqlParameter = SQLcmd.Parameters.Add("@CALENDERMEMO27", MySqlDbType.VarChar)    '一連指定番号_トラクタ_カレンダー画面メモ
                         Dim ORDSTDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDSTDATE", MySqlDbType.Date)   'オーダー開始日
                         Dim ORDENDATE As MySqlParameter = SQLcmd.Parameters.Add("@ORDENDATE", MySqlDbType.Date)   'オーダー終了日
-                        Dim OPENENDATE As MySqlParameter = SQLcmd.Parameters.Add("@OPENENDATE", MySqlDbType.Date)   '表示用オーダー終了日
                         Dim LUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@LUPDKEY", MySqlDbType.VarChar)    'L配更新キー
                         Dim HUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@HUPDKEY", MySqlDbType.VarChar)    'はこぶわ更新キー
                         Dim JXORDUPDKEY As MySqlParameter = SQLcmd.Parameters.Add("@JXORDUPDKEY", MySqlDbType.VarChar)    'JX形式オーダー更新キー
@@ -2384,6 +2243,7 @@ Public Class LNT0001ZissekiIntake
                             TORICODE.Value = updRow("届先取引先コード") '届先取引先コード（先頭5桁＋"00000"に編集済）
                             TORINAME.Value = updRow("届先取引先名称")  '届先取引先名称
                             TORICODE_AVOCADO.Value = updRow("TORICODE_AVOCADO") '届先取引先コード（アボカドコードをそのまま）
+                            TODOKECONTNAME.Value = updRow("届先契約先名称") '届先契約先名称
                             TODOKEADDR.Value = updRow("届先住所")   '届先住所
                             TODOKETEL.Value = updRow("届先電話番号")  '届先電話番号
                             If updRow("届先緯度") = "" AndAlso updRow("届先経度") = "" Then
@@ -2396,15 +2256,13 @@ Public Class LNT0001ZissekiIntake
                             TODOKEBIKO1.Value = updRow("届先備考1") '届先備考1
                             TODOKEBIKO2.Value = updRow("届先備考2") '届先備考2
                             TODOKEBIKO3.Value = updRow("届先備考3") '届先備考3
-                            TODOKECOLOR1.Value = updRow("届先カラーコード_背景色") '届先カラーコード_背景色
-                            TODOKECOLOR2.Value = updRow("届先カラーコード_境界色") '届先カラーコード_境界色
-                            TODOKECOLOR3.Value = updRow("届先カラーコード_文字色") '届先カラーコード_文字色
                             SHUKASLCT.Value = updRow("出荷場所選択")  '出荷場所選択
                             SHUKABASHO.Value = updRow("出荷場所コード")    '出荷場所コード
                             SHUKANAME.Value = updRow("出荷場所名称")  '出荷場所名称
                             SHUKANAMES.Value = updRow("出荷場所略名") '出荷場所略名
                             SHUKATORICODE.Value = updRow("出荷場所取引先コード")  '出荷場所取引先コード
                             SHUKATORINAME.Value = updRow("出荷場所取引先名称")   '出荷場所取引先名称
+                            SHUKACONTNAME.Value = updRow("出荷場所契約先名称")   '出荷場所契約先名称
                             SHUKAADDR.Value = updRow("出荷場所住所")  '出荷場所住所
                             SHUKAADDRTEL.Value = updRow("出荷場所電話番号") '出荷場所電話番号
                             If updRow("出荷場所緯度") = "" AndAlso updRow("出荷場所経度") = "" Then
@@ -2417,9 +2275,6 @@ Public Class LNT0001ZissekiIntake
                             SHUKABIKOU1.Value = updRow("出荷場所備考1")   '出荷場所備考1
                             SHUKABIKOU2.Value = updRow("出荷場所備考2")   '出荷場所備考2
                             SHUKABIKOU3.Value = updRow("出荷場所備考3")   '出荷場所備考3
-                            SHUKACOLOR1.Value = updRow("出荷場所カラーコード_背景色")    '出荷場所カラーコード_背景色
-                            SHUKACOLOR2.Value = updRow("出荷場所カラーコード_境界色")    '出荷場所カラーコード_境界色
-                            SHUKACOLOR3.Value = updRow("出荷場所カラーコード_文字色")    '出荷場所カラーコード_文字色
                             If iTbl.Columns.Contains("標準所要時間") Then
                                 REQUIREDTIME.Value = updRow("標準所要時間") '標準所要時間
                             Else
@@ -2508,17 +2363,6 @@ Public Class LNT0001ZissekiIntake
                             SUBSTAFFSLCT.Value = updRow("副乗務員選択")   '副乗務員選択
                             SUBSTAFFNAME.Value = updRow("氏名_副乗務員")  '氏名_副乗務員
                             SUBSTAFFNUM.Value = updRow("社員番号_副乗務員") '社員番号_副乗務員
-                            CALENDERMEMO1.Value = updRow("カレンダー画面メモ表示") 'カレンダー画面メモ表示
-                            CALENDERMEMO2.Value = updRow("業務車番選択_カレンダー画面メモ")    '業務車番選択_カレンダー画面メモ
-                            CALENDERMEMO3.Value = updRow("開始日_カレンダー画面メモ")   '開始日_カレンダー画面メモ
-                            CALENDERMEMO4.Value = updRow("終了日_カレンダー画面メモ")   '終了日_カレンダー画面メモ
-                            CALENDERMEMO5.Value = updRow("背景色_カレンダー画面メモ")   '背景色_カレンダー画面メモ
-                            CALENDERMEMO6.Value = updRow("境界色_カレンダー画面メモ")   '境界色_カレンダー画面メモ
-                            CALENDERMEMO7.Value = updRow("文字色_カレンダー画面メモ")   '文字色_カレンダー画面メモ
-                            CALENDERMEMO8.Value = updRow("表示内容_カレンダー画面メモ")  '表示内容_カレンダー画面メモ
-                            CALENDERMEMO9.Value = updRow("業務車番_カレンダー画面メモ")  '業務車番_カレンダー画面メモ
-                            'CALENDERMEMO10.Value = updRow("表示用終了日_カレンダー画面メモ")   '表示用終了日_カレンダー画面メモ　2025/08/14 削除
-                            CALENDERMEMO10.Value = ""   '表示用終了日_カレンダー画面メモ　2025/08/14 変更
                             GYOMUTANKNUM.Value = updRow("業務車番") '業務車番
                             YOUSYA.Value = updRow("用車先")    '用車先
                             RECOTITLE.Value = updRow("レコードタイトル用")   'レコードタイトル用
@@ -2533,23 +2377,34 @@ Public Class LNT0001ZissekiIntake
                                 KIKODATE.Value = updRow("帰庫日")  '帰庫日
                             End If
                             KIKOTIME.Value = updRow("帰庫時間") '帰庫時間
+                            If String.IsNullOrEmpty(updRow("距離")) Then
+                                DISTANCE.Value = 0 '距離
+                            Else
+                                DISTANCE.Value = updRow("距離") '距離
+                            End If
                             CREWBIKOU1.Value = updRow("乗務員備考1") '乗務員備考1
                             CREWBIKOU2.Value = updRow("乗務員備考2") '乗務員備考2
                             CREWSEQ.Value = updRow("表示順_乗務員") '表示順_乗務員
                             SUBCREWBIKOU1.Value = updRow("副乗務員備考1") '副乗務員備考1
                             SUBCREWBIKOU2.Value = updRow("副乗務員備考2") '副乗務員備考2
                             SUBCREWSEQ.Value = updRow("表示順_副乗務員") '表示順_副乗務員
+                            SUBNGSYAGATA.Value = updRow("乗務不可車型_副乗務員") '乗務不可車型_副乗務員
                             SUBSHUKKINTIME.Value = updRow("出勤時間_副乗務員")  '出勤時間_副乗務員
-                            CALENDERMEMO11.Value = updRow("乗務員選択_カレンダー画面メモ")    '乗務員選択_カレンダー画面メモ
-                            CALENDERMEMO12.Value = updRow("社員番号_カレンダー画面メモ") '社員番号_カレンダー画面メモ
-                            CALENDERMEMO13.Value = updRow("内容詳細_カレンダー画面メモ") '内容詳細_カレンダー画面メモ
                             SYABARATANNI.Value = updRow("車腹単位") '車腹単位
-                            'TAIKINTIME.Value = updRow("退勤時間")   '退勤時間　2025/08/14 削除
                             TAIKINTIME.Value = updRow("退勤見込み時間")   '退勤見込み時間　2025/08/14 更新
-                            'SUBTIKINTIME.Value = updRow("退勤時間_副乗務員")    '退勤時間_副乗務員　2025/08/14 削除
+                            If String.IsNullOrEmpty(updRow("マルヨ")) Then
+                                MARUYO.Value = 0   'マルヨ　2025/08/14 更新
+                            Else
+                                MARUYO.Value = updRow("マルヨ")   'マルヨ　2025/08/14 更新
+                            End If
                             SUBTIKINTIME.Value = updRow("退勤見込み時間_副乗務員")    '退勤時間_副乗務員　2025/08/14 更新
-                            'KVTITLE.Value = updRow("kViewer用タイトル")  'kViewer用タイトル　2025/08/14 削除
-                            KVTITLE.Value = updRow("kViewer用タイトル_届先名なし")  'kViewer用タイトル　2025/08/14 更新
+                            If String.IsNullOrEmpty(updRow("マルヨ_副乗務員")) Then
+                                SUBMARUYO.Value = 0    'マルヨ_副乗務員　2025/08/14 更新
+                            Else
+                                SUBMARUYO.Value = updRow("マルヨ_副乗務員")    'マルヨ_副乗務員　2025/08/14 更新
+                            End If
+                            KVTITLE.Value = updRow("kViewer用タイトル_届先名なし")  'kViewer用タイトル_届先名なし　2025/08/14 更新
+                            KVTITLETODOKE.Value = updRow("kViewer用タイトル_届先名あり")  'kViewer用タイトル_届先名あり　2025/08/14 更新
                             KVZYUTYU.Value = updRow("kViewer用受注数量") 'kViewer用受注数量
                             KVZISSEKI.Value = updRow("kViewer用実績数量")    'kViewer用実績数量
                             KVCREW.Value = updRow("kViewer用乗務員情報")  'kViewer用乗務員情報
@@ -2596,20 +2451,6 @@ Public Class LNT0001ZissekiIntake
                             HONTRACTER23.Value = updRow("車両備考1_本トラクタ")  '車両備考1_本トラクタ
                             HONTRACTER24.Value = updRow("車両備考2_本トラクタ")  '車両備考2_本トラクタ
                             HONTRACTER25.Value = updRow("車両備考3_本トラクタ")  '車両備考3_本トラクタ
-                            CALENDERMEMO14.Value = updRow("用車先_カレンダー画面メモ")  '用車先_カレンダー画面メモ
-                            CALENDERMEMO15.Value = updRow("車型_カレンダー画面メモ")   '車型_カレンダー画面メモ
-                            CALENDERMEMO16.Value = updRow("陸事番号_カレンダー画面メモ") '陸事番号_カレンダー画面メモ
-                            CALENDERMEMO17.Value = updRow("車腹_カレンダー画面メモ")   '車腹_カレンダー画面メモ
-                            CALENDERMEMO18.Value = updRow("車腹単位_カレンダー画面メモ") '車腹単位_カレンダー画面メモ
-                            CALENDERMEMO19.Value = updRow("陸運局_カレンダー画面メモ")  '陸運局_カレンダー画面メモ
-                            CALENDERMEMO20.Value = updRow("分類番号_カレンダー画面メモ") '分類番号_カレンダー画面メモ
-                            CALENDERMEMO21.Value = updRow("ひらがな_カレンダー画面メモ") 'ひらがな_カレンダー画面メモ
-                            CALENDERMEMO22.Value = updRow("一連指定番号_カレンダー画面メモ")   '一連指定番号_カレンダー画面メモ
-                            CALENDERMEMO23.Value = updRow("陸事番号_トラクタ_カレンダー画面メモ")    '陸事番号_トラクタ_カレンダー画面メモ
-                            CALENDERMEMO24.Value = updRow("陸運局_トラクタ_カレンダー画面メモ") '陸運局_トラクタ_カレンダー画面メモ
-                            CALENDERMEMO25.Value = updRow("分類番号_トラクタ_カレンダー画面メモ")    '分類番号_トラクタ_カレンダー画面メモ
-                            CALENDERMEMO26.Value = updRow("ひらがな_トラクタ_カレンダー画面メモ")    'ひらがな_トラクタ_カレンダー画面メモ
-                            CALENDERMEMO27.Value = updRow("一連指定番号_トラクタ_カレンダー画面メモ")  '一連指定番号_トラクタ_カレンダー画面メモ
                             If String.IsNullOrEmpty(updRow("オーダー開始日")) Then
                                 ORDSTDATE.Value = DBNull.Value 'オーダー開始日
                             Else
@@ -2620,13 +2461,6 @@ Public Class LNT0001ZissekiIntake
                             Else
                                 ORDENDATE.Value = updRow("オーダー終了日") 'オーダー終了日
                             End If
-                            '2025/08/14 UPDATE
-                            'If String.IsNullOrEmpty(updRow("表示用オーダー終了日")) Then
-                            '    OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
-                            'Else
-                            '    OPENENDATE.Value = updRow("表示用オーダー終了日") '表示用オーダー終了日
-                            'End If
-                            OPENENDATE.Value = DBNull.Value '表示用オーダー終了日
                             '2025/08/14 UPDATE
                             If iTbl.Columns.Contains("L配更新キー") Then
                                 LUPDKEY.Value = updRow("L配更新キー")    'L配更新キー
