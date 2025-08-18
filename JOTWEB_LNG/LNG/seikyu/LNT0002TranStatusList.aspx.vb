@@ -625,7 +625,9 @@ Public Class LNT0002TranStatusList
         SQLStr.AppendLine("      AND  A1.UPDYMD = A2.UPDYMD                                                                     ")
         SQLStr.AppendLine("      LEFT JOIN                                                                                      ")
         SQLStr.AppendLine("      COM.LNS0001_USER US                                                                            ")
-        SQLStr.AppendLine("      ON  A2.UPDUSER = US.USERID                                                                      ")
+        SQLStr.AppendLine("      ON  A2.UPDUSER = US.USERID                                                                     ")
+        SQLStr.AppendLine("    ORDER BY                                                                                         ")
+        SQLStr.AppendLine("           A2.UPDYMD DESC                                                                            ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
