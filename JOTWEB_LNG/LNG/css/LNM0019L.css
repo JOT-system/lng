@@ -1,0 +1,116 @@
+﻿/*アップロードボタン*/
+#WF_UPLOAD_LABEL {
+    display: block;
+}
+
+input#WF_UPLOAD_BTN {
+    display: none;
+}
+
+#WF_UPLOAD_LABEL:hover {
+    cursor: pointer;
+}
+
+#WF_UPLOAD_LABEL:has(input:disabled) {
+    background-color: #f3f3f3;
+    color: #aaa;
+}
+
+    #WF_UPLOAD_LABEL:has(input:disabled):hover {
+        border-color: #cfcfcf;
+        cursor: default;
+    }
+#btnFee, #btnTanka {
+    padding: 0px;
+    height: 20px;
+    width: 62px;
+    font-size: 12px;
+    background-color: #04ADE2;
+    color: #FFFFFF;
+}
+
+    #btnFee:hover, #btnTanka:hover {
+        cursor: pointer;
+    }
+
+/*--------------------------------------------------------------
+# 調整（k.miyake)
+--------------------------------------------------------------*/
+    #divContensbox {
+    overflow: hidden;
+}
+
+#pnlListArea {
+    margin: 0 0px;
+    height: 69% !important;
+}
+
+:root, [data-bs-theme=light] {
+    --bs-body-font-size: 1.5rem;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+}
+th {
+    text-align: center;
+}
+.input-group {
+    flex-wrap: nowrap;
+}
+/*--------------------------------------------------------------
+# サイズ基準
+# 1rem = 16px
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Bootstrap Customize
+--------------------------------------------------------------*/
+.form-select {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
+
+.calendararea {
+    display: inline-block;
+    width: 160px !important;
+}
+
+#ListCount{
+    margin-right:10px;
+    width:90px;
+}
+
+.leftSide {
+    display: flex;
+}
+
+
+#WF_TORI, #WF_ORG, #WF_DEPARTURE {
+    width: 170px !important;
+    margin-right: 10px;
+}
+
+#WF_ButtonExtract {
+    margin-left:10px;
+}
+
+#WF_DELDATAFLG {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* ui-multiselect*/
+.ui-multiselect {
+    height: 32px;
+    border-color: #cfcfcf;
+    border-radius: 0;
+    color: #333;
+    font-weight: normal;
+    font-size: 13px;
+}

@@ -356,9 +356,22 @@ Public Module PrevDispMap
         ''' </summary>
         Public Const LNM0017D As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATEDETAIL_ASPX"
         ''' <summary>
-        ''' 休日割増単価スタメンテナンス（履歴）
+        ''' 休日割増単価マスタメンテナンス（履歴）
         ''' </summary>
         Public Const LNM0017H As String = "ASP.LNG_MAS_LNM0017HOLIDAYRATEHISTORY_ASPX"
+
+        ''' <summary>
+        ''' サーチャージ定義マスタメンテナンス（一覧）
+        ''' </summary>
+        Public Const LNM0019L As String = "ASP.LNG_MAS_LNM0019SURCHARGEPATTERNLIST_ASPX"
+        ''' <summary>
+        ''' サーチャージ定義マスタメンテナンス（詳細）
+        ''' </summary>
+        Public Const LNM0019D As String = "ASP.LNG_MAS_LNM0019SURCHARGEPATTERNDETAIL_ASPX"
+        ''' <summary>
+        ''' サーチャージ定義マスタメンテナンス（履歴）
+        ''' </summary>
+        Public Const LNM0019H As String = "ASP.LNG_MAS_LNM0019SURCHARGEPATTERNHISTORY_ASPX"
 
         ''' <summary>
         ''' 軽油価格参照先管理マスタメンテナンス（一覧）

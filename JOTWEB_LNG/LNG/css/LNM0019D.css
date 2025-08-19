@@ -1,0 +1,643 @@
+﻿body {
+}
+
+input[type=text][readonly] {
+    padding-left: 4px !important;
+    background-color: rgb(237, 237, 237) !important;
+}
+
+    input[type=text][readonly].disabledcalendarIcon:not(.iconOnly) {
+        padding-left: 0.3em;
+    }
+
+input[type=text].disabledcalendarIcon {
+    padding-left: 25px;
+}
+
+input[type=date][readonly] {
+    background-color: rgb(237, 237, 237) !important;
+}
+
+#SetItemBox {
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    margin: 24px 16px 0;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+    #SetItemBox div[id^=KEY_LINE_] {
+        display: flex;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+    }
+        /* ************************** */
+        /* 単票入力欄の列定義         */
+        /* ************************** */
+        /* 1項目(名称 文言 列幅) */
+        #SetItemBox div[id^=KEY_LINE_] > .divSelectItem {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+            /* 項目名欄(n行目の入力欄の1,3・・・列に適用するスタイル) */
+            #SetItemBox div[id^=KEY_LINE_] > .divSelectItem > :nth-child(2n+1) {
+                display: inline-block;
+                width: 7em;
+                padding-left: 16px;
+                font-weight: bold;
+                flex-shrink: 0;
+            }
+            /* 入力欄(n行目の入力欄の2,4・・・列に適用するスタイル) */
+            #SetItemBox div[id^=KEY_LINE_] > .divSelectItem > :nth-child(2n+2) {
+                display: inline-block;
+            }
+/* ************************** */
+/* セレクトボックス           */
+/* ************************** */
+.selectBox {
+    margin-bottom: 16px;
+    font-weight: bold;
+}
+
+.divListItem input[type=checkbox],
+.divListItem2 input[type=checkbox] {
+    display: none;
+}
+
+    .divListItem input[type=checkbox] + label,
+    .divListItem2 input[type=checkbox] + label {
+        display: flex;
+        width: 75px;
+        padding-left: 5px;
+        padding-right: 5px;
+        height: 28px;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #cfcfcf;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        position: relative;
+    }
+
+    .divListItem input[type=checkbox]:checked + label,
+    .divListItem2 input[type=checkbox]:checked + label {
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .divListItem input[type=checkbox]:checked + label:before,
+    .divListItem2 input[type=checkbox]:checked + label:before {
+        position: absolute;
+        left: 2px;
+        content: "✔";
+        color: #0d6efd;
+    }
+
+    .divListItem input[type=checkbox]:not(:disabled) + label:hover,
+    .divListItem2 input[type=checkbox]:not(:disabled) + label:hover {
+        cursor: pointer;
+        background-color: #e1eeff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+.divListItem ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.divListItem2 ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+/*--------------------------------------------------------------
+# 調整（k.miyake)
+--------------------------------------------------------------*/
+#divContensbox {
+    overflow: hidden;
+}
+
+#pnlListArea {
+    margin: 0 0px;
+}
+
+:root, [data-bs-theme=light] {
+    --bs-body-font-size: 1.5rem;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+}
+
+/*--------------------------------------------------------------
+# サイズ基準
+# 1rem = 16px
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Bootstrap Customize
+--------------------------------------------------------------*/
+.form-select {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
+
+
+/*--------------------------------------------------------------
+# common微調整
+--------------------------------------------------------------*/
+/* 虫眼鏡アイコン位置調整 */
+.boxIconArea div {
+    margin-top: calc(100% - 0px) !important;
+}
+
+/* 明細位置調整 */
+.detailboxOnly {
+    height: 100% !important;
+    /*width: 90% !important;*/
+}
+#detailkeybox {
+    height: 73% !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    padding-bottom: 180px;
+    position: fixed;
+}
+
+/* 左ボックス */
+#LF_LEFTBOX {
+    width: 30em !important;
+}
+
+#detailkeybox p[id^=TYPE_], #detailkeybox div[id^=TYPE_] {
+    min-width: 500px !important;
+    display: flex;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* ************************** */
+/* 単票入力欄の列定義         */
+/* ************************** */
+/* 1項目(名称 文言 列幅) */
+#SetItemBox div[id^=TYPE_] > .divSelectItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* 項目名欄(n行目の列に適用するスタイル) */
+#detailkeybox div[id^=TYPE_A] > span {
+    display: inline-block;
+    width: 10em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(2) {
+    display: inline-block;
+    width: 180px;
+}
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(3) {
+    display: inline-block;
+    width: 5.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_B] > span > :nth-child(4) {
+    display: inline-block;
+    width: 180px;
+}
+
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+#detailkeybox p[id^=TYPE_C] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left:20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(1) {
+    display: inline-block;
+    width: 3.8em;
+}
+
+#detailkeybox p[id^=TYPE_G] > span > :nth-child(2) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+
+#detailkeybox p[id^=TYPE_H] {
+    padding-bottom: 0px !important;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+    margin-left: 4.4em;
+}
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(2) {
+    display: inline-block;
+    width: 12.2em;
+}
+
+#detailkeybox p[id^=TYPE_I] {
+    padding-top: 0px !important;
+}
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(1) {
+    display: inline-block;
+    width: 9.8em;
+    font-weight: bold;
+    margin-left: 4.4em;
+}
+
+#detailkeybox p[id^=TYPE_I] > span > :nth-child(2) {
+    display: inline-block;
+    width: 12.2em;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+
+#detailkeybox p[id^=TYPE_J] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(1) {
+    display: inline-block;
+    width: 3.8em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(2) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_L] {
+    padding-bottom: 0px !important;
+}
+
+    #detailkeybox p[id^=TYPE_L] > span > :nth-child(1) {
+        display: inline-block;
+        width: 9.8em;
+        font-weight: bold;
+        margin-left: 4.4em;
+    }
+
+    #detailkeybox p[id^=TYPE_L] > span > :nth-child(2) {
+        display: inline-block;
+        width: 12.2em;
+    }
+
+#detailkeybox p[id^=TYPE_M] {
+    padding-top: 0px !important;
+}
+
+    #detailkeybox p[id^=TYPE_M] > span > :nth-child(1) {
+        display: inline-block;
+        width: 9.8em;
+        font-weight: bold;
+        margin-left: 4.4em;
+    }
+
+    #detailkeybox p[id^=TYPE_M] > span > :nth-child(2) {
+        display: inline-block;
+        width: 12.2em;
+    }
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(2) {
+    display: inline-block;
+    width: 9.7em;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left:1.1em;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(4) {
+    display: inline-block;
+    width: 9.7em;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(5) {
+    display: inline-block;
+    margin-left: 1.1em;
+    width: 2.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(6) {
+    display: inline-block;
+    width: 5.7em;
+}
+#detailkeybox p[id^=TYPE_N] > span > :nth-child(7) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+
+#detailkeybox p[id^=TYPE_O] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(3) {
+    display: inline-block;
+    width: 2.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(4) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+#detailkeybox p[id^=TYPE_P] > span > :nth-child(5) {
+    display: inline-block;
+    width: 20.7em;
+}
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(2) {
+    display: inline-block;
+    width: 7.7em;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(3) {
+    display: inline-block;
+    width: 2.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(4) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(5) {
+    display: inline-block;
+    width: 19.4em;
+}
+#detailkeybox p[id^=TYPE_Q] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+#detailkeybox div[id^=TYPE_R] > span {
+    display: inline-block;
+    width: 8em;
+    font-weight: bold;
+}
+
+
+#detailkeybox div[id^=TYPE_R] > :nth-child(3) {
+    display: inline-block;
+    width: 11.5em;
+    margin-left:0.8em;
+    font-weight: bold;
+}
+#detailkeybox div[id^=TYPE_R] > :nth-child(4) {
+    width: 13.8em;
+}
+
+#detailkeybox p[id^=TYPE_S] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_S] > span > :nth-child(2) {
+    display: inline-block;
+    width: 4.0em;
+}
+
+#detailkeybox p[id^=TYPE_T] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_T] > span > :nth-child(2) {
+    display: inline-block;
+    width: 34.5em;
+}
+
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(2) {
+    display: inline-block;
+    width: 400px;
+}
+
+#detailkeybox p[id^=TYPE_U] > span > :nth-child(3) {
+    display: inline-block;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(1) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(2) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(3) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(4) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(5) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_V] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
+
+.WF_RADIO {
+    display: inline-block;
+}
+
+.WF_RADIO input {
+    display: none;
+}
+
+.WF_RADIO label {
+    text-decoration: none;
+    padding: 2px 16px;
+    line-height: 23px;
+    text-align: center;
+    color: #333;
+    border: solid 1px #cfcfcf;
+    background-color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+    border-radius: 6px;
+    margin-right: 15px;
+    border-color: #5B9BD5;
+    width: 120px;
+}
+
+.WF_RADIO input:checked + label {
+    background-color: #F7BDA4;
+    border-color: #ED7D31;
+}
+
+.WF_RADIO2 {
+    display: inline-block;
+}
+
+    .WF_RADIO2 input {
+        display: none;
+    }
+
+    .WF_RADIO2 label {
+        text-decoration: none;
+        padding: 2px 16px;
+        line-height: 23px;
+        text-align: center;
+        color: #333;
+        border: solid 1px #cfcfcf;
+        background-color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        outline: none;
+        border-radius: 6px;
+        margin-right: 10px;
+        border-color: #5B9BD5;
+        width: 70px;
+    }
+
+    .WF_RADIO2 input:checked + label {
+        background-color: #F7BDA4;
+        border-color: #ED7D31;
+    }
+
+#TxtBRANCHCODE, #TxtKOTEIHIM, #TxtTANKA, #TxtROUNDTRIP, #TxtTOLLFEE, #TxtSYABARA, #TxtJOTPERCENTAGE, #TxtENEXPERCENTAGE {
+    text-align: right !important;
+}
+
+#WF_ORGCODE_TEXT, #WF_KASANORGCODE_TEXT, #WF_ACCOUNTCODE_TEXT, #WF_SEGMENTCODE_TEXT {
+    background-color: #F2F2F2;
+}
+
+/* 中央寄せの箱 */
+.actionButtonBox .centerSide {
+    box-sizing: border-box;
+    margin-left: 150px;
+}
+
+#WF_ButtonUPDATE, #WF_ButtonCANCEL {
+    width: 200px !important;
+    height: 50px !important;
+}
+
+#WF_ButtonCANCEL {
+    margin-left: 100px !important;
+}
+
+#WF_BILLINGCYCLE_L::after, #WF_SURCHARGEPATTERNCODE_L::after, #WF_CALCMETHOD_L::after, #WF_DISPLAYNAME_L::after {
+    content: "";
+    background-image: url(../img/help.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-left: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
+}

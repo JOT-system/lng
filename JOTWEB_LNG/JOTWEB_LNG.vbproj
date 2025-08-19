@@ -237,8 +237,11 @@
     <Content Include="css\jquery.multiselect.css" />
     <Content Include="img\favicon.png" />
     <Content Include="img\kronos_logo.svg" />
+    <Content Include="LNG\css\LNM0019D.css" />
     <Content Include="LNG\css\LNM0006D.css" />
+    <Content Include="LNG\css\LNM0019H.css" />
     <Content Include="LNG\css\LNM0006H.css" />
+    <Content Include="LNG\css\LNM0019L.css" />
     <Content Include="LNG\css\LNM0006L.css" />
     <Content Include="LNG\css\LNM0006S.css" />
     <Content Include="LNG\css\LNM0020H.css" />
@@ -312,6 +315,7 @@
     <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
+    <Content Include="LNG\inc\LNM0019WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0020WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0017WRKINC.ascx" />
@@ -322,8 +326,11 @@
     <Content Include="LNG\inc\LNS0008WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0001WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0002WRKINC.ascx" />
+    <Content Include="LNG\mas\LNM0019SurchargePatternDetail.aspx" />
     <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
+    <Content Include="LNG\mas\LNM0019SurchargePatternHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
+    <Content Include="LNG\mas\LNM0019SurchargePatternList.aspx" />
     <Content Include="LNG\mas\LNM0006TankaList.aspx" />
     <Content Include="LNG\mas\LNM0020DieselPriceSiteHistory.aspx" />
     <Content Include="LNG\mas\LNM0020DieselPriceSiteDetail.aspx" />
@@ -341,8 +348,11 @@
     <Content Include="LNG\mas\LNS0001UserHistory.aspx" />
     <Content Include="LNG\mas\LNS0001UserList.aspx" />
     <Content Include="LNG\mas\LNS0001UserSearch.aspx" />
+    <Content Include="LNG\script\LNM0019D.js" />
     <Content Include="LNG\script\LNM0006D.js" />
+    <Content Include="LNG\script\LNM0019H.js" />
     <Content Include="LNG\script\LNM0006H.js" />
+    <Content Include="LNG\script\LNM0019L.js" />
     <Content Include="LNG\script\LNM0006L.js" />
     <Content Include="LNG\script\LNM0006S.js" />
     <Content Include="LNG\script\LNM0020H.js" />
@@ -571,6 +581,13 @@
       <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNM0019WRKINC.ascx.designer.vb">
+      <DependentUpon>LNM0019WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNM0019WRKINC.ascx.vb">
+      <DependentUpon>LNM0019WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\inc\LNM0006WRKINC.ascx.designer.vb">
       <DependentUpon>LNM0006WRKINC.ascx</DependentUpon>
     </Compile>
@@ -644,6 +661,13 @@
       <DependentUpon>LNT0002WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternDetail.aspx.designer.vb">
+      <DependentUpon>LNM0019SurchargePatternDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternDetail.aspx.vb">
+      <DependentUpon>LNM0019SurchargePatternDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\mas\LNM0006TankaDetail.aspx.designer.vb">
       <DependentUpon>LNM0006TankaDetail.aspx</DependentUpon>
     </Compile>
@@ -651,11 +675,25 @@
       <DependentUpon>LNM0006TankaDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternHistory.aspx.designer.vb">
+      <DependentUpon>LNM0019SurchargePatternHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternHistory.aspx.vb">
+      <DependentUpon>LNM0019SurchargePatternHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\mas\LNM0006TankaHistory.aspx.designer.vb">
       <DependentUpon>LNM0006TankaHistory.aspx</DependentUpon>
     </Compile>
     <Compile Include="LNG\mas\LNM0006TankaHistory.aspx.vb">
       <DependentUpon>LNM0006TankaHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternList.aspx.designer.vb">
+      <DependentUpon>LNM0019SurchargePatternList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNM0019SurchargePatternList.aspx.vb">
+      <DependentUpon>LNM0019SurchargePatternList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNM0006TankaList.aspx.designer.vb">

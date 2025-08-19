@@ -1,0 +1,53 @@
+﻿[id^="WF_DDL"] {
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+    ime-mode: inactive;
+    color: #404040;
+    /*padding: 6px 4px 6px 4px;*/
+    border-color: skyblue;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 3px;
+    width: 80px;
+    height: 25px;
+}
+/*--------------------------------------------------------------
+# 調整（k.miyake)
+--------------------------------------------------------------*/
+#divContensbox {
+    overflow: hidden;
+}
+
+#pnlListArea {
+    margin: 0 0px;
+}
+
+:root, [data-bs-theme=light] {
+    --bs-body-font-size: 1.5rem;
+}
+
+.fs-5 {
+    font-size: 1.5rem !important;
+}
+
+th {
+    text-align: center;
+}
+/*--------------------------------------------------------------
+# サイズ基準
+# 1rem = 16px
+--------------------------------------------------------------*/
+/*--------------------------------------------------------------
+# Bootstrap Customize
+--------------------------------------------------------------*/
+.form-select {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+}
