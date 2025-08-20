@@ -114,3 +114,16 @@ p {
     font-weight: normal;
     font-size: 13px;
 }
+
+/*　ヘッダアイコン（インフォメーション）*/
+#surchargepattern::after, #calcmethod::after, #dieselpreicesite::after {
+    content: "";
+    background-image: url(../img/guidanceIconI.png);
+    display: inline-block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-right: 0.2em;
+    width: 1.2em;
+    height: 1.2em;
+    transform: translateY(20%)
+}

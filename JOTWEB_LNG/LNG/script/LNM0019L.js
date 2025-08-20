@@ -37,6 +37,10 @@ window.onload = function () {
 
     //削除行灰色表示
     f_DeleteRowGray()
+
+    //ヘッダコメント編集
+    f_CommentCtrlCol();
+
 }
 
 /**
@@ -150,4 +154,40 @@ function f_DeleteRowGray() {
             objTable.rows[i].style.backgroundColor = "gray";
         }
     }
+}
+
+// ○ヘッダコメント編集
+function f_CommentCtrlCol() {
+    var Col = {
+        SURCHARGEPATTERN: 8     //サーチャージパターン
+        , CALCMETHOD: 10        //距離計算方式
+        , DIESELPRICESITE: 11   //実績単価参照先
+    };
+
+    //**********ヘッダ********************/
+    //1つの列以外を非表示にして表示中の列幅を伸ばす
+    var objTableHR = document.getElementById("pnlListArea_HR").children[0];
+
+    //ID追加
+    objTableHR.rows[0].cells[Col.SURCHARGEPATTERN].id = "surchargepattern";
+    objTableHR.rows[0].cells[Col.CALCMETHOD].id = "calcmethod";
+    objTableHR.rows[0].cells[Col.DIESELPRICESITE].id = "dieselpreicesite";
+    //タイトル(吹き出し)
+    objTableHR.rows[0].cells[Col.SURCHARGEPATTERN].title = "【サーチャージパターンについて】\n" +
+        "・荷主単位：車両や届先に関わらず、荷主単位でサーチャージ料金が定義されている場合を指します。\n" +
+        "・届先単位：届先毎に輸送距離や基準単価等が定義されている場合を指します。\n" +
+        "・車型単位：車型によって輸送距離や基準単価等が定義されている場合を指します。\n" +
+        "・車腹単位：車腹によって輸送距離や基準単価等が定義されている場合を指します。\n" +
+        "・車番単位：車番によって輸送距離や基準単価等が定義されている場合を指します。";
+    //タイトル(吹き出し)
+    objTableHR.rows[0].cells[Col.CALCMETHOD].title = "【距離計算方式について】\n" +
+        "・距離定義による計算：\n" +
+        "　協定書等で距離程が定義されており、輸送回数に応じて自動計算が行われるデータです。\n" +
+        "・距離は実績値を画面に入力：\n" +
+        "　実勢単価参照先が新たに生じた場合は、軽油価格参照先管理マスタで事前登録を行ってください。";
+    //タイトル(吹き出し)
+    objTableHR.rows[0].cells[Col.DIESELPRICESITE].title = "【実勢価格参照先について】\n" +
+        "サーチャージ定義毎の、実勢単価の参照先名称を表示します。\n" +
+        "実勢単価参照先が新たに生じた場合は、軽油価格参照先管理マスタで事前登録を行ってください。";
+
 }
