@@ -3306,6 +3306,8 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectCOMP_TANKNUMBER(ByVal I_TORICODE As String, ByVal I_ORDERORGCODE As String,
                                      ByRef I_dtTank As DataTable,
+                                     Optional ByVal I_SHUKABASHO As String = Nothing,
+                                     Optional ByVal I_TODOKECODE As String = Nothing,
                                      Optional ByRef O_dtCOMP_TANKNUMBER As DataTable = Nothing)
         Dim SQLStr As String = ""
         '-- SELECT
@@ -3333,7 +3335,17 @@ Public Class CmnParts
         SQLStr &= " WHERE "
         SQLStr &= " VIW0005.ZISSEKI_TANKNUMBER <> '' "
         SQLStr &= String.Format(" AND VIW0005.ZISSEKI_TORICODE = '{0}' ", I_TORICODE)
-        SQLStr &= String.Format(" AND VIW0005.ZISSEKI_ORDERORGCODE = '{0}' ", I_ORDERORGCODE)
+        If Not IsNothing(I_ORDERORGCODE) Then
+            SQLStr &= String.Format(" AND VIW0005.ZISSEKI_ORDERORGCODE = '{0}' ", I_ORDERORGCODE)
+        End If
+
+        If Not IsNothing(I_SHUKABASHO) Then
+            SQLStr &= String.Format(" AND VIW0005.ZISSEKI_SHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If Not IsNothing(I_TODOKECODE) Then
+            SQLStr &= String.Format(" AND VIW0005.ZISSEKI_TODOKECODE = '{0}' ", I_TODOKECODE)
+        End If
 
         Try
             '〇SQL結果取得
@@ -3341,21 +3353,54 @@ Public Class CmnParts
             '★結果が0件の場合はSKIP
             If O_dtCOMP_TANKNUMBER.Rows.Count = 0 Then Exit Sub
 
-            For Each dtCOMP_TANKNUMBERrow As DataRow In O_dtCOMP_TANKNUMBER.Rows
-                Dim cmpTanknumber As String = dtCOMP_TANKNUMBERrow("ZISSEKI_TANKNUMBER").ToString()
-                Dim cmpGyomuTanknum As String = dtCOMP_TANKNUMBERrow("ZISSEKI_GYOMUTANKNUM").ToString()
-                Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTanknumber)
+            '■石油資源開発(本州)
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+                AndAlso I_ORDERORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
 
-                If I_dtTank.Select(condition).Count > 0 Then
-                    Continue For
-                End If
+                For Each dtCOMP_TANKNUMBERrow As DataRow In O_dtCOMP_TANKNUMBER.Rows
+                    Dim cmpTanknumber As String = dtCOMP_TANKNUMBERrow("ZISSEKI_TANKNUMBER").ToString()
+                    Dim cmpGyomuTanknum As String = dtCOMP_TANKNUMBERrow("ZISSEKI_GYOMUTANKNUM").ToString()
+                    Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTanknumber)
+                    Dim conditionSub As String = "KEYCODE01=''"
+                    If Not IsNothing(I_SHUKABASHO) Then
+                        condition &= String.Format(" AND KEYCODE05 = '{0}' ", I_SHUKABASHO)
+                        conditionSub &= String.Format(" AND KEYCODE05 = '{0}' ", I_SHUKABASHO)
+                    End If
+                    If Not IsNothing(I_TODOKECODE) Then
+                        condition &= String.Format(" AND KEYCODE07 = '{0}' ", I_TODOKECODE)
+                        conditionSub &= String.Format(" AND KEYCODE07 = '{0}' ", I_TODOKECODE)
+                    End If
 
-                For Each dtTankrow As DataRow In I_dtTank.Select("KEYCODE01=''", "KEYCODE10")
-                    dtTankrow("KEYCODE01") = cmpTanknumber
-                    Exit For
+                    If I_dtTank.Select(condition).Count > 0 Then
+                        Continue For
+                    End If
+
+                    For Each dtTankrow As DataRow In I_dtTank.Select(conditionSub)
+                        dtTankrow("KEYCODE01") = cmpTanknumber
+                        dtTankrow("KEYCODE04") = cmpGyomuTanknum
+                        If dtTankrow("KEYCODE09") = "1" Then Continue For
+                        Exit For
+                    Next
                 Next
 
-            Next
+            Else
+                For Each dtCOMP_TANKNUMBERrow As DataRow In O_dtCOMP_TANKNUMBER.Rows
+                    Dim cmpTanknumber As String = dtCOMP_TANKNUMBERrow("ZISSEKI_TANKNUMBER").ToString()
+                    Dim cmpGyomuTanknum As String = dtCOMP_TANKNUMBERrow("ZISSEKI_GYOMUTANKNUM").ToString()
+                    Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTanknumber)
+
+                    If I_dtTank.Select(condition).Count > 0 Then
+                        Continue For
+                    End If
+
+                    For Each dtTankrow As DataRow In I_dtTank.Select("KEYCODE01=''", "KEYCODE10")
+                        dtTankrow("KEYCODE01") = cmpTanknumber
+                        Exit For
+                    Next
+                Next
+
+            End If
+
         Catch ex As Exception
         End Try
 
@@ -3366,6 +3411,7 @@ Public Class CmnParts
     ''' </summary>
     Public Sub SelectCOMP_TODOKE(ByVal I_TORICODE As String, ByVal I_ORDERORGCODE As String,
                                  ByVal I_dtTodoke As DataTable,
+                                 Optional ByVal I_SHUKABASHO As String = Nothing,
                                  Optional ByRef O_dtCOMP_TODOKE As DataTable = Nothing)
         Dim SQLStr As String = ""
         '-- SELECT
@@ -3393,34 +3439,72 @@ Public Class CmnParts
         SQLStr &= String.Format(" AND VIW0005.ZISSEKI_TORICODE = '{0}' ", I_TORICODE)
         SQLStr &= String.Format(" AND VIW0005.ZISSEKI_ORDERORGCODE = '{0}' ", I_ORDERORGCODE)
 
+        If Not IsNothing(I_SHUKABASHO) Then
+            SQLStr &= String.Format(" AND VIW0005.ZISSEKI_SHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
         Try
             '〇SQL結果取得
             O_dtCOMP_TODOKE = SelectSearch(SQLStr)
             '★結果が0件の場合はSKIP
             If O_dtCOMP_TODOKE.Rows.Count = 0 Then Exit Sub
 
-            For Each dtCOMP_TODOKErow As DataRow In O_dtCOMP_TODOKE.Rows
-                Dim cmpTodokeCode As String = dtCOMP_TODOKErow("ZISSEKI_TODOKECODE").ToString()
-                Dim cmpTodokeName As String = dtCOMP_TODOKErow("ZISSEKI_TODOKENAME").ToString()
-                Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTodokeCode)
+            '■石油資源開発(本州)
+            If I_TORICODE = BaseDllConst.CONST_TORICODE_0132800000 _
+                AndAlso I_ORDERORGCODE <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                For Each dtCOMP_TODOKErow As DataRow In O_dtCOMP_TODOKE.Rows
+                    Dim cmpTodokeCode As String = dtCOMP_TODOKErow("ZISSEKI_TODOKECODE").ToString()
+                    Dim cmpTodokeName As String = dtCOMP_TODOKErow("ZISSEKI_TODOKENAME").ToString()
+                    Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTodokeCode)
+                    Dim conditionSub As String = "VALUE02='1'"
 
-                If I_dtTodoke.Select(condition).Count > 0 Then
-                    Continue For
-                End If
+                    If Not IsNothing(I_SHUKABASHO) Then
+                        condition &= String.Format(" AND KEYCODE06 = '{0}' ", I_SHUKABASHO)
+                        conditionSub &= String.Format(" AND KEYCODE06 = '{0}' ", I_SHUKABASHO)
+                    End If
 
-                For Each dtTodokerow As DataRow In I_dtTodoke.Select("VALUE02='1'", "KEYCODE03")
-                    If dtTodokerow("KEYCODE01").ToString().Substring(0, 5) = "99999" Then
+                    If I_dtTodoke.Select(condition).Count > 0 Then
                         Continue For
                     End If
 
-                    dtTodokerow("KEYCODE01") = cmpTodokeCode
-                    dtTodokerow("KEYCODE02") = cmpTodokeName
-                    dtTodokerow("VALUE01") = cmpTodokeName
-                    dtTodokerow("VALUE06") = cmpTodokeName
-                    Exit For
+                    For Each dtTodokerow As DataRow In I_dtTodoke.Select(conditionSub, "KEYCODE03")
+                        If dtTodokerow("KEYCODE01").ToString().Substring(0, 3) <> "TMP" Then
+                            Continue For
+                        End If
+
+                        dtTodokerow("KEYCODE01") = cmpTodokeCode
+                        dtTodokerow("KEYCODE02") = cmpTodokeName
+                        dtTodokerow("VALUE01") = cmpTodokeName
+                        dtTodokerow("VALUE06") = cmpTodokeName
+                        Exit For
+                    Next
                 Next
 
-            Next
+            Else
+                For Each dtCOMP_TODOKErow As DataRow In O_dtCOMP_TODOKE.Rows
+                    Dim cmpTodokeCode As String = dtCOMP_TODOKErow("ZISSEKI_TODOKECODE").ToString()
+                    Dim cmpTodokeName As String = dtCOMP_TODOKErow("ZISSEKI_TODOKENAME").ToString()
+                    Dim condition As String = String.Format("KEYCODE01 = '{0}'", cmpTodokeCode)
+
+                    If I_dtTodoke.Select(condition).Count > 0 Then
+                        Continue For
+                    End If
+
+                    For Each dtTodokerow As DataRow In I_dtTodoke.Select("VALUE02='1'", "KEYCODE03")
+                        If dtTodokerow("KEYCODE01").ToString().Substring(0, 5) = "99999" Then
+                            Continue For
+                        End If
+
+                        dtTodokerow("KEYCODE01") = cmpTodokeCode
+                        dtTodokerow("KEYCODE02") = cmpTodokeName
+                        dtTodokerow("VALUE01") = cmpTodokeName
+                        dtTodokerow("VALUE06") = cmpTodokeName
+                        Exit For
+                    Next
+                Next
+
+            End If
+
         Catch ex As Exception
         End Try
 

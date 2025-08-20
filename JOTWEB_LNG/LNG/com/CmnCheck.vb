@@ -447,13 +447,60 @@ Public Class CmnCheck
                 Exit Sub
         End Select
 
+        '★陸事番号マスタ(出荷・届先)取得
+        Dim tankNumberSQL As String = ""
+        tankNumberSQL &= " SELECT DISTINCT "
+        tankNumberSQL &= "   LNM0005.KEYCODE05 AS SHUKABASHO "
+        tankNumberSQL &= " , LNM0005.KEYCODE06 AS SHUKANAME "
+        'tankNumberSQL &= " , LNM0005.KEYCODE07 AS TODOKECODE "
+        'tankNumberSQL &= " , LNM0005.KEYCODE08 AS TODOKENAME "
+        tankNumberSQL &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+        tankNumberSQL &= String.Format(" WHERE LNM0005.CLASS = '{0}' ", sekiyuSigenTankClass)
+        Dim tankNumberDT = CMNPTS.SelectSearch(tankNumberSQL)
+        '★陸事番号マスタ((※個別設定用)出荷・届先)取得
+        Dim otherTankNumberSQL As String = ""
+        otherTankNumberSQL &= " SELECT DISTINCT "
+        otherTankNumberSQL &= "   LNM0005.KEYCODE05 AS SHUKABASHO "
+        otherTankNumberSQL &= " , LNM0005.KEYCODE06 AS SHUKANAME "
+        otherTankNumberSQL &= " , LNM0005.KEYCODE07 AS TODOKECODE "
+        otherTankNumberSQL &= " , LNM0005.KEYCODE08 AS TODOKENAME "
+        otherTankNumberSQL &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+        otherTankNumberSQL &= String.Format(" WHERE LNM0005.CLASS = '{0}' ", sekiyuSigenTankSubClass)
+        Dim otherTankNumberDT = CMNPTS.SelectSearch(otherTankNumberSQL)
+
+        '★届先出荷場所車庫マスタ(部署・出荷)取得
+        Dim shukaBashoSQL As String = ""
+        shukaBashoSQL &= " SELECT DISTINCT "
+        shukaBashoSQL &= "   LNM0005.KEYCODE04 AS ORDERORGCODE "
+        shukaBashoSQL &= " , LNM0005.KEYCODE05 AS ORDERORGNAME "
+        shukaBashoSQL &= " , LNM0005.KEYCODE06 AS SHUKABASHO "
+        shukaBashoSQL &= " , LNM0005.KEYCODE07 AS SHUKANAME "
+        shukaBashoSQL &= " FROM LNG.LNM0005_CONVERT LNM0005 "
+        shukaBashoSQL &= String.Format(" WHERE LNM0005.CLASS = '{0}' ", sekiyuSigenTodokeClass)
+        Dim shukaBashoDT = CMNPTS.SelectSearch(shukaBashoSQL)
+
         Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
             SQLcon.Open()  ' DataBase接続
             '--〇変換マスタ(陸事番号マスタ)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank, I_ORDERBY_KEY:="KEYCODE05, CAST(KEYCODE10 AS SIGNED), KEYCODE09")
+            For Each tankNumberDTrow As DataRow In tankNumberDT.Rows
+                Dim shukaBasho As String = tankNumberDTrow("SHUKABASHO").ToString()
+                CMNPTS.SelectCOMP_TANKNUMBER(arrToriCode(0), Nothing, dtSekiyuSigenTank, I_SHUKABASHO:=shukaBasho)
+            Next
+            '--  (※個別設定用)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub, I_ORDERBY_KEY:="KEYCODE05, KEYCODE07, CAST(KEYCODE10 AS SIGNED), KEYCODE09")
+            For Each otherTankNumberDTrow As DataRow In otherTankNumberDT.Rows
+                Dim shukaBasho As String = otherTankNumberDTrow("SHUKABASHO").ToString()
+                Dim todokeCode As String = otherTankNumberDTrow("TODOKECODE").ToString()
+                CMNPTS.SelectCOMP_TANKNUMBER(arrToriCode(0), BaseDllConst.CONST_ORDERORGCODE_021502, dtSekiyuSigenTankSub, I_SHUKABASHO:=shukaBasho, I_TODOKECODE:=todokeCode)
+            Next
             '--〇変換マスタ(届先出荷場所車庫マスタ)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
+            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke, I_ORDERBY_KEY:="KEYCODE06, CAST(KEYCODE03 AS SIGNED)")
+            For Each shukaBashoDTrow As DataRow In shukaBashoDT.Rows
+                Dim orderOrgCode As String = shukaBashoDTrow("ORDERORGCODE").ToString()
+                Dim shukaBasho As String = shukaBashoDTrow("SHUKABASHO").ToString()
+                CMNPTS.SelectCOMP_TODOKE(arrToriCode(0), orderOrgCode, dtSekiyuSigenTodoke, I_SHUKABASHO:=shukaBasho)
+            Next
             '--〇統合版単価マスタ
             CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl, I_SEKIYU_HONSHU_FLG:=True)
             'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), TaishoYm + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
