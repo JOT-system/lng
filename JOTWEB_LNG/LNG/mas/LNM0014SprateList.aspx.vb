@@ -507,7 +507,7 @@ Public Class LNM0014SprateList
         SQLStr.AppendLine("   , 0                                                                        AS HIDDEN              ")
         SQLStr.AppendLine("   , 0                                                                        AS LINECNT             ")
         SQLStr.AppendLine("   , ''                                                                       AS OPERATION           ")
-        SQLStr.AppendLine("   , LNM0014.UPDTIMSTP                                                        AS UPDTIMSTP           ")
+        SQLStr.AppendLine("   , COALESCE(LNM0014.UPDTIMSTP, '')                                          AS UPDTIMSTP           ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.DELFLG), '')                                      AS DELFLG              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.TARGETYM), '')                                    AS TARGETYM            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0014.TORICODE), '')                                    AS TORICODE            ")
