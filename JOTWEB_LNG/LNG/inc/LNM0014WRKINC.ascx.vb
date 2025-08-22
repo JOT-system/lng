@@ -1324,6 +1324,9 @@ Public Class LNM0014WRKINC
                     If WW_Tbl.Rows.Count >= 1 AndAlso WW_ROW("MIDCATENAME").ToString() <> "" Then
                         '1加算
                         GenerateMidcateCode = (CInt(WW_Tbl.Rows(0)("MIDCATECODE").ToString) + 1).ToString
+                    ElseIf WW_ROW("MIDCATENAME").ToString() = "" Then
+                        '0空白
+                        GenerateMidcateCode = "0"
                     Else
                         'そのまま
                         GenerateMidcateCode = (CInt(WW_Tbl.Rows(0)("MIDCATECODE").ToString)).ToString
@@ -1382,9 +1385,15 @@ Public Class LNM0014WRKINC
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(SQLdr)
 
-                    If WW_Tbl.Rows.Count >= 1 Then
+                    If WW_Tbl.Rows.Count >= 1 AndAlso WW_ROW("SMALLCATENAME").ToString() <> "" Then
                         '1加算
                         GenerateSmallcateCode = (CInt(WW_Tbl.Rows(0)("SMALLCATECODE").ToString) + 1).ToString
+                    ElseIf WW_ROW("SMALLCATENAME").ToString() = "" Then
+                        '0空白
+                        GenerateSmallcateCode = "0"
+                    Else
+                        'そのまま
+                        GenerateSmallcateCode = (CInt(WW_Tbl.Rows(0)("SMALLCATECODE").ToString)).ToString
                     End If
                 End Using
             End Using
@@ -1579,7 +1588,7 @@ Public Class LNM0014WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT                                      ")
-        SQLStr.AppendLine("    UPDTIMSTP                                ")
+        SQLStr.AppendLine("    COALESCE(UPDTIMSTP, '') AS UPDTIMSTP     ")
         SQLStr.AppendLine(" FROM                                        ")
         SQLStr.AppendLine("     LNG.LNM0014_SPRATE2                     ")
         SQLStr.AppendLine(" WHERE                                       ")
@@ -1621,12 +1630,18 @@ Public Class LNM0014WRKINC
                     If LNM0014Chk.Rows.Count > 0 Then
                         Dim LNM0014row As DataRow
                         LNM0014row = LNM0014Chk.Rows(0)
-                        If Not String.IsNullOrEmpty(LNM0014row("UPDTIMSTP").ToString) Then          'タイムスタンプ
-                            If LNM0014row("UPDTIMSTP").ToString <> I_TIMESTAMP Then
-                                ' 排他エラー
-                                O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
+                        Try
+                            If Not String.IsNullOrEmpty(LNM0014row("UPDTIMSTP").ToString) Then          'タイムスタンプ
+                                Dim timeStampLnm0014 = Date.Parse(LNM0014row("UPDTIMSTP")).ToString("yyyy/MM/dd HH:mm:ss")
+                                Dim timeStampInput = Date.Parse(I_TIMESTAMP).ToString("yyyy/MM/dd HH:mm:ss")
+                                'If LNM0014row("UPDTIMSTP").ToString <> I_TIMESTAMP Then
+                                If timeStampLnm0014 <> timeStampInput Then
+                                    ' 排他エラー
+                                    O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
+                                End If
                             End If
-                        End If
+                        Catch ex As Exception
+                        End Try
                     Else
                         ' 排他エラー
                         O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR

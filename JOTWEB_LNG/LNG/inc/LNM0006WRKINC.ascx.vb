@@ -1244,12 +1244,18 @@ Public Class LNM0006WRKINC
                     If LNM0006Chk.Rows.Count > 0 Then
                         Dim LNM0006row As DataRow
                         LNM0006row = LNM0006Chk.Rows(0)
-                        If Not String.IsNullOrEmpty(LNM0006row("UPDTIMSTP").ToString) Then          'タイムスタンプ
-                            If LNM0006row("UPDTIMSTP").ToString <> I_TIMESTAMP Then
-                                ' 排他エラー
-                                O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
+                        Try
+                            If Not String.IsNullOrEmpty(LNM0006row("UPDTIMSTP").ToString) Then          'タイムスタンプ
+                                Dim timeStampLnm0006 = Date.Parse(LNM0006row("UPDTIMSTP")).ToString("yyyy/MM/dd HH:mm:ss")
+                                Dim timeStampInput = Date.Parse(I_TIMESTAMP).ToString("yyyy/MM/dd HH:mm:ss")
+                                'If LNM0006row("UPDTIMSTP").ToString <> I_TIMESTAMP Then
+                                If timeStampLnm0006 <> timeStampInput Then
+                                    ' 排他エラー
+                                    O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR
+                                End If
                             End If
-                        End If
+                        Catch ex As Exception
+                        End Try
                     Else
                         ' 排他エラー
                         O_MESSAGENO = Messages.C_MESSAGE_NO.CTN_HAITA_DATA_ERROR

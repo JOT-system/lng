@@ -1140,6 +1140,7 @@ Public Class LNM0014SprateDetail
     Protected Sub MASTEREXISTS(ByVal SQLcon As MySqlConnection, ByRef WW_MODIFYKBN As String)
 
         WW_ErrSW = Messages.C_MESSAGE_NO.NORMAL
+        Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
 
         '特別料金マスタに同一キーのデータが存在するか確認する。
         Dim SQLStr = New StringBuilder
@@ -1172,7 +1173,7 @@ Public Class LNM0014SprateDetail
                 'Dim P_DETAILID As MySqlParameter = SQLcmd.Parameters.Add("@DETAILID", MySqlDbType.Decimal, 2)     '明細ID
 #End Region
 
-                Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
+                'Dim LNM0014row As DataRow = LNM0014INPtbl.Rows(0)
 
                 P_TARGETYM.Value = LNM0014row("TARGETYM")           '対象年月
                 P_TORICODE.Value = LNM0014row("TORICODE")           '取引先コード
@@ -1213,6 +1214,15 @@ Public Class LNM0014SprateDetail
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
 
+            Dim errMessage = ex.Message
+            'Dim errMessage = "DB更新処理で例外エラーが発生しました。システム管理者にお問い合わせ下さい。"
+            errMessage &= String.Format(Environment.NewLine + "【対象年月　】{0}", LNM0014row("TARGETYM").ToString())
+            errMessage &= String.Format(Environment.NewLine + "【取引先コード】{0}", LNM0014row("TORICODE").ToString())
+            errMessage &= String.Format(Environment.NewLine + "【部　門コード】{0}", LNM0014row("ORGCODE").ToString())
+            errMessage &= String.Format(Environment.NewLine + "【大分類コード】{0}", LNM0014row("BIGCATECODE").ToString())
+            errMessage &= String.Format(Environment.NewLine + "【中分類コード】{0}", LNM0014row("MIDCATECODE").ToString())
+            errMessage &= String.Format(Environment.NewLine + "【小分類コード】{0}", LNM0014row("SMALLCATECODE").ToString())
+            rightview.AddErrorReport(errMessage)
             WW_ErrSW = C_MESSAGE_NO.DB_ERROR
             Exit Sub
         End Try
@@ -3152,11 +3162,14 @@ Public Class LNM0014SprateDetail
                     Case LNM0014INPtbl.Rows(0)("BIGCATECODE").ToString = ""     '大分類コードが無い場合
                         '大分類コードを生成
                         LNM0014INPtbl.Rows(0)("BIGCATECODE") = LNM0014WRKINC.GenerateBigcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
-                        LNM0014INPtbl.Rows(0)("MIDCATECODE") = "1"
-                        LNM0014INPtbl.Rows(0)("SMALLCATECODE") = "1"
+                        'LNM0014INPtbl.Rows(0)("MIDCATECODE") = "1"
+                        'LNM0014INPtbl.Rows(0)("SMALLCATECODE") = "1"
+                        LNM0014INPtbl.Rows(0)("MIDCATECODE") = LNM0014WRKINC.GenerateMidcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
+                        LNM0014INPtbl.Rows(0)("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
                     Case LNM0014INPtbl.Rows(0)("MIDCATECODE").ToString = ""     '中分類コードが無い場合
                         '中分類コードを生成
                         LNM0014INPtbl.Rows(0)("MIDCATECODE") = LNM0014WRKINC.GenerateMidcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
+                        LNM0014INPtbl.Rows(0)("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
                     Case LNM0014INPtbl.Rows(0)("SMALLCATECODE").ToString = ""   '小分類コードが無い場合
                         '小分類コードを生成
                         LNM0014INPtbl.Rows(0)("SMALLCATECODE") = LNM0014WRKINC.GenerateSmallcateCode(SQLcon, LNM0014INPtbl.Rows(0), WW_DBDataCheck)
