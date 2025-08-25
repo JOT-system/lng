@@ -98,7 +98,7 @@ Public Class LNT0031DieselPriceHist
                             WF_EXCELPDF(LNT0031WRKINC.FILETYPE.EXCEL)
                         Case "WF_ButtonPRINT"           '一覧印刷ボタン押下
                             WF_EXCELPDF(LNT0031WRKINC.FILETYPE.PDF)
-                        Case "WF_ButtonEND", "LNT0031L" '戻るボタン押下
+                        Case "WF_ButtonEND", "LNM0019L" '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_ButtonUPLOAD"          'ｱｯﾌﾟﾛｰﾄﾞボタン押下
                             WF_ButtonUPLOAD_Click()
