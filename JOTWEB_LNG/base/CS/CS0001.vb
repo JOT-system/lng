@@ -37,6 +37,7 @@ Public Structure CS0001INIFILEget
         LICENSE
         ENVIRONMENT
         PRINTROOT
+        HELPROOT
     End Enum
 
     Private Const IniFileC As String = "C:\APPL\APPLINI\CTN\JOTWEB_LNG.ini"
@@ -237,6 +238,25 @@ Public Structure CS0001INIFILEget
                             IniString = IniString.Replace("value=", "")
 
                             CS0050SESSION.PRINT_ROOT_URL_NAME = Trim(IniString)
+                            IniString = ""
+                            IniType = STRINGTYPE.NONE
+                        End If
+                    End If
+
+                    'ダウンロードファイルURL(HELP)
+                    If IniBuf.IndexOf("<help root>") >= 0 OrElse IniType = STRINGTYPE.HELPROOT Then
+                        IniType = STRINGTYPE.HELPROOT
+                        IniString &= IniBuf
+
+                        If IniBuf.IndexOf("</help root>") >= 0 Then
+                            IniString = IniString.Replace("<name string>", "")
+                            IniString = IniString.Replace("</name string>", "")
+                            IniString = IniString.Replace("<help root>", "")
+                            IniString = IniString.Replace("</help root>", "")
+                            IniString = IniString.Replace(ControlChars.Quote, "")
+                            IniString = IniString.Replace("value=", "")
+
+                            CS0050SESSION.PRINT_ROOT_HELP_NAME = Trim(IniString)
                             IniString = ""
                             IniType = STRINGTYPE.NONE
                         End If

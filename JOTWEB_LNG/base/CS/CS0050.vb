@@ -317,6 +317,24 @@ Public Class CS0050SESSION : Implements IDisposable
         End Set
     End Property
     ''' <summary>
+    ''' HelpURLのルート名
+    ''' </summary>
+    ''' <returns></returns>
+    Public Property PRINT_ROOT_HELP_NAME As String
+        Get
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            Dim retVal As String = Convert.ToString(SESSION(C_SESSION_KEY.PRINT_ROOT_HELP_NAME))
+            If retVal.Trim = "" Then
+                retVal = "HELP"
+            End If
+            Return retVal
+        End Get
+        Set(value As String)
+            SESSION = If(SESSION, HttpContext.Current.Session)
+            SESSION(C_SESSION_KEY.PRINT_ROOT_HELP_NAME) = value
+        End Set
+    End Property
+    ''' <summary>
     ''' APサーバ端末ID
     ''' </summary>
     ''' <value></value>

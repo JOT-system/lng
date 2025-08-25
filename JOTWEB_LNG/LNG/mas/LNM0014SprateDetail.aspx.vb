@@ -209,6 +209,9 @@ Public Class LNM0014SprateDetail
         '○ 画面の値設定
         WW_MAPValueSet()
 
+        Me.WF_URL_CATENAME.Value = "分類.xlsx"
+        Me.WF_URL_CATE.Value = String.Format("{0}://{1}/{2}/{3}", CS0050SESSION.HTTPS_GET, HttpContext.Current.Request.Url.Host, CS0050SESSION.PRINT_ROOT_HELP_NAME, Me.WF_URL_CATENAME.Value)
+
     End Sub
 
     ''' <summary>

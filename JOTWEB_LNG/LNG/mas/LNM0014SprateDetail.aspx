@@ -138,7 +138,7 @@
 
                             <asp:Panel ID="pnlYusouArea" runat="server">
                                 <p id="YUSOU_LINE_1">
-                                    <asp:Label ID="WF_YUSOU_L" runat="server" Text="●輸送費明細(その他明細)に出力する名称" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_YUSOU_L" runat="server" Text="●輸送費明細(その他明細)に出力する名称" CssClass="WF_TEXT_LEFT" onclick="downloadFile();"></asp:Label>
                                 </p>
                                <p id="YUSOU_LINE_2">
                                     <span class="ef magnifier">
@@ -528,6 +528,9 @@
 
         <!-- 縦スクロール位置 -->
         <input id="WF_scrollY" runat="server" value="0" type="text" />
+        <!-- URL(分類Help) -->
+        <input id="WF_URL_CATE" runat="server" value="0" type="text" />
+        <input id="WF_URL_CATENAME" runat="server" value="0" type="text" />
 
     </div>
  

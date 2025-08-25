@@ -59,24 +59,18 @@ window.onload = function () {
     };
 
     //ポップアップメッセージ
-    document.getElementById("pnlYusouArea").title = "大分類名\n" +
-        "　・・・共通する大分類名を束ねたい場合に使用してください。\n" +
-        "　　　　束ねる必要が無い場合は、こちらを大分類名としてご使用ください。\n" +
-        "\n" +
-        "中分類名\n" +
-        "　・・・中分類で束ねたい場合に使用してください。\n" +
-        "　　　　束ねる必要が無い場合は大分類名を使用し、こちらは入力不要です。\n" +
-        "\n" +
-        "小分類名\n" +
-        "　・・・小分類で束ねたい場合に使用してください。\n";
-        //"　　　　束ねる必要が無い場合は大分類名(または中分類名)を使用し、こちらは入力不要です。"; 
-    //document.getElementById("pnlYusouArea").title = "明細グループ名\n" +
-    //    "　・・・共通する明細名を束ねたい場合に使用してください。\n" +
-    //    "　　　　束ねる必要が無い場合は、こちらを明細名としてご使用ください。\n" +
+    document.getElementById("pnlYusouArea").title =""
+    //document.getElementById("pnlYusouArea").title = "大分類名\n" +
+    //    "　・・・共通する大分類名を束ねたい場合に使用してください。\n" +
+    //    "　　　　束ねる必要が無い場合は、こちらを大分類名としてご使用ください。\n" +
     //    "\n" +
-    //    "明細名\n" +
-    //    "　・・・グループで束ねたい場合に使用してください。\n" +
-    //    "　　　　束ねる必要が無い場合はグループ名を使用し、こちらは入力不要です。"; 
+    //    "中分類名\n" +
+    //    "　・・・中分類で束ねたい場合に使用してください。\n" +
+    //    "　　　　束ねる必要が無い場合は大分類名を使用し、こちらは入力不要です。\n" +
+    //    "\n" +
+    //    "小分類名\n" +
+    //    "　・・・小分類で束ねたい場合に使用してください。\n";
+    //    //"　　　　束ねる必要が無い場合は大分類名(または中分類名)を使用し、こちらは入力不要です。"; 
 
     let wkmessage1 = "JOT手数料として収受する割合(JOT収入分)をパーセンテージで入力してください。\n" +
         "JOTとENEXの割合は、合計100%となるようにしてください。";
@@ -208,4 +202,24 @@ function AtokabuChange() {
     if (ato.options[1].selected == true) {
         document.getElementById('WF_ATENALISTSELECT').value = "ATO";
     }
+}
+
+function downloadFile() {
+
+    var url = document.getElementById('WF_URL_CATE');
+    var filename = document.getElementById('WF_URL_CATENAME');
+
+    // aタグを作成
+    const link = document.createElement('a');
+    link.href = url.value;
+
+    // ダウンロード時のファイル名を指定
+    link.download = filename.value;
+
+    // リンクを一時的にDOMに追加してクリックイベントを発火
+    document.body.appendChild(link);
+    link.click();
+
+    // リンクを削除
+    document.body.removeChild(link);
 }

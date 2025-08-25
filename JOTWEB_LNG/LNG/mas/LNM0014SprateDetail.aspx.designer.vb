@@ -1148,6 +1148,24 @@ Partial Public Class LNM0014SprateDetail
     Protected WithEvents WF_scrollY As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
+    '''WF_URL_CATE コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_URL_CATE As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_URL_CATENAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_URL_CATENAME As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
     '''Master プロパティ。
     '''</summary>
     '''<remarks>
