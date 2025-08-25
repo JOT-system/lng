@@ -191,3 +191,17 @@ function f_CommentCtrlCol() {
         "実勢単価参照先が新たに生じた場合は、軽油価格参照先管理マスタで事前登録を行ってください。";
 
 }
+
+//料金設定ボタン押下時
+//function BtnFeeClick(obj, lineCnt, fieldNM) {
+//    document.getElementById("WF_SelectedIndex").value = lineCnt
+//    document.getElementById("WF_ButtonClick").value = "WF_ButtonAddClick";
+//    document.forms[0].submit();
+//}
+
+//実勢単価ボタン押下時
+function BtnTankaClick(obj, lineCnt, fieldNM) {
+    document.getElementById("WF_SelectedIndex").value = lineCnt
+    document.getElementById("WF_ButtonClick").value = "WF_ButtonTankaClick";
+    document.forms[0].submit();
+}
