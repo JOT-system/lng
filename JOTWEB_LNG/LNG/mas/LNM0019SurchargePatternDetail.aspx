@@ -33,12 +33,12 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0019L');">サーチャージ定義マスタタ</a></li>
-                        <li class="breadcrumb-item active" id="PAGE_NAME1" aria-current="page">サーチャージ定義マスタタ（詳細）</li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNM0019L');">サーチャージ定義マスタ</a></li>
+                        <li class="breadcrumb-item active" id="PAGE_NAME1" aria-current="page">サーチャージ定義マスタ（詳細）</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title" id="PAGE_NAME2">サーチャージ定義マスタタ詳細</h2>
+                    <h2 class="w-100 fs-5 fw-bold contents-title" id="PAGE_NAME2">サーチャージ定義マスタ詳細</h2>
                     <div class="Operation">
                             <div class="actionButtonBox">
                                 <div class="rightSide">
