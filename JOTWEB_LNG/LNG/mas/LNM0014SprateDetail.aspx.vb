@@ -85,11 +85,11 @@ Public Class LNM0014SprateDetail
                             RowSelected_mspSmallCateCodeSingle()
                             'RowSelected_mspDetailIdSingle()
                         Case "WF_TORIChange"                '取引先コードチェンジ
-                            WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_ORGChange"                 '部門コードチェンジ
-                            WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_KASANORGChange"            '加算先部門コードチェンジ
-                            WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_SelectCALENDARChange"      'カレンダーチェンジ
                             WF_ACCOUNTCODE_TEXT.Text = ""
                             WF_SEGMENTCODE_TEXT.Text = ""
@@ -223,7 +223,7 @@ Public Class LNM0014SprateDetail
         Me.WF_TORI.Items.Clear()
         Me.WF_TORI.Items.Add("")
         Dim retToriList As New DropDownList
-        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
@@ -232,7 +232,7 @@ Public Class LNM0014SprateDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
@@ -258,7 +258,7 @@ Public Class LNM0014SprateDetail
         Me.WF_KASANORG.Items.Clear()
         Me.WF_KASANORG.Items.Add("")
         Dim retKasanOrgList As New DropDownList
-        retKasanOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG)
+        retKasanOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
         For index As Integer = 0 To retKasanOrgList.Items.Count - 1
             WF_KASANORG.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
         Next
@@ -2421,6 +2421,93 @@ Public Class LNM0014SprateDetail
 
         'ポップアップの非表示
         Me.mspSmallcateCodeSingle.HidePopUp()
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">荷主(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■荷主(情報)取得
+        Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■加算先部門(情報)取得
+        Dim selectKASANORG As String = WF_KASANORG.SelectedValue
+        Dim selectindexKASANORG As Integer = WF_KASANORG.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '荷主(変更)時
+            Case "WF_TORIChange"
+                If selectTORI = "" Then
+                    selectORG = ""              '-- 部門(表示)初期化
+                    selectindexORG = 0          '-- 部門(INDEX)初期化
+                    selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                    selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+                End If
+            '部門(変更)時
+            Case "WF_ORGChange"
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+            '加算先部門(変更)時
+            Case "WF_KASANORGChange"
+        End Select
+
+        '〇荷主
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_TORI.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(荷主)の場合
+        If retToriList.Items.Count = 1 Then
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(荷主)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        WF_TORI.SelectedIndex = selectindexTORI
+        WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_ORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items.Count = 1 Then
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        WF_ORG.SelectedIndex = selectindexORG
+        WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+
+        '〇加算先部門
+        Me.WF_KASANORG.Items.Clear()
+        Dim retKASANOrgList As New DropDownList
+        retKASANOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_KASANORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(加算先部門)の場合
+        If retKASANOrgList.Items.Count = 1 Then
+            selectindexKASANORG = 1
+        End If
+        '★ドロップダウンリスト再作成(加算先部門)
+        For index As Integer = 0 To retKASANOrgList.Items.Count - 1
+            WF_KASANORG.Items.Add(New ListItem(retKASANOrgList.Items(index).Text, retKASANOrgList.Items(index).Value))
+        Next
+        WF_KASANORG.SelectedIndex = selectindexKASANORG
+        WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
 
     End Sub
 
