@@ -235,7 +235,7 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
         SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
+        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -248,11 +248,11 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine("      ON  VIEW0006.ORGCODE = LNS0005.CODE                                                            ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     DELFLG = @DELFLG                                                                                ")
-        SQLStr.AppendLine(" ORDER BY                                                                       ")
-        SQLStr.AppendLine("     LNM0006.TORICODE                                                           ")
+        SQLStr.AppendLine("     1 = 1                                                                                           ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     VIEW0006.TORICODE                                                                               ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -261,7 +261,6 @@ Public Class LNM0019WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
-                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -307,10 +306,10 @@ Public Class LNM0019WRKINC
         Dim SQLStr As New StringBuilder
 
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       LNM0006.ORGCODE AS ORGCODE                                                                    ")
-        SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(LNM0006.ORGNAME,' ',''),'　',''),'EX','EX ') AS ORGNAME               ")
+        SQLStr.AppendLine("       VIW0006.ORGCODE AS ORGCODE                                                                    ")
+        SQLStr.AppendLine("      ,VIW0006.ORGNAME AS ORGNAME                                                                    ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
+        SQLStr.AppendLine("     LNG.VIW0006_TORI VIW0006                                                                        ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -323,12 +322,11 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine("      ON  VIW0006.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     TORICODE LIKE CONCAT(@TORICODE, '%')                                                            ")
-        SQLStr.AppendLine(" AND DELFLG = @DELFLG                                                                                ")
+        SQLStr.AppendLine("     TORICODE     LIKE CONCAT(@TORICODE, '%')                                                        ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     LNM0006.ORGCODE                                                                                 ")
+        SQLStr.AppendLine("     VIW0006.ORGCODE                                                                                 ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -338,7 +336,6 @@ Public Class LNM0019WRKINC
                 With sqlCmd.Parameters
                     .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
                     .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
-                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -374,26 +371,19 @@ Public Class LNM0019WRKINC
     ''' </summary>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownKasanOrgList(ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownKasanOrgList(ByVal I_TORICODE As String, ByVal I_ORGCODE As String) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       LNM0002.ORGCODE AS KASANORGCODE                                                               ")
-        SQLStr.AppendLine("      ,CONCAT('EX ',COALESCE(RTRIM(LNM0002.NAME), '')) AS KASANORGNAME                               ")
+        SQLStr.AppendLine("       VIEW0006.KASANORGCODE AS KASANORGCODE                                                         ")
+        SQLStr.AppendLine("      ,VIEW0006.KASANORGNAME AS KASANORGNAME                                                         ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0002_ORG LNM0002                                                                         ")
-        SQLStr.AppendLine(" INNER JOIN  LNG.LNM0002_ORG LNM0002_1                                                               ")
-        SQLStr.AppendLine("      ON  LNM0002_1.ORGCODE like @ORGCODE                                                            ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN LNM0002_1.STYMD AND LNM0002_1.ENDYMD                                     ")
-        SQLStr.AppendLine("      AND LNM0002_1.DELFLG <> '1'                                                                    ")
+        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("      LNM0002.ORGCODE = LNM0002_1.CONTROLCODE                                                        ")
-        SQLStr.AppendLine(" AND  CURDATE() BETWEEN LNM0002.STYMD AND LNM0002.ENDYMD                                             ")
-        SQLStr.AppendLine(" AND  LNM0002.DELFLG = '0'                                                                           ")
-        SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     LNM0002.ORGCODE                                                                                 ")
+        SQLStr.AppendLine("      VIEW0006.TORICODE like CONCAT(@TORICODE, '%')                                                  ")
+        SQLStr.AppendLine(" AND  VIEW0006.ORGCODE  like CONCAT(@ORGCODE, '%')                                                   ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -401,11 +391,8 @@ Public Class LNM0019WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    If String.IsNullOrEmpty(I_ORGCODE) Then
-                        .Add("@ORGCODE", MySqlDbType.VarChar).Value = "%"
-                    Else
-                        .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
-                    End If
+                    .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
+                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
