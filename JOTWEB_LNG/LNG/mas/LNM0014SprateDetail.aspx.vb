@@ -2430,10 +2430,10 @@ Public Class LNM0014SprateDetail
     ''' <summary>
     ''' フィールド(変更)時処理
     ''' </summary>
-    ''' <param name="resVal">荷主(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
+    ''' <param name="resVal">取引先(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
     ''' <remarks></remarks>
     Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
-        '■荷主(情報)取得
+        '■取引先(情報)取得
         Dim selectTORI As String = WF_TORI.SelectedValue
         Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
         '■部門(情報)取得
@@ -2445,7 +2445,7 @@ Public Class LNM0014SprateDetail
 
         '〇フィールド(変更)ボタン
         Select Case resVal
-            '荷主(変更)時
+            '取引先荷主(変更)時
             Case "WF_TORIChange"
                 If selectTORI = "" Then
                     selectORG = ""              '-- 部門(表示)初期化
@@ -2461,16 +2461,16 @@ Public Class LNM0014SprateDetail
             Case "WF_KASANORGChange"
         End Select
 
-        '〇荷主
+        '〇取引先
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
         retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
         WF_TORI.Items.Add(New ListItem("", ""))
-        '★ドロップダウンリスト選択(荷主)の場合
+        '★ドロップダウンリスト選択(取引先)の場合
         If retToriList.Items.Count = 1 Then
             selectindexTORI = 1
         End If
-        '★ドロップダウンリスト再作成(荷主)
+        '★ドロップダウンリスト再作成(取引先)
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next

@@ -77,6 +77,10 @@ Public Class LNM0007KoteihiDetail
                             Dim WW_HT As New Hashtable
                             For index As Integer = 0 To WF_TORI.Items.Count - 1
                                 WW_HT.Add(WF_TORI.Items(index).Text, WF_TORI.Items(index).Value)
+                                If WF_TORI.Items(index).Text = WF_TORINAME.Text Then
+                                    WF_TORI.SelectedValue = WF_TORI.Items(index).Value
+                                    WF_TORI.SelectedIndex = index
+                                End If
                             Next
 
                             If WW_HT.ContainsKey(WF_TORINAME.Text) Then
@@ -84,11 +88,13 @@ Public Class LNM0007KoteihiDetail
                             Else
                                 WF_TORICODE_TEXT.Text = ""
                             End If
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_ORGChange"    '部門コードチェンジ
-                            WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+                            'WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_KASANORGChange"    '加算先部門コードチェンジ
                             WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
-
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_SelectCALENDARChange" 'カレンダーチェンジ
                             WF_ACCOUNTCODE_TEXT.Text = ""
                             WF_SEGMENTCODE_TEXT.Text = ""
@@ -1679,6 +1685,97 @@ Public Class LNM0007KoteihiDetail
         WF_FIELD_REP.Value = ""
         WF_LeftboxOpen.Value = ""
         WF_RightboxOpen.Value = ""
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">取引(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■取引先(情報)取得
+        Dim selectTORI As String = WF_TORICODE_TEXT.Text
+        'Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■加算先部門(情報)取得
+        Dim selectKASANORG As String = WF_KASANORG.SelectedValue
+        Dim selectindexKASANORG As Integer = WF_KASANORG.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '取引先(変更)時
+            Case "WF_TORIChange"
+                If selectTORI = "" Then
+                    selectORG = ""              '-- 部門(表示)初期化
+                    selectindexORG = 0          '-- 部門(INDEX)初期化
+                    selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                    selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+                End If
+            '部門(変更)時
+            Case "WF_ORGChange"
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+            '加算先部門(変更)時
+            Case "WF_KASANORGChange"
+        End Select
+
+        '〇取引先
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        'retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_TORI.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(取引先)の場合
+        If retToriList.Items.Count = 1 Then
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(取引先)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        WF_TORI.SelectedIndex = selectindexTORI
+        WF_TORINAME.Text = WF_TORI.Items(Integer.Parse(selectindexTORI)).Text
+        WF_TORICODE_TEXT.Text = WF_TORI.Items(Integer.Parse(selectindexTORI)).Value
+        'WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_ORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items.Count = 1 Then
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        WF_ORG.SelectedIndex = selectindexORG
+        WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+
+        '〇加算先部門
+        Me.WF_KASANORG.Items.Clear()
+        Dim retKASANOrgList As New DropDownList
+        retKASANOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_KASANORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(加算先部門)の場合
+        If retKASANOrgList.Items.Count = 1 Then
+            selectindexKASANORG = 1
+        End If
+        '★ドロップダウンリスト再作成(加算先部門)
+        For index As Integer = 0 To retKASANOrgList.Items.Count - 1
+            WF_KASANORG.Items.Add(New ListItem(retKASANOrgList.Items(index).Text, retKASANOrgList.Items(index).Value))
+        Next
+        WF_KASANORG.SelectedIndex = selectindexKASANORG
+        WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
 
     End Sub
 
