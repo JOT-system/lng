@@ -275,13 +275,12 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("         SELECT ")
             SQLStr.AppendLine("             LNT0001.TORICODE ")
             SQLStr.AppendLine("           , LNT0001.TORINAME ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGCODE AS ORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGNAME AS ORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORG AS KASANORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORGNAME AS KASANORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.TODOKEDATE ")
-            SQLStr.AppendLine("           , LNT0001.DELFLG ")
-            SQLStr.AppendLine("         FROM LNG.LNT0001_ZISSEKI LNT0001 ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
             SQLStr.AppendLine("     ) LNT0001 ")
 
             SQLStr.AppendLine("     INNER JOIN ")
@@ -299,7 +298,6 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
             SQLStr.AppendLine("     WHERE ")
             SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
-            SQLStr.AppendLine("         AND LNT0001.TODOKEDATE >= DATE_FORMAT((CURDATE() - INTERVAL 1 MONTH), '%Y/%m/01') ")
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
@@ -418,13 +416,12 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("         SELECT ")
             SQLStr.AppendLine("             LNT0001.TORICODE ")
             SQLStr.AppendLine("           , LNT0001.TORINAME ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGCODE AS ORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGNAME AS ORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORG AS KASANORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORGNAME AS KASANORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.TODOKEDATE ")
-            SQLStr.AppendLine("           , LNT0001.DELFLG ")
-            SQLStr.AppendLine("         FROM LNG.LNT0001_ZISSEKI LNT0001 ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
             SQLStr.AppendLine("     ) LNT0001 ")
 
             SQLStr.AppendLine("     INNER JOIN ")
@@ -442,7 +439,6 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
             SQLStr.AppendLine("     WHERE ")
             SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
-            SQLStr.AppendLine("         AND LNT0001.TODOKEDATE >= DATE_FORMAT((CURDATE() - INTERVAL 1 MONTH), '%Y/%m/01') ")
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
@@ -558,13 +554,12 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("         SELECT ")
             SQLStr.AppendLine("             LNT0001.TORICODE ")
             SQLStr.AppendLine("           , LNT0001.TORINAME ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGCODE AS ORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.ORDERORGNAME AS ORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORG AS KASANORGCODE ")
-            SQLStr.AppendLine("           , LNT0001.KASANSHIPORGNAME AS KASANORGNAME ")
-            SQLStr.AppendLine("           , LNT0001.TODOKEDATE ")
-            SQLStr.AppendLine("           , LNT0001.DELFLG ")
-            SQLStr.AppendLine("         FROM LNG.LNT0001_ZISSEKI LNT0001 ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
             SQLStr.AppendLine("     ) LNT0001 ")
 
             SQLStr.AppendLine("     INNER JOIN ")
@@ -582,7 +577,6 @@ Public Class LNM0014WRKINC
             SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
             SQLStr.AppendLine("     WHERE ")
             SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
-            SQLStr.AppendLine("         AND LNT0001.TODOKEDATE >= DATE_FORMAT((CURDATE() - INTERVAL 1 MONTH), '%Y/%m/01') ")
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then

@@ -2447,12 +2447,12 @@ Public Class LNM0014SprateDetail
         Select Case resVal
             '取引先荷主(変更)時
             Case "WF_TORIChange"
-                If selectTORI = "" Then
-                    selectORG = ""              '-- 部門(表示)初期化
-                    selectindexORG = 0          '-- 部門(INDEX)初期化
-                    selectKASANORG = ""         '-- 加算先部門(表示)初期化
-                    selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
-                End If
+                'If selectTORI = "" Then
+                selectORG = ""              '-- 部門(表示)初期化
+                selectindexORG = 0          '-- 部門(INDEX)初期化
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+                'End If
             '部門(変更)時
             Case "WF_ORGChange"
                 selectKASANORG = ""         '-- 加算先部門(表示)初期化
@@ -2464,7 +2464,8 @@ Public Class LNM0014SprateDetail
         '〇取引先
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
-        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        'retToriList = LNM0014WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
         WF_TORI.Items.Add(New ListItem("", ""))
         '★ドロップダウンリスト選択(取引先)の場合
         If retToriList.Items.Count = 1 Then
