@@ -73,10 +73,14 @@ Public Class LNM0006TankaDetail
                             WF_ButtonSel_Click()
                         Case "btnClearConfirmOK"        '戻るボタン押下後の確認ダイアログでOK押下
                             WF_CLEAR_ConfirmOkClick()
-                        Case "WF_TORIChange"    '取引先名チェンジ
+                        Case "WF_TORIChange"            '取引先名チェンジ
                             Dim WW_HT As New Hashtable
                             For index As Integer = 0 To WF_TORI.Items.Count - 1
                                 WW_HT.Add(WF_TORI.Items(index).Text, WF_TORI.Items(index).Value)
+                                If WF_TORI.Items(index).Text = WF_TORINAME.Text Then
+                                    WF_TORI.SelectedValue = WF_TORI.Items(index).Value
+                                    WF_TORI.SelectedIndex = index
+                                End If
                             Next
 
                             If WW_HT.ContainsKey(WF_TORINAME.Text) Then
@@ -84,14 +88,21 @@ Public Class LNM0006TankaDetail
                             Else
                                 WF_TORICODE_TEXT.Text = ""
                             End If
-                        Case "WF_ORGChange"    '部門コードチェンジ
-                            WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
-                        Case "WF_KASANORGChange"    '加算先部門コードチェンジ
-                            WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
+                        Case "WF_ORGChange"             '部門コードチェンジ
+                            'WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
+                        Case "WF_KASANORGChange"        '加算先部門コードチェンジ
+                            'WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_AVOCADOSHUKAChange"    '出荷場所名チェンジ
                             Dim WW_HT As New Hashtable
                             For index As Integer = 0 To WF_AVOCADOSHUKA.Items.Count - 1
                                 WW_HT.Add(WF_AVOCADOSHUKA.Items(index).Text, WF_AVOCADOSHUKA.Items(index).Value)
+                                If WF_AVOCADOSHUKA.Items(index).Text = WF_AVOCADOSHUKANAME.Text Then
+                                    WF_AVOCADOSHUKA.SelectedValue = WF_AVOCADOSHUKA.Items(index).Value
+                                    WF_AVOCADOSHUKA.SelectedIndex = index
+                                End If
                             Next
 
                             If WW_HT.ContainsKey(WF_AVOCADOSHUKANAME.Text) Then
@@ -99,10 +110,18 @@ Public Class LNM0006TankaDetail
                             Else
                                 WF_AVOCADOSHUKABASHO_TEXT.Text = ""
                             End If
+                            WF_SelectFIELD_CHANGE(WF_ButtonClick.Value)
                         Case "WF_AVOCADOTODOKEChange"    '実績届先名チェンジ
                             Dim WW_HT As New Hashtable
                             For index As Integer = 0 To WF_AVOCADOTODOKE.Items.Count - 1
-                                WW_HT.Add(WF_AVOCADOTODOKE.Items(index).Text, WF_AVOCADOTODOKE.Items(index).Value)
+                                Try
+                                    WW_HT.Add(WF_AVOCADOTODOKE.Items(index).Text, WF_AVOCADOTODOKE.Items(index).Value)
+                                    If WF_AVOCADOTODOKE.Items(index).Text = WF_AVOCADOTODOKENAME.Text Then
+                                        WF_AVOCADOTODOKE.SelectedValue = WF_AVOCADOTODOKE.Items(index).Value
+                                        WF_AVOCADOTODOKE.SelectedIndex = index
+                                    End If
+                                Catch ex As Exception
+                                End Try
                             Next
 
                             If WW_HT.ContainsKey(WF_AVOCADOTODOKENAME.Text) Then
@@ -232,7 +251,7 @@ Public Class LNM0006TankaDetail
         Me.WF_TORI.Items.Add("")
 
         Dim retToriList As New DropDownList
-        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
@@ -249,7 +268,7 @@ Public Class LNM0006TankaDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
@@ -275,7 +294,7 @@ Public Class LNM0006TankaDetail
         Me.WF_KASANORG.Items.Clear()
         Me.WF_KASANORG.Items.Add("")
         Dim retKasanOrgList As New DropDownList
-        retKasanOrgList = LNM0006WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG)
+        retKasanOrgList = LNM0006WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
         For index As Integer = 0 To retKasanOrgList.Items.Count - 1
             WF_KASANORG.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
         Next
@@ -285,7 +304,7 @@ Public Class LNM0006TankaDetail
         Me.WF_AVOCADOSHUKA.Items.Add("")
 
         Dim retAvocadoshukaiList As New DropDownList
-        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
+        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retAvocadoshukaiList.Items.Count - 1
             WF_AVOCADOSHUKA.Items.Add(New ListItem(retAvocadoshukaiList.Items(index).Text, retAvocadoshukaiList.Items(index).Value))
         Next
@@ -303,7 +322,7 @@ Public Class LNM0006TankaDetail
         Me.WF_AVOCADOTODOKE.Items.Add("")
 
         Dim retAvocadotodokeList As New DropDownList
-        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text)
+        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retAvocadotodokeList.Items.Count - 1
             WF_AVOCADOTODOKE.Items.Add(New ListItem(retAvocadotodokeList.Items(index).Text, retAvocadotodokeList.Items(index).Value))
         Next
@@ -1683,6 +1702,195 @@ Public Class LNM0006TankaDetail
 
         Master.MAPID = WF_BeforeMAPID.Value
         Master.TransitionPrevPage()
+
+    End Sub
+
+    ' ******************************************************************************
+    ' ***  フィールド変更処理                                                    ***
+    ' ******************************************************************************
+    ''' <summary>
+    ''' フィールド(変更)時処理
+    ''' </summary>
+    ''' <param name="resVal">取引先(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
+    ''' <remarks></remarks>
+    Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '■取引先(情報)取得
+        Dim selectTORI As String = WF_TORICODE_TEXT.Text
+        'Dim selectTORI As String = WF_TORI.SelectedValue
+        Dim selectindexTORI As Integer = WF_TORI.SelectedIndex
+        '■部門(情報)取得
+        Dim selectORG As String = WF_ORG.SelectedValue
+        Dim selectindexORG As Integer = WF_ORG.SelectedIndex
+        '■加算先部門(情報)取得
+        Dim selectKASANORG As String = WF_KASANORG.SelectedValue
+        Dim selectindexKASANORG As Integer = WF_KASANORG.SelectedIndex
+        '■出荷(情報)取得
+        Dim selectSHUKA As String = WF_AVOCADOSHUKABASHO_TEXT.Text
+        'Dim selectSHUKA As String = WF_AVOCADOSHUKA.SelectedValue
+        Dim selectindexSHUKA As Integer = WF_AVOCADOSHUKA.SelectedIndex
+        '■届先(情報)取得
+        Dim selectTODOKE As String = WF_AVOCADOTODOKECODE_TEXT.Text
+        'Dim selectTODOKE As String = WF_AVOCADOTODOKE.SelectedValue
+        Dim selectindexTODOKE As Integer = WF_AVOCADOTODOKE.SelectedIndex
+
+        '〇フィールド(変更)ボタン
+        Select Case resVal
+            '取引先(変更)時
+            Case "WF_TORIChange"
+                If selectTORI = "" Then
+                    selectORG = ""              '-- 部門(表示)初期化
+                    selectindexORG = 0          '-- 部門(INDEX)初期化
+                    selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                    selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+                    selectSHUKA = ""            '-- 出荷(表示)初期化
+                    selectindexSHUKA = 0        '-- 出荷(INDEX)初期化
+                    selectTODOKE = ""           '-- 届先(表示)初期化
+                    selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+                End If
+            '部門(変更)時
+            Case "WF_ORGChange"
+                selectKASANORG = ""         '-- 加算先部門(表示)初期化
+                selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
+                selectSHUKA = ""            '-- 出荷(表示)初期化
+                selectindexSHUKA = 0        '-- 出荷(INDEX)初期化
+                selectTODOKE = ""           '-- 届先(表示)初期化
+                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+            '加算先部門(変更)時
+            Case "WF_KASANORGChange"
+                selectSHUKA = ""            '-- 出荷(表示)初期化
+                selectindexSHUKA = 0        '-- 出荷(INDEX)初期化
+                selectTODOKE = ""           '-- 届先(表示)初期化
+                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+            '出荷(変更)時
+            Case "WF_AVOCADOSHUKAChange"
+                selectTODOKE = ""           '-- 届先(表示)初期化
+                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+            '届先(変更)時
+            Case "WF_AVOCADOTODOKEChange"
+        End Select
+
+        '〇取引先
+        Me.WF_TORI.Items.Clear()
+        Dim retToriList As New DropDownList
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
+        'retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_TORI.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(取引先)の場合
+        If retToriList.Items.Count = 1 Then
+            selectindexTORI = 1
+        End If
+        '★ドロップダウンリスト再作成(取引先)
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
+        Try
+            WF_TORI.SelectedIndex = selectindexTORI
+        Catch ex As Exception
+            WF_TORI.SelectedIndex = 0
+        End Try
+        WF_TORINAME.Text = WF_TORI.Items(Integer.Parse(selectindexTORI)).Text
+        WF_TORICODE_TEXT.Text = WF_TORI.Items(Integer.Parse(selectindexTORI)).Value
+        'WF_TORICODE_TEXT.Text = WF_TORI.SelectedValue
+
+        '〇部門
+        Me.WF_ORG.Items.Clear()
+        Dim retOrgList As New DropDownList
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_SHUKABASHO:=selectSHUKA, I_CREATEFLG:=True)
+        WF_ORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(部門)の場合
+        If retOrgList.Items.Count = 1 Then
+            selectindexORG = 1
+        End If
+        '★ドロップダウンリスト再作成(部門)
+        For index As Integer = 0 To retOrgList.Items.Count - 1
+            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+        Next
+        Try
+            WF_ORG.SelectedIndex = selectindexORG
+        Catch ex As Exception
+            WF_ORG.SelectedIndex = 0
+        End Try
+        WF_ORGCODE_TEXT.Text = WF_ORG.SelectedValue
+
+        '〇加算先部門
+        Me.WF_KASANORG.Items.Clear()
+        Dim retKASANOrgList As New DropDownList
+        retKASANOrgList = LNM0006WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_SHUKABASHO:=selectSHUKA, I_CREATEFLG:=True)
+        WF_KASANORG.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(加算先部門)の場合
+        If retKASANOrgList.Items.Count = 1 Then
+            selectindexKASANORG = 1
+        End If
+        '★ドロップダウンリスト再作成(加算先部門)
+        For index As Integer = 0 To retKASANOrgList.Items.Count - 1
+            WF_KASANORG.Items.Add(New ListItem(retKASANOrgList.Items(index).Text, retKASANOrgList.Items(index).Value))
+        Next
+        Try
+            WF_KASANORG.SelectedIndex = selectindexKASANORG
+        Catch ex As Exception
+            WF_KASANORG.SelectedIndex = 0
+        End Try
+        WF_KASANORGCODE_TEXT.Text = WF_KASANORG.SelectedValue
+
+        '〇出荷
+        Me.WF_AVOCADOSHUKA.Items.Clear()
+        Dim retShukaList As New DropDownList
+        retShukaList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_AVOCADOSHUKA.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(出荷)の場合
+        If retShukaList.Items.Count = 1 Then
+            selectindexSHUKA = 1
+        End If
+        '★ドロップダウンリスト再作成(出荷)
+        For index As Integer = 0 To retShukaList.Items.Count - 1
+            WF_AVOCADOSHUKA.Items.Add(New ListItem(retShukaList.Items(index).Text, retShukaList.Items(index).Value))
+        Next
+        Try
+            WF_AVOCADOSHUKA.SelectedIndex = selectindexSHUKA
+        Catch ex As Exception
+            WF_AVOCADOSHUKA.SelectedIndex = 0
+        End Try
+        WF_AVOCADOSHUKANAME.Text = WF_AVOCADOSHUKA.Items(Integer.Parse(selectindexSHUKA)).Text
+        WF_AVOCADOSHUKABASHO_TEXT.Text = WF_AVOCADOSHUKA.Items(Integer.Parse(selectindexSHUKA)).Value
+        'WF_AVOCADOSHUKABASHO_TEXT.Text = WF_AVOCADOSHUKA.SelectedValue
+
+        'コンボボックス化
+        Dim WF_AVOCADOSHUKA_OPTIONS As String = ""
+        For index As Integer = 0 To retShukaList.Items.Count - 1
+            WF_AVOCADOSHUKA_OPTIONS += "<option>" + retShukaList.Items(index).Text + "</option>"
+        Next
+        WF_AVOCADOSHUKA_DL.InnerHtml = WF_AVOCADOSHUKA_OPTIONS
+        Me.WF_AVOCADOSHUKANAME.Attributes("list") = Me.WF_AVOCADOSHUKA_DL.ClientID
+
+        '〇届先
+        Me.WF_AVOCADOTODOKE.Items.Clear()
+        Dim retTodokeList As New DropDownList
+        retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        WF_AVOCADOTODOKE.Items.Add(New ListItem("", ""))
+        '★ドロップダウンリスト選択(届先)の場合
+        If retTodokeList.Items.Count = 1 Then
+            selectindexTODOKE = 1
+        End If
+        '★ドロップダウンリスト再作成(届先)
+        For index As Integer = 0 To retTodokeList.Items.Count - 1
+            WF_AVOCADOTODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
+        Next
+        Try
+            WF_AVOCADOTODOKE.SelectedIndex = selectindexTODOKE
+        Catch ex As Exception
+            WF_AVOCADOTODOKE.SelectedIndex = 0
+        End Try
+        WF_AVOCADOTODOKENAME.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Text
+        WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Value
+        'WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.SelectedValue
+
+        'コンボボックス化
+        Dim WF_AVOCADOTODOKE_OPTIONS As String = ""
+        For index As Integer = 0 To retTodokeList.Items.Count - 1
+            WF_AVOCADOTODOKE_OPTIONS += "<option>" + retTodokeList.Items(index).Text + "</option>"
+        Next
+        WF_AVOCADOTODOKE_DL.InnerHtml = WF_AVOCADOTODOKE_OPTIONS
+        Me.WF_AVOCADOTODOKENAME.Attributes("list") = Me.WF_AVOCADOTODOKE_DL.ClientID
 
     End Sub
 

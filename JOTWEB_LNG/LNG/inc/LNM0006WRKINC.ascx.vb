@@ -163,48 +163,99 @@ Public Class LNM0006WRKINC
     Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String, ByVal I_STYMD As String,
                                                Optional ByVal I_TORICODE As String = Nothing,
                                                Optional ByVal I_ORGCODE As String = Nothing,
+                                               Optional ByVal I_KASANORGCODE As String = Nothing,
                                                Optional ByVal I_TODOKECODE As String = Nothing,
-                                               Optional ByVal I_SHUKABASHO As String = Nothing) As DropDownList
+                                               Optional ByVal I_SHUKABASHO As String = Nothing,
+                                               Optional ByVal I_CREATEFLG As Boolean = False) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
-        SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        If I_CREATEFLG = False Then
+            SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+            SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
+            SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
+            SQLStr.AppendLine(" FROM                                                                                                ")
+            SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
+            SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+            SQLStr.AppendLine("    (                                                                                                ")
+            SQLStr.AppendLine("      SELECT                                                                                         ")
+            SQLStr.AppendLine("          CODE                                                                                       ")
+            SQLStr.AppendLine("      FROM                                                                                           ")
+            SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+            SQLStr.AppendLine("      WHERE                                                                                          ")
+            SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+            SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+            SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+            SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+            SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+            SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
 
-        SQLStr.AppendLine(" WHERE                ")
-        SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine(" WHERE                ")
+            SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
 
-        If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
-            SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
+                SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            End If
+        Else
+            SQLStr.AppendLine("SELECT ")
+            SQLStr.AppendLine("       TORICODE ")
+            SQLStr.AppendLine("      ,TORINAME ")
+            SQLStr.AppendLine(" FROM ( ")
+            SQLStr.AppendLine("     SELECT DISTINCT ")
+            SQLStr.AppendLine("           LNT0001.TORICODE AS TORICODE ")
+            SQLStr.AppendLine("          ,LNT0001.TORINAME AS TORINAME ")
+            SQLStr.AppendLine("          ,LNT0001.DELFLG ")
+
+            SQLStr.AppendLine("     FROM ( ")
+            SQLStr.AppendLine("         SELECT ")
+            SQLStr.AppendLine("             LNT0001.TORICODE ")
+            SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
+            SQLStr.AppendLine("     ) LNT0001 ")
+
+            SQLStr.AppendLine("     INNER JOIN ")
+            SQLStr.AppendLine("        ( ")
+            SQLStr.AppendLine("          SELECT ")
+            SQLStr.AppendLine("              CODE ")
+            SQLStr.AppendLine("          FROM ")
+            SQLStr.AppendLine("              COM.LNS0005_ROLE ")
+            SQLStr.AppendLine("          WHERE ")
+            SQLStr.AppendLine("              OBJECT = 'ORG' ")
+            SQLStr.AppendLine("          AND ROLE = @ROLE ")
+            SQLStr.AppendLine("          AND CURDATE() BETWEEN STYMD AND ENDYMD ")
+            SQLStr.AppendFormat("        AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("        ) LNS0005 ")
+            SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
+            SQLStr.AppendLine("     WHERE ")
+            SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
         End If
 
         If Not IsNothing(I_SHUKABASHO) AndAlso I_SHUKABASHO <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+            SQLStr.AppendFormat(" AND AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If I_CREATEFLG = True Then
+            SQLStr.AppendLine(" ) LNM0006 ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -258,48 +309,101 @@ Public Class LNM0006WRKINC
     Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String, ByVal I_STYMD As String,
                                               Optional ByVal I_TORICODE As String = Nothing,
                                               Optional ByVal I_ORGCODE As String = Nothing,
+                                              Optional ByVal I_KASANORGCODE As String = Nothing,
                                               Optional ByVal I_TODOKECODE As String = Nothing,
-                                              Optional ByVal I_SHUKABASHO As String = Nothing) As DropDownList
+                                              Optional ByVal I_SHUKABASHO As String = Nothing,
+                                              Optional ByVal I_CREATEFLG As Boolean = False) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       LNM0006.ORGCODE AS ORGCODE                                                                    ")
-        SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(LNM0006.ORGNAME,' ',''),'　',''),'EX','EX ') AS ORGNAME               ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                      ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        If I_CREATEFLG = False Then
+            SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+            SQLStr.AppendLine("       LNM0006.ORGCODE AS ORGCODE                                                                    ")
+            SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(LNM0006.ORGNAME,' ',''),'　',''),'EX','EX ') AS ORGNAME               ")
+            SQLStr.AppendLine(" FROM                                                                                                ")
+            SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                      ")
+            SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+            SQLStr.AppendLine("    (                                                                                                ")
+            SQLStr.AppendLine("      SELECT                                                                                         ")
+            SQLStr.AppendLine("          CODE                                                                                       ")
+            SQLStr.AppendLine("      FROM                                                                                           ")
+            SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+            SQLStr.AppendLine("      WHERE                                                                                          ")
+            SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+            SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+            SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+            SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+            SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+            SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
 
-        SQLStr.AppendLine(" WHERE                ")
-        SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine(" WHERE                ")
+            SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
 
-        If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
-            SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
+                SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            End If
+
+        Else
+            SQLStr.AppendLine("SELECT ")
+            SQLStr.AppendLine("       ORGCODE ")
+            SQLStr.AppendLine("      ,ORGNAME ")
+            SQLStr.AppendLine(" FROM ( ")
+            SQLStr.AppendLine("     SELECT DISTINCT ")
+            SQLStr.AppendLine("           LNT0001.ORGCODE AS ORGCODE ")
+            SQLStr.AppendLine("          ,REPLACE(LNT0001.ORGNAME,'EX_','EX ') AS ORGNAME ")
+            SQLStr.AppendLine("          ,LNT0001.DELFLG ")
+
+            SQLStr.AppendLine("     FROM ( ")
+            SQLStr.AppendLine("         SELECT ")
+            SQLStr.AppendLine("             LNT0001.TORICODE ")
+            SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
+            SQLStr.AppendLine("     ) LNT0001 ")
+
+            SQLStr.AppendLine("     INNER JOIN ")
+            SQLStr.AppendLine("        ( ")
+            SQLStr.AppendLine("          SELECT ")
+            SQLStr.AppendLine("              CODE ")
+            SQLStr.AppendLine("          FROM ")
+            SQLStr.AppendLine("              COM.LNS0005_ROLE ")
+            SQLStr.AppendLine("          WHERE ")
+            SQLStr.AppendLine("              OBJECT = 'ORG' ")
+            SQLStr.AppendLine("          AND ROLE = @ROLE ")
+            SQLStr.AppendLine("          AND CURDATE() BETWEEN STYMD AND ENDYMD ")
+            SQLStr.AppendFormat("        AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("        ) LNS0005 ")
+            SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
+            SQLStr.AppendLine("     WHERE ")
+            SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
         End If
 
         If Not IsNothing(I_SHUKABASHO) AndAlso I_SHUKABASHO <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+            SQLStr.AppendFormat(" AND AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If I_CREATEFLG = True Then
+            SQLStr.AppendLine(" ) LNM0006 ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -346,31 +450,106 @@ Public Class LNM0006WRKINC
     ''' ドロップダウンリスト加算先部門データ取得
     ''' </summary>
     ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <param name="I_ROLEORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownKasanOrgList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String, Optional ByVal I_STYMD As String = Nothing,
+                                                   Optional ByVal I_TORICODE As String = Nothing,
+                                                   Optional ByVal I_ORGCODE As String = Nothing,
+                                                   Optional ByVal I_KASANORGCODE As String = Nothing,
+                                                   Optional ByVal I_TODOKECODE As String = Nothing,
+                                                   Optional ByVal I_SHUKABASHO As String = Nothing,
+                                                   Optional ByVal I_CREATEFLG As Boolean = False) As DropDownList
+
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       LNM0006.KASANORGCODE AS KASANORGCODE                                                          ")
-        SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(COALESCE(RTRIM(LNM0006.KASANORGNAME), ''),' ',''),'　',''),'EX','EX ') AS KASANORGNAME ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                      ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        If I_CREATEFLG = False Then
+            SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+            SQLStr.AppendLine("       LNM0006.KASANORGCODE AS KASANORGCODE                                                          ")
+            SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(COALESCE(RTRIM(LNM0006.KASANORGNAME), ''),' ',''),'　',''),'EX','EX ') AS KASANORGNAME ")
+            SQLStr.AppendLine(" FROM                                                                                                ")
+            SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                      ")
+            SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+            SQLStr.AppendLine("    (                                                                                                ")
+            SQLStr.AppendLine("      SELECT                                                                                         ")
+            SQLStr.AppendLine("          CODE                                                                                       ")
+            SQLStr.AppendLine("      FROM                                                                                           ")
+            SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+            SQLStr.AppendLine("      WHERE                                                                                          ")
+            SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+            SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+            SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+            SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+            SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+            SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+
+            If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
+                SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            End If
+
+        Else
+            SQLStr.AppendLine("SELECT ")
+            SQLStr.AppendLine("       KASANORGCODE ")
+            SQLStr.AppendLine("      ,KASANORGNAME ")
+            SQLStr.AppendLine(" FROM ( ")
+            SQLStr.AppendLine("     SELECT DISTINCT ")
+            SQLStr.AppendLine("           LNT0001.KASANORGCODE AS KASANORGCODE ")
+            SQLStr.AppendLine("          ,REPLACE(LNT0001.KASANORGNAME,'EX_','EX ') AS KASANORGNAME ")
+            SQLStr.AppendLine("          ,LNT0001.DELFLG ")
+
+            SQLStr.AppendLine("     FROM ( ")
+            SQLStr.AppendLine("         SELECT ")
+            SQLStr.AppendLine("             LNT0001.TORICODE ")
+            SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
+            SQLStr.AppendLine("     ) LNT0001 ")
+
+            SQLStr.AppendLine("     INNER JOIN ")
+            SQLStr.AppendLine("        ( ")
+            SQLStr.AppendLine("          SELECT ")
+            SQLStr.AppendLine("              CODE ")
+            SQLStr.AppendLine("          FROM ")
+            SQLStr.AppendLine("              COM.LNS0005_ROLE ")
+            SQLStr.AppendLine("          WHERE ")
+            SQLStr.AppendLine("              OBJECT = 'ORG' ")
+            SQLStr.AppendLine("          AND ROLE = @ROLE ")
+            SQLStr.AppendLine("          AND CURDATE() BETWEEN STYMD AND ENDYMD ")
+            SQLStr.AppendFormat("        AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("        ) LNS0005 ")
+            SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
+            SQLStr.AppendLine("     WHERE ")
+            SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
+        End If
+
+        If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
+        End If
+
+        If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
+        End If
+
+        If Not IsNothing(I_SHUKABASHO) AndAlso I_SHUKABASHO <> "" Then
+            SQLStr.AppendFormat(" AND AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If I_CREATEFLG = True Then
+            SQLStr.AppendLine(" ) LNM0006 ")
+        End If
+
         SQLStr.AppendLine(" ORDER BY                                                                       ")
         SQLStr.AppendLine("     LNM0006.KASANORGCODE                                                           ")
 
@@ -380,7 +559,7 @@ Public Class LNM0006WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ROLEORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -420,48 +599,114 @@ Public Class LNM0006WRKINC
     Public Shared Function getDowpDownAvocadoshukaList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String, ByVal I_STYMD As String,
                                                        Optional ByVal I_TORICODE As String = Nothing,
                                                        Optional ByVal I_ORGCODE As String = Nothing,
+                                                       Optional ByVal I_KASANORGCODE As String = Nothing,
                                                        Optional ByVal I_TODOKECODE As String = Nothing,
-                                                       Optional ByVal I_SHUKABASHO As String = Nothing) As DropDownList
+                                                       Optional ByVal I_SHUKABASHO As String = Nothing,
+                                                       Optional ByVal I_CREATEFLG As Boolean = False) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       AVOCADOSHUKABASHO AS AVOCADOSHUKABASHO                                                                          ")
-        SQLStr.AppendLine("      ,AVOCADOSHUKANAME AS AVOCADOSHUKANAME                                                                          ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+        If I_CREATEFLG = False Then
+            SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+            SQLStr.AppendLine("       AVOCADOSHUKABASHO AS AVOCADOSHUKABASHO                                                                          ")
+            SQLStr.AppendLine("      ,AVOCADOSHUKANAME AS AVOCADOSHUKANAME                                                                          ")
+            SQLStr.AppendLine(" FROM                                                                                                ")
+            SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
+            SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+            SQLStr.AppendLine("    (                                                                                                ")
+            SQLStr.AppendLine("      SELECT                                                                                         ")
+            SQLStr.AppendLine("          CODE                                                                                       ")
+            SQLStr.AppendLine("      FROM                                                                                           ")
+            SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+            SQLStr.AppendLine("      WHERE                                                                                          ")
+            SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+            SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+            SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+            SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+            SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+            SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
 
-        SQLStr.AppendLine(" WHERE                ")
-        SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine(" WHERE                ")
+            SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
 
-        If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
-            SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
+                SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            End If
+
+        Else
+            SQLStr.AppendLine("SELECT ")
+            SQLStr.AppendLine("       AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("      ,AVOCADOSHUKANAME ")
+            SQLStr.AppendLine(" FROM ( ")
+            SQLStr.AppendLine("     SELECT DISTINCT ")
+            SQLStr.AppendLine("           LNT0001.AVOCADOSHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("          ,LNT0001.AVOCADOSHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("          ,LNT0001.DELFLG ")
+
+            SQLStr.AppendLine("     FROM ( ")
+            SQLStr.AppendLine("         SELECT ")
+            SQLStr.AppendLine("             LNT0001.TORICODE ")
+            SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            SQLStr.AppendLine("           , LNT0001.ORDERORGCODE AS ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORDERORGNAME AS ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANCODEORDERORG AS KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANAMEORDERORG AS KASANORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("           , LNT0001.TODOKECODE ")
+            SQLStr.AppendLine("           , LNT0001.TODOKENAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TODOKE LNT0001 ")
+            'SQLStr.AppendLine("         SELECT ")
+            'SQLStr.AppendLine("             LNT0001.TORICODE ")
+            'SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            'SQLStr.AppendLine("           , LNT0001.ORGCODE ")
+            'SQLStr.AppendLine("           , LNT0001.ORGNAME ")
+            'SQLStr.AppendLine("           , LNT0001.KASANORGCODE ")
+            'SQLStr.AppendLine("           , LNT0001.KASANORGNAME ")
+            'SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            'SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            'SQLStr.AppendLine("           , '0' AS DELFLG ")
+            'SQLStr.AppendLine("         FROM LNG.VIW0006_TORI LNT0001 ")
+            SQLStr.AppendLine("     ) LNT0001 ")
+
+            SQLStr.AppendLine("     INNER JOIN ")
+            SQLStr.AppendLine("        ( ")
+            SQLStr.AppendLine("          SELECT ")
+            SQLStr.AppendLine("              CODE ")
+            SQLStr.AppendLine("          FROM ")
+            SQLStr.AppendLine("              COM.LNS0005_ROLE ")
+            SQLStr.AppendLine("          WHERE ")
+            SQLStr.AppendLine("              OBJECT = 'ORG' ")
+            SQLStr.AppendLine("          AND ROLE = @ROLE ")
+            SQLStr.AppendLine("          AND CURDATE() BETWEEN STYMD AND ENDYMD ")
+            SQLStr.AppendFormat("        AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("        ) LNS0005 ")
+            SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
+            SQLStr.AppendLine("     WHERE ")
+            SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.TORICODE = '{0}' ", I_TORICODE)
+            SQLStr.AppendFormat(" AND TORICODE = '{0}' ", I_TORICODE)
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.ORGCODE = '{0}' ", I_ORGCODE)
+            SQLStr.AppendFormat(" AND ORGCODE = '{0}' ", I_ORGCODE)
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
         End If
 
         If Not IsNothing(I_SHUKABASHO) AndAlso I_SHUKABASHO <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+            SQLStr.AppendFormat(" AND AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If I_CREATEFLG = True Then
+            SQLStr.AppendLine(" ) LNM0006 ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
@@ -514,47 +759,102 @@ Public Class LNM0006WRKINC
     Public Shared Function getDowpDownAvocadotodokeList(ByVal I_MAPID As String, ByVal I_ROLEORGCODE As String, ByVal I_STYMD As String,
                                                         Optional ByVal I_TORICODE As String = Nothing,
                                                         Optional ByVal I_ORGCODE As String = Nothing,
+                                                        Optional ByVal I_KASANORGCODE As String = Nothing,
                                                         Optional ByVal I_TODOKECODE As String = Nothing,
-                                                        Optional ByVal I_SHUKABASHO As String = Nothing) As DropDownList
+                                                        Optional ByVal I_SHUKABASHO As String = Nothing,
+                                                        Optional ByVal I_CREATEFLG As Boolean = False) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       AVOCADOTODOKECODE AS AVOCADOTODOKECODE                                                                      ")
-        SQLStr.AppendLine("      ,AVOCADOTODOKENAME AS AVOCADOTODOKENAME                                                                      ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
-        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
-        SQLStr.AppendLine("    (                                                                                                ")
-        SQLStr.AppendLine("      SELECT                                                                                         ")
-        SQLStr.AppendLine("          CODE                                                                                       ")
-        SQLStr.AppendLine("      FROM                                                                                           ")
-        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
-        SQLStr.AppendLine("      WHERE                                                                                          ")
-        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
-        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
-        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
-        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
-        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
-        SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     '0' = '0'                                                                                       ")
+        If I_CREATEFLG = False Then
+            SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+            SQLStr.AppendLine("       AVOCADOTODOKECODE AS AVOCADOTODOKECODE                                                                      ")
+            SQLStr.AppendLine("      ,AVOCADOTODOKENAME AS AVOCADOTODOKENAME                                                                      ")
+            SQLStr.AppendLine(" FROM                                                                                                ")
+            SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
+            SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+            SQLStr.AppendLine("    (                                                                                                ")
+            SQLStr.AppendLine("      SELECT                                                                                         ")
+            SQLStr.AppendLine("          CODE                                                                                       ")
+            SQLStr.AppendLine("      FROM                                                                                           ")
+            SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+            SQLStr.AppendLine("      WHERE                                                                                          ")
+            SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+            SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+            SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+            SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+            SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+            SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
+            SQLStr.AppendLine(" WHERE                                                                                               ")
+            SQLStr.AppendLine("     '0' = '0'                                                                                       ")
 
-        If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
-            SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
+                SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)
+            End If
+
+        Else
+            SQLStr.AppendLine("SELECT ")
+            SQLStr.AppendLine("       AVOCADOTODOKECODE ")
+            SQLStr.AppendLine("      ,AVOCADOTODOKENAME ")
+            SQLStr.AppendLine(" FROM ( ")
+            SQLStr.AppendLine("     SELECT DISTINCT ")
+            SQLStr.AppendLine("           LNT0001.AVOCADOTODOKECODE ")
+            SQLStr.AppendLine("          ,LNT0001.AVOCADOTODOKENAME ")
+            SQLStr.AppendLine("          ,LNT0001.DELFLG ")
+
+            SQLStr.AppendLine("     FROM ( ")
+            SQLStr.AppendLine("         SELECT ")
+            SQLStr.AppendLine("             LNT0001.TORICODE ")
+            SQLStr.AppendLine("           , LNT0001.TORINAME ")
+            SQLStr.AppendLine("           , LNT0001.ORDERORGCODE AS ORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.ORDERORGNAME AS ORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.KASANCODEORDERORG AS KASANORGCODE ")
+            SQLStr.AppendLine("           , LNT0001.KASANAMEORDERORG AS KASANORGNAME ")
+            SQLStr.AppendLine("           , LNT0001.SHUKABASHO AS AVOCADOSHUKABASHO ")
+            SQLStr.AppendLine("           , LNT0001.SHUKANAME AS AVOCADOSHUKANAME ")
+            SQLStr.AppendLine("           , LNT0001.TODOKECODE AS AVOCADOTODOKECODE ")
+            SQLStr.AppendLine("           , LNT0001.TODOKENAME AS AVOCADOTODOKENAME ")
+            SQLStr.AppendLine("           , '0' AS DELFLG ")
+            SQLStr.AppendLine("         FROM LNG.VIW0006_TODOKE LNT0001 ")
+            SQLStr.AppendLine("     ) LNT0001 ")
+
+            SQLStr.AppendLine("     INNER JOIN ")
+            SQLStr.AppendLine("        ( ")
+            SQLStr.AppendLine("          SELECT ")
+            SQLStr.AppendLine("              CODE ")
+            SQLStr.AppendLine("          FROM ")
+            SQLStr.AppendLine("              COM.LNS0005_ROLE ")
+            SQLStr.AppendLine("          WHERE ")
+            SQLStr.AppendLine("              OBJECT = 'ORG' ")
+            SQLStr.AppendLine("          AND ROLE = @ROLE ")
+            SQLStr.AppendLine("          AND CURDATE() BETWEEN STYMD AND ENDYMD ")
+            SQLStr.AppendFormat("        AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("        ) LNS0005 ")
+            SQLStr.AppendLine("          ON  LNT0001.ORGCODE = LNS0005.CODE ")
+            SQLStr.AppendLine("     WHERE ")
+            SQLStr.AppendFormat("         LNT0001.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+
         End If
 
         If Not IsNothing(I_TORICODE) AndAlso I_TORICODE <> "" Then
-            SQLStr.AppendLine(" AND  LNM0006.TORICODE = '" & I_TORICODE & "'                                                    ")
+            SQLStr.AppendLine(" AND  TORICODE = '" & I_TORICODE & "'                                                    ")
         End If
 
         If Not IsNothing(I_ORGCODE) AndAlso I_ORGCODE <> "" Then
-            SQLStr.AppendLine(" AND  LNM0006.ORGCODE = '" & I_ORGCODE & "'                                                    ")
+            SQLStr.AppendLine(" AND  ORGCODE = '" & I_ORGCODE & "'                                                    ")
+        End If
+
+        If Not IsNothing(I_KASANORGCODE) AndAlso I_KASANORGCODE <> "" Then
+            SQLStr.AppendFormat(" AND KASANORGCODE = '{0}' ", I_KASANORGCODE)
         End If
 
         If Not IsNothing(I_SHUKABASHO) AndAlso I_SHUKABASHO <> "" Then
-            SQLStr.AppendFormat(" AND LNM0006.AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+            SQLStr.AppendFormat(" AND AVOCADOSHUKABASHO = '{0}' ", I_SHUKABASHO)
+        End If
+
+        If I_CREATEFLG = True Then
+            SQLStr.AppendLine(" ) LNM0006 ")
         End If
 
         SQLStr.AppendLine(" ORDER BY                                                                       ")
