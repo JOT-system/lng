@@ -563,7 +563,10 @@ Public Class GRC0002SELECTIONPOPUPWORKINC
                             val = Convert.ToString(sqlDr(colName))
                             retItem.Add(colName, val)
                         Next
-                        retVal.Add(keyVal, retItem)
+                        Try
+                            retVal.Add(keyVal, retItem)
+                        Catch ex As Exception
+                        End Try
                     End While
                 End Using 'sqlDr
             End Using 'sqlCmd
