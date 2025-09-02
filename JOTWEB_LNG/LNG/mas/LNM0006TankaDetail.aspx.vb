@@ -1753,18 +1753,18 @@ Public Class LNM0006TankaDetail
                 selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
                 selectSHUKA = ""            '-- 出荷(表示)初期化
                 selectindexSHUKA = 0        '-- 出荷(INDEX)初期化
-                selectTODOKE = ""           '-- 届先(表示)初期化
-                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+                'selectTODOKE = ""           '-- 届先(表示)初期化
+                'selectindexTODOKE = 0       '-- 届先(INDEX)初期化
             '加算先部門(変更)時
             Case "WF_KASANORGChange"
                 selectSHUKA = ""            '-- 出荷(表示)初期化
                 selectindexSHUKA = 0        '-- 出荷(INDEX)初期化
-                selectTODOKE = ""           '-- 届先(表示)初期化
-                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+                'selectTODOKE = ""           '-- 届先(表示)初期化
+                'selectindexTODOKE = 0       '-- 届先(INDEX)初期化
             '出荷(変更)時
             Case "WF_AVOCADOSHUKAChange"
-                selectTODOKE = ""           '-- 届先(表示)初期化
-                selectindexTODOKE = 0       '-- 届先(INDEX)初期化
+                'selectTODOKE = ""           '-- 届先(表示)初期化
+                'selectindexTODOKE = 0       '-- 届先(INDEX)初期化
             '届先(変更)時
             Case "WF_AVOCADOTODOKEChange"
         End Select
@@ -1896,10 +1896,13 @@ Public Class LNM0006TankaDetail
             WF_AVOCADOTODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
         Next
         Try
-            WF_AVOCADOTODOKE.SelectedIndex = selectindexTODOKE
-            WF_AVOCADOTODOKENAME.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Text
-            WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Value
-            'WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.SelectedValue
+            '取引先(変更)時
+            If resVal = "WF_TORIChange" Then
+                WF_AVOCADOTODOKE.SelectedIndex = selectindexTODOKE
+                WF_AVOCADOTODOKENAME.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Text
+                WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.Items(Integer.Parse(selectindexTODOKE)).Value
+                'WF_AVOCADOTODOKECODE_TEXT.Text = WF_AVOCADOTODOKE.SelectedValue
+            End If
         Catch ex As Exception
             WF_AVOCADOTODOKE.SelectedIndex = 0
         End Try
