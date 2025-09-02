@@ -112,6 +112,9 @@ Public Class LNM0019SurchargePatternList
                             For index As Integer = 0 To retOrgList.Items.Count - 1
                                 WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
                             Next
+                        Case "WF_ButtonTankaClick"     '実勢単価
+                            InputSave()
+                            DieselPriceSiteSave()
                     End Select
 
                     '○ 一覧再表示処理
@@ -230,7 +233,7 @@ Public Class LNM0019SurchargePatternList
 
         Select Case Context.Handler.ToString().ToUpper()
             '○ 登録・履歴画面からの遷移
-            Case C_PREV_MAP_LIST.LNM0019D, C_PREV_MAP_LIST.LNM0019H
+            Case C_PREV_MAP_LIST.LNM0019D, C_PREV_MAP_LIST.LNM0019H, C_PREV_MAP_LIST.LNT0031L
                 Master.RecoverTable(LNM0019tbl, work.WF_SEL_INPTBL.Text)
                 '対象日
                 Dim WW_YMD As String = Replace(work.WF_SEL_TARGETYMD_L.Text, "/", "")
@@ -823,6 +826,34 @@ Public Class LNM0019SurchargePatternList
         work.WF_SEL_ORG_L.Text = WF_ORG.SelectedValue '部門
 
         work.WF_SEL_CHKDELDATAFLG_L.Text = ChkDelDataFlg.Checked '削除済みデータ表示状態
+
+    End Sub
+
+    '選択行の軽油価格参照先を保持する
+    Protected Sub DieselPriceSiteSave()
+
+        '○ LINECNT取得
+        Dim WW_LineCNT As Integer = 0
+        Try
+            Integer.TryParse(WF_SelectedIndex.Value, WW_LineCNT)
+            WW_LineCNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        work.WF_SEL_DIESELPRICESITEID.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEID")           '実勢軽油価格参照先ID
+        work.WF_SEL_DIESELPRICESITENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITENAME")       '実勢軽油価格参照先名
+        work.WF_SEL_DIESELPRICESITEBRANCH.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEBRANCH")   '実勢軽油価格参照先ID枝番
+        work.WF_SEL_DIESELPRICESITEKBNNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
+
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '○ 画面表示データ保存(遷移先(登録画面)向け)
+        Master.SaveTable(LNM0019tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 実績単価履歴画面ページへ遷移
+        Server.Transfer("~/LNG/mas/LNT0031DieselPriceHist.aspx")
 
     End Sub
 
@@ -2216,7 +2247,6 @@ Public Class LNM0019SurchargePatternList
 
                 'LINECNT
                 LNM0019Exceltblrow("LINECNT") = WW_LINECNT
-                WW_LINECNT = WW_LINECNT + 1
 
                 '◆データセット
                 '取引先コード
@@ -2343,6 +2373,7 @@ Public Class LNM0019SurchargePatternList
                 '登録
                 LNM0019Exceltbl.Rows.Add(LNM0019Exceltblrow)
 
+                WW_LINECNT = WW_LINECNT + 1
             Next
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.OIL_FREE_MESSAGE, C_MESSAGE_TYPE.ERR, "アップロードファイル不正、内容を確認してください。", needsPopUp:=True)

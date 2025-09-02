@@ -76,6 +76,7 @@ Public Class LNM0019SurchargePatternDetail
                         Case "WF_TORINAMEChange"                        '取引先名チェンジ
                             WF_TORICODE.Text = WF_TORINAME.SelectedValue
                             createListBox("ORG")
+                            createListBox("KASANORG")
                         Case "WF_ORGNAMEChange"                         '部門コードチェンジ
                             WF_ORGCODE.Text = WF_ORGNAME.SelectedValue
                             createListBox("KASANORG")
@@ -173,6 +174,7 @@ Public Class LNM0019SurchargePatternDetail
 
         '荷主
         If I_KBN = "INIT" OrElse I_KBN = "TORI" Then
+            Me.WF_TORICODE.Text = ""
             Me.WF_TORINAME.Items.Clear()
             Me.WF_TORINAME.Items.Add("")
 
@@ -185,6 +187,7 @@ Public Class LNM0019SurchargePatternDetail
 
         '部門
         If I_KBN = "INIT" OrElse I_KBN = "ORG" Then
+            Me.WF_ORGCODE.Text = ""
             Me.WF_ORGNAME.Items.Clear()
             Me.WF_ORGNAME.Items.Add("")
             Dim retOrgList As New DropDownList
@@ -213,10 +216,11 @@ Public Class LNM0019SurchargePatternDetail
 
         '加算先部門
         If I_KBN = "INIT" OrElse I_KBN = "KASANORG" Then
+            Me.WF_KASANORGCODE.Text = ""
             Me.WF_KASANORGNAME.Items.Clear()
             Me.WF_KASANORGNAME.Items.Add("")
             Dim retKasanOrgList As New DropDownList
-            retKasanOrgList = LNM0019WRKINC.getDowpDownKasanOrgList(WF_ORGCODE.Text)
+            retKasanOrgList = LNM0019WRKINC.getDowpDownKasanOrgList(WF_TORICODE.Text, WF_ORGCODE.Text)
             For index As Integer = 0 To retKasanOrgList.Items.Count - 1
                 WF_KASANORGNAME.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
             Next

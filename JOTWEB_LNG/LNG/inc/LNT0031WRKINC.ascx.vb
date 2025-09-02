@@ -1,13 +1,10 @@
 ﻿Imports MySQL.Data.MySqlClient
 Imports JOTWEB_LNG.GRIS0005LeftBox
 
-Public Class LNM0019WRKINC
+Public Class LNT0031WRKINC
     Inherits UserControl
 
-    Public Const MAPIDS As String = "LNM0019S"       'MAPID(検索)
-    Public Const MAPIDL As String = "LNM0019L"       'MAPID(一覧)
-    Public Const MAPIDD As String = "LNM0019D"       'MAPID(更新)
-    Public Const MAPIDH As String = "LNM0019H"       'MAPID(履歴)
+    Public Const MAPIDL As String = "LNT0031L"       'MAPID(一覧)
     'タイトル区分
     Public Const TITLEKBNS As String = "C"   'タイトル区分
 
@@ -33,24 +30,26 @@ Public Class LNM0019WRKINC
     ''' <remarks></remarks>
     Public Enum INOUTEXCELCOL
         DELFLG   '削除フラグ
-        TORICODE   '取引先コード
-        TORINAME   '取引先名
-        ORGCODE   '部門コード
-        ORGNAME   '部門名
-        KASANORGCODE   '加算先部門コード
-        KASANORGNAME   '加算先部門名
-        SURCHARGEPATTERNCODE   'サーチャージパターンコード
-        SURCHARGEPATTERNNAME   'サーチャージパターン名
-        BILLINGCYCLE   '請求サイクル
-        BILLINGCYCLENAME   '請求サイクル名
-        CALCMETHOD   '距離算定方式
-        CALCMETHODNAME   '距離算定方式名
-        STYMD   '有効開始日
-        ENDYMD   '有効終了日
         DIESELPRICESITEID   '実勢軽油価格参照先ID
         DIESELPRICESITENAME   '実勢軽油価格参照先名
         DIESELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
-        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先名
+        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
+        TARGETYEAR   '対象年
+        DIESELPRICE1   '1月実勢単価
+        DIESELPRICE2   '2月実勢単価
+        DIESELPRICE3   '3月実勢単価
+        DIESELPRICE4   '4月実勢単価
+        DIESELPRICE5   '5月実勢単価
+        DIESELPRICE6   '6月実勢単価
+        DIESELPRICE7   '7月実勢単価
+        DIESELPRICE8   '8月実勢単価
+        DIESELPRICE9   '9月実勢単価
+        DIESELPRICE10   '10月実勢単価
+        DIESELPRICE11   '11月実勢単価
+        DIESELPRICE12   '12月実勢単価
+        LOCKFLG   'ロックフラグ
+        LOCKYMD   'ロック実行年月日
+        LOCKUSER   'ロック実行者
     End Enum
 
     ''' <summary>
@@ -63,24 +62,26 @@ Public Class LNM0019WRKINC
         MODIFYYMD   '変更日時
         MODIFYUSER   '変更USER
         DELFLG   '削除フラグ
-        TORICODE   '取引先コード
-        TORINAME   '取引先名
-        ORGCODE   '部門コード
-        ORGNAME   '部門名
-        KASANORGCODE   '加算先部門コード
-        KASANORGNAME   '加算先部門名
-        SURCHARGEPATTERNCODE   'サーチャージパターンコード
-        SURCHARGEPATTERNNAME   'サーチャージパターン名
-        BILLINGCYCLE   '請求サイクル
-        BILLINGCYCLENAME   '請求サイクル名
-        CALCMETHOD   '距離算定方式
-        CALCMETHODNAME   '距離算定方式名
-        STYMD   '有効開始日
-        ENDYMD   '有効終了日
         DIESELPRICESITEID   '実勢軽油価格参照先ID
         DIESELPRICESITENAME   '実勢軽油価格参照先名
         DIESELPRICESITEBRANCH   '実勢軽油価格参照先ID枝番
-        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先名
+        DIESELPRICESITEKBNNAME   '実勢軽油価格参照先区分名
+        TARGETYEAR   '対象年
+        DIESELPRICE1   '1月実勢単価
+        DIESELPRICE2   '2月実勢単価
+        DIESELPRICE3   '3月実勢単価
+        DIESELPRICE4   '4月実勢単価
+        DIESELPRICE5   '5月実勢単価
+        DIESELPRICE6   '6月実勢単価
+        DIESELPRICE7   '7月実勢単価
+        DIESELPRICE8   '8月実勢単価
+        DIESELPRICE9   '9月実勢単価
+        DIESELPRICE10   '10月実勢単価
+        DIESELPRICE11   '11月実勢単価
+        DIESELPRICE12   '12月実勢単価
+        LOCKFLG   'ロックフラグ
+        LOCKYMD   'ロック実行年月日
+        LOCKUSER   'ロック実行者
     End Enum
 
     '操作区分
@@ -235,7 +236,7 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
         SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
+        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -248,11 +249,11 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  VIEW0006.ORGCODE = LNS0005.CODE                                                            ")
+        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     1 = 1                                                                                           ")
-        SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     VIEW0006.TORICODE                                                                               ")
+        SQLStr.AppendLine("     DELFLG = @DELFLG                                                                                ")
+        SQLStr.AppendLine(" ORDER BY                                                                       ")
+        SQLStr.AppendLine("     LNM0006.TORICODE                                                           ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -261,6 +262,7 @@ Public Class LNM0019WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -306,10 +308,10 @@ Public Class LNM0019WRKINC
         Dim SQLStr As New StringBuilder
 
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       VIW0006.ORGCODE AS ORGCODE                                                                    ")
-        SQLStr.AppendLine("      ,VIW0006.ORGNAME AS ORGNAME                                                                    ")
+        SQLStr.AppendLine("       LNM0006.ORGCODE AS ORGCODE                                                                    ")
+        SQLStr.AppendLine("      ,REPLACE(REPLACE(REPLACE(LNM0006.ORGNAME,' ',''),'　',''),'EX','EX ') AS ORGNAME               ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIW0006                                                                        ")
+        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA LNM0006                                                                    ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -322,11 +324,12 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  VIW0006.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine("      ON  LNM0006.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     TORICODE     LIKE CONCAT(@TORICODE, '%')                                                        ")
+        SQLStr.AppendLine("     TORICODE LIKE CONCAT(@TORICODE, '%')                                                            ")
+        SQLStr.AppendLine(" AND DELFLG = @DELFLG                                                                                ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     VIW0006.ORGCODE                                                                                 ")
+        SQLStr.AppendLine("     LNM0006.ORGCODE                                                                                 ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -336,6 +339,7 @@ Public Class LNM0019WRKINC
                 With sqlCmd.Parameters
                     .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
                     .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -371,19 +375,26 @@ Public Class LNM0019WRKINC
     ''' </summary>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownKasanOrgList(ByVal I_TORICODE As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownKasanOrgList(ByVal I_ORGCODE As String) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       VIEW0006.KASANORGCODE AS KASANORGCODE                                                         ")
-        SQLStr.AppendLine("      ,VIEW0006.KASANORGNAME AS KASANORGNAME                                                         ")
+        SQLStr.AppendLine("       LNM0002.ORGCODE AS KASANORGCODE                                                               ")
+        SQLStr.AppendLine("      ,CONCAT('EX ',COALESCE(RTRIM(LNM0002.NAME), '')) AS KASANORGNAME                               ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
+        SQLStr.AppendLine("     LNG.LNM0002_ORG LNM0002                                                                         ")
+        SQLStr.AppendLine(" INNER JOIN  LNG.LNM0002_ORG LNM0002_1                                                               ")
+        SQLStr.AppendLine("      ON  LNM0002_1.ORGCODE like @ORGCODE                                                            ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN LNM0002_1.STYMD AND LNM0002_1.ENDYMD                                     ")
+        SQLStr.AppendLine("      AND LNM0002_1.DELFLG <> '1'                                                                    ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("      VIEW0006.TORICODE like CONCAT(@TORICODE, '%')                                                  ")
-        SQLStr.AppendLine(" AND  VIEW0006.ORGCODE  like CONCAT(@ORGCODE, '%')                                                   ")
+        SQLStr.AppendLine("      LNM0002.ORGCODE = LNM0002_1.CONTROLCODE                                                        ")
+        SQLStr.AppendLine(" AND  CURDATE() BETWEEN LNM0002.STYMD AND LNM0002.ENDYMD                                             ")
+        SQLStr.AppendLine(" AND  LNM0002.DELFLG = '0'                                                                           ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     LNM0002.ORGCODE                                                                                 ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -391,8 +402,11 @@ Public Class LNM0019WRKINC
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
-                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    If String.IsNullOrEmpty(I_ORGCODE) Then
+                        .Add("@ORGCODE", MySqlDbType.VarChar).Value = "%"
+                    Else
+                        .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    End If
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -641,67 +655,6 @@ Public Class LNM0019WRKINC
     End Sub
 
     ''' <summary>
-    ''' 有効開始日取得
-    ''' </summary>
-    ''' <param name="SQLcon"></param>
-    ''' <param name="WW_ROW"></param>
-    Public Shared Function GetSTYMD(ByVal SQLcon As MySqlConnection, ByVal WW_ROW As DataRow, ByRef O_MESSAGENO As String) As String
-
-        GetSTYMD = ""
-
-        Dim CS0011LOGWrite As New CS0011LOGWrite                    'ログ出力
-        O_MESSAGENO = Messages.C_MESSAGE_NO.NORMAL
-
-        '○ 対象データ取得
-        Dim SQLStr = New StringBuilder
-        SQLStr.AppendLine(" SELECT ")
-        SQLStr.AppendLine("       DATE_FORMAT(MAX(STYMD), '%Y/%m/%d') AS STYMD ")
-        SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0019_SURCHARGEPATTERN")
-        SQLStr.AppendLine(" WHERE")
-        SQLStr.AppendLine("       TORICODE  = @TORICODE                           ")
-        SQLStr.AppendLine("   AND ORGCODE  = @ORGCODE                             ")
-        SQLStr.AppendLine("   AND SURCHARGEPATTERNCODE  = @SURCHARGEPATTERNCODE   ")
-        SQLStr.AppendLine("   AND BILLINGCYCLE  = @BILLINGCYCLE                   ")
-
-        Try
-            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 10) '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 6) '部門コード
-                Dim P_SURCHARGEPATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEPATTERNCODE", MySqlDbType.VarChar, 6)     'サーチャージパターンコード
-                Dim P_BILLINGCYCLE As MySqlParameter = SQLcmd.Parameters.Add("@BILLINGCYCLE", MySqlDbType.VarChar, 6)     '請求サイクル
-
-                P_TORICODE.Value = WW_ROW("TORICODE") '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE") '部門コード
-                P_SURCHARGEPATTERNCODE.Value = WW_ROW("SURCHARGEPATTERNCODE") 'サーチャージパターンコード
-                P_BILLINGCYCLE.Value = WW_ROW("BILLINGCYCLE") '請求サイクル
-
-                Dim WW_Tbl = New DataTable
-                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
-                    '○ フィールド名とフィールドの型を取得
-                    For index As Integer = 0 To SQLdr.FieldCount - 1
-                        WW_Tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
-                    Next
-                    '○ テーブル検索結果をテーブル格納
-                    WW_Tbl.Load(SQLdr)
-
-                    If WW_Tbl.Rows.Count >= 1 Then
-                        GetSTYMD = WW_Tbl.Rows(0)("STYMD").ToString
-                    End If
-                End Using
-            End Using
-        Catch ex As Exception
-            CS0011LOGWrite.INFSUBCLASS = "MAIN"                   'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0019_SURCHARGEPATTERN SELECT"
-            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
-            CS0011LOGWrite.TEXT = ex.ToString()
-            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
-            CS0011LOGWrite.CS0011LOGWrite()                       'ログ出力
-            Exit Function
-        End Try
-    End Function
-
-    ''' <summary>
     ''' 会社コード取得のパラメータ設定
     ''' </summary>
     ''' <param name="COMPANY_FLG"></param>
@@ -832,26 +785,23 @@ Public Class LNM0019WRKINC
         '更新前の削除フラグを取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine("    SELECT")
-        SQLStr.AppendLine("        TORICODE")
+        SQLStr.AppendLine("        DIESELPRICESITEID")
         SQLStr.AppendLine("    FROM")
-        SQLStr.AppendLine("        LNG.LNM0019_SURCHARGEPATTERN")
+        SQLStr.AppendLine("        LNG.LNT0031_DISELPRICEHIST")
         SQLStr.AppendLine("    WHERE")
-        SQLStr.AppendLine("         COALESCE(TORICODE, '')              = @TORICODE ")
-        SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')               = @ORGCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(SURCHARGEPATTERNCODE, '')  = @SURCHARGEPATTERNCODE ")
-        SQLStr.AppendLine("    AND  COALESCE(BILLINGCYCLE, '')          = @BILLINGCYCLE ")
+        SQLStr.AppendLine("         COALESCE(DIESELPRICESITEID, '')      = @DIESELPRICESITEID ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESITEBRANCH, '')  = @DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("    AND  COALESCE(TARGETYEAR, '')             = @TARGETYEAR ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
-                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar, 20)     '取引先コード
-                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar, 20)     '部門コード
-                Dim P_SURCHARGEPATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEPATTERNCODE", MySqlDbType.VarChar, 2)     'サーチャージパターンコード
-                Dim P_BILLINGCYCLE As MySqlParameter = SQLcmd.Parameters.Add("@BILLINGCYCLE", MySqlDbType.VarChar, 1)     '請求サイクル
+                Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar, 10)                '実勢軽油価格参照先ID
+                Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar, 10)        '実勢軽油価格参照先ID枝番
+                Dim P_TARGETYEAR As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYEAR", MySqlDbType.VarChar, 4)                               '対象年
 
-                P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
-                P_ORGCODE.Value = WW_ROW("ORGCODE")           '部門コード
-                P_SURCHARGEPATTERNCODE.Value = WW_ROW("SURCHARGEPATTERNCODE")           'サーチャージパターンコード
-                P_BILLINGCYCLE.Value = WW_ROW("BILLINGCYCLE")           '請求サイクル
+                P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")             '実勢軽油価格参照先ID
+                P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")     '実勢軽油価格参照先ID枝番
+                P_TARGETYEAR.Value = WW_ROW("TARGETYEAR")                           '対象年
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable
@@ -873,7 +823,7 @@ Public Class LNM0019WRKINC
         Catch ex As Exception
 
             CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
-            CS0011LOGWrite.INFPOSI = "DB:LNM0019_SURCHARGEPATTERN SELECT"
+            CS0011LOGWrite.INFPOSI = "DB:LNT0031_DISELPRICEHIST SELECT"
             CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
