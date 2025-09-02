@@ -18,7 +18,7 @@ Public Class LNT0001ZissekiIntake
 
     '○ 検索結果格納Table
     Private LNT0003tbl As DataTable                                  '一覧（実績取込履歴）格納用テーブル
-    Private LNT0028tbl As DataTable                                  '実績不良データ格納用テーブル
+    Private LNT0028tbl As DataTable                                  '実績不備データ格納用テーブル
 
     ''' <summary>
     ''' 定数
@@ -26,7 +26,7 @@ Public Class LNT0001ZissekiIntake
     Private Const CONST_DISPROWCOUNT As Integer = 16                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 16                 'マウススクロール時稼働行数
     Private Const CONST_LNT0001 As String = "LNG.LNT0001_ZISSEKI"   '実績テーブル
-    Private Const CONST_LNT0028 As String = "LNG.LNT0028_NGZISSEKI" '実績不良テーブル
+    Private Const CONST_LNT0028 As String = "LNG.LNT0028_NGZISSEKI" '実績不備テーブル
 
     '○ 共通関数宣言(BASEDLL)
     Private CS0007CheckAuthority As New CS0007CheckAuthority        '更新権限チェック
@@ -69,7 +69,7 @@ Public Class LNT0001ZissekiIntake
                             WF_KintoneGetRecodes_Click()
                         Case "WF_ButtonZero"， "btnCommonConfirmYes"            '実績数量ゼロボタンクリック
                             WF_ButtonZero_Click()
-                        Case "WF_ButtonNgPrint"         '実績不良データボタンクリック
+                        Case "WF_ButtonNgPrint"         '実績不備データボタンクリック
                             WF_ButtonNgPrint_Click()
                         Case "WF_Field_DBClick"         'フィールドダブルクリック
                             WF_FiledDBClick()
@@ -498,7 +498,7 @@ Public Class LNT0001ZissekiIntake
     End Sub
 
     ''' <summary>
-    ''' アボカド不良データﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
+    ''' アボカド不備データﾀﾞｳﾝﾛｰﾄﾞ(Excel出力)ボタン押下時処理
     ''' </summary>
     ''' <remarks></remarks>
     Protected Sub WF_ButtonNgPrint_Click()
@@ -520,7 +520,7 @@ Public Class LNT0001ZissekiIntake
 
             'データ存在チェック
             If LNT0028tbl.Rows.Count = 0 Then
-                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, "不良データは存在しません", "", True)
+                Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, "不備データは存在しません", "", True)
                 Exit Sub
             End If
         End Using
@@ -536,6 +536,7 @@ Public Class LNT0001ZissekiIntake
         CS0030REPORT.FILEtyp = "XLSX"                           '出力ファイル形式
         CS0030REPORT.TBLDATA = LNT0028tbl                       'データ参照  Table
         CS0030REPORT.CHKTBL = ChkTbl                            '荷主別チェック項目  Table
+        CS0030REPORT.FILENAME = "実績不備データ"                '出力ファイル名
         CS0030REPORT.CS0030REPORT()
         If Not isNormal(CS0030REPORT.ERR) Then
             If CS0030REPORT.ERR = C_MESSAGE_NO.REPORT_EXCEL_NOT_FOUND_ERROR Then
@@ -552,7 +553,7 @@ Public Class LNT0001ZissekiIntake
     End Sub
 
     ''' <summary>
-    ''' 不良データ取得
+    ''' 不備データ取得
     ''' </summary>
     ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
@@ -1192,10 +1193,10 @@ Public Class LNT0001ZissekiIntake
                 ' 結果を表示
                 If Cnt > 0 Then
                     Msg1 += "<BR><BR>"
-                    Msg1 += sp & "不良データが存在します。"
+                    Msg1 += sp & "不備データが存在します。"
                     Msg1 += "<BR>" & sp & "対象年月：" & Me.WF_TaishoYm.Value
                 Else
-                    Msg1 += "不良データが存在します。"
+                    Msg1 += "不備データが存在します。"
                     Msg1 += "<BR>" & "対象年月：" & Me.WF_TaishoYm.Value
                 End If
                 For Each result In query
@@ -1205,7 +1206,7 @@ Public Class LNT0001ZissekiIntake
                     End If
                 Next
 
-                '実績数量ゼロあり＆不良データありメッセージ出力
+                '実績数量ゼロあり＆不備データありメッセージ出力
                 'Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True, "", True, "btnCommonConfirmYes")
                 Master.Output(C_MESSAGE_NO.CTN_UNIVERSAL_MESSAGE, C_MESSAGE_TYPE.WAR, Msg1, Msg2, True)
                 Exit Sub
@@ -1335,7 +1336,7 @@ Public Class LNT0001ZissekiIntake
                         Exit For
                     End If
                     If String.IsNullOrEmpty(DataRow(ChkRow(ValueStr))) Then
-                        'チェック項目がNGの場合、実績不良テーブルへの出力指示
+                        'チェック項目がNGの場合、実績不備テーブルへの出力指示
                         DataRow("OUTTBL") = CONST_LNT0028
                     End If
                 Next
