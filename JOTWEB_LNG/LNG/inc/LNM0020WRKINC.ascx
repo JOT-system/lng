@@ -22,6 +22,7 @@
     <asp:TextBox ID="WF_SEL_DISPLAYNAME" runat="server"></asp:TextBox>              <!-- 画面表示名称 -->
     <asp:TextBox ID="WF_SEL_DIESELPRICESITEURL" runat="server"></asp:TextBox>       <!-- 実勢軽油価格参照先URL -->
     <asp:TextBox ID="WF_SEL_DELFLG" runat="server"></asp:TextBox>                   <!-- 削除フラグ -->
+    <asp:TextBox ID="WF_SEL_DELFLGNAME" runat="server"></asp:TextBox>               <!-- 削除フラグ名 -->
 
     <asp:TextBox ID="WF_SEL_TIMESTAMP" runat="server"></asp:TextBox>                <!-- タイムスタンプ -->
     <asp:TextBox ID="WF_SEL_INPTBL" runat="server"></asp:TextBox>                   <!-- 更新データ(退避用) -->

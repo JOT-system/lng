@@ -30,7 +30,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_LINECNT As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEID_L コントロール。
     '''</summary>
@@ -39,7 +39,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEID_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEBRANCH_L コントロール。
     '''</summary>
@@ -48,7 +48,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEBRANCH_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITENAME_L コントロール。
     '''</summary>
@@ -57,7 +57,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITENAME_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEKBNNAME_L コントロール。
     '''</summary>
@@ -66,7 +66,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEKBNNAME_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DISPLAYNAME_L コントロール。
     '''</summary>
@@ -75,7 +75,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DISPLAYNAME_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEURL_L コントロール。
     '''</summary>
@@ -84,7 +84,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEURL_L As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEID コントロール。
     '''</summary>
@@ -93,7 +93,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEID As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEBRANCH コントロール。
     '''</summary>
@@ -102,7 +102,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEBRANCH As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITENAME コントロール。
     '''</summary>
@@ -111,7 +111,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITENAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEKBNNAME コントロール。
     '''</summary>
@@ -120,7 +120,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEKBNNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DISPLAYNAME コントロール。
     '''</summary>
@@ -129,7 +129,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DISPLAYNAME As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DIESELPRICESITEURL コントロール。
     '''</summary>
@@ -138,7 +138,7 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DIESELPRICESITEURL As Global.System.Web.UI.WebControls.TextBox
-
+    
     '''<summary>
     '''WF_SEL_DELFLG コントロール。
     '''</summary>
@@ -147,7 +147,16 @@ Partial Public Class LNM0020WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_DELFLG As Global.System.Web.UI.WebControls.TextBox
-    
+
+    '''<summary>
+    '''WF_SEL_DELFLGNAME コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Public WithEvents WF_SEL_DELFLGNAME As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_TIMESTAMP コントロール。
     '''</summary>
