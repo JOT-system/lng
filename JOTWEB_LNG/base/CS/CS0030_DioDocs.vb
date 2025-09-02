@@ -90,6 +90,14 @@ Public Structure CS0030REPORT
     Public Property CHKTBL() As DataTable
 
     ''' <summary>
+    ''' 出力ファイル名
+    ''' </summary>
+    ''' <value>出力ファイル名</value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property FILENAME() As string
+
+    ''' <summary>
     ''' エラーコード
     ''' </summary>
     ''' <value></value>
@@ -967,7 +975,12 @@ Public Structure CS0030REPORT
         End Try
 
         '○ファイル(PDF,CSV)保存
-        Dim WW_datetime As String = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString
+        Dim WW_datetime As String = ""
+        If String.IsNullOrEmpty(FILENAME) Then
+            WW_datetime = DateTime.Now.ToString("yyyyMMddHHmmss") & DateTime.Now.Millisecond.ToString
+        Else
+            WW_datetime = FILENAME
+        End If
         FILEtyp = FILEtyp.ToLower()
         Dim WW_SaveState As String = Nothing
 
