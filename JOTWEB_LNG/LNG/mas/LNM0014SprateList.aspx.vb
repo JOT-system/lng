@@ -98,7 +98,7 @@ Public Class LNM0014SprateList
                         Case "WF_ButtonDebug"           'デバッグボタン押下
                             WF_ButtonDEBUG_Click()
                         Case "WF_SelectCALENDARChange"  '対象年月(変更)時
-                            MapInitialize()
+                            MapInitialize(WF_ButtonClick.Value)
                         Case "WF_SelectTORIChange",     '荷主(変更)時
                              "WF_SelectORGChange",      '部門(変更)時
                              "WF_SelectKASANORGChange"  '加算先部門(変更)時
@@ -106,7 +106,7 @@ Public Class LNM0014SprateList
                         Case "WF_ButtonExtract"         '検索ボタン押下時
                             GridViewInitialize()
                         Case "WF_ButtonRelease"         '解除ボタンクリック
-                            MapInitialize()
+                            MapInitialize(WF_ButtonClick.Value)
                         Case "WF_ButtonPAGE", "WF_ButtonFIRST", "WF_ButtonPREVIOUS", "WF_ButtonNEXT", "WF_ButtonLAST"
                             Me.WF_ButtonPAGE_Click()
                     End Select
@@ -1029,9 +1029,12 @@ Public Class LNM0014SprateList
     ''' <summary>
     ''' 画面初期化処理
     ''' </summary>
-    Private Sub MapInitialize()
-        'ドロップダウン生成処理
-        createListBox()
+    Private Sub MapInitialize(ByVal resVal As String)
+        '解除ボタンクリック
+        If resVal = "WF_ButtonRelease" Then
+            'ドロップダウン生成処理
+            createListBox()
+        End If
 
         'GridViewデータ設定
         GridViewInitialize()

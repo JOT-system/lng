@@ -916,8 +916,11 @@ Public Class LNM0006TankaList
     ''' 画面初期化処理
     ''' </summary>
     Private Sub MapInitialize(Optional ByVal resVal As String = Nothing)
-        'ドロップダウン生成処理
-        createListBox(resVal:=WF_ButtonClick.Value)
+        '解除ボタンクリック
+        If resVal = "WF_ButtonRelease" Then
+            'ドロップダウン生成処理
+            createListBox(resVal:=WF_ButtonClick.Value)
+        End If
 
         'GridViewデータ設定
         GridViewInitialize()

@@ -314,8 +314,11 @@ Public Class LNM0007KoteihiList
     ''' 画面初期化処理
     ''' </summary>
     Private Sub MapInitialize(Optional ByVal resVal As String = Nothing)
-        'ドロップダウン生成処理
-        createListBox(resVal)
+        '解除ボタンクリック
+        If resVal = "WF_ButtonRelease" Then
+            'ドロップダウン生成処理
+            createListBox(resVal)
+        End If
 
         'GridViewデータ設定
         GridViewInitialize()
