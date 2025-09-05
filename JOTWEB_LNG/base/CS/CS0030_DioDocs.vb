@@ -992,18 +992,18 @@ Public Structure CS0030REPORT
                     'アクティブシートのみ出力（横1ページに収める）
                     WW_Activesheet.Save(FILEpath, SaveFileFormat.Pdf)
                 Case "csv"
-                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".CSV"
-                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".CSV"
+                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".csv"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".csv"
                     WW_Activesheet.Save(FILEpath, SaveFileFormat.Csv)
 
                 Case "xls"
-                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLS"
-                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLS"
+                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".xls"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".xls"
                     'DioDocsでは、xls形式のExcelファイルを読み込んだり、また、作成した内容をxls形式のExcelファイルに保存することはできません。 from GreapeCityナレッジベース
                     WW_Workbook.Save(FILEpath, SaveFileFormat.Xlsx)
                 Case "xlsx"
-                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".XLSX"
-                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".XLSX"
+                    FILEpath = CS0050SESSION.UPLOAD_PATH & "\PRINTWORK\" & CS0050SESSION.USERID & "\" & WW_datetime & ".xlsx"
+                    URL = CS0050SESSION.HTTPS_GET & "://" & HttpContext.Current.Request.Url.Host & "/" & CS0050SESSION.PRINT_ROOT_URL_NAME & "/" & CS0050SESSION.USERID & "/" & WW_datetime & ".xlsx"
                     'Workbook.Saveメソッドを呼び出すと、数式セルの結果値が計算され、Excelファイルに保存されます
                     WW_Workbook.Save(FILEpath, SaveFileFormat.Xlsx)
             End Select

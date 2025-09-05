@@ -307,8 +307,23 @@ Public Class LNM0020DieselPriceSiteList
         SQLStr.AppendLine("   , LNM20.DISPLAYNAME                               AS DISPLAYNAME           ")
         SQLStr.AppendLine("   , LNM20.DIESELPRICESITEURL                        AS DIESELPRICESITEURL    ")
         SQLStr.AppendLine("   , LNM20.DELFLG                                    AS DELFLG                ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS0006.VALUE1), '')             AS DELFLGNAME            ")
         SQLStr.AppendLine(" FROM                                                                         ")
         SQLStr.AppendLine("     LNG.LNM0020_DIESELPRICESITE LNM20                                        ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                    ")
+        SQLStr.AppendLine("    (                                                                         ")
+        SQLStr.AppendLine("      SELECT                                                                  ")
+        SQLStr.AppendLine("          KEYCODE                                                             ")
+        SQLStr.AppendLine("         ,VALUE1                                                              ")
+        SQLStr.AppendLine("      FROM                                                                    ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                ")
+        SQLStr.AppendLine("      WHERE                                                                   ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                ")
+        SQLStr.AppendLine("      AND CLASS = 'DELFLG'                                                    ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                  ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                       ")
+        SQLStr.AppendLine("    ) LNS0006                                                                 ")
+        SQLStr.AppendLine("      ON  LNM20.DELFLG = LNS0006.KEYCODE                                      ")
         SQLStr.AppendLine(" WHERE                                                                        ")
         SQLStr.AppendLine("     '0' = '0'                                                                ")
         '削除フラグ
@@ -321,7 +336,12 @@ Public Class LNM0020DieselPriceSiteList
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                '会社
+                Dim P_CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar, 20)
+                P_CAMPCODE.Value = Master.USERCAMP
+
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+
                     '○ フィールド名とフィールドの型を取得
                     For index As Integer = 0 To SQLdr.FieldCount - 1
                         LNM0020tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
@@ -578,6 +598,9 @@ Public Class LNM0020DieselPriceSiteList
                     Exit Sub
                 End If
                 LNM0020tbl.Rows(WW_LineCNT)("DELFLG") = C_DELETE_FLG.ALIVE
+                Dim WW_NAME As String = ""
+                CODENAME_get("DELFLG", C_DELETE_FLG.ALIVE, WW_NAME, WW_RtnSW)
+                LNM0020tbl.Rows(WW_LineCNT)("DELFLGNAME") = WW_NAME
                 LNM0020tbl.Rows(WW_LineCNT)("UPDTIMSTP") = WW_UPDTIMSTP
                 Master.SaveTable(LNM0020tbl)
                 Master.Output(C_MESSAGE_NO.DELETE_ROW_ACTIVATION, C_MESSAGE_TYPE.NOR, needsPopUp:=True)
@@ -595,6 +618,7 @@ Public Class LNM0020DieselPriceSiteList
         work.WF_SEL_DIESELPRICESITEURL.Text = LNM0020tbl.Rows(WW_LineCNT)("DIESELPRICESITEURL")             '実勢軽油価格参照先URL
 
         work.WF_SEL_DELFLG.Text = LNM0020tbl.Rows(WW_LineCNT)("DELFLG")          '削除フラグ
+        work.WF_SEL_DELFLGNAME.Text = LNM0020tbl.Rows(WW_LineCNT)("DELFLGNAME")   '削除フラグ名
         work.WF_SEL_TIMESTAMP.Text = LNM0020tbl.Rows(WW_LineCNT)("UPDTIMSTP")    'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
 
