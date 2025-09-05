@@ -322,7 +322,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
         Try
             '■基準シート
             '①基準(川越・知多)
-            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "1"))
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}' AND TANKAKBN='0'", "1"))
                 '・往復距離(km)
                 Dim setCellROUNDTRIP As String = ""
                 If PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
@@ -345,7 +345,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
 
             Next
             '②基準(上越)
-            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "2"))
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}' AND TANKAKBN='0'", "2"))
                 '・往復距離(km)
                 Dim setCellROUNDTRIP As String = ""
                 If PrintTankDatarow("SHUKABASHO").ToString() = "900" Then
@@ -368,7 +368,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
 
             Next
             '③基準
-            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}'", "3"))
+            For Each PrintTankDatarow As DataRow In PrintTankData.Select(String.Format("GRPNO='{0}' AND TANKAKBN='0'", "3"))
                 '・運賃(円)
                 Dim setCellGyo As Integer = Integer.Parse(PrintTankDatarow("MASTERNO").ToString())
                 If PrintTankDatarow("SHUKABASHO").ToString() = "100" Then
@@ -388,7 +388,7 @@ Public Class LNT0001InvoiceOutputCENERGY_ELNESS
             '〇[マスタ]シート
             '★シーエナジーについて(車番、単価(距離単価)、設定セルNo)をグルーピング
             Dim queryK = From row In PrintTankData.AsEnumerable()
-                         Where row.Field(Of String)("TORICODE") = BaseDllConst.CONST_TORICODE_0110600000 AndAlso row.Field(Of Decimal)("TANKA") <> 0
+                         Where row.Field(Of String)("TORICODE") = BaseDllConst.CONST_TORICODE_0110600000 AndAlso row.Field(Of Decimal)("TANKA") <> 0 AndAlso row.Field(Of String)("TANKAKBN") = "0"
                          Group row By SYAGOU = row.Field(Of String)("SYAGOU"),
                                       SYABARA = row.Field(Of Decimal)("SYABARA"),
                                       TANKA = row.Field(Of Decimal)("TANKA"),
