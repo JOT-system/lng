@@ -505,9 +505,16 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
             Dim uchiwakeTanka As String = "F"   '-- 単価
             Dim uchiwakeAmount As String = "H"  '-- 数量
             Dim uchiwakeTaxable As String = "M" '-- 課税対象額
+            '　内訳(No)保持用
+            'Dim uchiwakeHokkaido As Integer() = {0, 0, 0}   '-- 北海道ガス石狩LNG基地出荷分((SK)釧路ガス, (SK)室蘭ガス, JSW)
+            'Dim uchiwakeHokuden As Integer() = {0, 0}       '-- ほくでん石狩LNG基地出荷分(ＳＫ勇払（工場）, 室蘭港バンカリング)
+            Dim uchiwakeSyaryou As Integer() = {0}          '-- 車両固定運賃
+            Dim uchiwakeContainaer As Integer() = {0}       '-- コンテナ料金
+            Dim uchiwakeBunkering As Integer() = {0}        '-- バンカリング追加人件費
+            Dim uchiwakeOther As Integer() = {0}            '-- その他
             '★(新)レイアウト対応
             If PrintTogouSprate.Rows(0)("KOTEIHI_CONVERT").ToString() = "SEKIYU_HKD_KOTEIHI2" Then
-                uchiwakeNo = "B"                '-- 内訳NO
+                uchiwakeNo = "C"                '-- 内訳NO
                 uchiwakeName = "D"              '-- 内訳名称
                 uchiwakeTanka = "E"             '-- 単価
                 uchiwakeAmount = "F"            '-- 数量
@@ -518,6 +525,9 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                 '★ 月額固定費
                 If PrintTogouSpraterow("BIGCATECODE").ToString() = "5" Then
                     '〇３）バンカリング追加人件費
+                    '★ Ｎｏ設定
+                    uchiwakeBunkering(0) += 1
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = uchiwakeBunkering(0)
                     '★ 名称
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString().Replace(PrintTogouSpraterow("MIDCATENAME").ToString() + "　", "")
                     '★ 単価
@@ -529,6 +539,9 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                     Dim otDetailNo As Integer = 0
                     otDetailNo = CInt(PrintTogouSpraterow("SMALLCATECODE").ToString())
                     '★ その他
+                    '・Ｎｏ設定
+                    uchiwakeOther(0) += 1
+                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = uchiwakeOther(0)
                     '・名称設定
                     WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString()
                     'WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = WW_ReportOtherNo(otDetailNo) + PrintTogouSpraterow("SMALLCATENAME").ToString()
@@ -547,6 +560,17 @@ Public Class LNT0001InvoiceOutputSEKIYUSIGENHokaido
                             OrElse PrintTogouSpraterow("BIGCATECODE").ToString() = "5") _
                         AndAlso PrintTogouSpraterow("QUANTITY").ToString() <> "0.00" Then
                         Try
+                            '★ Ｎｏ設定
+                            Select Case PrintTogouSpraterow("BIGCATECODE").ToString()
+                                '車両固定運賃
+                                Case "3"
+                                    uchiwakeSyaryou(0) += 1
+                                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = uchiwakeSyaryou(0)
+                                'コンテナ料金
+                                Case "4"
+                                    uchiwakeContainaer(0) += 1
+                                    WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = uchiwakeContainaer(0)
+                            End Select
                             '★ 名称
                             WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeName + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value = PrintTogouSpraterow("SMALLCATENAME").ToString().Replace(PrintTogouSpraterow("MIDCATENAME").ToString() + "　", "")
                             'Dim cellNo As String = WW_Workbook.Worksheets(WW_SheetNoUchiwake).Range(uchiwakeNo + PrintTogouSpraterow("KOTEIHI_CELLNUM").ToString()).Value.ToString()
