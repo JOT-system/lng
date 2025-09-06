@@ -108,7 +108,7 @@ function BtnAddClick(EventName) {
     }
     if (findFlg == true) {
         //追加行があれば、SUNMITしない
-        retuen;
+        return;
     }
 
     document.getElementById("WF_ButtonClick").value = EventName;
