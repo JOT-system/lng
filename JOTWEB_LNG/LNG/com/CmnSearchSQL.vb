@@ -1,6 +1,6 @@
 ﻿Option Strict On
 
-Imports MySQL.Data.MySqlClient
+Imports MySql.Data.MySqlClient
 Imports JOTWEB_LNG.GRC0002SELECTIONPOPUPWORKINC
 
 ''' <summary>
@@ -226,29 +226,26 @@ Public Class CmnSearchSQL
     ''' 単価実績出荷場所取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoShukabashoSQL(Optional ByVal prmOrgCode As String = "", Optional ByVal prmToriCode As String = "") As String
+    Public Shared Function GetTankaAvocadoShukabashoSQL(Optional ByVal prmOrgCode As String = "") As String
 
         Dim SQLBldr As New StringBuilder
 
         '-- 届先取得
         SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     SHUKABASHO AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(SHUKABASHO) AS AVOCADOSHUKABASHO")
-        SQLBldr.AppendLine("    , RTRIM(SHUKANAME)  AS AVOCADOSHUKANAME")
+        SQLBldr.AppendLine("     AVOCADOSHUKABASHO AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(AVOCADOSHUKABASHO) AS AVOCADOSHUKABASHO")
+        SQLBldr.AppendLine("    , RTRIM(AVOCADOSHUKANAME) AS AVOCADOSHUKANAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.VIW0006_TODOKE")
+        SQLBldr.AppendLine("     LNG.LNM0006_NEWTANKA")
         SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     '1' = '1'")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN STYMD AND ENDYMD")
         '部門コードが入力されている場合条件に含める
         If Not prmOrgCode = "" Then
-            SQLBldr.AppendLine("  AND ORDERORGCODE LIKE '%" & prmOrgCode & "%'")
-        End If
-        '取引先コードが入力されている場合条件に含める
-        If Not prmToriCode = "" Then
-            SQLBldr.AppendLine("  AND TORICODE LIKE '%" & prmToriCode & "%'")
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
         End If
         SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     SHUKABASHO")
+        SQLBldr.AppendLine("     AVOCADOSHUKABASHO")
 
         Return SQLBldr.ToString
 
@@ -258,29 +255,26 @@ Public Class CmnSearchSQL
     ''' 単価実績届先取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoTodokeSQL(Optional ByVal prmOrgCode As String = "", Optional ByVal prmToriCode As String = "") As String
+    Public Shared Function GetTankaAvocadoTodokeSQL(Optional ByVal prmOrgCode As String = "") As String
 
         Dim SQLBldr As New StringBuilder
 
         '-- 届先取得
         SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     TODOKECODE AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS AVOCADOTODOKECODE")
-        SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS AVOCADOTODOKENAME")
+        SQLBldr.AppendLine("     AVOCADOTODOKECODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(AVOCADOTODOKECODE) AS AVOCADOTODOKECODE")
+        SQLBldr.AppendLine("    , RTRIM(AVOCADOTODOKENAME) AS AVOCADOTODOKENAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.VIW0006_TODOKE")
+        SQLBldr.AppendLine("     LNG.LNM0006_NEWTANKA")
         SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     '1' = '1'")
+        SQLBldr.AppendLine("     DELFLG = '0'")
+        SQLBldr.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN STYMD AND ENDYMD")
         '部門コードが入力されている場合条件に含める
         If Not prmOrgCode = "" Then
-            SQLBldr.AppendLine("  AND ORDERORGCODE LIKE '%" & prmOrgCode & "%'")
-        End If
-        '取引先コードが入力されている場合条件に含める
-        If Not prmToriCode = "" Then
-            SQLBldr.AppendLine("  AND TORICODE LIKE '%" & prmToriCode & "%'")
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
         End If
         SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     TODOKECODE")
+        SQLBldr.AppendLine("     AVOCADOTODOKECODE")
 
         Return SQLBldr.ToString
 

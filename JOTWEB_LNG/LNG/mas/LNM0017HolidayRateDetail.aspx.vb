@@ -74,11 +74,8 @@ Public Class LNM0017HolidayRateDetail
                             WF_CLEAR_ConfirmOkClick()
                         Case "WF_TORIChange"                '取引先コードチェンジ
                             WF_TORICODE_TEXT.Text = WF_TORICODE.SelectedValue
-                            createListBox("ORG")
-                            createListBox("SHUKABASHO")
                         Case "WF_ORGChange"                  '受注受付部署コードチェンジ
                             WF_ORDERORGCODE_TEXT.Text = WF_ORDERORGCODE.SelectedValue
-                            createListBox("SHUKABASHO")
                         Case "WF_ORDERORGCATEGORYChange"    '受注受付部署判定区分コードチェンジ
                             WF_ORDERORGCATEGORY_TEXT.Text = WF_ORDERORGCATEGORY.SelectedValue
                         Case "WF_SHUKABASHOChange"          '出荷場所コードチェンジ
@@ -168,72 +165,62 @@ Public Class LNM0017HolidayRateDetail
     ''' ドロップダウン生成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub createListBox(Optional I_KBN As String = "INIT")
+    Protected Sub createListBox()
         '荷主
-        If I_KBN = "INIT" Then
-            Me.WF_TORICODE.Items.Clear()
-            Me.WF_TORICODE.Items.Add("")
-            Dim retToriList As DropDownList = CmnLng.getDowpDownNewTankaList("TORI")
-            For index As Integer = 0 To retToriList.Items.Count - 1
-                WF_TORICODE.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
-            Next
-        End If
+        Me.WF_TORICODE.Items.Clear()
+        Me.WF_TORICODE.Items.Add("")
+        Dim retToriList As DropDownList = CmnLng.getDowpDownNewTankaList("TORI")
+        For index As Integer = 0 To retToriList.Items.Count - 1
+            WF_TORICODE.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+        Next
 
         '受注受付部署部署
-        If I_KBN = "INIT" OrElse I_KBN = "ORG" Then
-            Me.WF_ORDERORGCODE.Items.Clear()
-            Me.WF_ORDERORGCODE.Items.Add("")
-            Dim retOrgList As DropDownList = CmnLng.getDowpDownNewTankaList("ORG", WF_TORICODE.SelectedValue, WF_ORDERORGCODE.SelectedValue)
-            If retOrgList.Items.Count > 0 Then
-                '情シス、高圧ガス以外
-                If LNM0017WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
-                    Dim WW_OrgPermitHt As New Hashtable
-                    Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-                        SQLcon.Open()  ' DataBase接続
-                        work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
-                        For index As Integer = 0 To retOrgList.Items.Count - 1
-                            If WW_OrgPermitHt.ContainsKey(retOrgList.Items(index).Value) = True Then
-                                WF_ORDERORGCODE.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
-                            End If
-                        Next
-                    End Using
-                Else
+        Me.WF_ORDERORGCODE.Items.Clear()
+        Me.WF_ORDERORGCODE.Items.Add("")
+        Dim retOrgList As DropDownList = CmnLng.getDowpDownNewTankaList("ORG")
+        If retOrgList.Items.Count > 0 Then
+            '情シス、高圧ガス以外
+            If LNM0017WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
+                Dim WW_OrgPermitHt As New Hashtable
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    work.GetPermitOrg(SQLcon, Master.USERCAMP, Master.ROLE_ORG, WW_OrgPermitHt)
                     For index As Integer = 0 To retOrgList.Items.Count - 1
-                        WF_ORDERORGCODE.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+                        If WW_OrgPermitHt.ContainsKey(retOrgList.Items(index).Value) = True Then
+                            WF_ORDERORGCODE.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+                        End If
                     Next
-                End If
+                End Using
+            Else
+                For index As Integer = 0 To retOrgList.Items.Count - 1
+                    WF_ORDERORGCODE.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+                Next
             End If
         End If
 
         '受注受付部署部署判定区分
-        If I_KBN = "INIT" Then
-            Me.WF_ORDERORGCATEGORY.Items.Clear()
-            Me.WF_ORDERORGCATEGORY.Items.Add("")
-            Dim retOrgCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
-            For index As Integer = 0 To retOrgCategoryList.Items.Count - 1
-                WF_ORDERORGCATEGORY.Items.Add(New ListItem(retOrgCategoryList.Items(index).Text, retOrgCategoryList.Items(index).Value))
-            Next
-        End If
+        Me.WF_ORDERORGCATEGORY.Items.Clear()
+        Me.WF_ORDERORGCATEGORY.Items.Add("")
+        Dim retOrgCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
+        For index As Integer = 0 To retOrgCategoryList.Items.Count - 1
+            WF_ORDERORGCATEGORY.Items.Add(New ListItem(retOrgCategoryList.Items(index).Text, retOrgCategoryList.Items(index).Value))
+        Next
 
         '出荷場所
-        If I_KBN = "INIT" OrElse I_KBN = "SHUKABASHO" Then
-            Me.WF_SHUKABASHO.Items.Clear()
-            Me.WF_SHUKABASHO.Items.Add("")
-            Dim retShukabashoList As DropDownList = CmnLng.getDowpDownNewTankaList("SHUKABASHO", WF_TORICODE.SelectedValue, WF_ORDERORGCODE.SelectedValue)
-            For index As Integer = 0 To retShukabashoList.Items.Count - 1
-                WF_SHUKABASHO.Items.Add(New ListItem(retShukabashoList.Items(index).Text, retShukabashoList.Items(index).Value))
-            Next
-        End If
+        Me.WF_SHUKABASHO.Items.Clear()
+        Me.WF_SHUKABASHO.Items.Add("")
+        Dim retShukabashoList As DropDownList = CmnLng.getDowpDownNewTankaList("SHUKABASHO")
+        For index As Integer = 0 To retShukabashoList.Items.Count - 1
+            WF_SHUKABASHO.Items.Add(New ListItem(retShukabashoList.Items(index).Text, retShukabashoList.Items(index).Value))
+        Next
 
         '受出荷場所判定区分
-        If I_KBN = "INIT" Then
-            Me.WF_SHUKABASHOCATEGORY.Items.Clear()
-            Me.WF_SHUKABASHOCATEGORY.Items.Add("")
-            Dim retShukabashoCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
-            For index As Integer = 0 To retShukabashoCategoryList.Items.Count - 1
-                WF_SHUKABASHOCATEGORY.Items.Add(New ListItem(retShukabashoCategoryList.Items(index).Text, retShukabashoCategoryList.Items(index).Value))
-            Next
-        End If
+        Me.WF_SHUKABASHOCATEGORY.Items.Clear()
+        Me.WF_SHUKABASHOCATEGORY.Items.Add("")
+        Dim retShukabashoCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
+        For index As Integer = 0 To retShukabashoCategoryList.Items.Count - 1
+            WF_SHUKABASHOCATEGORY.Items.Add(New ListItem(retShukabashoCategoryList.Items(index).Text, retShukabashoCategoryList.Items(index).Value))
+        Next
 
         '届先
         'Me.WF_TODOKECODE.Items.Clear()
@@ -244,14 +231,12 @@ Public Class LNM0017HolidayRateDetail
         'Next
 
         '届先判定区分
-        If I_KBN = "INIT" Then
-            Me.WF_TODOKECATEGORY.Items.Clear()
-            Me.WF_TODOKECATEGORY.Items.Add("")
-            Dim retTodokeCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
-            For index As Integer = 0 To retTodokeCategoryList.Items.Count - 1
-                WF_TODOKECATEGORY.Items.Add(New ListItem(retTodokeCategoryList.Items(index).Text, retTodokeCategoryList.Items(index).Value))
-            Next
-        End If
+        Me.WF_TODOKECATEGORY.Items.Clear()
+        Me.WF_TODOKECATEGORY.Items.Add("")
+        Dim retTodokeCategoryList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "CATEGORY")
+        For index As Integer = 0 To retTodokeCategoryList.Items.Count - 1
+            WF_TODOKECATEGORY.Items.Add(New ListItem(retTodokeCategoryList.Items(index).Text, retTodokeCategoryList.Items(index).Value))
+        Next
 
     End Sub
 
@@ -334,12 +319,6 @@ Public Class LNM0017HolidayRateDetail
 
         'Disabled制御項目
         DisabledKeyItem.Value = work.WF_SEL_ID.Text
-
-        '追加（新規）ではない場合、ドロップダウン（部署、出荷場所）を再作成
-        If Not String.IsNullOrEmpty(work.WF_SEL_TODOKECODE.Text) Then
-            createListBox("ORG")
-            createListBox("SHUKABASHO")
-        End If
 
         '○ サイドメニューへの値設定
         leftmenu.COMPCODE = Master.USERCAMP
@@ -1126,12 +1105,9 @@ Public Class LNM0017HolidayRateDetail
 
         '○ 変更した項目の名称をセット
         Select Case WF_FIELD.Value
-            Case "WF_TODOKECODE_TEXT"      '届先
-                If String.IsNullOrEmpty(WF_TODOKECODE.Text) Then
-                    WF_TODOKECODE_TEXT.Text = ""
-                End If
-
-
+            'Case "TxtDelFlg"      '削除フラグ
+            '    CODENAME_get("DELFLG", RadioDELFLG.SelectedValue, LblDelFlgName.Text, WW_Dummy)
+            '    TxtDelFlg.Focus()
         End Select
 
         '○ メッセージ表示
@@ -1324,7 +1300,7 @@ Public Class LNM0017HolidayRateDetail
         Me.mspShukabashoSingle.InitPopUp()
         Me.mspShukabashoSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspShukabashoSingle.SQL = CmnSearchSQL.GetTankaAvocadoShukabashoSQL(WF_ORDERORGCODE.SelectedValue, WF_TORICODE.SelectedValue)
+        Me.mspShukabashoSingle.SQL = CmnSearchSQL.GetTankaAvocadoShukabashoSQL(WF_ORDERORGCODE.SelectedValue)
 
         Me.mspShukabashoSingle.KeyFieldName = "KEYCODE"
         Me.mspShukabashoSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaAvocadoShukabashoTitle)
@@ -1340,7 +1316,7 @@ Public Class LNM0017HolidayRateDetail
         Me.mspTodokeCodeSingle.InitPopUp()
         Me.mspTodokeCodeSingle.SelectionMode = ListSelectionMode.Single
 
-        Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetTankaAvocadoTodokeSQL(WF_ORDERORGCODE.SelectedValue, WF_TORICODE.SelectedValue)
+        Me.mspTodokeCodeSingle.SQL = CmnSearchSQL.GetTankaAvocadoTodokeSQL(WF_ORDERORGCODE.SelectedValue)
 
         Me.mspTodokeCodeSingle.KeyFieldName = "KEYCODE"
         Me.mspTodokeCodeSingle.DispFieldList.AddRange(CmnSearchSQL.GetTankaAvocadoTodokeTitle)
