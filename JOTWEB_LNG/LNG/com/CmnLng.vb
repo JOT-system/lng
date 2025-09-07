@@ -197,7 +197,7 @@ Public Class CmnLng
     ''' </summary>
     ''' <param name="blnBlank">空白追加フラグ</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownNewTankaList(ByVal prmKeyWard As String, Optional ByVal blnBlank As Boolean = False) As DropDownList
+    Public Shared Function getDowpDownNewTankaList(ByVal prmKeyWard As String, Optional ByVal iTORICODE As String = "", Optional ByVal iORGCODE As String = "", Optional ByVal blnBlank As Boolean = False) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim sqlStat As New StringBuilder
@@ -205,47 +205,51 @@ Public Class CmnLng
         Select Case prmKeyWard
             Case "TORI"
                 sqlStat.AppendLine("SELECT")
-                sqlStat.AppendLine("       LNM6.TORICODE as CODE")
-                sqlStat.AppendLine("      ,LNM6.TORINAME as NAME")
+                sqlStat.AppendLine("       VIW6.TORICODE as CODE")
+                sqlStat.AppendLine("      ,VIW6.TORINAME as NAME")
             Case "ORG"
                 sqlStat.AppendLine("SELECT")
-                sqlStat.AppendLine("       LNM6.ORGCODE as CODE")
-                sqlStat.AppendLine("      ,LNM6.ORGNAME as NAME")
+                sqlStat.AppendLine("       VIW6.ORDERORGCODE as CODE")
+                sqlStat.AppendLine("      ,VIW6.ORDERORGNAME as NAME")
             Case "SHUKABASHO"
                 sqlStat.AppendLine("SELECT")
-                sqlStat.AppendLine("       LNM6.AVOCADOSHUKABASHO as CODE")
-                sqlStat.AppendLine("      ,LNM6.AVOCADOSHUKANAME as NAME")
+                sqlStat.AppendLine("       VIW6.SHUKABASHO as CODE")
+                sqlStat.AppendLine("      ,VIW6.SHUKANAME as NAME")
             Case "TODOKE"
                 sqlStat.AppendLine("SELECT")
-                sqlStat.AppendLine("       LNM6.AVOCADOTODOKECODE as CODE")
-                sqlStat.AppendLine("      ,LNM6.AVOCADOTODOKENAME as NAME")
+                sqlStat.AppendLine("       VIW6.TODOKECODE as CODE")
+                sqlStat.AppendLine("      ,VIW6.TODOKENAME as NAME")
             Case Else
                 sqlStat.AppendLine("SELECT")
-                sqlStat.AppendLine("       LNM6.TORICODE as CODE")
-                sqlStat.AppendLine("      ,LNM6.TORINAME as NAME")
+                sqlStat.AppendLine("       VIW6.TORICODE as CODE")
+                sqlStat.AppendLine("      ,VIW6.TORINAME as NAME")
         End Select
 
-        sqlStat.AppendLine("  FROM LNG.LNM0006_NEWTANKA as LNM6")
+        sqlStat.AppendLine("  FROM LNG.VIW0006_TODOKE as VIW6")
         sqlStat.AppendLine(" WHERE")
-        sqlStat.AppendLine("      LNM6.DELFLG = @DELFLG")
-        sqlStat.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN LNM6.STYMD AND LNM6.ENDYMD")
+        sqlStat.AppendLine("      '1' = '1'")
 
         Select Case prmKeyWard
             Case "TORI"
-                sqlStat.AppendLine(" GROUP BY  LNM6.TORICODE, LNM6.TORINAME")
-                sqlStat.AppendLine(" ORDER BY  LNM6.TORICODE")
+                sqlStat.AppendLine(" GROUP BY  VIW6.TORICODE, VIW6.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  VIW6.TORICODE")
             Case "ORG"
-                sqlStat.AppendLine(" GROUP BY  LNM6.ORGCODE, LNM6.ORGNAME")
-                sqlStat.AppendLine(" ORDER BY  LNM6.ORGCODE")
+                sqlStat.AppendLine(" AND   VIW6.TORICODE like CONCAT(@TORICODE, '%')")
+                sqlStat.AppendLine(" GROUP BY  VIW6.ORDERORGCODE, VIW6.ORDERORGNAME")
+                sqlStat.AppendLine(" ORDER BY  VIW6.ORDERORGCODE")
             Case "SHUKABASHO"
-                sqlStat.AppendLine(" GROUP BY  LNM6.AVOCADOSHUKABASHO, LNM6.AVOCADOSHUKANAME")
-                sqlStat.AppendLine(" ORDER BY  LNM6.AVOCADOSHUKABASHO")
+                sqlStat.AppendLine(" AND   VIW6.TORICODE like CONCAT(@TORICODE, '%')")
+                sqlStat.AppendLine(" AND   VIW6.ORDERORGCODE like CONCAT(@ORDERORGCODE, '%')")
+                sqlStat.AppendLine(" GROUP BY  VIW6.SHUKABASHO, VIW6.SHUKANAME")
+                sqlStat.AppendLine(" ORDER BY  VIW6.SHUKABASHO")
             Case "TODOKE"
-                sqlStat.AppendLine(" GROUP BY  LNM6.AVOCADOTODOKECODE, LNM6.AVOCADOTODOKENAME")
-                sqlStat.AppendLine(" ORDER BY  LNM6.AVOCADOTODOKECODE")
+                sqlStat.AppendLine(" AND   VIW6.TORICODE like CONCAT(@TORICODE, '%')")
+                sqlStat.AppendLine(" AND   VIW6.ORDERORGCODE like CONCAT(@ORDERORGCODE, '%')")
+                sqlStat.AppendLine(" GROUP BY  VIW6.TODOKECODE, VIW6.TODOKENAME")
+                sqlStat.AppendLine(" ORDER BY  VIW6.TODOKECODE")
             Case Else
-                sqlStat.AppendLine(" GROUP BY  LNM6.TORICODE, LNM6.TORINAME")
-                sqlStat.AppendLine(" ORDER BY  LNM6.TORICODE")
+                sqlStat.AppendLine(" GROUP BY  VIW6.TORICODE, VIW6.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  VIW6.TORICODE")
         End Select
 
 
@@ -261,7 +265,8 @@ Public Class CmnLng
                 sqlCon.Open()
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
-                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@TORICODE", MySqlDbType.VarChar).Value = iTORICODE
+                    .Add("@ORDERORGCODE", MySqlDbType.VarChar).Value = iORGCODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
