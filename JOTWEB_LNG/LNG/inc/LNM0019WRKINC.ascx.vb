@@ -384,6 +384,8 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("      VIEW0006.TORICODE like CONCAT(@TORICODE, '%')                                                  ")
         SQLStr.AppendLine(" AND  VIEW0006.ORGCODE  like CONCAT(@ORGCODE, '%')                                                   ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     VIEW0006.KASANORGCODE                                                                           ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),

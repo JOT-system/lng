@@ -193,11 +193,11 @@ function f_CommentCtrlCol() {
 }
 
 //料金設定ボタン押下時
-//function BtnFeeClick(obj, lineCnt, fieldNM) {
-//    document.getElementById("WF_SelectedIndex").value = lineCnt
-//    document.getElementById("WF_ButtonClick").value = "WF_ButtonAddClick";
-//    document.forms[0].submit();
-//}
+function BtnSurchargeFeeClick(obj, lineCnt, fieldNM) {
+    document.getElementById("WF_SelectedIndex").value = lineCnt
+    document.getElementById("WF_ButtonClick").value = "WF_ButtonFeeClick";
+    document.forms[0].submit();
+}
 
 //実勢単価ボタン押下時
 function BtnTankaClick(obj, lineCnt, fieldNM) {

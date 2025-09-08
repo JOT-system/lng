@@ -69,7 +69,7 @@
                                         <b class="calendararea">
                                             <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
                                                 <input type="text" id="WF_StYMD" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_StYMDChange');" data-input>
-                                                <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
+                                                <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle="data-toggle">
                                                     <span class="material-symbols-outlined">calendar_month</span>
                                                 </span>
                                             </b>

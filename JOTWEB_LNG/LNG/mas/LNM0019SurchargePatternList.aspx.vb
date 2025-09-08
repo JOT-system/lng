@@ -112,7 +112,10 @@ Public Class LNM0019SurchargePatternList
                             For index As Integer = 0 To retOrgList.Items.Count - 1
                                 WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
                             Next
-                        Case "WF_ButtonTankaClick"     '実勢単価
+                        Case "WF_ButtonFeeClick"        '料金設定
+                            InputSave()
+                            SurchargeFeeSave()
+                        Case "WF_ButtonTankaClick"      '実勢単価
                             InputSave()
                             DieselPriceSiteSave()
                     End Select
@@ -829,6 +832,52 @@ Public Class LNM0019SurchargePatternList
 
     End Sub
 
+    '選択行の取引先、部門、サーチャージパターン、請求サイクルを保持する
+    Protected Sub SurchargeFeeSave()
+
+        '○ LINECNT取得
+        Dim WW_LineCNT As Integer = 0
+        Try
+            Integer.TryParse(WF_SelectedIndex.Value, WW_LineCNT)
+            WW_LineCNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        work.WF_SEL_LINECNT.Text = LNM0019tbl.Rows(WW_LineCNT)("LINECNT")                               '選択行
+        work.WF_SEL_TORICODE.Text = LNM0019tbl.Rows(WW_LineCNT)("TORICODE")                             '取引先コード
+        work.WF_SEL_TORINAME.Text = LNM0019tbl.Rows(WW_LineCNT)("TORINAME")                             '取引先名称
+        work.WF_SEL_ORGCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("ORGCODE")                               '部門コード
+        work.WF_SEL_ORGNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("ORGNAME")                               '部門名称
+        work.WF_SEL_KASANORGCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("KASANORGCODE")                     '加算先部門コード
+        work.WF_SEL_KASANORGNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("KASANORGNAME")                     '加算先部門名称
+        work.WF_SEL_SURCHARGEPATTERNCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("SURCHARGEPATTERNCODE")     'サーチャージパターンコード
+        work.WF_SEL_SURCHARGEPATTERNNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("SURCHARGEPATTERNNAME")     'サーチャージパターン名
+        work.WF_SEL_BILLINGCYCLE.Text = LNM0019tbl.Rows(WW_LineCNT)("BILLINGCYCLE")                     '請求サイクル
+        work.WF_SEL_BILLINGCYCLENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("BILLINGCYCLENAME")             '請求サイクル名
+        work.WF_SEL_CALCMETHOD.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHOD")                         '距離算定方式
+        work.WF_SEL_CALCMETHODNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHODNAME")                 '距離算定方式名
+        work.WF_SEL_STYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("STYMD")                                   '有効開始日
+        work.WF_SEL_ENDYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("ENDYMD")                                 '有効終了日
+        work.WF_SEL_DIESELPRICESITEID.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEID")           '実勢軽油価格参照先ID
+        work.WF_SEL_DIESELPRICESITENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITENAME")       '実勢軽油価格参照先名
+        work.WF_SEL_DIESELPRICESITEBRANCH.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEBRANCH")   '実勢軽油価格参照先ID枝番
+        work.WF_SEL_DIESELPRICESITEKBNNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
+        work.WF_SEL_DISPLAYNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DISPLAYNAME")                       '実勢軽油価格参照先表示名
+        work.WF_SEL_DELFLG.Text = LNM0019tbl.Rows(WW_LineCNT)("DELFLG")                                 '削除フラグ
+        work.WF_SEL_TIMESTAMP.Text = LNM0019tbl.Rows(WW_LineCNT)("UPDTIMSTP")                           'タイムスタンプ
+
+        '○ 遷移先(登録画面)退避データ保存先の作成
+        WW_CreateXMLSaveFile()
+
+        '○ 画面表示データ保存(遷移先(登録画面)向け)
+        Master.SaveTable(LNM0019tbl, work.WF_SEL_INPTBL.Text)
+
+        '○ 実績単価履歴画面ページへ遷移
+        Server.Transfer("~/LNG/mas/LNT0030SurchargeFee.aspx")
+
+    End Sub
+
     '選択行の軽油価格参照先を保持する
     Protected Sub DieselPriceSiteSave()
 
@@ -841,10 +890,28 @@ Public Class LNM0019SurchargePatternList
             Exit Sub
         End Try
 
+        work.WF_SEL_LINECNT.Text = LNM0019tbl.Rows(WW_LineCNT)("LINECNT")                               '選択行
+        work.WF_SEL_TORICODE.Text = LNM0019tbl.Rows(WW_LineCNT)("TORICODE")                             '取引先コード
+        work.WF_SEL_TORINAME.Text = LNM0019tbl.Rows(WW_LineCNT)("TORINAME")                             '取引先名称
+        work.WF_SEL_ORGCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("ORGCODE")                               '部門コード
+        work.WF_SEL_ORGNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("ORGNAME")                               '部門名称
+        work.WF_SEL_KASANORGCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("KASANORGCODE")                     '加算先部門コード
+        work.WF_SEL_KASANORGNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("KASANORGNAME")                     '加算先部門名称
+        work.WF_SEL_SURCHARGEPATTERNCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("SURCHARGEPATTERNCODE")     'サーチャージパターンコード
+        work.WF_SEL_SURCHARGEPATTERNNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("SURCHARGEPATTERNNAME")     'サーチャージパターン名
+        work.WF_SEL_BILLINGCYCLE.Text = LNM0019tbl.Rows(WW_LineCNT)("BILLINGCYCLE")                     '請求サイクル
+        work.WF_SEL_BILLINGCYCLENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("BILLINGCYCLENAME")             '請求サイクル名
+        work.WF_SEL_CALCMETHOD.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHOD")                         '距離算定方式
+        work.WF_SEL_CALCMETHODNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHODNAME")                 '距離算定方式名
+        work.WF_SEL_STYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("STYMD")                                   '有効開始日
+        work.WF_SEL_ENDYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("ENDYMD")                                 '有効終了日
         work.WF_SEL_DIESELPRICESITEID.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEID")           '実勢軽油価格参照先ID
         work.WF_SEL_DIESELPRICESITENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITENAME")       '実勢軽油価格参照先名
         work.WF_SEL_DIESELPRICESITEBRANCH.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEBRANCH")   '実勢軽油価格参照先ID枝番
         work.WF_SEL_DIESELPRICESITEKBNNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
+        work.WF_SEL_DISPLAYNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("DISPLAYNAME")                       '実勢軽油価格参照先表示名
+        work.WF_SEL_DELFLG.Text = LNM0019tbl.Rows(WW_LineCNT)("DELFLG")                                 '削除フラグ
+        work.WF_SEL_TIMESTAMP.Text = LNM0019tbl.Rows(WW_LineCNT)("UPDTIMSTP")                           'タイムスタンプ
 
         '○ 遷移先(登録画面)退避データ保存先の作成
         WW_CreateXMLSaveFile()
