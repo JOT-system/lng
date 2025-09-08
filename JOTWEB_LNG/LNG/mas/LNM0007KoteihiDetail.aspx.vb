@@ -277,6 +277,10 @@ Public Class LNM0007KoteihiDetail
         'Dim retKasanOrgList As New DropDownList
         'retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG)
         Dim retKasanOrgList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDKASANORG")
+        '★編集の場合(加算先部門を対象の部門のみ選択できるように設定)
+        If work.WF_SEL_LINECNT.Text <> "" Then
+            retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_ORGCODE:=work.WF_SEL_ORGCODE.Text, I_CREATEFLG:=True)
+        End If
         For index As Integer = 0 To retKasanOrgList.Items.Count - 1
             WF_KASANORG.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
         Next
@@ -1697,6 +1701,19 @@ Public Class LNM0007KoteihiDetail
     ''' <param name="resVal">取引(変更)時(WF_SelectTORIChange),部門(変更)時(WF_SelectORGChange),加算先部門(変更)時(WF_SelectKASANORGChange)</param>
     ''' <remarks></remarks>
     Protected Sub WF_SelectFIELD_CHANGE(ByVal resVal As String)
+        '★編集の場合(非活性の場合、値がきえてしまうので再設定)
+        If work.WF_SEL_LINECNT.Text <> "" Then
+            '取引先コード、名称
+            WF_TORICODE_TEXT.Text = work.WF_SEL_TORICODE.Text
+            WF_TORINAME.Text = work.WF_SEL_TORINAME.Text
+            '部門コード、名称
+            WF_ORG.SelectedValue = work.WF_SEL_ORGCODE.Text
+            WF_ORGCODE_TEXT.Text = work.WF_SEL_ORGCODE.Text
+            '加算先部門コード、名称
+            WF_KASANORG.SelectedValue = work.WF_SEL_KASANORGCODE.Text
+            WF_KASANORGCODE_TEXT.Text = work.WF_SEL_KASANORGCODE.Text
+        End If
+
         '■取引先(情報)取得
         Dim selectTORI As String = WF_TORICODE_TEXT.Text
         'Dim selectTORI As String = WF_TORI.SelectedValue
@@ -1748,7 +1765,8 @@ Public Class LNM0007KoteihiDetail
         '〇部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_CREATEFLG:=True)
+        'retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
         If selectTORI <> "" AndAlso retOrgList.Items.Count = 0 Then
             selectORG = ""              '-- 部門(表示)初期化
             selectindexORG = 0          '-- 部門(INDEX)初期化

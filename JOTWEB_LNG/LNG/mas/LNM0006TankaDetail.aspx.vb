@@ -1795,7 +1795,8 @@ Public Class LNM0006TankaDetail
         '〇部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_SHUKABASHO:=selectSHUKA, I_CREATEFLG:=True)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_CREATEFLG:=True)
+        'retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_SHUKABASHO:=selectSHUKA, I_CREATEFLG:=True)
         If selectTORI <> "" AndAlso retOrgList.Items.Count = 0 Then
             selectORG = ""              '-- 部門(表示)初期化
             selectindexORG = 0          '-- 部門(INDEX)初期化
