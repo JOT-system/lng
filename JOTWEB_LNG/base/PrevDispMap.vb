@@ -53,6 +53,11 @@ Public Module PrevDispMap
         Public Const LNT0002D As String = "ASP.LNG_SEIKYU_LNT0002SEIKYUDETAILADD_ASPX"
 
         ''' <summary>
+        ''' サーチャージ料金
+        ''' </summary>
+        Public Const LNT0030L As String = "ASP.LNG_MAS_LNT0030SURCHARGEFEE_ASPX"
+
+        ''' <summary>
         ''' 実績単価履歴
         ''' </summary>
         Public Const LNT0031L As String = "ASP.LNG_MAS_LNT0031DIESELPRICEHIST_ASPX"
