@@ -241,6 +241,7 @@
     <Content Include="LNG\css\LNM0006D.css" />
     <Content Include="LNG\css\LNM0019H.css" />
     <Content Include="LNG\css\LNM0006H.css" />
+    <Content Include="LNG\css\LNT0030L.css" />
     <Content Include="LNG\css\LNT0031L.css" />
     <Content Include="LNG\css\LNM0019L.css" />
     <Content Include="LNG\css\LNM0006L.css" />
@@ -316,6 +317,7 @@
     <Content Include="LNG\inc\GRC0001TILESELECTORWRKINC.ascx" />
     <Content Include="LNG\inc\GRC0002SELECTIONPOPUPWORKINC.ascx" />
     <Content Include="LNG\inc\GRM00001WRKINC.ascx" />
+    <Content Include="LNG\inc\LNT0030WRKINC.ascx" />
     <Content Include="LNG\inc\LNT0031WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0019WRKINC.ascx" />
     <Content Include="LNG\inc\LNM0006WRKINC.ascx" />
@@ -332,6 +334,8 @@
     <Content Include="LNG\mas\LNM0006TankaDetail.aspx" />
     <Content Include="LNG\mas\LNM0019SurchargePatternHistory.aspx" />
     <Content Include="LNG\mas\LNM0006TankaHistory.aspx" />
+    <Content Include="LNG\mas\LNT0030SurchargeFee.aspx" />
+    <Content Include="LNG\script\LNT0030L.js" />
     <Content Include="LNG\script\LNT0031L.js" />
     <Content Include="LNG\mas\LNT0031DieselPriceHist.aspx" />
     <Content Include="LNG\mas\LNM0019SurchargePatternList.aspx" />
@@ -585,6 +589,13 @@
       <DependentUpon>GRM00001WRKINC.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="LNG\inc\LNT0030WRKINC.ascx.designer.vb">
+      <DependentUpon>LNT0030WRKINC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\inc\LNT0030WRKINC.ascx.vb">
+      <DependentUpon>LNT0030WRKINC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="LNG\inc\LNT0031WRKINC.ascx.designer.vb">
       <DependentUpon>LNT0031WRKINC.ascx</DependentUpon>
     </Compile>
@@ -698,6 +709,13 @@
     </Compile>
     <Compile Include="LNG\mas\LNM0006TankaHistory.aspx.vb">
       <DependentUpon>LNM0006TankaHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LNG\mas\LNT0030SurchargeFee.aspx.designer.vb">
+      <DependentUpon>LNT0030SurchargeFee.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LNG\mas\LNT0030SurchargeFee.aspx.vb">
+      <DependentUpon>LNT0030SurchargeFee.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="LNG\mas\LNT0031DieselPriceHist.aspx.designer.vb">
