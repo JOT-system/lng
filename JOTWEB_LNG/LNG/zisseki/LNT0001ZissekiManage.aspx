@@ -48,7 +48,7 @@
                         <div class="actionButtonBox">
                             <div class="rightSide">
                                 <input type="button" id="WF_ButtonZisseki" class="btn-sticky btn-action" value="実績取込" onclick="ButtonClick('WF_ButtonZisseki');" />
-                                <input type="button" id="WF_ButtonInvoice" class="btn-sticky btn-action" value="請求書出力" onclick="ButtonClick('WF_ButtonInvoice');" />
+                                <input type="button" id="WF_ButtonInvoice" class="btn-sticky btn-action" value="輸送費明細出力" onclick="ButtonClick('WF_ButtonInvoice');" />
                             </div>
                         </div>
                     </div>
