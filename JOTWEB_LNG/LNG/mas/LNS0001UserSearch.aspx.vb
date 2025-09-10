@@ -110,11 +110,14 @@ Public Class LNS0001UserSearch
             '組織ドロップダウンの生成
             Select Case True
                 Case TxtCampCode.Text <> ""
-                    retOfficeList = CmnLng.getDowpDownFixedList(TxtCampCode.Text, "ORGCODEDROP")
+                    retOfficeList = LNS0001WRKINC.getDowpDownOrgList(TxtCampCode.Text)
+                    'retOfficeList = CmnLng.getDowpDownFixedList(TxtCampCode.Text, "ORGCODEDROP")
                 Case work.WF_SEL_CAMPCODE_S.Text <> ""
-                    retOfficeList = CmnLng.getDowpDownFixedList(work.WF_SEL_CAMPCODE_S.Text, "ORGCODEDROP")
+                    retOfficeList = LNS0001WRKINC.getDowpDownOrgList(work.WF_SEL_CAMPCODE_S.Text)
+                    'retOfficeList = CmnLng.getDowpDownFixedList(work.WF_SEL_CAMPCODE_S.Text, "ORGCODEDROP")
                 Case Else
-                    retOfficeList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
+                    retOfficeList = LNS0001WRKINC.getDowpDownOrgList(Master.USERCAMP)
+                    'retOfficeList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "ORGCODEDROP")
             End Select
 
             If retOfficeList.Items.Count > 0 Then
