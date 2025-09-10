@@ -193,6 +193,7 @@ Public Class LNM0006WRKINC
 
             SQLStr.AppendLine(" WHERE                ")
             SQLStr.AppendFormat("     LNM0006.DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("   AND LNM0006.TORINAME NOT LIKE '%診断%' ")
 
             If Not IsNothing(I_STYMD) AndAlso I_STYMD <> "" Then
                 SQLStr.AppendFormat(" AND '{0}' BETWEEN LNM0006.STYMD AND LNM0006.ENDYMD ", I_STYMD)

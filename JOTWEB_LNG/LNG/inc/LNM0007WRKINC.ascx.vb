@@ -174,6 +174,7 @@ Public Class LNM0007WRKINC
             SQLStr.AppendLine("      ON  LNM0007.ORGCODE = LNS0005.CODE                                                             ")
 
             SQLStr.AppendLine(" WHERE 1=1 ")
+            SQLStr.AppendLine("   AND TORINAME NOT LIKE '%診断%' ")
         Else
             SQLStr.AppendLine("SELECT ")
             SQLStr.AppendLine("       TORICODE ")

@@ -261,6 +261,7 @@ Public Class LNM0014WRKINC
 
             SQLStr.AppendLine(" WHERE                ")
             SQLStr.AppendFormat("     DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+            SQLStr.AppendLine("   AND TORINAME NOT LIKE '%診断%' ")
         Else
             SQLStr.AppendLine("SELECT ")
             SQLStr.AppendLine("       TORICODE ")

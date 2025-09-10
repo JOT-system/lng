@@ -858,7 +858,8 @@ Public Class LNM0006TankaList
         '〇荷主
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
-        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
+        retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
+        'retToriList = LNM0006WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
         '★ドロップダウンリスト選択(荷主)の場合
         If retToriList.Items(0).Text <> "全て表示" Then
             WF_TORI.Items.Add(New ListItem("全て表示", ""))
@@ -873,7 +874,8 @@ Public Class LNM0006TankaList
         '〇部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI)
+        'retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_TODOKECODE:="", I_SHUKABASHO:=selectDEPARTURE)
         '★ドロップダウンリスト選択(部門)の場合
         If retOrgList.Items(0).Text <> "全て表示" Then
             WF_ORG.Items.Add(New ListItem("全て表示", ""))

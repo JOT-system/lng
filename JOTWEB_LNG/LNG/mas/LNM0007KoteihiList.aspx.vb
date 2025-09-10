@@ -851,7 +851,8 @@ Public Class LNM0007KoteihiList
         '〇荷主
         Me.WF_TORI.Items.Clear()
         Dim retToriList As New DropDownList
-        retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
+        retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+        'retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
         '★ドロップダウンリスト選択(荷主)の場合
         If retToriList.Items(0).Text <> "全て表示" Then
             WF_TORI.Items.Add(New ListItem("全て表示", ""))
@@ -866,7 +867,8 @@ Public Class LNM0007KoteihiList
         '〇部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
+        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI)
+        'retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_SEASONKBN:=selectSEASON)
         '★ドロップダウンリスト選択(部門)の場合
         If retOrgList.Items(0).Text <> "全て表示" Then
             WF_ORG.Items.Add(New ListItem("全て表示", ""))
