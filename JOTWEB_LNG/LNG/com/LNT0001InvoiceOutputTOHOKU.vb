@@ -889,11 +889,13 @@ Public Class LNT0001InvoiceOutputTOHOKU
         SQLStr &= String.Format("          A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
         SQLStr &= String.Format("      AND A01.TORICODE = '{0}' ", "0175400000")
         SQLStr &= String.Format("      AND A01.ORDERORG IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format("      AND A01.ZISSEKI <> '{0}' ", "0")
+        SQLStr &= String.Format("      AND A01.LOADUNLOTYPE <> '{0}' ", "積込")
         SQLStr &= String.Format("      AND DATE_FORMAT(A01.TODOKEDATE,'%Y/%m') = '{0}' ", TaishoYm)
         SQLStr &= "         GROUP BY "
         SQLStr &= "          A01.TODOKEDATE "
         SQLStr &= "         ,A01.GYOMUTANKNUM "
-        SQLStr &= "         HAVING COUNT(*) >= 4 "
+        SQLStr &= "         HAVING COUNT(DISTINCT STAFFCODE) > 1 "
         SQLStr &= "     )A02 "
         SQLStr &= "     GROUP BY "
         SQLStr &= "          A02.GYOMUTANKNUM "
