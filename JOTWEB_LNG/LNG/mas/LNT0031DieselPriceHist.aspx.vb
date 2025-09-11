@@ -32,8 +32,8 @@ Public Class LNT0031DieselPriceHist
     Private Const CONST_DISPROWCOUNT As Integer = 19                '1画面表示用
     Private Const CONST_SCROLLCOUNT As Integer = 19                 'マウススクロール時稼働行数
 
-    Private Const CONST_BTNLOCK As String = "<div><input  id=""btnLock{0}"" type=""image"" src=""../img/lockkey.png"" width=""20px"" height=""20px"" /></div>"
-    Private Const CONST_BTNUNLOCK As String = "<div><input  id=""btnLock{0}"" type=""image"" src=""../img/unlockkey.png"" width=""20px"" height=""20px"" /></div>"
+    Private Const CONST_BTNLOCK As String = "<div><img  id=""btnLock{0}"" type=""image"" src=""../img/lockkey.png"" width=""20px"" height=""20px"" /></div>"
+    Private Const CONST_BTNUNLOCK As String = "<div><img  id=""btnLock{0}"" type=""image"" src=""../img/unlockkey.png"" width=""20px"" height=""20px"" /></div>"
     Private Const CONST_BTNDEL As String = "<div><input class=""btn-sticky"" id=""btnDel{0}""　type=""button"" value=""削除"" readonly /></div>"
 
     '〇 帳票用
