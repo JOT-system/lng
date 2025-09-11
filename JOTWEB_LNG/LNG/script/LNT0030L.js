@@ -4,7 +4,7 @@ function InitDisplay() {
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
-    // テキストボックスEnter縦移動イベントバインド(必ず使用有無変更「DispFormat」の後で行う)
+    // テキストボックスEnter横移動イベントバインド(必ず使用有無変更「DispFormat」の後で行う)
     setTimeout(function () {
         // テキストボックスEnter横移動イベントバインド
         commonBindEnterToHorizontalTabStep();
