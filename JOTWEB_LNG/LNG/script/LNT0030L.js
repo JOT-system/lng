@@ -6,8 +6,8 @@ function InitDisplay() {
 
     // テキストボックスEnter縦移動イベントバインド(必ず使用有無変更「DispFormat」の後で行う)
     setTimeout(function () {
-        // テキストボックスEnter縦移動イベントバインド
-        commonBindEnterToVerticalTabStep();
+        // テキストボックスEnter横移動イベントバインド
+        commonBindEnterToHorizontalTabStep();
     }, 100);
 
     // カレンダー表示
@@ -293,11 +293,11 @@ function SelectCheckBox(obj, lineCnt) {
 var commonKeyEnterProgress = false; // これは関数(function)外部に設定(グローバルスコープの変数です)
 
 /**
- *  リストテーブルのEnterキーで下のテキストにタブを移すイベントバインド
+ *  リストテーブルのEnterキーで横のテキストにタブを移すイベントバインド
  * @return {undefined} なし
  * @description 
  */
-function commonBindEnterToVerticalTabStep() {
+function commonBindEnterToHorizontalTabStep() {
     let generatedTables = document.querySelectorAll("div[data-generated='1']");
     if (generatedTables === null) {
         return;
@@ -354,7 +354,7 @@ function commonBindEnterToVerticalTabStep() {
                     if (event.key === 'Enter') {
                         if (commonKeyEnterProgress === false) {
                             commonKeyEnterProgress = true; //Enter連打抑止
-                            commonListEnterToVerticalTabStep(textBox, panelId);
+                            commonListEnterToHorizontalTabStep(textBox, panelId);
                             return setTimeout(function () {
                                 commonKeyEnterProgress = false;　///Enter連打抑止
                             }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
@@ -366,13 +366,13 @@ function commonBindEnterToVerticalTabStep() {
     }
 }
 /**
- *  リストテーブルのEnterキーで下のテキストにタブを移すイベント
+ *  リストテーブルのEnterキーで横のテキストにタブを移すイベント
  * @param {Node} textBox テキストボックス
  * @param {string} panelId テキストボックス
  * @return {undefined} なし
  * @description 
  */
-function commonListEnterToVerticalTabStep(textBox, panelId) {
+function commonListEnterToHorizontalTabStep(textBox, panelId) {
     let curLineCnt = Number(textBox.attributes.getNamedItem("rownum").value);
     let fieldName = textBox.dataset.fieldName;
     let nextTextFieldName = textBox.dataset.nextTextFieldName;
