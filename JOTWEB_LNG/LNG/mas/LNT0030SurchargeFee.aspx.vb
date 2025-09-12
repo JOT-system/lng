@@ -390,6 +390,14 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine(" AND LNT0030.DELFLG = '0'                                                                            ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
         SQLStr.AppendLine("     LNT0030.SEIKYUYM                                                                                ")
+        SQLStr.AppendLine("    ,LNT0030.TORICODE                                                                                ")
+        SQLStr.AppendLine("    ,LNT0030.ORGCODE                                                                                 ")
+        SQLStr.AppendLine("    ,LNT0030.PATTERNCODE                                                                             ")
+        SQLStr.AppendLine("    ,LNT0030.AVOCADOSHUKABASHO                                                                       ")
+        SQLStr.AppendLine("    ,LNT0030.AVOCADOTODOKECODE                                                                       ")
+        SQLStr.AppendLine("    ,LNT0030.SHAGATA                                                                                 ")
+        SQLStr.AppendLine("    ,LNT0030.SHABARA                                                                                 ")
+        SQLStr.AppendLine("    ,LNT0030.SHABAN                                                                                  ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -3162,6 +3170,9 @@ Public Class LNT0030SurchargeFee
         SQLStr.Append("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
         SQLStr.Append("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.Append("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
+        SQLStr.Append("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
+        SQLStr.Append("    AND  SHABARA                           = @SHABARA ")
+        SQLStr.Append("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -3171,6 +3182,9 @@ Public Class LNT0030SurchargeFee
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
                 Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar)        '出荷場所コード
                 Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar)        '届先コード
+                Dim P_SHAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SHAGATA", MySqlDbType.VarChar)                            '車型
+                Dim P_SHABARA As MySqlParameter = SQLcmd.Parameters.Add("@SHABARA", MySqlDbType.Decimal)                            '車腹
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar)                              '車番
 
                 Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)                                     '更新年月日
                 Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar, 20)                                '更新ユーザーＩＤ
@@ -3183,10 +3197,13 @@ Public Class LNT0030SurchargeFee
                 P_PATTERNCODE.Value = WW_ROW("PATTERNCODE")                     'パターンコード
                 P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO")         '出荷場所コード
                 P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE")         '届先コード
-                P_UPDYMD.Value = WW_DATENOW                                 '更新年月日
-                P_UPDUSER.Value = Master.USERID                             '更新ユーザーＩＤ
-                P_UPDTERMID.Value = Master.USERTERMID                       '更新端末
-                P_UPDPGID.Value = Me.GetType().BaseType.Name                '更新プログラムＩＤ
+                P_SHAGATA.Value = WW_ROW("SHAGATA")                             '車型
+                P_SHABARA.Value = WW_ROW("SHABARA")                             '車腹
+                P_SHABAN.Value = WW_ROW("SHABAN")                               '車番
+                P_UPDYMD.Value = WW_DATENOW                                     '更新年月日
+                P_UPDUSER.Value = Master.USERID                                 '更新ユーザーＩＤ
+                P_UPDTERMID.Value = Master.USERTERMID                           '更新端末
+                P_UPDPGID.Value = Me.GetType().BaseType.Name                    '更新プログラムＩＤ
 
                 '登録
                 SQLcmd.CommandTimeout = 300
@@ -3895,6 +3912,9 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
+        SQLStr.AppendLine("    AND  SHABARA                           = @SHABARA ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -3904,6 +3924,9 @@ Public Class LNT0030SurchargeFee
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
                 Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar)        '出荷場所コード
                 Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar)        '届先コード
+                Dim P_SHAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SHAGATA", MySqlDbType.VarChar)                            '車型
+                Dim P_SHABARA As MySqlParameter = SQLcmd.Parameters.Add("@SHABARA", MySqlDbType.Decimal)                            '車腹
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar)                              '車番
 
                 P_SEIKYUYM.Value = WW_ROW("SEIKYUYM")                           '請求年月
                 P_TORICODE.Value = WW_ROW("TORICODE")                           '取引先コード
@@ -3911,6 +3934,9 @@ Public Class LNT0030SurchargeFee
                 P_PATTERNCODE.Value = WW_ROW("PATTERNCODE")                     'パターンコード
                 P_AVOCADOSHUKABASHO.Value = WW_ROW("AVOCADOSHUKABASHO")         '出荷場所コード
                 P_AVOCADOTODOKECODE.Value = WW_ROW("AVOCADOTODOKECODE")         '届先コード
+                P_SHAGATA.Value = WW_ROW("SHAGATA")                             '車型
+                P_SHABARA.Value = WW_ROW("SHABARA")                             '車腹
+                P_SHABAN.Value = WW_ROW("SHABAN")                               '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
                     Dim WW_Tbl = New DataTable

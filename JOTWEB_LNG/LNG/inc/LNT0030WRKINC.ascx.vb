@@ -491,6 +491,10 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
+        SQLStr.AppendLine("    AND  SHABARA                           = @SHABARA ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
+
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -500,6 +504,9 @@ Public Class LNT0030WRKINC
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
                 Dim P_AVOCADOSHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOSHUKABASHO", MySqlDbType.VarChar)        '出荷場所コード
                 Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar)        '届先コード
+                Dim P_SHAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SHAGATA", MySqlDbType.VarChar)                            '車型
+                Dim P_SHABARA As MySqlParameter = SQLcmd.Parameters.Add("@SHABARA", MySqlDbType.Decimal)                            '車腹
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.Decimal)                              '車番
 
                 P_SEIKYUYM.Value = I_ROW("SEIKYUYM")                           '請求年月
                 P_TORICODE.Value = I_ROW("TORICODE")                           '取引先コード
@@ -507,6 +514,9 @@ Public Class LNT0030WRKINC
                 P_PATTERNCODE.Value = I_ROW("PATTERNCODE")                     'パターンコード
                 P_AVOCADOSHUKABASHO.Value = I_ROW("AVOCADOSHUKABASHO")         '出荷場所コード
                 P_AVOCADOTODOKECODE.Value = I_ROW("AVOCADOTODOKECODE")         '届先コード
+                P_SHAGATA.Value = I_ROW("SHAGATA")                             '車型
+                P_SHABARA.Value = I_ROW("SHABARA")                             '車腹
+                P_SHABAN.Value = I_ROW("SHABAN")                               '車番
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
 
