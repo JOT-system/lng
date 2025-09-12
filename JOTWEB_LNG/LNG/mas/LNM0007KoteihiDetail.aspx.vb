@@ -380,15 +380,29 @@ Public Class LNM0007KoteihiDetail
         '季節料金判定終了月日
         TxtSEASONEND.Text = work.WF_SEL_SEASONEND.Text
         '固定費(月額)
-        TxtKOTEIHIM.Text = work.WF_SEL_KOTEIHIM.Text
+        Dim iKoteihiM As Decimal = 0
+        Try
+            iKoteihiM = CDec(work.WF_SEL_KOTEIHIM.Text)
+            TxtKOTEIHIM.Text = work.WF_SEL_KOTEIHIM.Text
+        Catch ex As Exception
+            TxtKOTEIHIM.Text = iKoteihiM
+        End Try
         '固定費(日額)
         TxtKOTEIHID.Text = work.WF_SEL_KOTEIHID.Text
         '回数
         TxtKAISU.Text = work.WF_SEL_KAISU.Text
-        '減額費用
-        TxtGENGAKU.Text = work.WF_SEL_GENGAKU.Text
+        '減額費用(調整額)
+        Dim iTyoseiGaku As Decimal = 0
+        Try
+            iTyoseiGaku = CDec(work.WF_SEL_GENGAKU.Text)
+            TxtGENGAKU.Text = work.WF_SEL_GENGAKU.Text
+        Catch ex As Exception
+            TxtGENGAKU.Text = iTyoseiGaku
+        End Try
         '請求額
-        TxtAMOUNT.Text = work.WF_SEL_AMOUNT.Text
+        Dim iAmount As Decimal = iKoteihiM + iTyoseiGaku
+        TxtAMOUNT.Text = iAmount.ToString()
+        'TxtAMOUNT.Text = work.WF_SEL_AMOUNT.Text
         '勘定科目
         WF_ACCOUNT.SelectedValue = work.WF_SEL_ACCOUNTCODE.Text
         WF_ACCOUNTCODE_TEXT.Text = work.WF_SEL_ACCOUNTCODE.Text
@@ -403,7 +417,7 @@ Public Class LNM0007KoteihiDetail
         TxtBIKOU1.Text = work.WF_SEL_BIKOU1.Text
         '備考2
         TxtBIKOU2.Text = work.WF_SEL_BIKOU2.Text
-        '備考3
+        '備考3(調整理由)
         TxtBIKOU3.Text = work.WF_SEL_BIKOU3.Text
 
         'Disabled制御項目
@@ -637,7 +651,7 @@ Public Class LNM0007KoteihiDetail
                 Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
-                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3(調整理由)
                 Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
                 Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
                 Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
@@ -753,7 +767,7 @@ Public Class LNM0007KoteihiDetail
 
                 P_BIKOU1.Value = LNM0007row("BIKOU1")           '備考1
                 P_BIKOU2.Value = LNM0007row("BIKOU2")           '備考2
-                P_BIKOU3.Value = LNM0007row("BIKOU3")           '備考3
+                P_BIKOU3.Value = LNM0007row("BIKOU3")           '備考3(調整理由)
 
                 P_INITYMD.Value = WW_DateNow                        '登録年月日
                 P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
@@ -1178,7 +1192,7 @@ Public Class LNM0007KoteihiDetail
         Master.EraseCharToIgnore(TxtAMOUNT.Text)  '請求額
         Master.EraseCharToIgnore(TxtBIKOU1.Text)  '備考1
         Master.EraseCharToIgnore(TxtBIKOU2.Text)  '備考2
-        Master.EraseCharToIgnore(TxtBIKOU3.Text)  '備考3
+        Master.EraseCharToIgnore(TxtBIKOU3.Text)  '備考3(調整理由)
 
 
         '○ GridViewから未選択状態で表更新ボタンを押下時の例外を回避する
@@ -1216,21 +1230,21 @@ Public Class LNM0007KoteihiDetail
         LNM0007INProw("SELECT") = 1
         LNM0007INProw("HIDDEN") = 0
 
-        LNM0007INProw("DELFLG") = RadioDELFLG.SelectedValue             '削除フラグ
+        LNM0007INProw("DELFLG") = RadioDELFLG.SelectedValue         '削除フラグ
 
         '更新の場合
         If Not DisabledKeyItem.Value = "" Then
-            LNM0007INProw("TORICODE") = work.WF_SEL_TORICODE.Text     '取引先コード
-            LNM0007INProw("TORINAME") = work.WF_SEL_TORINAME.Text      '取引先名称
-            LNM0007INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text          '部門コード
-            LNM0007INProw("ORGNAME") = work.WF_SEL_ORGNAME.Text           '部門名称
-            LNM0007INProw("TARGETYM") = work.WF_SEL_TARGETYM.Text         '対象年月
-            LNM0007INProw("SEASONKBN") = work.WF_SEL_SEASONKBN.Text           '季節料金判定区分
+            LNM0007INProw("TORICODE") = work.WF_SEL_TORICODE.Text   '取引先コード
+            LNM0007INProw("TORINAME") = work.WF_SEL_TORINAME.Text   '取引先名称
+            LNM0007INProw("ORGCODE") = work.WF_SEL_ORGCODE.Text     '部門コード
+            LNM0007INProw("ORGNAME") = work.WF_SEL_ORGNAME.Text     '部門名称
+            LNM0007INProw("TARGETYM") = work.WF_SEL_TARGETYM.Text   '対象年月
+            LNM0007INProw("SEASONKBN") = work.WF_SEL_SEASONKBN.Text '季節料金判定区分
         Else
-            LNM0007INProw("TORICODE") = WF_TORICODE_TEXT.Text            '取引先コード
+            LNM0007INProw("TORICODE") = WF_TORICODE_TEXT.Text       '取引先コード
             LNM0007INProw("TORINAME") = WF_TORINAME.Text            '取引先名称
-            LNM0007INProw("ORGCODE") = WF_ORG.SelectedValue           '部門コード
-            LNM0007INProw("ORGNAME") = WF_ORG.SelectedItem           '部門名称
+            LNM0007INProw("ORGCODE") = WF_ORG.SelectedValue         '部門コード
+            LNM0007INProw("ORGNAME") = WF_ORG.SelectedItem          '部門名称
 
             '対象年月
             If Not WF_TARGETYM.Value = "" Then
@@ -1239,17 +1253,17 @@ Public Class LNM0007KoteihiDetail
                 LNM0007INProw("TARGETYM") = WF_TARGETYM.Value
             End If
 
-            LNM0007INProw("SEASONKBN") = WF_SEASONKBN.SelectedValue            '季節料金判定区分
+            LNM0007INProw("SEASONKBN") = WF_SEASONKBN.SelectedValue '季節料金判定区分
         End If
 
-        LNM0007INProw("KASANORGCODE") = WF_KASANORG.SelectedValue            '加算先部門コード
-        LNM0007INProw("KASANORGNAME") = WF_KASANORG.SelectedItem            '加算先部門名称
+        LNM0007INProw("KASANORGCODE") = WF_KASANORG.SelectedValue   '加算先部門コード
+        LNM0007INProw("KASANORGNAME") = WF_KASANORG.SelectedItem    '加算先部門名称
 
-        LNM0007INProw("SYABAN") = TxtSYABAN.Text            '車番
-        LNM0007INProw("RIKUBAN") = TxtRIKUBAN.Text            '陸事番号
-        LNM0007INProw("SYAGATA") = WF_SYAGATA.SelectedValue           '車型
-        LNM0007INProw("SYAGATANAME") = WF_SYAGATA.SelectedItem            '車型名
-        LNM0007INProw("SYABARA") = TxtSYABARA.Text            '車腹
+        LNM0007INProw("SYABAN") = TxtSYABAN.Text                    '車番
+        LNM0007INProw("RIKUBAN") = TxtRIKUBAN.Text                  '陸事番号
+        LNM0007INProw("SYAGATA") = WF_SYAGATA.SelectedValue         '車型
+        LNM0007INProw("SYAGATANAME") = WF_SYAGATA.SelectedItem      '車型名
+        LNM0007INProw("SYABARA") = TxtSYABARA.Text                  '車腹
 
 
         '季節料金判定開始月日
@@ -1266,30 +1280,47 @@ Public Class LNM0007KoteihiDetail
             LNM0007INProw("SEASONEND") = TxtSEASONEND.Text
         End If
 
-        LNM0007INProw("KOTEIHIM") = TxtKOTEIHIM.Text            '固定費(月額)
-        LNM0007INProw("KOTEIHID") = TxtKOTEIHID.Text            '固定費(日額)
-        LNM0007INProw("KAISU") = TxtKAISU.Text            '回数
-        LNM0007INProw("GENGAKU") = TxtGENGAKU.Text            '減額費用
-        LNM0007INProw("AMOUNT") = TxtAMOUNT.Text            '請求額
+        '固定費(月額)
+        LNM0007INProw("KOTEIHIM") = TxtKOTEIHIM.Text
+        Dim iKoteihiM As Decimal = 0
+        Try
+            iKoteihiM = CDec(TxtKOTEIHIM.Text)
+        Catch ex As Exception
+        End Try
+        LNM0007INProw("KOTEIHID") = TxtKOTEIHID.Text                '固定費(日額)
+        LNM0007INProw("KAISU") = TxtKAISU.Text                      '回数
 
-        LNM0007INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue           '勘定科目コード
-        LNM0007INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem            '勘定科目名
+        '減額費用(調整額)
+        LNM0007INProw("GENGAKU") = TxtGENGAKU.Text
+        Dim iTyoseiGaku As Decimal = 0
+        Try
+            iTyoseiGaku = CDec(TxtGENGAKU.Text)
+        Catch ex As Exception
+        End Try
+
+        '請求額
+        Dim iAmount As Decimal = iKoteihiM + iTyoseiGaku
+        LNM0007INProw("AMOUNT") = iAmount.ToString()
+        'LNM0007INProw("AMOUNT") = TxtAMOUNT.Text
+
+        LNM0007INProw("ACCOUNTCODE") = WF_ACCOUNT.SelectedValue     '勘定科目コード
+        LNM0007INProw("ACCOUNTNAME") = WF_ACCOUNT.SelectedItem      '勘定科目名
 
         If Not WF_ACCOUNT.SelectedValue = "" Then
-            LNM0007INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue           'セグメントコード
-            LNM0007INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem            'セグメント名
+            LNM0007INProw("SEGMENTCODE") = WF_SEGMENT.SelectedValue 'セグメントコード
+            LNM0007INProw("SEGMENTNAME") = WF_SEGMENT.SelectedItem  'セグメント名
         Else
-            LNM0007INProw("SEGMENTCODE") = ""           'セグメントコード
-            LNM0007INProw("SEGMENTNAME") = ""            'セグメント名
+            LNM0007INProw("SEGMENTCODE") = ""                       'セグメントコード
+            LNM0007INProw("SEGMENTNAME") = ""                       'セグメント名
         End If
 
-        LNM0007INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text            '割合JOT
-        LNM0007INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text            '割合ENEX
+        LNM0007INProw("JOTPERCENTAGE") = TxtJOTPERCENTAGE.Text      '割合JOT
+        LNM0007INProw("ENEXPERCENTAGE") = TxtENEXPERCENTAGE.Text    '割合ENEX
 
 
-        LNM0007INProw("BIKOU1") = TxtBIKOU1.Text            '備考1
-        LNM0007INProw("BIKOU2") = TxtBIKOU2.Text            '備考2
-        LNM0007INProw("BIKOU3") = TxtBIKOU3.Text            '備考3
+        LNM0007INProw("BIKOU1") = TxtBIKOU1.Text                    '備考1
+        LNM0007INProw("BIKOU2") = TxtBIKOU2.Text                    '備考2
+        LNM0007INProw("BIKOU3") = TxtBIKOU3.Text                    '備考3(調整理由)
 
 
         '○ チェック用テーブルに登録する
@@ -1344,7 +1375,7 @@ Public Class LNM0007KoteihiDetail
                     LNM0007row("ENEXPERCENTAGE") = LNM0007INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                     LNM0007row("BIKOU1") = LNM0007INProw("BIKOU1") AndAlso                                '備考1
                     LNM0007row("BIKOU2") = LNM0007INProw("BIKOU2") AndAlso                                '備考2
-                    LNM0007row("BIKOU3") = LNM0007INProw("BIKOU3") Then                                '備考3
+                    LNM0007row("BIKOU3") = LNM0007INProw("BIKOU3") Then                                '備考3(調整理由)
 
                     ' 変更がない時は、入力変更フラグをOFFにする
                     WW_InputChangeFlg = False
@@ -1440,7 +1471,7 @@ Public Class LNM0007KoteihiDetail
         TxtENEXPERCENTAGE.Text = ""                    '割合ENEX
         TxtBIKOU1.Text = ""                    '備考1
         TxtBIKOU2.Text = ""                    '備考2
-        TxtBIKOU3.Text = ""                    '備考3
+        TxtBIKOU3.Text = ""                    '備考3(調整理由)
 
     End Sub
 
@@ -2125,10 +2156,10 @@ Public Class LNM0007KoteihiDetail
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
             End If
-            ' 備考3(バリデーションチェック)
+            ' 備考3(調整理由)(バリデーションチェック)
             Master.CheckField(Master.USERCAMP, "BIKOU3", LNM0007INProw("BIKOU3"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
             If Not isNormal(WW_CS0024FCheckerr) Then
-                WW_CheckMES1 = "・備考3エラーです。"
+                WW_CheckMES1 = "・調整理由エラーです。"
                 WW_CheckMES2 = WW_CS0024FCheckReport
                 WW_CheckERR(WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
@@ -2325,7 +2356,7 @@ Public Class LNM0007KoteihiDetail
                                 LNM0007row("ENEXPERCENTAGE") = LNM0007INProw("ENEXPERCENTAGE") AndAlso                                '割合ENEX
                                 LNM0007row("BIKOU1") = LNM0007INProw("BIKOU1") AndAlso                                '備考1
                                 LNM0007row("BIKOU2") = LNM0007INProw("BIKOU2") AndAlso                                '備考2
-                                LNM0007row("BIKOU3") = LNM0007INProw("BIKOU3") AndAlso                                '備考3
+                                LNM0007row("BIKOU3") = LNM0007INProw("BIKOU3") AndAlso                                '備考3(調整理由)
                                 Not C_LIST_OPERATION_CODE.UPDATING.Equals(LNM0007row("OPERATION")) Then
 
                         ' 変更がない時は「操作」の項目は空白にする

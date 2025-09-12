@@ -133,3 +133,15 @@ function f_seasonkbn() {
             break;
     }
 }
+
+function reAmount() {
+    // 月額固定費
+    let koteihiM = +document.getElementById("TxtKOTEIHIM").value;   // 数値に変換
+    document.getElementById("TxtKOTEIHIM").value = koteihiM;
+    // 調整額
+    let gengaku = +document.getElementById("TxtGENGAKU").value;     // 数値に変換
+    document.getElementById("TxtGENGAKU").value = gengaku;
+    // 月額固定費 + 調整額
+    let amount = parseFloat(koteihiM) + parseFloat(gengaku);
+    document.getElementById("TxtAMOUNT").value = amount
+}

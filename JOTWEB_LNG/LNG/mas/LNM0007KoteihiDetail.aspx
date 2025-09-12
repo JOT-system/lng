@@ -176,7 +176,7 @@
                                 <span>
                                     <!-- 月額固定費 -->
                                     <asp:Label ID="WF_KOTEIHIM_L" runat="server" Text="固定費(月額)" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtKOTEIHIM" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
+                                    <asp:TextBox ID="TxtKOTEIHIM" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8" onchange="reAmount()"></asp:TextBox>
                                     <asp:Label ID="WF_KOTEIHIM_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <!-- 日額固定費 -->
                                     <asp:Label ID="WF_KOTEIHID_L" runat="server" Text="固定費(日額)" CssClass="WF_TEXT_LEFT"></asp:Label>
@@ -189,8 +189,8 @@
                                 <span>
                                     <asp:Label ID="WF_KAISU_L" runat="server" Text="回数" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtKAISU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="3"　Enabled="false"></asp:TextBox>
-                                    <asp:Label ID="WF_GENGAKU_L" runat="server" Text="減額費用" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="TxtGENGAKU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
+                                    <asp:Label ID="WF_GENGAKU_L" runat="server" Text="調整額" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtGENGAKU" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="true" onchange="reAmount()"></asp:TextBox>
                                     <asp:Label ID="WF_GENGAKU_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
@@ -247,7 +247,7 @@
                             <p id="TYPE_I_LINE_26">
                                 <!-- 備考3 -->
                                 <span>
-                                    <asp:Label ID="WF_BIKOU3_L" runat="server" Text="備考3" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:Label ID="WF_BIKOU3_L" runat="server" Text="調整理由" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU3" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                 </span>
                             </p>

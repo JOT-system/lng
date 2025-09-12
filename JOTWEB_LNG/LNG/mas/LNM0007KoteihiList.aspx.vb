@@ -523,10 +523,10 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONKBN), '')                                   AS SEASONKBN              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONSTART), '')                                 AS SEASONSTART              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.SEASONEND), '')                                   AS SEASONEND              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KOTEIHIM), '')                                    AS KOTEIHIM              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KOTEIHIM), 0)                                    AS KOTEIHIM              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KOTEIHID), '')                                    AS KOTEIHID              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.KAISU), '')                                       AS KAISU              ")
-        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.GENGAKU), '')                                     AS GENGAKU              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.GENGAKU), 0)                                     AS GENGAKU              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.AMOUNT), '')                                      AS AMOUNT              ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.ACCOUNTCODE), '')                                 AS ACCOUNTCODE         ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0007.ACCOUNTNAME), '')                                 AS ACCOUNTNAME         ")
@@ -548,7 +548,7 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("     END AS SCRSYABARA                                                                               ")
         '固定費(月額)
         SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN ''                                                ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHIM), '') = '' THEN 0                                                ")
         SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHIM,0)                                                                       ")
         SQLStr.AppendLine("     END AS SCRKOTEIHIM                                                                              ")
         '固定費(日額)
@@ -556,9 +556,9 @@ Public Class LNM0007KoteihiList
         SQLStr.AppendLine("      WHEN COALESCE(RTRIM(KOTEIHID), '') = '' THEN ''                                                ")
         SQLStr.AppendLine("      ELSE  FORMAT(KOTEIHID,0)                                                                       ")
         SQLStr.AppendLine("     END AS SCRKOTEIHID                                                                              ")
-        '減額費用
+        '減額費用(調整額)
         SQLStr.AppendLine("   , CASE                                                                                            ")
-        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GENGAKU), '') = '' THEN ''                                                 ")
+        SQLStr.AppendLine("      WHEN COALESCE(RTRIM(GENGAKU), '') = '' THEN 0                                                 ")
         SQLStr.AppendLine("      ELSE  FORMAT(GENGAKU,0)                                                                        ")
         SQLStr.AppendLine("     END AS SCRGENGAKU                                                                               ")
         '請求額
@@ -720,6 +720,22 @@ Public Class LNM0007KoteihiList
                         Case Else : LNM0007row("SCRENEXPERCENTAGE") = LNM0007row("ENEXPERCENTAGE").ToString & "%"
                     End Select
 
+                    '固定費(月)
+                    Dim iKoteihiM As Decimal = 0
+                    Try
+                        iKoteihiM = CDec(LNM0007row("SCRKOTEIHIM").ToString)
+                    Catch ex As Exception
+                    End Try
+                    '減額費用(調整額)
+                    Dim iTyoseiGaku As Decimal = 0
+                    Try
+                        iTyoseiGaku = CDec(LNM0007row("SCRGENGAKU").ToString)
+                    Catch ex As Exception
+                    End Try
+                    '請求額
+                    Dim iAmount As Decimal = iKoteihiM + iTyoseiGaku
+                    LNM0007row("SCRAMOUNT") = iAmount.ToString("#,0")
+
                 Next
             End Using
 
@@ -783,7 +799,7 @@ Public Class LNM0007KoteihiList
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_ENEXPERCENTAGE.Text)    '割合ENEX
         work.WF_SEL_BIKOU1.Text = ""                                                      '備考1
         work.WF_SEL_BIKOU2.Text = ""                                                      '備考2
-        work.WF_SEL_BIKOU3.Text = ""                                                      '備考3
+        work.WF_SEL_BIKOU3.Text = ""                                                      '備考3(調整理由)
 
         work.WF_SEL_TIMESTAMP.Text = ""         　                               'タイムスタンプ
         work.WF_SEL_DETAIL_UPDATE_MESSAGE.Text = ""                              '詳細画面更新メッセージ
@@ -1217,7 +1233,7 @@ Public Class LNM0007KoteihiList
         work.WF_SEL_ENEXPERCENTAGE.Text = LNM0007tbl.Rows(WW_LineCNT)("ENEXPERCENTAGE")             '割合ENEX
         work.WF_SEL_BIKOU1.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU1")              '備考1
         work.WF_SEL_BIKOU2.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU2")              '備考2
-        work.WF_SEL_BIKOU3.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU3")              '備考3
+        work.WF_SEL_BIKOU3.Text = LNM0007tbl.Rows(WW_LineCNT)("BIKOU3")              '備考3(調整理由)
 
         work.WF_SEL_DELFLG.Text = LNM0007tbl.Rows(WW_LineCNT)("DELFLG")          '削除フラグ
         work.WF_SEL_TIMESTAMP.Text = LNM0007tbl.Rows(WW_LineCNT)("UPDTIMSTP")    'タイムスタンプ
@@ -1591,7 +1607,8 @@ Public Class LNM0007KoteihiList
         sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SEASONKBN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '季節料金判定区分
 
         '入力不要列網掛け
-        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '車型名
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.SYAGATANAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY)  '車型名
+        sheet.Columns(LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY)       '請求額
 
         '1,2行の網掛けは消す
         sheet.Rows(0).Interior.ColorIndex = 0
@@ -1660,7 +1677,7 @@ Public Class LNM0007KoteihiList
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHIM).Value = "固定費(月額)"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KOTEIHID).Value = "固定費(日額)"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = "回数"
-        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = "減額費用"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = "調整額"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = "請求額"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ACCOUNTCODE).Value = "勘定科目コード"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ACCOUNTNAME).Value = "勘定科目名"
@@ -1670,7 +1687,7 @@ Public Class LNM0007KoteihiList
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE).Value = "割合ENEX"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = "備考1"
         sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = "備考2"
-        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = "備考3"
+        sheet.Cells(WW_HEADERROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = "調整理由"
 
         Dim WW_TEXT As String = ""
         Dim WW_TEXTLIST = New StringBuilder
@@ -1875,19 +1892,21 @@ Public Class LNM0007KoteihiList
                 sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.KAISU).Value = CDbl(Row("KAISU"))
             End If
 
-            '減額費用
+            '減額費用(調整額)
             If Row("GENGAKU") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = Row("GENGAKU")
+                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = 0
+                'sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = Row("GENGAKU")
             Else
                 sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.GENGAKU).Value = CDbl(Row("GENGAKU"))
             End If
 
-            '請求額
-            If Row("AMOUNT") = "" Then
-                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = Row("AMOUNT")
-            Else
-                sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = CDbl(Row("AMOUNT"))
-            End If
+            '請求額( 計算式(固定費(月額) + 減額費用(調整額)) )
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Formula = String.Format("=Q{0}+T{0}", WW_ACTIVEROW + 1)
+            'If Row("AMOUNT") = "" Then
+            '    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = Row("AMOUNT")
+            'Else
+            '    sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.AMOUNT).Value = CDbl(Row("AMOUNT"))
+            'End If
 
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ACCOUNTCODE).Value = Row("ACCOUNTCODE") '勘定科目コード
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.ACCOUNTNAME).Value = Row("ACCOUNTNAME") '勘定科目名
@@ -1910,7 +1929,7 @@ Public Class LNM0007KoteihiList
 
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU1).Value = Row("BIKOU1") '備考1
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU2).Value = Row("BIKOU2") '備考2
-            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3
+            sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3).Value = Row("BIKOU3") '備考3(調整理由)
 
             '金額を数値形式に変更
             sheet.Cells(WW_ACTIVEROW, LNM0007WRKINC.INOUTEXCELCOL.SYABARA).Style = DecStyle
@@ -2658,10 +2677,10 @@ Public Class LNM0007KoteihiList
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                 End If
-                '備考3
+                '備考3(調整理由)
                 WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0007WRKINC.INOUTEXCELCOL.BIKOU3))
                 WW_DATATYPE = DataTypeHT("BIKOU3")
-                LNM0007Exceltblrow("BIKOU3") = LNM0007WRKINC.DataConvert("備考3", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                LNM0007Exceltblrow("BIKOU3") = LNM0007WRKINC.DataConvert("調整理由", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
@@ -2769,7 +2788,7 @@ Public Class LNM0007KoteihiList
                 Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
-                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3(調整理由)
                 Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)         '削除フラグ
 
                 P_TORICODE.Value = WW_ROW("TORICODE")           '取引先コード
@@ -2800,7 +2819,7 @@ Public Class LNM0007KoteihiList
                 P_ENEXPERCENTAGE.Value = WW_ROW("ENEXPERCENTAGE")           '割合ENEX
                 P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
                 P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
-                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
+                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3(調整理由)
                 P_DELFLG.Value = WW_ROW("DELFLG")               '削除フラグ
 
                 Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
@@ -3131,7 +3150,7 @@ Public Class LNM0007KoteihiList
                 Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_BIKOU1 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU1", MySqlDbType.VarChar, 50)     '備考1
                 Dim P_BIKOU2 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU2", MySqlDbType.VarChar, 50)     '備考2
-                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3
+                Dim P_BIKOU3 As MySqlParameter = SQLcmd.Parameters.Add("@BIKOU3", MySqlDbType.VarChar, 50)     '備考3(調整理由)
                 Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)     '登録年月日
                 Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar, 20)     '登録ユーザーＩＤ
                 Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar, 20)     '登録端末
@@ -3248,7 +3267,7 @@ Public Class LNM0007KoteihiList
 
                 P_BIKOU1.Value = WW_ROW("BIKOU1")           '備考1
                 P_BIKOU2.Value = WW_ROW("BIKOU2")           '備考2
-                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3
+                P_BIKOU3.Value = WW_ROW("BIKOU3")           '備考3(調整理由)
 
                 P_INITYMD.Value = WW_DATENOW                        '登録年月日
                 P_INITUSER.Value = Master.USERID                    '登録ユーザーＩＤ
@@ -3571,10 +3590,10 @@ Public Class LNM0007KoteihiList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        '備考3(バリデーションチェック)
+        '備考3(調整理由)(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "BIKOU3", WW_ROW("BIKOU3"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・備考3エラーです。"
+            WW_CheckMES1 = "・調整理由エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
             WW_LineErr = "ERR"
