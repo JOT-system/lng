@@ -41,8 +41,7 @@ window.onload = function () {
     // チェックボックス
     ChangeCheckBox();
     //届先選択ボタン制御
-    if (document.getElementById('WF_SURCHARGEPATTERNCODE').value == "01" ||
-        document.getElementById('WF_SURCHARGEPATTERNCODE').value == "05") {
+    if (document.getElementById('WF_SURCHARGEPATTERNCODE').value == "01") {
         document.getElementById('WF_ButtonTODOKE').disabled = true;
     } else {
         document.getElementById('WF_ButtonTODOKE').disabled = false;
@@ -166,8 +165,8 @@ function inputItemCtrl() {
                 //車番単位
                 document.getElementById("txtpnlListAreaAVOCADOSHUKANAME" + j + "commonIcon").setAttribute('class', '');     //出荷場所（虫眼鏡）
                 document.getElementById("txtpnlListAreaAVOCADOSHUKANAME" + j).setAttribute('readonly', 'true');             //出荷場所
-                document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j + "commonIcon").setAttribute('class', '');    //届先（虫眼鏡）
-                document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j).setAttribute('readonly', 'true');            //届先
+                //document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j + "commonIcon").setAttribute('class', '');    //届先（虫眼鏡）
+                //document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j).setAttribute('readonly', 'true');            //届先
                 document.getElementById("lbSHAGATASHAGATA" + j).disabled = true;                                            //車型
                 document.getElementById("txtpnlListAreaSHABARA" + j).setAttribute('readonly', 'true');                      //車腹
                 break;
