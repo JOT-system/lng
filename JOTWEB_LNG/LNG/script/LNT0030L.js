@@ -206,6 +206,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
         if (fieldNM === "SEIKYUDATEFROM" || fieldNM === "SEIKYUDATETO") {
             document.getElementById('WF_LeftMViewChange').value = "2";    //2:カレンダーを意味する
+        } else {
+            document.getElementById('WF_LeftMViewChange').value = "";
         }
         //カーソル位置を保管(カレンダーの表示位置)
         var elem = document.getElementById("txtpnlListArea" + fieldNM + Line);
