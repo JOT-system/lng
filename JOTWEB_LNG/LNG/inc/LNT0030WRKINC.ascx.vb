@@ -506,7 +506,7 @@ Public Class LNT0030WRKINC
                 Dim P_AVOCADOTODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@AVOCADOTODOKECODE", MySqlDbType.VarChar)        '届先コード
                 Dim P_SHAGATA As MySqlParameter = SQLcmd.Parameters.Add("@SHAGATA", MySqlDbType.VarChar)                            '車型
                 Dim P_SHABARA As MySqlParameter = SQLcmd.Parameters.Add("@SHABARA", MySqlDbType.Decimal)                            '車腹
-                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.Decimal)                              '車番
+                Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar)                              '車番
 
                 P_SEIKYUYM.Value = I_ROW("SEIKYUYM")                           '請求年月
                 P_TORICODE.Value = I_ROW("TORICODE")                           '取引先コード
