@@ -4,10 +4,10 @@ function InitDisplay() {
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 
-    // テキストボックスEnter縦移動イベントバインド(必ず使用有無変更「DispFormat」の後で行う)
+    // テキストボックスEnter横移動イベントバインド(必ず使用有無変更「DispFormat」の後で行う)
     setTimeout(function () {
-        // テキストボックスEnter縦移動イベントバインド
-        commonBindEnterToVerticalTabStep();
+        // テキストボックスEnter横移動イベントバインド
+        commonBindEnterToHorizontalTabStep();
     }, 100);
 
     // カレンダー表示
@@ -41,8 +41,7 @@ window.onload = function () {
     // チェックボックス
     ChangeCheckBox();
     //届先選択ボタン制御
-    if (document.getElementById('WF_SURCHARGEPATTERNCODE').value == "01" ||
-        document.getElementById('WF_SURCHARGEPATTERNCODE').value == "05") {
+    if (document.getElementById('WF_SURCHARGEPATTERNCODE').value == "01") {
         document.getElementById('WF_ButtonTODOKE').disabled = true;
     } else {
         document.getElementById('WF_ButtonTODOKE').disabled = false;
@@ -166,8 +165,8 @@ function inputItemCtrl() {
                 //車番単位
                 document.getElementById("txtpnlListAreaAVOCADOSHUKANAME" + j + "commonIcon").setAttribute('class', '');     //出荷場所（虫眼鏡）
                 document.getElementById("txtpnlListAreaAVOCADOSHUKANAME" + j).setAttribute('readonly', 'true');             //出荷場所
-                document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j + "commonIcon").setAttribute('class', '');    //届先（虫眼鏡）
-                document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j).setAttribute('readonly', 'true');            //届先
+                //document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j + "commonIcon").setAttribute('class', '');    //届先（虫眼鏡）
+                //document.getElementById("txtpnlListAreaAVOCADOTODOKENAME" + j).setAttribute('readonly', 'true');            //届先
                 document.getElementById("lbSHAGATASHAGATA" + j).disabled = true;                                            //車型
                 document.getElementById("txtpnlListAreaSHABARA" + j).setAttribute('readonly', 'true');                      //車腹
                 break;
@@ -206,6 +205,8 @@ function ListField_DBclick(pnlList, Line, fieldNM) {
         document.getElementById('WF_FIELD').value = fieldNM;
         if (fieldNM === "SEIKYUDATEFROM" || fieldNM === "SEIKYUDATETO") {
             document.getElementById('WF_LeftMViewChange').value = "2";    //2:カレンダーを意味する
+        } else {
+            document.getElementById('WF_LeftMViewChange').value = "";
         }
         //カーソル位置を保管(カレンダーの表示位置)
         var elem = document.getElementById("txtpnlListArea" + fieldNM + Line);
@@ -293,11 +294,11 @@ function SelectCheckBox(obj, lineCnt) {
 var commonKeyEnterProgress = false; // これは関数(function)外部に設定(グローバルスコープの変数です)
 
 /**
- *  リストテーブルのEnterキーで下のテキストにタブを移すイベントバインド
+ *  リストテーブルのEnterキーで横のテキストにタブを移すイベントバインド
  * @return {undefined} なし
  * @description 
  */
-function commonBindEnterToVerticalTabStep() {
+function commonBindEnterToHorizontalTabStep() {
     let generatedTables = document.querySelectorAll("div[data-generated='1']");
     if (generatedTables === null) {
         return;
@@ -354,7 +355,7 @@ function commonBindEnterToVerticalTabStep() {
                     if (event.key === 'Enter') {
                         if (commonKeyEnterProgress === false) {
                             commonKeyEnterProgress = true; //Enter連打抑止
-                            commonListEnterToVerticalTabStep(textBox, panelId);
+                            commonListEnterToHorizontalTabStep(textBox, panelId);
                             return setTimeout(function () {
                                 commonKeyEnterProgress = false;　///Enter連打抑止
                             }, 10); // 5ミリ秒だと連打でフォーカスパニックになったので10ミリ秒に
@@ -366,13 +367,13 @@ function commonBindEnterToVerticalTabStep() {
     }
 }
 /**
- *  リストテーブルのEnterキーで下のテキストにタブを移すイベント
+ *  リストテーブルのEnterキーで横のテキストにタブを移すイベント
  * @param {Node} textBox テキストボックス
  * @param {string} panelId テキストボックス
  * @return {undefined} なし
  * @description 
  */
-function commonListEnterToVerticalTabStep(textBox, panelId) {
+function commonListEnterToHorizontalTabStep(textBox, panelId) {
     let curLineCnt = Number(textBox.attributes.getNamedItem("rownum").value);
     let fieldName = textBox.dataset.fieldName;
     let nextTextFieldName = textBox.dataset.nextTextFieldName;
