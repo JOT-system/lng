@@ -335,6 +335,10 @@ Public Module BaseDllConst
     ''' </summary>
     Public Const CONST_TORICODE_0239900000 As String = "0239900000"
     ''' <summary>
+    ''' 東北天然ガス
+    ''' </summary>
+    Public Const CONST_TORICODE_0175300000 As String = "0175300000"
+    ''' <summary>
     ''' 東北電力
     ''' </summary>
     Public Const CONST_TORICODE_0175400000 As String = "0175400000"
