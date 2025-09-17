@@ -9,6 +9,8 @@ Public Class LNT0001WRKINC
     Public Const MAPIDI As String = "LNT0001I"      'MAPID
     Public Const MAPIDZ As String = "LNT0001Z"      'MAPID
     Public Const MAPIDAJ As String = "LNT0001AJ"    'MAPID
+    Public Const MAPIDAJS As String = "LNT0001AJS"  'MAPID
+    Public Const MAPIDAJD As String = "LNT0001AJD"  'MAPID
     Public Const MAPID2L As String = "LNT0002L"     'MAPID
 
     ''' <summary>
@@ -41,6 +43,51 @@ Public Class LNT0001WRKINC
             Me.Tori = Tori
         End Sub
     End Class
+
+    ''' <summary>
+    ''' ファイルタイプ
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum FILETYPE
+        EXCEL
+        PDF
+    End Enum
+    ''' <summary>
+    ''' 入出力項目位置
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum INOUTEXCELCOL
+        'DELFLG   '削除フラグ
+        SEIKYUYM   '請求年月
+        SEIKYUBRANCH   '請求年月枝番
+        SEIKYUDATEFROM   '請求対象期間From
+        SEIKYUDATETO   '請求対象期間To
+        TORICODE   '取引先コード
+        TORINAME   '取引先名
+        ORGCODE   '部門コード
+        ORGNAME   '部門名
+        'KASANORGCODE   '加算先部門コード
+        'KASANORGNAME   '加算先部門名
+        'PATTERNCODE   'パターンコード
+        AVOCADOSHUKABASHO   '出荷場所コード
+        AVOCADOSHUKANAME   '出荷場所名
+        AVOCADOTODOKECODE   '届先コード
+        AVOCADOTODOKENAME   '届先名
+        SHAGATA   '車型
+        SHABARA   '車腹
+        SHABAN   '車番
+        DIESELPRICESTANDARD   '基準単価
+        DIESELPRICECURRENT   '実勢単価
+        'CALCMETHOD   '距離計算方式
+        DISTANCE   '距離
+        SHIPPINGCOUNT   '輸送回数
+        NENPI   '燃費
+        FUELBASE   '基準燃料使用量
+        FUELRESULT   '燃料使用量
+        ADJUSTMENT   '精算調整幅
+        SURCHARGE   'サーチャージ
+        MEMO   '計算式メモ
+    End Enum
 
     ''' <summary>
     ''' ワークデータ初期化処理

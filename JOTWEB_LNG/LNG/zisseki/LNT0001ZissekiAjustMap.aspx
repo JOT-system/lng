@@ -22,6 +22,7 @@
     <script type="text/javascript" src='<%=ResolveUrl("~/LNG/script/LNT0001AJ.js")%>'></script>
     <script type="text/javascript">
         var pnlListAreaId = '<%=Me.pnlListArea.ClientID%>';
+        var pnlListAreaId2 = '<%=Me.pnlListArea2.ClientID%>';
         var IsPostBack = '<%=If(IsPostBack = True, "1", "0")%>';
     </script>
 </asp:Content>
@@ -80,11 +81,21 @@
                             <div class="d-flex align-items-center gap-2">
                                 <strong class="flex-shrink-0">対象</strong>
                                 <asp:DropDownList ID="WF_TARGETTABLE" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_TARGETTABLEChange');" />
+                                <%-- サーチャージ(検索エリア) 対象プルダウンのとなりに作成--%>
+                                <asp:Panel ID="pnlSurchargeArea" runat="server">
+                                    <div id="tab4" class="tabBox">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <strong class="flex-shrink-0" style="width:20px"></strong>
+                                            <input type="button" id="WF_ButtonHIDDEN" class="btn-sticky" value="実勢単価（非表示）" onclick="ButtonHIDDEN();" style="width:150px"/>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <strong class="flex-shrink-0" style="width:20px"></strong>
+                                            <input type="button" id="WF_ButtonPDF" class="btn-sticky" value="プレビュー" onclick="ButtonClick('WF_ButtonPDF');"" style="width:150px"/>
+                                        </div>
+                                    </div>
+                                </asp:Panel>
                             </div>
                         </div>
-                        <%-- 特別料金(検索エリア) --%>
-<%--                        <asp:Panel ID="pnlSpecialFEEArea" runat="server">
-                        </asp:Panel>--%>
                         <%-- 単価調整(検索エリア) --%>
                         <asp:Panel ID="pnlPriceArea" runat="server">
                             <div id="tab2" class="tabBox">
@@ -152,12 +163,7 @@
                                 </div>
                             </div>
                         </asp:Panel>
-                        <%-- 固定費調整(検索エリア) --%>
-<%--                        <asp:Panel ID="pnlFixedCostsArea" runat="server">
-                        </asp:Panel>--%>
-                        <%-- サーチャージ(検索エリア) --%>
-<%--                        <asp:Panel ID="pnlSurchargeArea" runat="server">
-                        </asp:Panel>--%>
+                        <asp:Panel ID="pnlListArea2" runat="server"></asp:Panel>
                         <asp:Panel ID="pnlListArea" runat="server"></asp:Panel>
                     </div>
                 </div>
@@ -214,6 +220,11 @@
         <input id="WF_TANKNUMBERhdn" runat="server" value="" type="text" />
         <input id="WF_GYOMUTANKNOhdn" runat="server" value="" type="text" />
 
+        <!-- 以下、サーチャージ専用　-->
+        <!-- データ退避ファイル２-->
+        <input id="WF_XMLsaveF30" runat="server" value="" type="text" />
+        <input id="WF_XMLsaveF31" runat="server" value="" type="text" />
+        
     </div>
 </asp:Content>
 

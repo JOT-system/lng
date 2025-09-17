@@ -77,6 +77,15 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     Protected WithEvents WF_TARGETTABLE As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''pnlSurchargeArea コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlSurchargeArea As Global.System.Web.UI.WebControls.Panel
+    
+    '''<summary>
     '''pnlPriceArea コントロール。
     '''</summary>
     '''<remarks>
@@ -165,6 +174,15 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_TOTALPAGECNT As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''pnlListArea2 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents pnlListArea2 As Global.System.Web.UI.WebControls.Panel
     
     '''<summary>
     '''pnlListArea コントロール。
@@ -363,6 +381,24 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents WF_GYOMUTANKNOhdn As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_XMLsaveF30 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_XMLsaveF30 As Global.System.Web.UI.HtmlControls.HtmlInputText
+    
+    '''<summary>
+    '''WF_XMLsaveF31 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_XMLsaveF31 As Global.System.Web.UI.HtmlControls.HtmlInputText
     
     '''<summary>
     '''Master プロパティ。
