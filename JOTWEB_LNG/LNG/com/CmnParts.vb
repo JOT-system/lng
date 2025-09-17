@@ -3076,6 +3076,289 @@ Public Class CmnParts
     End Function
 
     ''' <summary>
+    ''' 実績TBL検索
+    ''' </summary>
+    Public Function SelectSurcgargeZissekiSQL() As String
+        Dim SQLStr As String =
+              " Select                                                                          " _
+            & "      coalesce(LT1.RECONO, '')                             AS RECONO    	        " _
+            & "     ,coalesce(LT1.ORDERORG, '')                           AS ORDERORG    	    " _
+            & "     ,coalesce(LT1.ORDERORGNAME, '')                       AS ORDERORGNAME 	    " _
+            & "     ,coalesce(date_format(LT1.TODOKEDATE, '%Y/%m/%d'),'') AS TODOKEDATE         " _
+            & "     ,coalesce(LT1.TORICODE, '')                           AS TORICODE		    " _
+            & "     ,coalesce(LT1.TORINAME, '')                           AS TORINAME			" _
+            & "     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			" _
+            & "     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			" _
+            & "     ,coalesce(LT1.TODOKECODE, '')                         AS TODOKECODE			" _
+            & "     ,coalesce(LT1.TODOKENAME, '')                         AS TODOKENAME			" _
+            & "     ,CASE LT1.SYAGATA WHEN 'トレーラ' THEN '2' ELSE '1' END   AS SYAGATA	    " _
+            & "     ,coalesce(LT1.SYAGATA, '')                            AS SYAGATANAME   	    " _
+            & "     ,coalesce(LT1.SYABARA, '')                            AS SYABARA			" _
+            & "     ,coalesce(LT1.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM		" _
+            & "     ,coalesce(LT1.ZISSEKI, '')                            AS ZISSEKI			" _
+            & " FROM                                                                            " _
+            & "     LNG.LNT0001_ZISSEKI LT1                                                     " _
+            & " WHERE                                                                           " _
+            & "     LT1.TORICODE = @TORICODE                                                    " _
+            & " AND LT1.ORDERORGCODE  in ({0})                                                  " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @STTODOKEDATE                    " _
+            & " AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @ENDTODOKEDATE                   " _
+            & " AND LT1.ZISSEKI <> 0                                                            " _
+            & " AND LT1.DELFLG = '0'                                                            " _
+            & " ORDER BY                                                                        " _
+            & "     LT1.ORDERORGCODE, LT1.TODOKEDATE, LT1.SHUKABASHO, LT1.TODOKECODE            "
+
+        Return SQLStr
+    End Function
+
+    ''' <summary>
+    ''' サーチャージ料金TBL検索
+    ''' </summary>
+    Public Function SelectSurchargeSQL() As String
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" Select                                                                                              ")
+        SQLStr.AppendLine("     1                                                                      AS 'SELECT'              ")
+        SQLStr.AppendLine("   , 0                                                                      AS HIDDEN                ")
+        SQLStr.AppendLine("   , 0                                                                      AS LINECNT               ")
+        SQLStr.AppendLine("   , ''                                                                     AS OPERATION             ")
+        SQLStr.AppendLine("   , LNT0030.UPDTIMSTP                                                      AS UPDTIMSTP             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SEIKYUYM), '')                                  AS SEIKYUYM              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SEIKYUBRANCH), '')                              AS SEIKYUBRANCH          ")
+        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(SEIKYUDATEFROM, '%Y/%m/%d'), '')                  AS SEIKYUDATEFROM        ")
+        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(SEIKYUDATETO, '%Y/%m/%d'), '')                    AS SEIKYUDATETO          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.TORICODE), '')                                  AS TORICODE              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.TORINAME), '')                                  AS TORINAME              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.ORGCODE), '')                                   AS ORGCODE               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.ORGNAME), '')                                   AS ORGNAME               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.KASANORGCODE), '')                              AS KASANORGCODE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.KASANORGNAME), '')                              AS KASANORGNAME          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.PATTERNCODE), '')                               AS PATTERNCODE           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00060.VALUE1), '')                                   AS PATTERNNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.BILLINGCYCLE), '')                              AS BILLINGCYCLE          ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00061.VALUE1), '')                                   AS BILLINGCYCLENAME      ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.AVOCADOSHUKABASHO), '')                         AS AVOCADOSHUKABASHO     ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.AVOCADOSHUKANAME), '')                          AS AVOCADOSHUKANAME      ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.AVOCADOTODOKECODE), '')                         AS AVOCADOTODOKECODE     ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.AVOCADOTODOKENAME), '')                         AS AVOCADOTODOKENAME     ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SHAGATA), '')                                   AS SHAGATA               ")
+        SQLStr.AppendLine("   , CASE LNT0030.SHAGATA WHEN '1' THEN '単車' ELSE 'トレーラ' END          AS SHAGATANAME           ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.SHABARA, 0)                                           AS SHABARA               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SHABAN), '')                                    AS SHABAN                ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICESTANDARD, 0)                               AS DIESELPRICESTANDARD   ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICECURRENT, 0)                                AS DIESELPRICECURRENT    ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.CALCMETHOD), '')                                AS CALCMETHOD            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00062.VALUE1), '')                                   AS CALCMETHODNAME        ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DISTANCE, 0)                                          AS DISTANCE              ")
+        SQLStr.AppendLine("   , CASE COALESCE(LNT0030.DISTANCE, 0) WHEN 0 THEN '0' ELSE '1' END        AS DISTANCEUPDFLG        ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.SHIPPINGCOUNT, 0)                                     AS SHIPPINGCOUNT         ")
+        SQLStr.AppendLine("   , CASE COALESCE(LNT0030.SHIPPINGCOUNT, 0) WHEN 0 THEN '0' ELSE '1' END   AS SHIPPINGCOUNTUPDFLG   ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.NENPI, 1)                                             AS NENPI                 ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELBASE, 0)                                          AS FUELBASE              ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELRESULT, 0)                                        AS FUELRESULT            ")
+        SQLStr.AppendLine("   , CASE COALESCE(LNT0030.FUELRESULT, 0) WHEN 0 THEN '0' ELSE '1' END      AS FUELRESULTUPDFLG      ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.ADJUSTMENT, 0)                                        AS ADJUSTMENT            ")
+        SQLStr.AppendLine("   , 0                                                                      AS SURCHARGE             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.MEMO), '')                                      AS MEMO                  ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.DELFLG), '')                                    AS DELFLG                ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00063.VALUE1), '')                                   AS DELFLGNAME            ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICESITEID), '')                         AS DIESELPRICESITEID     ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICESITEBRANCH), '')                     AS DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICEROUNDLEN), '0')                      AS DIESELPRICEROUNDLEN   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICEROUNDMETHOD), '1')                   AS DIESELPRICEROUNDMETHOD")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.SURCHARGEROUNDMETHOD), '1')                     AS SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("   , COALESCE(                                                                                       ")
+        SQLStr.AppendLine("     (SELECT ROUNDTRIP                                                                               ")
+        SQLStr.AppendLine("       FROM LNG.LNM0006_NEWTANKA                                                                     ")
+        SQLStr.AppendLine("      WHERE TORICODE = @TORICODE                                                                     ")
+        SQLStr.AppendLine("        AND CURDATE() BETWEEN STYMD AND ENDYMD                                                       ")
+        SQLStr.AppendLine("        AND ORGCODE = LNT0030.ORGCODE                                                                ")
+        SQLStr.AppendLine("        AND AVOCADOSHUKABASHO = LNT0030.AVOCADOSHUKABASHO                                            ")
+        SQLStr.AppendLine("        AND AVOCADOTODOKECODE = LNT0030.AVOCADOTODOKECODE                                            ")
+        SQLStr.AppendLine("        AND DELFLG <> '1'                                                                            ")
+        SQLStr.AppendLine("        LIMIT 1                                                                                      ")
+        SQLStr.AppendLine("    ),'0')                                                                  AS ROUNDTRIP             ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNT0030_SURCHARGEFEE LNT0030                                                                ")
+        SQLStr.AppendLine(" LEFT JOIN LNG.LNM0019_SURCHARGEPATTERN LNM0019                                                      ")
+        SQLStr.AppendLine("      ON  LNM0019.TORICODE = LNT0030.TORICODE                                                        ")
+        SQLStr.AppendLine("      AND LNM0019.ORGCODE =  LNT0030.ORGCODE                                                         ")
+        SQLStr.AppendLine("      AND LNM0019.SURCHARGEPATTERNCODE =  LNT0030.PATTERNCODE                                        ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN LNM0019.STYMD AND LNM0019.ENDYMD                                         ")
+        SQLStr.AppendLine("      AND LNM0019.DELFLG <> '1'                                                                      ")
+        'SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        'SQLStr.AppendLine("    (                                                                                                ")
+        'SQLStr.AppendLine("      SELECT                                                                                         ")
+        'SQLStr.AppendLine("          ROUNDTRIP                                                                                  ")
+        'SQLStr.AppendLine("         ,SHUKABASHO                                                                                 ")
+        'SQLStr.AppendLine("         ,TODOKECODE                                                                                 ")
+        'SQLStr.AppendLine("      FROM                                                                                           ")
+        'SQLStr.AppendLine("          LNG.LNM0006_NEWTANKA                                                                       ")
+        'SQLStr.AppendLine("      WHERE                                                                                          ")
+        'SQLStr.AppendLine("          TORICODE = @TORICODE                                                                       ")
+        'SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        'SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        'SQLStr.AppendLine("      LIMIT 1                                                                                        ")
+        'SQLStr.AppendLine("    ) LNM0006                                                                                        ")
+        'SQLStr.AppendLine("      ON  SHUKABASHO = LNT0030.AVOCADOSHUKABASHO                                                     ")
+        'SQLStr.AppendLine("      AND TODOKECODE = LNT0030.AVOCADOTODOKECODE                                                     ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'SURCHARGEPATTERN'                                                                 ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00060                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0030.PATTERNCODE = LNS00060.KEYCODE                                                     ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'BILLINGCYCLE'                                                                     ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00061                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.BILLINGCYCLE = LNS00061.KEYCODE                                                    ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'CALCMETHOD'                                                                       ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00062                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.CALCMETHOD = LNS00062.KEYCODE                                                      ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'DELFLG'                                                                           ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00063                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0030.DELFLG = LNS00063.KEYCODE                                                          ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("     LNT0030.SEIKYUYM           = @SEIKYUYM                                                          ")
+        SQLStr.AppendLine(" AND LNT0030.TORICODE           = @TORICODE                                                          ")
+        SQLStr.AppendLine(" AND LNT0030.ORGCODE           in ({0})                                                              ")
+        'SQLStr.AppendLine(" AND LNT0030.PATTERNCODE     like CONCAT(@PATTERNCODE, '%')                                          ")
+        SQLStr.AppendLine(" AND LNT0030.DELFLG = '0'                                                                            ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     LNT0030.SEIKYUYM                                                                                ")
+
+        Return SQLStr.ToString
+    End Function
+
+    ''' <summary>
+    ''' 実勢単価履歴TBL検索
+    ''' </summary>
+    Public Function SelectDieselpriceSQL() As String
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" Select                                                                                              ")
+        SQLStr.AppendLine("     1                                                                      AS 'SELECT'              ")
+        SQLStr.AppendLine("   , 0                                                                      AS HIDDEN                ")
+        SQLStr.AppendLine("   , 0                                                                      AS LINECNT               ")
+        SQLStr.AppendLine("   , ''                                                                     AS OPERATION             ")
+        SQLStr.AppendLine("   , LNT0031.UPDTIMSTP                                                      AS UPDTIMSTP             ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.DIESELPRICESITEID), '')                         AS DIESELPRICESITEID     ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0020.DIESELPRICESITENAME), '')                       AS DIESELPRICESITENAME   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.DIESELPRICESITEBRANCH), '')                     AS DIESELPRICESITEBRANCH ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0020.DIESELPRICESITEKBNNAME), '')                    AS DIESELPRICESITEKBNNAME")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0020.DISPLAYNAME), '')                               AS DISPLAYNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.TARGETYEAR), '')                                AS TARGETYEAR            ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE1, 0)                                      AS DIESELPRICE1          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE2, 0)                                      AS DIESELPRICE2          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE3, 0)                                      AS DIESELPRICE3          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE4, 0)                                      AS DIESELPRICE4          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE5, 0)                                      AS DIESELPRICE5          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE6, 0)                                      AS DIESELPRICE6          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE7, 0)                                      AS DIESELPRICE7          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE8, 0)                                      AS DIESELPRICE8          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE9, 0)                                      AS DIESELPRICE9          ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE10, 0)                                     AS DIESELPRICE10         ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE11, 0)                                     AS DIESELPRICE11         ")
+        SQLStr.AppendLine("   , COALESCE(LNT0031.DIESELPRICE12, 0)                                     AS DIESELPRICE12         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.LOCKFLG), '')                                   AS LOCKFLG               ")
+        SQLStr.AppendLine("   , ''                                                                     AS LOCKFLGBTN            ")
+        SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNT0031.LOCKYMD, '%Y/%m/%d'), '')                 AS LOCKYMD               ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.LOCKUSER), '')                                  AS LOCKUSER              ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0031.DELFLG), '')                                    AS DELFLG                ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS0006.VALUE1), '')                                    AS DELFLGNAME            ")
+        SQLStr.AppendLine("   , '0'                                                                    AS ADDFLG                ")
+        SQLStr.AppendLine(" FROM (                                                                                              ")
+        SQLStr.AppendLine("      SELECT TORICODE                                                                                ")
+        SQLStr.AppendLine("            ,ORGCODE                                                                                 ")
+        SQLStr.AppendLine("            ,DIESELPRICESITEID                                                                       ")
+        SQLStr.AppendLine("            ,DIESELPRICESITEBRANCH                                                                   ")
+        SQLStr.AppendLine("        FROM LNG.LNM0019_SURCHARGEPATTERN                                                            ")
+        SQLStr.AppendLine("       WHERE                                                                                         ")
+        SQLStr.AppendLine("             TORICODE = @TORICODE                                                                    ")
+        SQLStr.AppendLine("         AND ORGCODE in ({0})                                                                        ")
+        SQLStr.AppendLine("         AND CURDATE() BETWEEN STYMD AND ENDYMD                                                      ")
+        SQLStr.AppendLine("         AND DELFLG = '0'                                                                            ")
+        SQLStr.AppendLine("         LIMIT 1                                                                                     ")
+        SQLStr.AppendLine(" ) LNM0019                                                                                           ")
+        SQLStr.AppendLine(" INNER JOIN LNG.LNT0031_DIESELPRICEHIST LNT0031                                                      ")
+        SQLStr.AppendLine(" ON  LNT0031.DIESELPRICESITEID     = LNM0019.DIESELPRICESITEID                                       ")
+        SQLStr.AppendLine(" AND LNT0031.DIESELPRICESITEBRANCH = LNM0019.DIESELPRICESITEBRANCH                                   ")
+        SQLStr.AppendLine(" AND LNT0031.TARGETYEAR BETWEEN @STTARGETYEAR AND @ENDTARGETYEAR                                     ")
+        SQLStr.AppendLine(" AND LNT0031.DELFLG = '0'                                                                            ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'DELFLG'                                                                           ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS0006                                                                                        ")
+        SQLStr.AppendLine("      ON  LNT0031.DELFLG = LNS0006.KEYCODE                                                           ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          DIESELPRICESITEID                                                                          ")
+        SQLStr.AppendLine("         ,DIESELPRICESITENAME                                                                        ")
+        SQLStr.AppendLine("         ,DIESELPRICESITEBRANCH                                                                      ")
+        SQLStr.AppendLine("         ,DIESELPRICESITEKBNNAME                                                                     ")
+        SQLStr.AppendLine("         ,DISPLAYNAME                                                                                ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          LNG.LNM0020_DIESELPRICESITE                                                                ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNM0020                                                                                        ")
+        SQLStr.AppendLine("      ON  LNM0020.DIESELPRICESITEID     = LNM0019.DIESELPRICESITEID                                  ")
+        SQLStr.AppendLine("      AND LNM0020.DIESELPRICESITEBRANCH = LNM0019.DIESELPRICESITEBRANCH                              ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     LNT0031.TARGETYEAR                                                                              ")
+
+        Return SQLStr.ToString
+    End Function
+
+    ''' <summary>
     ''' 北海道LNG(シート[輸送費明細])【基本料金A】取得用SQL
     ''' </summary>
     Public Sub SelectHokkaidoLNG_YusouhiKihonFeeA(ByVal I_CLASS As String,
@@ -3751,6 +4034,49 @@ Public Class CmnParts
         Else
             SQLStr &= String.Format(" {0} = '{1}' ", I_TABLEITEM, I_TABLEITEM_PARA)
         End If
+
+        '-- WHERE
+        If I_WCONDITION = "" Then
+            SQLStr &= String.Format("  WHERE DELFLG     <> '{0}' ", C_DELETE_FLG.DELETE)
+        Else
+            SQLStr &= String.Format("  WHERE {0} ", I_WCONDITION)
+            SQLStr &= String.Format("    AND DELFLG <> '{0}' ", C_DELETE_FLG.DELETE)
+        End If
+
+        Try
+            Dim SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+            SQLcmd.CommandTimeout = 300
+            SQLcmd.ExecuteNonQuery()
+
+            'CLOSE
+            SQLcmd.Dispose()
+            SQLcmd = Nothing
+
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' TBL更新(訂正更新用)
+    ''' </summary>
+    ''' <param name="SQLcon">SQL接続</param>
+    ''' <param name="I_TABLENAME">更新対象テーブル名(スキーマ付)</param>
+    ''' <param name="I_WCONDITION">WHERE追加条件(ない場合は空文字)</param>
+    ''' <param name="I_TABLEITEM">更新対象(項目)</param>
+    ''' <remarks></remarks>
+    Public Sub UpdateTableCRT2(ByVal SQLcon As MySqlConnection,
+                              ByVal I_TABLENAME As String, ByVal I_WCONDITION As String,
+                              ByVal I_TABLEITEM As String)
+
+        '更新SQL文
+        Dim SQLStr As String = ""
+        '-- TABLE
+        SQLStr &= " UPDATE " & I_TABLENAME
+
+        '-- SET
+        SQLStr &= "    SET "
+        SQLStr &= String.Format(" {0} ", I_TABLEITEM)
 
         '-- WHERE
         If I_WCONDITION = "" Then
