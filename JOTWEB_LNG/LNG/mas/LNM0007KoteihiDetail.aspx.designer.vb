@@ -500,6 +500,24 @@ Partial Public Class LNM0007KoteihiDetail
     Protected WithEvents TxtAMOUNT_TEXT As Global.System.Web.UI.WebControls.Label
     
     '''<summary>
+    '''WF_BIKOU3_L コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_BIKOU3_L As Global.System.Web.UI.WebControls.Label
+    
+    '''<summary>
+    '''TxtBIKOU3 コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents TxtBIKOU3 As Global.System.Web.UI.WebControls.TextBox
+    
+    '''<summary>
     '''WF_ACCOUNT_L コントロール。
     '''</summary>
     '''<remarks>
@@ -642,24 +660,6 @@ Partial Public Class LNM0007KoteihiDetail
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Protected WithEvents TxtBIKOU2 As Global.System.Web.UI.WebControls.TextBox
-    
-    '''<summary>
-    '''WF_BIKOU3_L コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents WF_BIKOU3_L As Global.System.Web.UI.WebControls.Label
-    
-    '''<summary>
-    '''TxtBIKOU3 コントロール。
-    '''</summary>
-    '''<remarks>
-    '''自動生成されたフィールド。
-    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
-    '''</remarks>
-    Protected WithEvents TxtBIKOU3 As Global.System.Web.UI.WebControls.TextBox
     
     '''<summary>
     '''rightview コントロール。

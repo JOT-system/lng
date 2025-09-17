@@ -408,6 +408,24 @@ p {
     display: inline-block;
     font-weight: bold;
 }
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(4) {
+    margin-left: 1.4em;
+    display: inline-block;
+    width: 11.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(5) {
+    display: inline-block;
+    width: 420px;
+}
+
+#detailkeybox p[id^=TYPE_H] > span > :nth-child(6) {
+    display: inline-block;
+    font-weight: bold;
+}
+
 /* 項目名欄(n行目の列に適用するスタイル) */
 #detailkeybox p[id^=TYPE_I] > span > :nth-child(1) {
     display: inline-block;

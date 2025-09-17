@@ -194,12 +194,15 @@
                                     <asp:Label ID="WF_GENGAKU_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
-                            <p id="TYPE_H_LINE_23">
+                            <p id="TYPE_H_LINE_21">
                                 <!-- 請求額 -->
                                 <span>
                                     <asp:Label ID="WF_AMOUNT_L" runat="server" Text="請求金額" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtAMOUNT" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="10" Enabled="false"></asp:TextBox>
                                     <asp:Label ID="TxtAMOUNT_TEXT" runat="server" Text="円" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 調整理由 -->
+                                    <asp:Label ID="WF_BIKOU3_L" runat="server" Text="調整理由" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="TxtBIKOU3" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                 </span>
                             </p>
                             <p id="TYPE_J_LINE_1">
@@ -244,13 +247,13 @@
                                     <asp:TextBox ID="TxtBIKOU2" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                 </span>
                             </p>
-                            <p id="TYPE_I_LINE_26">
+<%--                            <p id="TYPE_I_LINE_26">
                                 <!-- 備考3 -->
                                 <span>
                                     <asp:Label ID="WF_BIKOU3_L" runat="server" Text="調整理由" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <asp:TextBox ID="TxtBIKOU3" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="50"></asp:TextBox>
                                 </span>
-                            </p>
+                            </p>--%>
 
                             <div class="Operation">
                                     <div class="actionButtonBox">
