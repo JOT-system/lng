@@ -3076,6 +3076,43 @@ Public Class CmnParts
     End Function
 
     ''' <summary>
+    ''' 実績TBL(届先マスタ作成用)差分抽出
+    ''' </summary>
+    Public Function SelectZissekiTodokeSQL() As DataTable
+        Dim dtTodokeMas As New DataTable
+        Dim SQLStr As String = ""
+        '-- SELECT
+        SQLStr &= " SELECT "
+        SQLStr &= "     VIW0006.TORICODE "
+        SQLStr &= "   , VIW0006.TORINAME "
+        SQLStr &= "   , VIW0006.ORDERORGCODE AS ORGCODE "
+        SQLStr &= "   , VIW0006.ORDERORGNAME AS ORGNAME "
+        SQLStr &= "   , VIW0006.KASANCODEORDERORG AS KASANORGCODE "
+        SQLStr &= "   , VIW0006.KASANAMEORDERORG  AS KASANORGNAME "
+        SQLStr &= "   , VIW0006.SHUKABASHO AS SHUKABASHO "
+        SQLStr &= "   , VIW0006.SHUKANAME  AS SHUKANAME "
+        SQLStr &= "   , VIW0006.TODOKECODE AS TODOKECODE "
+        SQLStr &= "   , VIW0006.TODOKENAME AS TODOKENAME "
+        '-- FROM
+        SQLStr &= " FROM LNG.VIW0006_TODOKE VIW0006 "
+        '-- WHERE
+        SQLStr &= " WHERE NOT EXISTS ( "
+        SQLStr &= "     SELECT 'X' "
+        SQLStr &= "     FROM LNG.LNM0021_TODOKE LNM0021 "
+        SQLStr &= "     WHERE VIW0006.TORICODE = LNM0021.TORICODE "
+        SQLStr &= "       AND VIW0006.ORDERORGCODE = LNM0021.ORGCODE "
+        SQLStr &= "       AND VIW0006.KASANCODEORDERORG = LNM0021.KASANORGCODE "
+        SQLStr &= "       AND VIW0006.SHUKABASHO = LNM0021.SHUKABASHO "
+        SQLStr &= "       AND VIW0006.TODOKECODE = LNM0021.TODOKECODE "
+        SQLStr &= " ) "
+
+        '★データ取得
+        dtTodokeMas = SelectSearch(SQLStr)
+
+        Return dtTodokeMas
+    End Function
+
+    ''' <summary>
     ''' 北海道LNG(シート[輸送費明細])【基本料金A】取得用SQL
     ''' </summary>
     Public Sub SelectHokkaidoLNG_YusouhiKihonFeeA(ByVal I_CLASS As String,

@@ -38,6 +38,7 @@ Public Class LNT0001ZissekiIntake
     Private CS0051UserInfo As New CS0051UserInfo                    'ユーザー情報取得
     Private GS0007FIXVALUElst As New GS0007FIXVALUElst              '固定値マスタ
     Private CS0054KintoneApi As New CS0054KintoneApi                'KintoneAPI（アボカドデータ取得）
+    Private CMNPTS As New CmnParts                                  '共通関数
 
     '○ 共通処理結果
     Private WW_ErrSW As String = ""
@@ -1133,6 +1134,10 @@ Public Class LNT0001ZissekiIntake
                 If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
                     Exit Sub
                 End If
+
+                '〇届先マスタ差分抽出＆追加処理
+                TODOKESAKIMAS_Insert()
+
                 ' 画面選択された荷主を取得
                 SelectTori()
                 '○ 画面表示データ取得
@@ -7011,6 +7016,98 @@ Public Class LNT0001ZissekiIntake
             End Try
 
         End Using
+
+    End Sub
+
+    ''' <summary>
+    ''' 届先マスタ差分抽出＆追加処理
+    ''' </summary>
+    Private Sub TODOKESAKIMAS_Insert()
+        Dim dtTodokeMas As New DataTable
+        dtTodokeMas = CMNPTS.SelectZissekiTodokeSQL()
+
+        Dim SQLStr As String = ""
+        SQLStr &= " INSERT INTO LNG.LNM0021_TODOKE "
+        SQLStr &= "  ( TORICODE ,TORINAME ,ORGCODE ,ORGNAME ,KASANORGCODE ,KASANORGNAME "
+        SQLStr &= "  , SHUKABASHO ,SHUKANAME ,TODOKECODE ,TODOKENAME "
+        SQLStr &= "  , DELFLG ,INITYMD ,INITUSER ,INITTERMID ,INITPGID"
+        SQLStr &= "  , UPDYMD ,UPDUSER ,UPDTERMID ,UPDPGID ,RECEIVEYMD) "
+
+        SQLStr &= " VALUES "
+        SQLStr &= "  ( @TORICODE ,@TORINAME ,@ORGCODE ,@ORGNAME ,@KASANORGCODE ,@KASANORGNAME "
+        SQLStr &= "  , @SHUKABASHO ,@SHUKANAME ,@TODOKECODE ,@TODOKENAME "
+        SQLStr &= "  , @DELFLG ,@INITYMD ,@INITUSER ,@INITTERMID ,@INITPGID"
+        SQLStr &= "  , @UPDYMD ,@UPDUSER ,@UPDTERMID ,@UPDPGID ,@RECEIVEYMD) "
+
+        Try
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()  ' DataBase接続
+
+                Dim SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                SQLcmd.CommandTimeout = 300
+
+                Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)
+                Dim P_TORINAME As MySqlParameter = SQLcmd.Parameters.Add("@TORINAME", MySqlDbType.VarChar)
+                Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar)
+                Dim P_ORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@ORGNAME", MySqlDbType.VarChar)
+                Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar)
+                Dim P_KASANORGNAME As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGNAME", MySqlDbType.VarChar)
+                Dim P_SHUKABASHO As MySqlParameter = SQLcmd.Parameters.Add("@SHUKABASHO", MySqlDbType.VarChar)
+                Dim P_SHUKANAME As MySqlParameter = SQLcmd.Parameters.Add("@SHUKANAME", MySqlDbType.VarChar)
+                Dim P_TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar)
+                Dim P_TODOKENAME As MySqlParameter = SQLcmd.Parameters.Add("@TODOKENAME", MySqlDbType.VarChar)
+
+                Dim P_DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)
+                Dim P_INITYMD As MySqlParameter = SQLcmd.Parameters.Add("@INITYMD", MySqlDbType.DateTime)
+                Dim P_INITUSER As MySqlParameter = SQLcmd.Parameters.Add("@INITUSER", MySqlDbType.VarChar)
+                Dim P_INITTERMID As MySqlParameter = SQLcmd.Parameters.Add("@INITTERMID", MySqlDbType.VarChar)
+                Dim P_INITPGID As MySqlParameter = SQLcmd.Parameters.Add("@INITPGID", MySqlDbType.VarChar)
+                Dim P_UPDYMD As MySqlParameter = SQLcmd.Parameters.Add("@UPDYMD", MySqlDbType.DateTime)
+                Dim P_UPDUSER As MySqlParameter = SQLcmd.Parameters.Add("@UPDUSER", MySqlDbType.VarChar)
+                Dim P_UPDTERMID As MySqlParameter = SQLcmd.Parameters.Add("@UPDTERMID", MySqlDbType.VarChar)
+                Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar)
+                Dim P_RECEIVEYMD As MySqlParameter = SQLcmd.Parameters.Add("@RECEIVEYMD", MySqlDbType.DateTime)
+
+                For Each dtTodokeMasrow As DataRow In dtTodokeMas.Rows
+                    P_TORICODE.Value = dtTodokeMasrow("TORICODE")
+                    P_TORINAME.Value = dtTodokeMasrow("TORINAME")
+                    P_ORGCODE.Value = dtTodokeMasrow("ORGCODE")
+                    P_ORGNAME.Value = dtTodokeMasrow("ORGNAME")
+                    P_KASANORGCODE.Value = dtTodokeMasrow("KASANORGCODE")
+                    P_KASANORGNAME.Value = dtTodokeMasrow("KASANORGNAME")
+                    P_SHUKABASHO.Value = dtTodokeMasrow("SHUKABASHO")
+                    P_SHUKANAME.Value = dtTodokeMasrow("SHUKANAME")
+                    P_TODOKECODE.Value = dtTodokeMasrow("TODOKECODE")
+                    P_TODOKENAME.Value = dtTodokeMasrow("TODOKENAME")
+
+                    P_DELFLG.Value = C_DELETE_FLG.ALIVE
+                    P_INITYMD.Value = Date.Now
+                    P_INITUSER.Value = Master.USERID
+                    P_INITTERMID.Value = Master.USERTERMID
+                    P_INITPGID.Value = "LNT0001ZissekiIntake"
+                    P_UPDYMD.Value = Date.Now
+                    P_UPDUSER.Value = Master.USERID
+                    P_UPDTERMID.Value = Master.USERTERMID
+                    P_UPDPGID.Value = "LNT0001ZissekiIntake"
+                    P_RECEIVEYMD.Value = C_DEFAULT_YMD
+
+                    SQLcmd.ExecuteNonQuery()
+                Next
+                'CLOSE
+                SQLcmd.Dispose()
+                SQLcmd = Nothing
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNT0001Z TODOKESAKIMAS_Insert")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                             'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNT0001Z TODOKESAKIMAS_Insert"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                                 'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 #End Region
