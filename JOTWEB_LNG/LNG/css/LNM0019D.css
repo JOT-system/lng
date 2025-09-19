@@ -53,6 +53,25 @@ input[type=date][readonly] {
                 display: inline-block;
             }
 /* ************************** */
+/* ドロップダウンリスト非活性 */
+/* ************************** */
+.disabled-dropdown {
+    pointer-events: none;
+    background-color: #F2F2F2;
+}
+/* ************************** */
+/* ラジオボタン               */
+/* ************************** */
+.checkboxlist-inline input[type="radio"] {
+    display: inline-block;
+    margin-right: 10px; /* ラジオボタン間のスペース */
+}
+
+.checkboxlist-inline label {
+    display: inline-block;
+    margin-right: 20px; /* ラベル間のスペース */
+}
+/* ************************** */
 /* セレクトボックス           */
 /* ************************** */
 .selectBox {
@@ -308,10 +327,33 @@ p {
 
 #detailkeybox p[id^=TYPE_K] > span > :nth-child(1) {
     display: inline-block;
-    width: 3.8em;
+    width: 9.8em;
+    font-weight: bold;
 }
 
 #detailkeybox p[id^=TYPE_K] > span > :nth-child(2) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(3) {
+    display: inline-block;
+    width: 4.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(4) {
+    display: inline-block;
+    width: 7.8em;
+    font-weight: bold;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(5) {
+    display: inline-block;
+    width: 5.7em;
+}
+
+#detailkeybox p[id^=TYPE_K] > span > :nth-child(6) {
     display: inline-block;
     font-weight: bold;
 }
@@ -630,7 +672,7 @@ p {
     margin-left: 100px !important;
 }
 
-#WF_BILLINGCYCLE_L::after, #WF_SURCHARGEPATTERNCODE_L::after, #WF_CALCMETHOD_L::after, #WF_DISPLAYNAME_L::after {
+#WF_BILLINGCYCLE_L::after, #WF_SURCHARGEPATTERNCODE_L::after, #WF_CALCMETHOD_L::after, #WF_DISPLAYNAME_L::after, #WF_DIESELPRICEROUNDING_L::after {
     content: "";
     background-image: url(../img/help.png);
     display: inline-block;

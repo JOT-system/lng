@@ -163,6 +163,72 @@
                                 </span>
                             </p>
 
+                            <p id="TYPE_C_LINE_8">
+                                <span>
+                                    <asp:Label ID="WF_DIESELPRICEROUNDING_L" runat="server" Text="実勢単価端数処理" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_9">
+                                <!-- 実勢単価端数処理（桁数） -->
+                                <span>
+                                    <asp:Label ID="WF_DECIMALPOINT_L" runat="server" Text="　　　小数点以下" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:RadioButtonList ID="WF_DECIMALPOINT" runat="server" RepeatLayout="Flow" RepeatDirection="Horizontal" CssClass="checkboxlist-inline">
+                                        <asp:ListItem Text="第１位" Value="1"></asp:ListItem>
+                                        <asp:ListItem Text="第２位" Value="2"></asp:ListItem>
+                                        <asp:ListItem Text="第３位" Value="3"></asp:ListItem>
+                                    </asp:RadioButtonList>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_10">
+                                <!-- 実勢単価端数処理（方式） -->
+                                <span>
+                                    <asp:Label ID="WF_DIESELPRICEROUNDMETHOD_L" runat="server" Text="　　　処理方式" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:DropDownList ID="WF_DIESELPRICEROUNDMETHODNAME" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_DIESELPRICEROUNDMETHODChange');" />
+                                    <asp:TextBox ID="WF_DIESELPRICEROUNDMETHOD" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false" style="display:none;"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_11">
+                                <span>
+                                    <asp:Label ID="Label1" runat="server" Text="請求金額端数処理" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_12">
+                                <!-- サーチャージ請求金額端数処理（方式） -->
+                                <span>
+                                    <asp:Label ID="WF_SURCHARGEROUNDMETHOD_L" runat="server" Text="　　　処理方式" CssClass="WF_TEXT_LEFT requiredMark"></asp:Label>
+                                    <asp:DropDownList ID="WF_SURCHARGEROUNDMETHODNAME" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SURCHARGEROUNDMETHODChange');" />
+                                    <asp:TextBox ID="WF_SURCHARGEROUNDMETHOD" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false" style="display:none;"></asp:TextBox>
+                                </span>
+                            </p>
+
+                            <p id="TYPE_C_LINE_13">
+                                <!-- 勘定科目コード -->
+                                <span>
+                                    <asp:Label ID="WF_ACCOUNT_L" runat="server" Text="勘定科目名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_ACCOUNTNAME" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_ACCOUNTChange');" />
+                                    <asp:TextBox ID="WF_ACCOUNTCODE" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_C_LINE_14">
+                                <!-- セグメントコード -->
+                                <span>
+                                    <asp:Label ID="WF_SEGMENT_L" runat="server" Text="セグメント名" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:DropDownList ID="WF_SEGMENTNAME" runat="server" class="form-select rounded-0" onchange="ButtonClick('WF_SEGMENTChange');" />
+                                    <asp:TextBox ID="WF_SEGMENTCODE" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
+                                </span>
+                            </p>
+                            <p id="TYPE_K_LINE_1">
+                                <span>
+                                    <!-- 割合JOT -->
+                                    <asp:Label ID="WF_JOTPERCENTAGE_L" runat="server" Text="割合JOT" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="WF_JOTPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_JOTPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <!-- 割合ENEX -->
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_L" runat="server" Text="割合ENEX" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                    <asp:TextBox ID="WF_ENEXPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6"></asp:TextBox>
+                                    <asp:Label ID="WF_ENEXPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
+                                </span>
+                            </p>
                             <div class="Operation">
                                     <div class="actionButtonBox">
                                         <div class="centerSide">

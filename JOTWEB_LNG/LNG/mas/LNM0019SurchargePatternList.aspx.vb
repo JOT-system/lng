@@ -443,6 +443,18 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00062.VALUE1), '')                                   AS BILLINGCYCLENAME      ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.CALCMETHOD), '')                                AS CALCMETHOD            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00063.VALUE1), '')                                   AS CALCMETHODNAME        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICEROUNDLEN), '')                       AS DIESELPRICEROUNDLEN   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00064.VALUE1), '')                                   AS DIESELPRICEROUNDLENNAME    ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICEROUNDMETHOD), '')                    AS DIESELPRICEROUNDMETHOD")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00065.VALUE1), '')                                   AS DIESELPRICEROUNDMETHODNAME ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.SURCHARGEROUNDMETHOD), '')                      AS SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00066.VALUE1), '')                                   AS SURCHARGEROUNDMETHODNAME   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.ACCOUNTCODE), '')                               AS ACCOUNTCODE           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM00181.ACCOUNTNAME), '')                              AS ACCOUNTNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.SEGMENTCODE), '')                               AS SEGMENTCODE           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM00182.SEGMENTNAME), '')                              AS SEGMENTNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.JOTPERCENTAGE), '0.00')                         AS JOTPERCENTAGE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.ENEXPERCENTAGE), '0.00')                        AS ENEXPERCENTAGE        ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNM0019.STYMD, '%Y/%m/%d'), '')                   AS STYMD                 ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNM0019.ENDYMD, '%Y/%m/%d'), '')                  AS ENDYMD                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNM0019.DIESELPRICESITEID), '')                         AS DIESELPRICESITEID     ")
@@ -510,6 +522,74 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS00063                                                                                       ")
         SQLStr.AppendLine("      ON  LNM0019.CALCMETHOD = LNS00063.KEYCODE                                                      ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDLEN'                                                                         ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00064                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.DIESELPRICEROUNDLEN = LNS00064.KEYCODE                                             ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDMETHOD'                                                                      ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00065                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.DIESELPRICEROUNDMETHOD = LNS00065.KEYCODE                                          ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDMETHOD'                                                                      ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00066                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.SURCHARGEROUNDMETHOD = LNS00066.KEYCODE                                            ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        SQLStr.AppendLine("          ACCOUNTCODE                                                                                ")
+        SQLStr.AppendLine("         ,ACCOUNTNAME                                                                                ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          LNG.LNM0018_ACCOUNT                                                                        ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN FROMYMD AND ENDYMD                                                       ")
+        SQLStr.AppendLine("    ) LNM00181                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.ACCOUNTCODE = LNM00181.ACCOUNTCODE                                                 ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        SQLStr.AppendLine("          ACCOUNTCODE                                                                                ")
+        SQLStr.AppendLine("         ,SEGMENTCODE                                                                                ")
+        SQLStr.AppendLine("         ,SEGMENTNAME                                                                                ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          LNG.LNM0018_ACCOUNT                                                                        ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN FROMYMD AND ENDYMD                                                       ")
+        SQLStr.AppendLine("    ) LNM00182                                                                                       ")
+        SQLStr.AppendLine("      ON  LNM0019.ACCOUNTCODE = LNM00182.ACCOUNTCODE                                                 ")
+        SQLStr.AppendLine("      AND LNM0019.SEGMENTCODE = LNM00182.SEGMENTCODE                                                 ")
         SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -644,6 +724,13 @@ Public Class LNM0019SurchargePatternList
         work.WF_SEL_BILLINGCYCLENAME.Text = ""                                   '請求サイクル名
         work.WF_SEL_CALCMETHOD.Text = ""                                         '距離算定方式
         work.WF_SEL_CALCMETHODNAME.Text = ""                                     '距離算定方式名
+        work.WF_SEL_DIESELPRICEROUNDLEN.Text = ""                                '実勢単価端数処理（桁数）
+        work.WF_SEL_DIESELPRICEROUNDMETHOD.Text = ""                             '実勢単価端数処理（方式）
+        work.WF_SEL_SURCHARGEROUNDMETHOD.Text = ""                               'サーチャージ請求金額端数処理（方式）
+        work.WF_SEL_ACCOUNTCODE.Text = ""                                        '勘定科目コード
+        work.WF_SEL_SEGMENTCODE.Text = ""                                        'セグメントコード
+        work.WF_SEL_JOTPERCENTAGE.Text = "0.00"                                  '割合JOT
+        work.WF_SEL_ENEXPERCENTAGE.Text = "0.00"                                 '割合ENEX
         work.WF_SEL_STYMD.Text = Date.Now.ToString("yyyy/MM/01")                 '有効開始日
         work.WF_SEL_ENDYMD.Text = LNM0019WRKINC.MAX_ENDYMD                       '有効終了日
         work.WF_SEL_DIESELPRICESITEID.Text = ""                                  '実勢軽油価格参照先ID
@@ -996,6 +1083,13 @@ Public Class LNM0019SurchargePatternList
         work.WF_SEL_BILLINGCYCLENAME.Text = LNM0019tbl.Rows(WW_LineCNT)("BILLINGCYCLENAME")             '請求サイクル名
         work.WF_SEL_CALCMETHOD.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHOD")                         '距離算定方式
         work.WF_SEL_CALCMETHODNAME.Text = LNM0019tbl.Rows(WW_LineCNT)("CALCMETHODNAME")                 '距離算定方式名
+        work.WF_SEL_DIESELPRICEROUNDLEN.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICEROUNDLEN")       '実勢単価端数処理（桁数）
+        work.WF_SEL_DIESELPRICEROUNDMETHOD.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICEROUNDMETHOD") '実勢単価端数処理（方式）
+        work.WF_SEL_SURCHARGEROUNDMETHOD.Text = LNM0019tbl.Rows(WW_LineCNT)("SURCHARGEROUNDMETHOD")     'サーチャージ請求金額端数処理（方式）
+        work.WF_SEL_ACCOUNTCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("ACCOUNTCODE")                       '勘定科目コード
+        work.WF_SEL_SEGMENTCODE.Text = LNM0019tbl.Rows(WW_LineCNT)("SEGMENTCODE")                       'セグメントコード
+        work.WF_SEL_JOTPERCENTAGE.Text = LNM0019tbl.Rows(WW_LineCNT)("JOTPERCENTAGE")                   '割合JOT
+        work.WF_SEL_ENEXPERCENTAGE.Text = LNM0019tbl.Rows(WW_LineCNT)("ENEXPERCENTAGE")                 '割合ENEX
         work.WF_SEL_STYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("STYMD")                                   '有効開始日
         work.WF_SEL_ENDYMD.Text = LNM0019tbl.Rows(WW_LineCNT)("ENDYMD")                                 '有効終了日
         work.WF_SEL_DIESELPRICESITEID.Text = LNM0019tbl.Rows(WW_LineCNT)("DIESELPRICESITEID")           '実勢軽油価格参照先ID
@@ -1164,7 +1258,7 @@ Public Class LNM0019SurchargePatternList
     ''' <param name="O_TEXT"></param>
     ''' <param name="O_RTN"></param>
     ''' <remarks></remarks>
-    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+    Protected Sub CODENAME_get(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String, Optional ByVal I_ACCOUNT As String = "")
 
         O_TEXT = ""
         O_RTN = ""
@@ -1178,10 +1272,31 @@ Public Class LNM0019SurchargePatternList
             Select Case I_FIELD
                 Case "ORG"              '組織コード
                     LNM0019WRKINC.getOrgName(I_VALUE, O_TEXT, O_RTN)
-                Case "DELFLG", "SURCHARGEPATTERN", "BILLINGCYCLE", "CALCMETHOD"          '削除フラグ、サーチャージパターンコード、請求サイクル、距離算定方式
+                Case "DELFLG", "SURCHARGEPATTERN", "BILLINGCYCLE", "CALCMETHOD", "ROUNDLEN", "ROUNDMETHOD"
+                    '削除フラグ、サーチャージパターンコード、請求サイクル、距離算定方式、端数処理（桁数）、端数処理（方式）
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, I_FIELD))
                 Case "TORICODE"
                     LNM0019WRKINC.getToriName(I_VALUE, O_TEXT, O_RTN)
+                Case "ACCOUNTCODE"
+                    O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
+                    Dim retAccountList As New DropDownList
+                    retAccountList = LNM0019WRKINC.getDowpDownAccountList(Date.Now().ToString("yyyy/MM"))
+                    For i As Integer = 0 To retAccountList.Items.Count - 1
+                        If retAccountList.Items(i).Value = I_VALUE Then
+                            O_TEXT = retAccountList.Items(i).Text
+                            O_RTN = C_MESSAGE_NO.NORMAL
+                        End If
+                    Next
+                Case "SEGMENTCODE"
+                    O_RTN = C_MESSAGE_NO.NO_DATA_EXISTS_ERROR
+                    Dim retSegmentList As New DropDownList
+                    retSegmentList = LNM0007WRKINC.getDowpDownSegmentList(Date.Now().ToString("yyyy/MM"), I_ACCOUNT)
+                    For i As Integer = 0 To retSegmentList.Items.Count - 1
+                        If retSegmentList.Items(i).Value = I_VALUE Then
+                            O_TEXT = retSegmentList.Items(i).Text
+                            O_RTN = C_MESSAGE_NO.NORMAL
+                        End If
+                    Next
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
@@ -1366,6 +1481,9 @@ Public Class LNM0019SurchargePatternList
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.KASANORGCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '加算先部門コード
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEPATTERNCODE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'サーチャージパターンコード
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLE).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '請求サイクル
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実勢単価端数処理（桁数）
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '実勢単価端数処理（方式）
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) 'サーチャージ請求金額端数処理（方式）
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.STYMD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '有効開始日
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DELFLG).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_REQUIRED) '削除フラグ
 
@@ -1378,6 +1496,11 @@ Public Class LNM0019SurchargePatternList
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLENAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '請求サイクル名
         'sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '距離算定方式
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.CALCMETHODNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '距離算定方式
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLENNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢単価端数処理（桁数）名
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHODNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢単価端数処理（方式）名
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHODNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) 'サーチャージ請求金額端数処理（方式）名
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '勘定科目名
+        sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.SEGMENTNAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) 'セグメント名
         'sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID
         'sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先ID枝番
         sheet.Columns(LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITENAME).Interior.Color = ColorTranslator.FromHtml(CONST_COLOR_HATCHING_UNNECESSARY) '実勢軽油価格参照先名
@@ -1443,6 +1566,18 @@ Public Class LNM0019SurchargePatternList
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLENAME).Value = "請求サイクル名"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).Value = "距離算定方式"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHODNAME).Value = "距離算定方式名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN).Value = "（必須）実勢単価端数処理（桁数）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLENNAME).Value = "実勢単価端数処理（桁数）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD).Value = "（必須）実勢単価端数処理（方式）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHODNAME).Value = "実勢単価端数処理（方式）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD).Value = "（必須）サーチャージ請求金額端数処理（方式）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHODNAME).Value = "サーチャージ請求金額端数処理（方式）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTCODE).Value = "勘定科目コード"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTNAME).Value = "勘定科目名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SEGMENTCODE).Value = "セグメントコード"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SEGMENTNAME).Value = "セグメント名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.JOTPERCENTAGE).Value = "割合JOT"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE).Value = "割合ENEX"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.STYMD).Value = "（必須）有効開始日"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.ENDYMD).Value = "有効終了日"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Value = "実勢軽油価格参照先ID"
@@ -1492,28 +1627,54 @@ Public Class LNM0019SurchargePatternList
             End With
 
             '請求サイクル
-            WW_TEXTLIST.Clear()
-            WW_TEXTLIST.AppendLine("0：毎月")
-            WW_TEXTLIST.AppendLine("1：1回/年度")
-            WW_TEXTLIST.AppendLine("2：2回/年度")
-            WW_TEXTLIST.AppendLine("3：3回/年度")
-            WW_TEXT = WW_TEXTLIST.ToString
-            sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLE).AddComment(WW_TEXT)
-            With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLE).Comment.Shape
-                .Width = 100
-                .Height = 50
-            End With
+            COMMENT_get(SQLcon, "BILLINGCYCLE", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLE).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLE).Comment.Shape
+                    .Width = 100
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
 
             '距離算定方式
-            WW_TEXTLIST.Clear()
-            WW_TEXTLIST.AppendLine("1:距離定義による計算")
-            WW_TEXTLIST.AppendLine("2:距離は実績値を画面に入力")
-            WW_TEXT = WW_TEXTLIST.ToString
-            sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).AddComment(WW_TEXT)
-            With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).Comment.Shape
-                .Width = 200
-                .Height = 30
-            End With
+            COMMENT_get(SQLcon, "CALCMETHOD", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).Comment.Shape
+                    .Width = 200
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            '実勢単価端数処理（桁数）
+            COMMENT_get(SQLcon, "ROUNDLEN", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN).Comment.Shape
+                    .Width = 120
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            '実勢単価端数処理（方式）
+            COMMENT_get(SQLcon, "ROUNDMETHOD", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD).Comment.Shape
+                    .Width = 70
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
+
+            'サーチャージ請求金額端数処理（方式）
+            COMMENT_get(SQLcon, "ROUNDMETHOD", WW_TEXT, WW_CNT)
+            If Not WW_CNT = 0 Then
+                sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD).AddComment(WW_TEXT)
+                With sheet.Cells(WW_HEADERROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD).Comment.Shape
+                    .Width = 70
+                    .Height = CONST_HEIGHT_PER_ROW * WW_CNT
+                End With
+            End If
 
             '実勢軽油価格参照先ID
             WW_TEXTLIST.Clear()
@@ -1612,6 +1773,45 @@ Public Class LNM0019SurchargePatternList
             End With
         End If
 
+        '実勢単価端数処理（桁数）
+        SETFIXVALUELIST(subsheet, "ROUNDLEN", LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        '実勢単価端数処理（方式）
+        SETFIXVALUELIST(subsheet, "ROUNDMETHOD", LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
+        'サーチャージ請求金額端数処理（方式）
+        SETFIXVALUELIST(subsheet, "ROUNDMETHOD", LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD, WW_FIXENDROW)
+        If Not WW_FIXENDROW = -1 Then
+            WW_MAIN_STRANGE = mainsheet.Cells(WW_STROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD)
+            WW_MAIN_ENDRANGE = mainsheet.Cells(WW_ENDROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD)
+            WW_SUB_STRANGE = subsheet.Cells(0, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD)
+            WW_SUB_ENDRANGE = subsheet.Cells(WW_FIXENDROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD)
+            WW_FORMULA1 = "=" & CONST_PULLDOWNSHEETNAME & "!" & WW_SUB_STRANGE.Address & ":" & WW_SUB_ENDRANGE.Address
+            With mainsheet.Range(WW_MAIN_STRANGE.Address & ":" & WW_MAIN_ENDRANGE.Address).Validation
+                .Add(type:=ValidationType.List, formula1:=WW_FORMULA1)
+            End With
+        End If
+
         'メインシートをアクティブにする
         mainsheet.Activate()
         'サブシートを非表示にする
@@ -1680,6 +1880,16 @@ Public Class LNM0019SurchargePatternList
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.BILLINGCYCLENAME).Value = Row("BILLINGCYCLENAME") '請求サイクル名
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHOD).Value = Row("CALCMETHOD") '距離算定方式
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.CALCMETHODNAME).Value = Row("CALCMETHODNAME") '距離算定方式名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN).Value = Row("DIESELPRICEROUNDLEN") '実勢単価端数処理（桁数）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLENNAME).Value = Row("DIESELPRICEROUNDLENNAME") '実勢単価端数処理（桁数）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD).Value = Row("DIESELPRICEROUNDMETHOD") '実勢単価端数処理（方式）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHODNAME).Value = Row("DIESELPRICEROUNDMETHODNAME") '実勢単価端数処理（方式）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD).Value = Row("SURCHARGEROUNDMETHOD") 'サーチャージ請求金額端数処理（方式）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHODNAME).Value = Row("SURCHARGEROUNDMETHODNAME") 'サーチャージ請求金額端数処理（方式）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTCODE).Value = Row("ACCOUNTCODE") '勘定科目コード
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTNAME).Value = Row("ACCOUNTNAME") '勘定科目名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.SEGMENTCODE).Value = Row("SEGMENTCODE") 'セグメントコード
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.SEGMENTNAME).Value = Row("SEGMENTNAME") 'セグメント名
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEID).Value = Row("DIESELPRICESITEID") '実勢軽油価格参照先ID
@@ -1687,6 +1897,23 @@ Public Class LNM0019SurchargePatternList
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEBRANCH).Value = Row("DIESELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICESITEKBNNAME).Value = Row("DIESELPRICESITEKBNNAME") '実勢軽油価格参照先区分名
 
+            '割合JOT
+            If Row("JOTPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.JOTPERCENTAGE).Value = Row("JOTPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.JOTPERCENTAGE).Value = CDbl(Row("JOTPERCENTAGE"))
+            End If
+
+            '割合ENEX
+            If Row("ENEXPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE).Value = Row("ENEXPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE).Value = CDbl(Row("ENEXPERCENTAGE"))
+            End If
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.JOTPERCENTAGE).Style = DecStyle2
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE).Style = DecStyle2
 
             WW_ACTIVEROW += 1
         Next
@@ -1715,7 +1942,8 @@ Public Class LNM0019SurchargePatternList
 
         With leftview
             Select Case I_FIELD
-                Case "DELFLG"   '削除フラグ
+                '削除フラグ、サーチャージパターンコード、請求サイクル、距離算定方式、価端数処理（桁数）、端数処理（方式）
+                Case "DELFLG", "SURCHARGEPATTERN", "BILLINGCYCLE", "CALCMETHOD", "ROUNDLEN", "ROUNDMETHOD"
                     WW_PrmData = work.CreateFIXParam(Master.USERCAMP, I_FIELD)
                     WW_VALUE = LIST_BOX_CLASSIFICATION.LC_FIX_VALUE
             End Select
@@ -1749,7 +1977,8 @@ Public Class LNM0019SurchargePatternList
 
         With leftview
             Select Case I_FIELD
-                Case "DELFLG", "SURCHARGEPATTERN", "BILLINGCYCLE", "CALCMETHOD"   '削除フラグ、サーチャージパターンコード、請求サイクル、距離算定方式
+                '削除フラグ、サーチャージパターンコード、請求サイクル、距離算定方式、価端数処理（桁数）、端数処理（方式）
+                Case "DELFLG", "SURCHARGEPATTERN", "BILLINGCYCLE", "CALCMETHOD", "ROUNDLEN", "ROUNDMETHOD"
                     WW_PrmData = work.CreateFIXParam(Master.USERCAMP, I_FIELD)
                     WW_VALUE = GRIS0005LeftBox.LIST_BOX_CLASSIFICATION.LC_FIX_VALUE
             End Select
@@ -2252,6 +2481,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("        ,SURCHARGEPATTERNNAME  ")
         SQLStr.AppendLine("        ,BILLINGCYCLE  ")
         SQLStr.AppendLine("        ,CALCMETHOD  ")
+        SQLStr.AppendLine("        ,DIESELPRICEROUNDLEN  ")
+        SQLStr.AppendLine("        ,DIESELPRICEROUNDMETHOD  ")
+        SQLStr.AppendLine("        ,SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("  ,'' AS ACCOUNTCODE  ")
+        SQLStr.AppendLine("  ,'' AS SEGMENTCODE  ")
+        SQLStr.AppendLine("        ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("        ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("        ,STYMD  ")
         SQLStr.AppendLine("        ,ENDYMD  ")
         SQLStr.AppendLine("        ,DIESELPRICESITEID  ")
@@ -2396,6 +2632,62 @@ Public Class LNM0019SurchargePatternList
                     WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                     O_RTN = "ERR"
                 End If
+                '実勢単価端数処理（桁数）
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDLEN))
+                WW_DATATYPE = DataTypeHT("DIESELPRICEROUNDLEN")
+                LNM0019Exceltblrow("DIESELPRICEROUNDLEN") = LNM0019WRKINC.DataConvert("実勢単価端数処理（桁数）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '実勢単価端数処理（方式）
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.DIESELPRICEROUNDMETHOD))
+                WW_DATATYPE = DataTypeHT("DIESELPRICEROUNDMETHOD")
+                LNM0019Exceltblrow("DIESELPRICEROUNDMETHOD") = LNM0019WRKINC.DataConvert("実勢単価端数処理（方式）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'サーチャージ請求金額端数処理（方式）
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.SURCHARGEROUNDMETHOD))
+                WW_DATATYPE = DataTypeHT("SURCHARGEROUNDMETHOD")
+                LNM0019Exceltblrow("SURCHARGEROUNDMETHOD") = LNM0019WRKINC.DataConvert("サーチャージ請求金額端数処理（方式）", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '勘定科目コード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.ACCOUNTCODE))
+                WW_DATATYPE = DataTypeHT("ACCOUNTCODE")
+                LNM0019Exceltblrow("ACCOUNTCODE") = LNM0019WRKINC.DataConvert("勘定科目コード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                'セグメントコード
+                WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.SEGMENTCODE))
+                WW_DATATYPE = DataTypeHT("SEGMENTCODE")
+                LNM0019Exceltblrow("SEGMENTCODE") = LNM0019WRKINC.DataConvert("セグメントコード", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '割合JOT
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.JOTPERCENTAGE)), ",", "")
+                WW_DATATYPE = DataTypeHT("JOTPERCENTAGE")
+                LNM0019Exceltblrow("JOTPERCENTAGE") = LNM0019WRKINC.DataConvert("割合JOT", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
+                '割合ENEX
+                WW_TEXT = Replace(Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.ENEXPERCENTAGE)), ",", "")
+                WW_DATATYPE = DataTypeHT("ENEXPERCENTAGE")
+                LNM0019Exceltblrow("ENEXPERCENTAGE") = LNM0019WRKINC.DataConvert("割合ENEX", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
+                If WW_RESULT = False Then
+                    WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
+                    O_RTN = "ERR"
+                End If
                 '有効開始日
                 WW_TEXT = Convert.ToString(WW_EXCELDATA(WW_ROW, LNM0019WRKINC.INOUTEXCELCOL.STYMD))
                 WW_DATATYPE = DataTypeHT("STYMD")
@@ -2475,6 +2767,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("    AND  COALESCE(SURCHARGEPATTERNCODE, '')             = @SURCHARGEPATTERNCODE ")
         SQLStr.AppendLine("    AND  COALESCE(BILLINGCYCLE, '')             = @BILLINGCYCLE ")
         SQLStr.AppendLine("    AND  COALESCE(CALCMETHOD, '')             = @CALCMETHOD ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICEROUNDLEN, '')             = @DIESELPRICEROUNDLEN ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICEROUNDMETHOD, '')             = @DIESELPRICEROUNDMETHOD ")
+        SQLStr.AppendLine("    AND  COALESCE(SURCHARGEROUNDMETHOD, '')             = @SURCHARGEROUNDMETHOD ")
+        SQLStr.AppendLine("    AND  COALESCE(ACCOUNTCODE, '')             =  COALESCE(@ACCOUNTCODE, '') ")
+        SQLStr.AppendLine("    AND  COALESCE(SEGMENTCODE, '')             =  COALESCE(@SEGMENTCODE, '') ")
+        SQLStr.AppendLine("    AND  COALESCE(JOTPERCENTAGE, 0)             = @JOTPERCENTAGE ")
+        SQLStr.AppendLine("    AND  COALESCE(ENEXPERCENTAGE, 0)             = @ENEXPERCENTAGE ")
         SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(STYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@STYMD, '%Y/%m/%d'), '') ")
         If Not WW_ROW("ENDYMD") = Date.MinValue Then
             SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(ENDYMD, '%Y/%m/%d'), '') = COALESCE(DATE_FORMAT(@ENDYMD, '%Y/%m/%d'), '') ")
@@ -2491,6 +2790,13 @@ Public Class LNM0019SurchargePatternList
                 Dim P_SURCHARGEPATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEPATTERNCODE", MySqlDbType.VarChar, 2)     'サーチャージパターンコード
                 Dim P_BILLINGCYCLE As MySqlParameter = SQLcmd.Parameters.Add("@BILLINGCYCLE", MySqlDbType.VarChar, 1)     '請求サイクル
                 Dim P_CALCMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@CALCMETHOD", MySqlDbType.VarChar, 1)     '距離算定方式
+                Dim P_DIESELPRICEROUNDLEN As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICEROUNDLEN", MySqlDbType.VarChar, 1)     '実勢単価端数処理（桁数）
+                Dim P_DIESELPRICEROUNDMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICEROUNDMETHOD", MySqlDbType.VarChar, 1)     '実勢単価端数処理（方式）
+                Dim P_SURCHARGEROUNDMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEROUNDMETHOD", MySqlDbType.VarChar, 1)     'サーチャージ請求金額端数処理（方式）
+                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)     '勘定科目コード
+                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)     'セグメントコード
+                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合JOT
+                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar, 10)     '実勢軽油価格参照先ID
                 Dim P_DIESELPRICESITEBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEBRANCH", MySqlDbType.VarChar, 10)     '実勢軽油価格参照先ID枝番
@@ -2502,6 +2808,29 @@ Public Class LNM0019SurchargePatternList
                 P_SURCHARGEPATTERNCODE.Value = WW_ROW("SURCHARGEPATTERNCODE")           'サーチャージパターンコード
                 P_BILLINGCYCLE.Value = WW_ROW("BILLINGCYCLE")           '請求サイクル
                 P_CALCMETHOD.Value = WW_ROW("CALCMETHOD")           '距離算定方式
+                P_DIESELPRICEROUNDLEN.Value = WW_ROW("DIESELPRICEROUNDLEN")           '実勢単価端数処理（桁数）
+                P_DIESELPRICEROUNDMETHOD.Value = WW_ROW("DIESELPRICEROUNDMETHOD")           '実勢単価端数処理（方式）
+                P_SURCHARGEROUNDMETHOD.Value = WW_ROW("SURCHARGEROUNDMETHOD")           'サーチャージ請求金額端数処理（方式）
+                If String.IsNullOrEmpty(WW_ROW("ACCOUNTCODE")) Then
+                    P_ACCOUNTCODE.Value = DBNull.Value                    '勘定科目コード
+                Else
+                    P_ACCOUNTCODE.Value = WW_ROW("ACCOUNTCODE")           '勘定科目コード
+                End If
+                If String.IsNullOrEmpty(WW_ROW("SEGMENTCODE")) Then
+                    P_SEGMENTCODE.Value = DBNull.Value                    'セグメントコード
+                Else
+                    P_SEGMENTCODE.Value = WW_ROW("SEGMENTCODE")           'セグメントコード
+                End If
+                If String.IsNullOrEmpty(WW_ROW("JOTPERCENTAGE")) Then
+                    P_JOTPERCENTAGE.Value = 0                             '割合JOT
+                Else
+                    P_JOTPERCENTAGE.Value = WW_ROW("JOTPERCENTAGE")       '割合JOT
+                End If
+                If String.IsNullOrEmpty(WW_ROW("JOTPERCENTAGE")) Then
+                    P_ENEXPERCENTAGE.Value = 0                            '割合ENEX
+                Else
+                    P_ENEXPERCENTAGE.Value = WW_ROW("ENEXPERCENTAGE")     '割合ENEX
+                End If
                 P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
                 P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")           '実勢軽油価格参照先ID
                 P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")           '実勢軽油価格参照先ID枝番
@@ -2711,6 +3040,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("     ,SURCHARGEPATTERNNAME  ")
         SQLStr.AppendLine("     ,BILLINGCYCLE  ")
         SQLStr.AppendLine("     ,CALCMETHOD  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDLEN  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,DIESELPRICESITEID  ")
@@ -2734,6 +3070,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("     ,@SURCHARGEPATTERNNAME  ")
         SQLStr.AppendLine("     ,@BILLINGCYCLE  ")
         SQLStr.AppendLine("     ,@CALCMETHOD  ")
+        SQLStr.AppendLine("     ,@DIESELPRICEROUNDLEN  ")
+        SQLStr.AppendLine("     ,@DIESELPRICEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,@SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,@ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,@SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,@JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,@ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,@STYMD  ")
         SQLStr.AppendLine("     ,@ENDYMD  ")
         SQLStr.AppendLine("     ,@DIESELPRICESITEID  ")
@@ -2756,6 +3099,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("     ,SURCHARGEPATTERNNAME =  @SURCHARGEPATTERNNAME")
         SQLStr.AppendLine("     ,BILLINGCYCLE =  @BILLINGCYCLE")
         SQLStr.AppendLine("     ,CALCMETHOD =  @CALCMETHOD")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDLEN  = @DIESELPRICEROUNDLEN")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDMETHOD  = @DIESELPRICEROUNDMETHOD")
+        SQLStr.AppendLine("     ,SURCHARGEROUNDMETHOD  = @SURCHARGEROUNDMETHOD")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  = @ACCOUNTCODE")
+        SQLStr.AppendLine("     ,SEGMENTCODE  = @SEGMENTCODE")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  = @JOTPERCENTAGE")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  = @ENEXPERCENTAGE")
         SQLStr.AppendLine("     ,STYMD =  @STYMD")
         SQLStr.AppendLine("     ,ENDYMD =  @ENDYMD")
         SQLStr.AppendLine("     ,DIESELPRICESITEID =  @DIESELPRICESITEID")
@@ -2779,6 +3129,13 @@ Public Class LNM0019SurchargePatternList
                 Dim P_SURCHARGEPATTERNNAME As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEPATTERNNAME", MySqlDbType.VarChar, 20)     'サーチャージパターン名
                 Dim P_BILLINGCYCLE As MySqlParameter = SQLcmd.Parameters.Add("@BILLINGCYCLE", MySqlDbType.VarChar, 1)     '請求サイクル
                 Dim P_CALCMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@CALCMETHOD", MySqlDbType.VarChar, 1)     '距離算定方式
+                Dim P_DIESELPRICEROUNDLEN As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICEROUNDLEN", MySqlDbType.VarChar, 1)     '実勢単価端数処理（桁数）
+                Dim P_DIESELPRICEROUNDMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICEROUNDMETHOD", MySqlDbType.VarChar, 1)     '実勢単価端数処理（方式）
+                Dim P_SURCHARGEROUNDMETHOD As MySqlParameter = SQLcmd.Parameters.Add("@SURCHARGEROUNDMETHOD", MySqlDbType.VarChar, 1)     'サーチャージ請求金額端数処理（方式）
+                Dim P_ACCOUNTCODE As MySqlParameter = SQLcmd.Parameters.Add("@ACCOUNTCODE", MySqlDbType.Decimal, 8)     '勘定科目コード
+                Dim P_SEGMENTCODE As MySqlParameter = SQLcmd.Parameters.Add("@SEGMENTCODE", MySqlDbType.Decimal, 5)     'セグメントコード
+                Dim P_JOTPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@JOTPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合JOT
+                Dim P_ENEXPERCENTAGE As MySqlParameter = SQLcmd.Parameters.Add("@ENEXPERCENTAGE", MySqlDbType.Decimal, 5, 2)     '割合ENEX
                 Dim P_STYMD As MySqlParameter = SQLcmd.Parameters.Add("@STYMD", MySqlDbType.Date)     '有効開始日
                 Dim P_ENDYMD As MySqlParameter = SQLcmd.Parameters.Add("@ENDYMD", MySqlDbType.Date)     '有効終了日
                 Dim P_DIESELPRICESITEID As MySqlParameter = SQLcmd.Parameters.Add("@DIESELPRICESITEID", MySqlDbType.VarChar, 10)     '実勢軽油価格参照先ID
@@ -2806,6 +3163,29 @@ Public Class LNM0019SurchargePatternList
                 P_SURCHARGEPATTERNNAME.Value = WW_ROW("SURCHARGEPATTERNNAME")           'サーチャージパターン名
                 P_BILLINGCYCLE.Value = WW_ROW("BILLINGCYCLE")           '請求サイクル
                 P_CALCMETHOD.Value = WW_ROW("CALCMETHOD")           '距離算定方式
+                P_DIESELPRICEROUNDLEN.Value = WW_ROW("DIESELPRICEROUNDLEN")           '実勢単価端数処理（桁数）
+                P_DIESELPRICEROUNDMETHOD.Value = WW_ROW("DIESELPRICEROUNDMETHOD")           '実勢単価端数処理（方式）
+                P_SURCHARGEROUNDMETHOD.Value = WW_ROW("SURCHARGEROUNDMETHOD")           'サーチャージ請求金額端数処理（方式）
+                If String.IsNullOrEmpty(WW_ROW("ACCOUNTCODE")) Then
+                    P_ACCOUNTCODE.Value = DBNull.Value                        '勘定科目コード
+                Else
+                    P_ACCOUNTCODE.Value = WW_ROW("ACCOUNTCODE")           '勘定科目コード
+                End If
+                If String.IsNullOrEmpty(WW_ROW("SEGMENTCODE")) Then
+                    P_SEGMENTCODE.Value = DBNull.Value                        'セグメントコード
+                Else
+                    P_SEGMENTCODE.Value = WW_ROW("SEGMENTCODE")           'セグメントコード
+                End If
+                If String.IsNullOrEmpty(WW_ROW("JOTPERCENTAGE")) Then
+                    P_JOTPERCENTAGE.Value = 0                                 '割合JOT
+                Else
+                    P_JOTPERCENTAGE.Value = WW_ROW("JOTPERCENTAGE")       '割合JOT
+                End If
+                If String.IsNullOrEmpty(WW_ROW("ENEXPERCENTAGE")) Then
+                    P_ENEXPERCENTAGE.Value = 0                                '割合ENEX
+                Else
+                    P_ENEXPERCENTAGE.Value = WW_ROW("ENEXPERCENTAGE")     '割合ENEX
+                End If
                 P_STYMD.Value = WW_ROW("STYMD")           '有効開始日
                 P_DIESELPRICESITEID.Value = WW_ROW("DIESELPRICESITEID")           '実勢軽油価格参照先ID
                 P_DIESELPRICESITEBRANCH.Value = WW_ROW("DIESELPRICESITEBRANCH")           '実勢軽油価格参照先ID枝番
@@ -3063,7 +3443,122 @@ Public Class LNM0019SurchargePatternList
             WW_LineErr = "ERR"
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
-        ' 有効開始日(バリデーションチェック)
+        ' 実勢単価端数処理（桁数）
+        Master.CheckField(Master.USERCAMP, "DIESELPRICEROUNDLEN", WW_ROW("DIESELPRICEROUNDLEN"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("ROUNDLEN", WW_ROW("DIESELPRICEROUNDLEN"), WW_Dummy, WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・ 実勢単価端数処理（桁数）入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
+            WW_CheckMES1 = "・実勢単価端数処理（桁数）エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        ' 実勢単価端数処理（方式）
+        Master.CheckField(Master.USERCAMP, "DIESELPRICEROUNDMETHOD", WW_ROW("DIESELPRICEROUNDMETHOD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("ROUNDMETHOD", WW_ROW("DIESELPRICEROUNDMETHOD"), WW_Dummy, WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・ 実勢単価端数処理（方式）入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
+            WW_CheckMES1 = "・実勢単価端数処理（方式）エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        ' サーチャージ請求金額端数処理（方式）
+        Master.CheckField(Master.USERCAMP, "SURCHARGEROUNDMETHOD", WW_ROW("SURCHARGEROUNDMETHOD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("ROUNDMETHOD", WW_ROW("SURCHARGEROUNDMETHOD"), WW_Dummy, WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・ サーチャージ請求金額端数処理（方式）入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
+            WW_CheckMES1 = "・サーチャージ請求金額端数処理（方式）エラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '勘定科目コード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", WW_ROW("ACCOUNTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            If Not String.IsNullOrEmpty(WW_ROW("ACCOUNTCODE")) Then
+                CODENAME_get("ACCOUNTCODE", WW_ROW("ACCOUNTCODE"), WW_Dummy, WW_RtnSW)
+                If Not isNormal(WW_RtnSW) Then
+                    WW_CheckMES1 = "・ 勘定科目コード入力エラーです。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
+        Else
+            WW_CheckMES1 = "・勘定科目コードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        'セグメントコード(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "SEGMENTCODE", WW_ROW("SEGMENTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If isNormal(WW_CS0024FCheckerr) Then
+            If Not String.IsNullOrEmpty(WW_ROW("SEGMENTCODE")) Then
+                CODENAME_get("SEGMENTCODE", WW_ROW("SEGMENTCODE"), WW_Dummy, WW_RtnSW, WW_ROW("ACCOUNTCODE"))
+                If Not isNormal(WW_RtnSW) Then
+                    WW_CheckMES1 = "・ セグメントコード入力エラーです。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
+        Else
+            WW_CheckMES1 = "・セグメントコードエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '割合JOT(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "JOTPERCENTAGE", WW_ROW("JOTPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・割合JOTエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If
+        '割合ENEX(バリデーションチェック)
+        Master.CheckField(Master.USERCAMP, "ENEXPERCENTAGE", WW_ROW("ENEXPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        If Not isNormal(WW_CS0024FCheckerr) Then
+            WW_CheckMES1 = "・割合ENEXエラーです。"
+            WW_CheckMES2 = WW_CS0024FCheckReport
+            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+            WW_LineErr = "ERR"
+            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        End If        ' 有効開始日(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "STYMD", WW_ROW("STYMD"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
             WW_CheckMES1 = "・有効開始日エラーです。"
@@ -3227,6 +3722,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("     ,SURCHARGEPATTERNNAME  ")
         SQLStr.AppendLine("     ,BILLINGCYCLE  ")
         SQLStr.AppendLine("     ,CALCMETHOD  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDLEN  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,DIESELPRICESITEID  ")
@@ -3252,6 +3754,13 @@ Public Class LNM0019SurchargePatternList
         SQLStr.AppendLine("     ,SURCHARGEPATTERNNAME  ")
         SQLStr.AppendLine("     ,BILLINGCYCLE  ")
         SQLStr.AppendLine("     ,CALCMETHOD  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDLEN  ")
+        SQLStr.AppendLine("     ,DIESELPRICEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("     ,ACCOUNTCODE  ")
+        SQLStr.AppendLine("     ,SEGMENTCODE  ")
+        SQLStr.AppendLine("     ,JOTPERCENTAGE  ")
+        SQLStr.AppendLine("     ,ENEXPERCENTAGE  ")
         SQLStr.AppendLine("     ,STYMD  ")
         SQLStr.AppendLine("     ,ENDYMD  ")
         SQLStr.AppendLine("     ,DIESELPRICESITEID  ")

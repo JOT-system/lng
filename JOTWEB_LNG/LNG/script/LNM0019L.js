@@ -143,15 +143,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ○削除行を灰色表示
 function f_DeleteRowGray() {
-    var objTable = document.getElementById("pnlListArea_DR").children[0];
+    var objDL = document.getElementById("pnlListArea_DL").children[0];
+    var objDR = document.getElementById("pnlListArea_DR").children[0];
     var Col = {
-        DELFLG: 14 //削除フラグ
+        DELFLG: 15 //削除フラグ
     };
 
-    for (var i = 0; i < objTable.rows.length; i++) {
+    for (var i = 0; i < objDR.rows.length; i++) {
         //削除行の場合
-        if (objTable.rows[i].cells[Col.DELFLG].innerHTML == "1") {
-            objTable.rows[i].style.backgroundColor = "gray";
+        if (objDR.rows[i].cells[Col.DELFLG].innerHTML == "1") {
+            objDL.rows[i].style.backgroundColor = "gray";
+            objDR.rows[i].style.backgroundColor = "gray";
         }
     }
 }
@@ -159,9 +161,10 @@ function f_DeleteRowGray() {
 // ○ヘッダコメント編集
 function f_CommentCtrlCol() {
     var Col = {
-        SURCHARGEPATTERN: 8     //サーチャージパターン
-        , CALCMETHOD: 10        //距離計算方式
-        , DIESELPRICESITE: 11   //実績単価参照先
+        SURCHARGEPATTERN: 2         //サーチャージパターン
+        , CALCMETHOD: 4             //距離計算方式
+        , DIESELPRICESITE: 5        //実績単価参照先
+        , DIESELPRICEROUNDLEN: 6    //実勢単価端数処理（桁数）
     };
 
     //**********ヘッダ********************/
@@ -172,6 +175,7 @@ function f_CommentCtrlCol() {
     objTableHR.rows[0].cells[Col.SURCHARGEPATTERN].id = "surchargepattern";
     objTableHR.rows[0].cells[Col.CALCMETHOD].id = "calcmethod";
     objTableHR.rows[0].cells[Col.DIESELPRICESITE].id = "dieselpreicesite";
+    objTableHR.rows[0].cells[Col.DIESELPRICEROUNDLEN].id = "dieselpreicesite";
     //タイトル(吹き出し)
     objTableHR.rows[0].cells[Col.SURCHARGEPATTERN].title = "【サーチャージパターンについて】\n" +
         "・荷主単位：車両や届先に関わらず、荷主単位でサーチャージ料金が定義されている場合を指します。\n" +
@@ -189,6 +193,10 @@ function f_CommentCtrlCol() {
     objTableHR.rows[0].cells[Col.DIESELPRICESITE].title = "【実勢価格参照先について】\n" +
         "サーチャージ定義毎の、実勢単価の参照先名称を表示します。\n" +
         "実勢単価参照先が新たに生じた場合は、軽油価格参照先管理マスタで事前登録を行ってください。";
+    //タイトル(吹き出し)
+    objTableHR.rows[0].cells[Col.DIESELPRICEROUNDLEN].title = "【実勢単価端数処理について】\n" +
+        "「小数点以下は、端数処理を行う桁数です。\n" +
+        "第3位の場合、第3位に対して端数処理を行い、X.XXの桁数を意味します。";
 
 }
 
