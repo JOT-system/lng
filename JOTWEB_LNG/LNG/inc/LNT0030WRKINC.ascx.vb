@@ -486,6 +486,8 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine(" FROM LNG.LNT0030_SURCHARGEFEE                      ")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(SEIKYUYM, '')            = @SEIKYUYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SEIKYUDATEFROM, '')      = @SEIKYUDATEFROM ")
+        SQLStr.AppendLine("    AND  COALESCE(SEIKYUDATETO, '')        = @SEIKYUDATETO ")
         SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')            = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
@@ -499,6 +501,8 @@ Public Class LNT0030WRKINC
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_SEIKYUYM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUYM", MySqlDbType.VarChar)                          '請求年月
+                Dim P_SEIKYUDATEFROM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATEFROM", MySqlDbType.Date)                 '請求対象期間From
+                Dim P_SEIKYUDATETO As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATETO", MySqlDbType.Date)                     '請求対象期間To
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                          '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar)                            '部門コード
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
@@ -509,6 +513,8 @@ Public Class LNT0030WRKINC
                 Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar)                              '車番
 
                 P_SEIKYUYM.Value = I_ROW("SEIKYUYM")                           '請求年月
+                P_SEIKYUDATEFROM.Value = I_ROW("SEIKYUDATEFROM")               '請求対象期間From
+                P_SEIKYUDATETO.Value = I_ROW("SEIKYUDATETO")                   '請求対象期間To
                 P_TORICODE.Value = I_ROW("TORICODE")                           '取引先コード
                 P_ORGCODE.Value = I_ROW("ORGCODE")                             '部門コード
                 P_PATTERNCODE.Value = I_ROW("PATTERNCODE")                     'パターンコード
