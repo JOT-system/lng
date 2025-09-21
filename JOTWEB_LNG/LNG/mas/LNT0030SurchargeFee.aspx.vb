@@ -261,8 +261,7 @@ Public Class LNT0030SurchargeFee
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0030tbl)
-        '○ 初期データ保存
-        Master.SaveTable(LNT0030tbl, WF_XMLsaveF2.Value)
+        Master.SaveTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
         '〇 一覧ヘッダを設定
         Me.ListCount.Text = "件数：" + LNT0030tbl.Rows.Count.ToString()
@@ -528,7 +527,7 @@ Public Class LNT0030SurchargeFee
         End If
 
         '初期取得データの戻し
-        Master.RecoverTable(LNT0030tbl, WF_XMLsaveF2.Value)
+        Master.RecoverTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
         '変更チェック
         '○ 追加変更判定
@@ -616,7 +615,7 @@ Public Class LNT0030SurchargeFee
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNT0030tbl)
+        Master.SaveTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
     End Sub
 
@@ -1668,7 +1667,7 @@ Public Class LNT0030SurchargeFee
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub WW_CreateXMLSaveFile()
-        WF_XMLsaveF2.Value = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
+        work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INITTBL.txt"
 
     End Sub

@@ -255,7 +255,7 @@ Partial Public Class LNT0030WRKINC
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
     Public WithEvents WF_SEL_TIMESTAMP As Global.System.Web.UI.WebControls.TextBox
-    
+
     '''<summary>
     '''WF_SEL_INPTBL コントロール。
     '''</summary>
@@ -263,8 +263,8 @@ Partial Public Class LNT0030WRKINC
     '''自動生成されたフィールド。
     '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
     '''</remarks>
-    Protected WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
-    
+    Public WithEvents WF_SEL_INPTBL As Global.System.Web.UI.WebControls.TextBox
+
     '''<summary>
     '''WF_SEL_DETAIL_UPDATE_MESSAGE コントロール。
     '''</summary>
