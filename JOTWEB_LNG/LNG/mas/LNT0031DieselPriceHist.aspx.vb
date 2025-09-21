@@ -163,6 +163,8 @@ Public Class LNT0031DieselPriceHist
         Master.eventDrop = True
         '○ Grid情報保存先のファイル名
         Master.CreateXMLSaveFile()
+        '○ 入力情報（INPtbl）保存先のファイル名
+        WW_CreateXMLSaveFile()
 
         '○ 初期値設定
         WF_FIELD.Value = ""
@@ -238,6 +240,8 @@ Public Class LNT0031DieselPriceHist
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0031tbl)
+        '○ 初期データ保存
+        Master.SaveTable(LNT0031tbl, work.WF_SEL_INPTBL.Text)
 
         '〇 一覧ヘッダを設定
         Me.ListCount.Text = "件数：" + LNT0031tbl.Rows.Count.ToString()
@@ -491,6 +495,7 @@ Public Class LNT0031DieselPriceHist
             Exit Sub
         End If
 
+        Master.RecoverTable(LNT0031tbl, work.WF_SEL_INPTBL.Text)
         '変更チェック
         '○ 追加変更判定
         For Each LNT0031INProw As DataRow In LNT0031INPtbl.Rows
@@ -609,7 +614,7 @@ Public Class LNT0031DieselPriceHist
             Dim LNT0031INProw As DataRow = LNT0031INPtbl.NewRow
             LNT0031INProw.ItemArray = LNT0031tbl.Rows(i).ItemArray
 
-            LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+            'LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
             LNT0031INProw("SELECT") = 1
             LNT0031INProw("HIDDEN") = 0
 
