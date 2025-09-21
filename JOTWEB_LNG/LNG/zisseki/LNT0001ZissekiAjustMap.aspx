@@ -38,12 +38,12 @@
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item d-flex align-items-center gap-1"><span class="material-symbols-outlined">home</span><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('WF_ButtonBackToMenu');">TOP</a></li>
-                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0001L');">実績管理</a></li>
+                        <li class="breadcrumb-item active"><a style="cursor: pointer;text-decoration:underline" onclick="ButtonClick('LNT0002L');">輸送費明細出力状況</a></li>
                         <li class="breadcrumb-item active" aria-current="page">調整画面</li>
                     </ol>
                 </nav>
                 <div id="contentsInner" class="border bg-white px-3 py-3 overflow-hidden contents-inner">
-                    <h2 class="w-100 fs-5 fw-bold contents-title">実績単価調整画面</h2>
+                    <h2 id="headtitle" runat="server" class="w-100 fs-5 fw-bold contents-title">調整画面</h2>
                     <div class="headerboxOnly" id="headerbox">
                         <div class="Operation">
                             <div class="actionButtonBox">

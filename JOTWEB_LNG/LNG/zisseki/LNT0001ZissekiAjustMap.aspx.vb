@@ -98,45 +98,45 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     WW_GridPositionARROW = 0
                     Dim WW_SURCHARGEUPD As Boolean = False   'サーチャージでの更新ボタン押下有無を判定するための変数
                     Select Case WF_ButtonClick.Value
-                        Case "WF_CheckBoxSELECT"        'チェックボックス(選択)クリック
+                        Case "WF_CheckBoxSELECT"                    'チェックボックス(選択)クリック
                             WF_CheckBoxSELECT_Click()
-                        Case "WF_ButtonALLSELECT"       '全選択ボタン押下
+                        Case "WF_ButtonALLSELECT"                   '全選択ボタン押下
                             WF_ButtonALLSELECT_Click()
-                        Case "WF_ButtonSELECT_LIFTED"   '選択解除ボタン押下
+                        Case "WF_ButtonSELECT_LIFTED"               '選択解除ボタン押下
                             WF_ButtonSELECT_LIFTED_Click()
-                        Case "WF_ButtonREFLECT"         '反映ボタン押下
+                        Case "WF_ButtonREFLECT"                     '反映ボタン押下
                             WF_ButtonREFLECT_Click()
-                        Case "WF_ButtonPAGE",           'ページボタン押下時処理
+                        Case "WF_ButtonPAGE",                       'ページボタン押下時処理
                              "WF_ButtonFIRST",
                              "WF_ButtonPREVIOUS",
                              "WF_ButtonNEXT",
                              "WF_ButtonLAST"
                             Me.WF_ButtonPAGE_Click()
-                        Case "WF_ButtonUPDATE"          '保存ボタンクリック
+                        Case "WF_ButtonUPDATE"                      '保存ボタンクリック
                             WF_ButtonUPDATE(WW_SURCHARGEUPD)
-                        Case "WF_ButtonCLEAR"           '戻るボタンクリック
+                        Case "WF_ButtonCLEAR", "LNT0002L"           '戻るボタンクリック
                             WF_ButtonEND_Click()
-                        Case "WF_SelectCALENDARChange"  'カレンダー変更時
+                        Case "WF_SelectCALENDARChange"              'カレンダー変更時
                             WF_TARGETTABLEInitialize()
-                        Case "WF_TARGETTABLEChange"     '対象選択クリック
+                        Case "WF_TARGETTABLEChange"                 '対象選択クリック
                             WF_TARGETTABLEInitialize()
-                        Case "WF_ButtonSearch"          '検索ボタンクリック
+                        Case "WF_ButtonSearch"                      '検索ボタンクリック
                             WF_ButtonSearch_Click()
                         Case "WF_MouseWheelUp"
                             Me.WF_ButtonPAGE_Click()
                         Case "WF_MouseWheelDown"
                             Me.WF_ButtonPAGE_Click()
-                        Case "WF_ButtonRelease"         '解除ボタンクリック
+                        Case "WF_ButtonRelease"                     '解除ボタンクリック
                             WF_ButtonRelease_Click()
-                        Case "WF_Field_DBClick"         'フィールドダブルクリック
+                        Case "WF_Field_DBClick"                     'フィールドダブルクリック
                             WF_FIELD_DBClick()
-                        Case "WF_ListboxDBclick"        '左ボックスダブルクリック
+                        Case "WF_ListboxDBclick"                    '左ボックスダブルクリック
                             WF_ButtonSel_Click()
-                        Case "WF_ButtonCan"             '(左ボックス)キャンセルボタン押下
+                        Case "WF_ButtonCan"                         '(左ボックス)キャンセルボタン押下
                             WF_ButtonCan_Click()
-                        Case "WF_ListChange"            'リスト変更
+                        Case "WF_ListChange"                        'リスト変更
                             WF_ListChange()
-                        Case "WF_ButtonPDF"             '請求書プレビュー
+                        Case "WF_ButtonPDF"                         '請求書プレビュー
                             WF_EXCELPDF(LNT0001WRKINC.FILETYPE.PDF)
                     End Select
                     If WW_ErrSW = "ERR" _
@@ -711,7 +711,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     Master.SaveTable(LNT0031tbl, WF_XMLsaveF31.Value)
                     '○ 一覧表示データ編集(性能対策)
                     TBLview2 = New DataView(LNT0031tbl)
-
+                Case Else
+                    Exit Sub
             End Select
         End Using
 
@@ -828,6 +829,8 @@ Public Class LNT0001ZissekiAjustMap_aspx
                     End If
                 Next
                 TBLview2 = New DataView(LNT0031tbl)
+            Case Else
+                Exit Sub
         End Select
 
         '○ 表示対象行カウント(絞り込み対象)
@@ -1279,6 +1282,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 '単価調整
                 '-----------------------------
                 work.WF_SEL_CONTROLTYPE.Text = LNT0001WRKINC.MAPIDAJ
+                Me.headtitle.InnerText = "実績単価調整画面"
                 Me.pnlListArea2.Visible = False
                 Me.pnlPriceArea.Visible = True
                 '〇対象年月(変更)
@@ -1299,6 +1303,7 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 'サーチャージ
                 '-----------------------------
                 work.WF_SEL_CONTROLTYPE.Text = LNT0001WRKINC.MAPIDAJS
+                Me.headtitle.InnerText = "サーチャージ画面"
                 Me.pnlListArea2.Visible = True
                 Me.pnlSurchargeArea.Visible = True
                 '○ GridView初期設定
@@ -1529,17 +1534,42 @@ Public Class LNT0001ZissekiAjustMap_aspx
                 Dim WW_ListValue = Request.Form("txt" & pnlListArea.ID & WF_FIELD.Value & WF_GridDBclick.Text)
                 If String.IsNullOrEmpty(WW_ListValue) Then WW_ListValue = 0
 
+                Dim WW_CS0024FCheckerr As String = ""
+                Dim WW_CS0024FCheckReport As String = ""
                 Select Case WF_FIELD.Value
                     Case "DISTANCE"
                         updHeader("OPERATION") = "1"
-                        updHeader("DISTANCE") = WW_ListValue
+                        '距離(バリデーションチェック)
+                        Master.CheckField(Master.USERCAMP, "DISTANCE", WW_ListValue, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+                        If isNormal(WW_CS0024FCheckerr) Then
+                            updHeader("DISTANCE") = WW_ListValue
+                        Else
+                            Exit Sub
+                        End If
                     Case "SHIPPINGCOUNT"
                         updHeader("OPERATION") = "1"
-                        updHeader("SHIPPINGCOUNT") = WW_ListValue
+                        '輸送回数(バリデーションチェック)
+                        Master.CheckField(Master.USERCAMP, "SHIPPINGCOUNT", WW_ListValue, WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+                        If isNormal(WW_CS0024FCheckerr) Then
+                            updHeader("SHIPPINGCOUNT") = WW_ListValue
+                        Else
+                            Exit Sub
+                        End If
                     Case "FUELRESULT"
                         updHeader("OPERATION") = "1"
-                        updHeader("FUELRESULT") = WW_ListValue
+                        '燃料使用量(バリデーションチェック)
+                        Master.CheckField(Master.USERCAMP, "FUELRESULT", updHeader("FUELRESULT"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+                        If isNormal(WW_CS0024FCheckerr) Then
+                            updHeader("FUELRESULT") = WW_ListValue
+                        Else
+                            Exit Sub
+                        End If
                 End Select
+                'サーチャージ計算
+                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                    SQLcon.Open()  ' DataBase接続
+                    SurchargeCalc(SQLcon)
+                End Using
 
                 '○ 画面表示データ保存
                 Master.SaveTable(LNT0030tbl, WF_XMLsaveF30.Value)       'サーチャージ用

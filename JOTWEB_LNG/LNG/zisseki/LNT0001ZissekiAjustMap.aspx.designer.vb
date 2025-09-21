@@ -23,6 +23,15 @@ Partial Public Class LNT0001ZissekiAjustMap_aspx
     Protected WithEvents leftmenu As Global.JOTWEB_LNG.GRIS0006LeftMenu
     
     '''<summary>
+    '''headtitle コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents headtitle As Global.System.Web.UI.HtmlControls.HtmlGenericControl
+    
+    '''<summary>
     '''WF_TaishoYm コントロール。
     '''</summary>
     '''<remarks>
