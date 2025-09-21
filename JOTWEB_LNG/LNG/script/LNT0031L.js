@@ -108,14 +108,18 @@ function BtnAddClick(EventName) {
     for (var i = 0; i < objDRTable.rows.length; i++) {
         var j = i + 1;
         if (document.getElementById("txtpnlListAreaADDFLG" + j).value == "1") {
-            findFlg = true
+            if (document.getElementById("txtpnlListAreaTARGETYEAR" + j).value == "") {
+                findFlg = true
+            } else {
+                //追加行に入力（対象年）がある場合、追加フラグをリセット"0"
+                document.getElementById("txtpnlListAreaADDFLG" + j).value = "0"
+            }
         }
     }
     if (findFlg == true) {
         //追加行があれば、SUNMITしない
         return;
     }
-
     document.getElementById("WF_ButtonClick").value = EventName;
     document.forms[0].submit();
 }
