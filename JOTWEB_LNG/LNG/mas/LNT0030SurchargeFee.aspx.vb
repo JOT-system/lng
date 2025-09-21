@@ -3500,6 +3500,8 @@ Public Class LNT0030SurchargeFee
                 WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Else
+                WW_ROW("SEIKYUYM") = WW_result.ToString("yyyyMM")
             End If
         Else
             WW_CheckMES1 = "・請求年月エラーです。"
