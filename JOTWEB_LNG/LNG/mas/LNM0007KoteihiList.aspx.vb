@@ -222,7 +222,7 @@ Public Class LNM0007KoteihiList
         '部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG)
+        retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text)
         For index As Integer = 0 To retOrgList.Items.Count - 1
             WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
         Next
@@ -766,16 +766,28 @@ Public Class LNM0007KoteihiList
 
         work.WF_SEL_TARGETYM.Text = Date.Now.ToString("yyyy/MM")                       '対象年月
 
+        '取引先コード/取引先名称
         If WF_TORI.SelectedValue = "" Then
-            work.WF_SEL_TORICODE.Text = ""                  '取引先コード
-            work.WF_SEL_TORINAME.Text = ""                 '取引先名称
+            work.WF_SEL_TORICODE.Text = ""
+            work.WF_SEL_TORINAME.Text = ""
         Else
-            work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue                         '取引先コード
-            work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString                 '取引先名称
+            work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
+            work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString
         End If
+        'work.WF_SEL_TORICODE.Text = ""                  '取引先コード
+        'work.WF_SEL_TORINAME.Text = ""                 '取引先名称
 
-        work.WF_SEL_ORGCODE.Text = ""                                                     '部門コード
-        work.WF_SEL_ORGNAME.Text = ""                                                     '部門名称
+        '部門コード/部門名称
+        If WF_ORG.SelectedValue = "" Then
+            work.WF_SEL_ORGCODE.Text = ""
+            work.WF_SEL_ORGNAME.Text = ""
+        Else
+            work.WF_SEL_ORGCODE.Text = WF_ORG.SelectedValue
+            work.WF_SEL_ORGNAME.Text = WF_ORG.SelectedItem.ToString
+        End If
+        'work.WF_SEL_ORGCODE.Text = ""                                                     '部門コード
+        'work.WF_SEL_ORGNAME.Text = ""                                                     '部門名称
+
         work.WF_SEL_KASANORGCODE.Text = ""                                                '加算先部門コード
         work.WF_SEL_KASANORGNAME.Text = ""                                                '加算先部門名称
         work.WF_SEL_SYABAN.Text = ""                                                      '車番

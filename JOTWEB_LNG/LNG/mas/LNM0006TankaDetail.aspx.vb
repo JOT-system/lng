@@ -268,7 +268,7 @@ Public Class LNM0006TankaDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
@@ -294,17 +294,21 @@ Public Class LNM0006TankaDetail
         Me.WF_KASANORG.Items.Clear()
         Me.WF_KASANORG.Items.Add("")
         Dim retKasanOrgList As New DropDownList
-        retKasanOrgList = LNM0006WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        retKasanOrgList = LNM0006WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_ORGCODE:=work.WF_SEL_ORGCODE.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retKasanOrgList.Items.Count - 1
             WF_KASANORG.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
         Next
+        If retKasanOrgList.Items.Count = 1 AndAlso work.WF_SEL_KASANORGCODE.Text = "" Then
+            WF_KASANORG.SelectedValue = retKasanOrgList.Items(0).Value
+            work.WF_SEL_KASANORGCODE.Text = retKasanOrgList.Items(0).Value
+        End If
 
         '出荷場所
         Me.WF_AVOCADOSHUKA.Items.Clear()
         Me.WF_AVOCADOSHUKA.Items.Add("")
 
         Dim retAvocadoshukaiList As New DropDownList
-        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
+        retAvocadoshukaiList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retAvocadoshukaiList.Items.Count - 1
             WF_AVOCADOSHUKA.Items.Add(New ListItem(retAvocadoshukaiList.Items(index).Text, retAvocadoshukaiList.Items(index).Value))
         Next
@@ -322,7 +326,7 @@ Public Class LNM0006TankaDetail
         Me.WF_AVOCADOTODOKE.Items.Add("")
 
         Dim retAvocadotodokeList As New DropDownList
-        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_CREATEFLG:=True)
+        retAvocadotodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TARGETYMD_L.Text, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
         For index As Integer = 0 To retAvocadotodokeList.Items.Count - 1
             WF_AVOCADOTODOKE.Items.Add(New ListItem(retAvocadotodokeList.Items(index).Text, retAvocadotodokeList.Items(index).Value))
         Next
@@ -395,6 +399,7 @@ Public Class LNM0006TankaDetail
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
 
         '取引先コード、名称
+        WF_TORI.SelectedValue = work.WF_SEL_TORICODE.Text
         WF_TORICODE_TEXT.Text = work.WF_SEL_TORICODE.Text
         WF_TORINAME.Text = work.WF_SEL_TORINAME.Text
         WF_TORICODE_TEXT_SAVE.Value = work.WF_SEL_TORICODE.Text
@@ -411,6 +416,7 @@ Public Class LNM0006TankaDetail
         WF_KASANORG_SAVE.Value = work.WF_SEL_KASANORGCODE.Text
 
         '実績出荷場所コード、名称
+        WF_AVOCADOSHUKA.SelectedValue = work.WF_SEL_AVOCADOSHUKABASHO.Text
         WF_AVOCADOSHUKABASHO_TEXT.Text = work.WF_SEL_AVOCADOSHUKABASHO.Text
         WF_AVOCADOSHUKANAME.Text = work.WF_SEL_AVOCADOSHUKANAME.Text
         WF_AVOCADOSHUKABASHO_TEXT_SAVE.Value = work.WF_SEL_AVOCADOSHUKABASHO.Text
@@ -491,7 +497,8 @@ Public Class LNM0006TankaDetail
         TxtBIKOU3.Text = work.WF_SEL_BIKOU3.Text
 
         'Disabled制御項目
-        DisabledKeyItem.Value = work.WF_SEL_AVOCADOSHUKABASHO.Text
+        DisabledKeyItem.Value = work.WF_SEL_LINECNT.Text
+        'DisabledKeyItem.Value = work.WF_SEL_AVOCADOSHUKABASHO.Text
 
         '表示制御項目
         '情シス、高圧ガス以外の場合

@@ -189,8 +189,15 @@ Public Class LNM0006TankaList
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize("")
 
-        '○ ドロップダウンリスト生成
+        '取引コード(保持)用の初期化判断
+        Select Case Context.Handler.ToString().ToUpper()
+            Case C_PREV_MAP_LIST.LNM0006D, C_PREV_MAP_LIST.LNM0006H
+                '○ 登録・履歴画面以外からの遷移
+            Case Else
+                work.WF_SEL_TORICODE.Text = ""
+        End Select
         WF_StYMD.Value = Date.Now.ToString("yyyy/MM/dd")
+        '○ ドロップダウンリスト生成
         createListBox()
 
         '○ 画面の値設定
@@ -230,7 +237,7 @@ Public Class LNM0006TankaList
         '部門
         Me.WF_ORG.Items.Clear()
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
+        retOrgList = LNM0006WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=work.WF_SEL_TORICODE.Text)
         For index As Integer = 0 To retOrgList.Items.Count - 1
             WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
         Next
@@ -249,7 +256,7 @@ Public Class LNM0006TankaList
         '出荷地
         Me.WF_DEPARTURE.Items.Clear()
         Dim retDepartureList As New DropDownList
-        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value)
+        retDepartureList = LNM0006WRKINC.getDowpDownAvocadoshukaList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=work.WF_SEL_TORICODE.Text)
         For index As Integer = 0 To retDepartureList.Items.Count - 1
             WF_DEPARTURE.Items.Add(New ListItem(retDepartureList.Items(index).Text, retDepartureList.Items(index).Value))
         Next
@@ -749,16 +756,43 @@ Public Class LNM0006TankaList
         work.WF_SEL_LINECNT.Text = ""                                            '選択行
         Master.GetFirstValue(Master.USERCAMP, "ZERO", work.WF_SEL_DELFLG.Text)   '削除
 
-        work.WF_SEL_TORICODE.Text = ""                                           '取引先コード
-        work.WF_SEL_TORINAME.Text = ""                                           '取引先名称
+        '取引先コード/取引先名称
+        If WF_TORI.SelectedValue = "" Then
+            work.WF_SEL_TORICODE.Text = ""
+            work.WF_SEL_TORINAME.Text = ""
+        Else
+            work.WF_SEL_TORICODE.Text = WF_TORI.SelectedValue
+            work.WF_SEL_TORINAME.Text = WF_TORI.SelectedItem.ToString
+        End If
+        'work.WF_SEL_TORICODE.Text = ""                                           '取引先コード
+        'work.WF_SEL_TORINAME.Text = ""                                           '取引先名称
 
-        work.WF_SEL_ORGCODE.Text = ""                                            '部門コード
-        work.WF_SEL_ORGNAME.Text = ""                                            '部門名称
+        '部門コード/部門名称
+        If WF_ORG.SelectedValue = "" Then
+            work.WF_SEL_ORGCODE.Text = ""
+            work.WF_SEL_ORGNAME.Text = ""
+        Else
+            work.WF_SEL_ORGCODE.Text = WF_ORG.SelectedValue
+            work.WF_SEL_ORGNAME.Text = WF_ORG.SelectedItem.ToString
+        End If
+        'work.WF_SEL_ORGCODE.Text = ""                                            '部門コード
+        'work.WF_SEL_ORGNAME.Text = ""                                            '部門名称
 
-        work.WF_SEL_KASANORGCODE.Text = ""                                           '加算先部門コード
-        work.WF_SEL_KASANORGNAME.Text = ""                                           '加算先部門名称
-        work.WF_SEL_AVOCADOSHUKABASHO.Text = ""                                      '実績出荷場所コード
-        work.WF_SEL_AVOCADOSHUKANAME.Text = ""                                       '実績出荷場所名称
+        '加算先部門コード
+        work.WF_SEL_KASANORGCODE.Text = ""
+        '加算先部門名称
+        work.WF_SEL_KASANORGNAME.Text = ""
+
+        '実績出荷場所コード/実績出荷場所名称
+        If WF_DEPARTURE.SelectedValue = "" Then
+            work.WF_SEL_AVOCADOSHUKABASHO.Text = ""
+            work.WF_SEL_AVOCADOSHUKANAME.Text = ""
+        Else
+            work.WF_SEL_AVOCADOSHUKABASHO.Text = WF_DEPARTURE.SelectedValue
+            work.WF_SEL_AVOCADOSHUKANAME.Text = WF_DEPARTURE.SelectedItem.ToString
+        End If
+        'work.WF_SEL_AVOCADOSHUKABASHO.Text = ""                                      '実績出荷場所コード
+        'work.WF_SEL_AVOCADOSHUKANAME.Text = ""                                       '実績出荷場所名称
         work.WF_SEL_SHUKABASHO.Text = ""                                             '変換後出荷場所コード
         work.WF_SEL_SHUKANAME.Text = ""                                              '変換後出荷場所名称
         work.WF_SEL_AVOCADOTODOKECODE.Text = ""                                      '実績届先コード
@@ -1210,7 +1244,7 @@ Public Class LNM0006TankaList
         Me.WF_TODOKE.Items.Clear()
         If Not work.WF_SEL_TORI_L.Text = "" Then
             Dim retTodokeList As New DropDownList
-            retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, work.WF_SEL_TORI_L.Text)
+            retTodokeList = LNM0006WRKINC.getDowpDownAvocadotodokeList(Master.MAPID, Master.ROLE_ORG, WF_StYMD.Value, I_TORICODE:=work.WF_SEL_TORI_L.Text)
             For index As Integer = 0 To retTodokeList.Items.Count - 1
                 WF_TODOKE.Items.Add(New ListItem(retTodokeList.Items(index).Text, retTodokeList.Items(index).Value))
             Next

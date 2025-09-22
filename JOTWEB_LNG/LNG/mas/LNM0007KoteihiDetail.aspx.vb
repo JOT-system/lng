@@ -227,7 +227,8 @@ Public Class LNM0007KoteihiDetail
         Me.WF_TORI.Items.Add("")
         'Dim retToriList As New DropDownList
         'retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
-        Dim retToriList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDTORI")
+        Dim retToriList = LNM0007WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        'Dim retToriList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDTORI")
         For index As Integer = 0 To retToriList.Items.Count - 1
             WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
         Next
@@ -250,7 +251,8 @@ Public Class LNM0007KoteihiDetail
         '    WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
         'Next
 
-        Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDORG")
+        Dim retOfficeList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
+        'Dim retOfficeList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDORG")
         If retOfficeList.Items.Count > 0 Then
             '情シス、高圧ガス以外
             If LNM0007WRKINC.AdminCheck(Master.ROLE_ORG) = False Then
@@ -276,7 +278,8 @@ Public Class LNM0007KoteihiDetail
         Me.WF_KASANORG.Items.Add("")
         'Dim retKasanOrgList As New DropDownList
         'retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG)
-        Dim retKasanOrgList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDKASANORG")
+        Dim retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_ORGCODE:=work.WF_SEL_ORGCODE.Text, I_CREATEFLG:=True)
+        'Dim retKasanOrgList As DropDownList = CmnLng.getDowpDownFixedList(Master.USERCAMP, "FIXEDKASANORG")
         '★編集の場合(加算先部門を対象の部門のみ選択できるように設定)
         If work.WF_SEL_LINECNT.Text <> "" Then
             retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_ORGCODE:=work.WF_SEL_ORGCODE.Text, I_CREATEFLG:=True)
@@ -340,6 +343,7 @@ Public Class LNM0007KoteihiDetail
         TxtCampCode.Text = work.WF_SEL_CAMPCODE.Text
         CODENAME_get("CAMPCODE", TxtCampCode.Text, LblCampCodeName.Text, WW_RtnSW)
         '取引先コード、名称
+        WF_TORI.SelectedValue = work.WF_SEL_TORICODE.Text
         WF_TORICODE_TEXT.Text = work.WF_SEL_TORICODE.Text
         WF_TORINAME.Text = work.WF_SEL_TORINAME.Text
         WF_TORICODE_TEXT_SAVE.Value = work.WF_SEL_TORICODE.Text
@@ -1809,6 +1813,7 @@ Public Class LNM0007KoteihiDetail
         '★ドロップダウンリスト選択(部門)の場合
         If retOrgList.Items.Count = 1 Then
             selectindexORG = 1
+            selectORG = ""
         End If
         '★ドロップダウンリスト再作成(部門)
         For index As Integer = 0 To retOrgList.Items.Count - 1
