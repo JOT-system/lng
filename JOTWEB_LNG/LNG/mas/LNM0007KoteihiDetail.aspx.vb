@@ -1827,9 +1827,11 @@ Public Class LNM0007KoteihiDetail
         Dim retKASANOrgList As New DropDownList
         retKASANOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
         If selectTORI <> "" AndAlso retKASANOrgList.Items.Count = 0 Then
+            selectORG = ""              '-- 部門(表示)初期化
+            selectindexORG = 0          '-- 部門(INDEX)初期化
             selectKASANORG = ""         '-- 加算先部門(表示)初期化
             selectindexKASANORG = 0     '-- 加算先部門(INDEX)初期化
-            retOrgList = LNM0007WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
+            retKASANOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=selectTORI, I_ORGCODE:=selectORG, I_KASANORGCODE:=selectKASANORG, I_CREATEFLG:=True)
         End If
         WF_KASANORG.Items.Add(New ListItem("", ""))
         '★ドロップダウンリスト選択(加算先部門)の場合
