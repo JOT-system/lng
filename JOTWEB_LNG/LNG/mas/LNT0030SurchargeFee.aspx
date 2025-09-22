@@ -162,8 +162,6 @@
         <input id="WF_MAPpermitcode" runat="server" value="" type="text" />
         <!-- フラグパラメタの保存 -->
         <input id="WF_FLGPARM" runat="server" value="" type="text" />
-        <!-- 初期データの保存 -->
-        <input id="WF_XMLsaveF2" runat="server" value="" type="text" />
     </div>
  
 </asp:Content>

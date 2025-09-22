@@ -40,6 +40,13 @@ _:-ms-lang(x)::backdrop, .calendarIconArea div, .boxIconArea div {
 
 #pnlListArea {
     margin: 0 0px;
+
+}
+
+#pnlListArea2 {
+    height: 100px;
+    margin: 0 0px;
+    position: relative;
 }
 
 :root, [data-bs-theme=light] {

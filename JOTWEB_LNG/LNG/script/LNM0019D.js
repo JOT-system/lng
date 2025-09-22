@@ -22,38 +22,50 @@ window.onload = function () {
         document.getElementById('WF_ButtonUPDATE').value = "登録";
     } else {
         //値復元
-        document.getElementById('WF_TORICODE').value = document.getElementById('WF_TORICODE_SAVE').value;
-        SetDropDownList(document.getElementById('WF_TORINAME'), document.getElementById('WF_TORINAME_SAVE').value);
-        document.getElementById('WF_ORGCODE').value = document.getElementById('WF_ORG_SAVE').value;
-        SetDropDownList(document.getElementById('WF_ORGNAME'), document.getElementById('WF_ORGNAME_SAVE').value);
-        document.getElementById('WF_KASANORGCODE').value = document.getElementById('WF_KASANORG_SAVE').value;
-        SetDropDownList(document.getElementById('WF_KASANORGNAME'), document.getElementById('WF_KASANORGNAME_SAVE').value);
-        document.getElementById('WF_BILLINGCYCLE').value = document.getElementById('WF_BILLINGCYCLE_SAVE').value;
-        SetDropDownList(document.getElementById('WF_BILLINGCYCLENAME'), document.getElementById('WF_BILLINGCYCLENAME_SAVE').value);
-        document.getElementById('WF_SURCHARGEPATTERNCODE').value = document.getElementById('WF_SURCHARGEPATTERNCODE_SAVE').value;
-        SetDropDownList(document.getElementById('WF_SURCHARGEPATTERNNAME'), document.getElementById('WF_SURCHARGEPATTERNNAME_SAVE').value);
+        //document.getElementById('WF_TORICODE').value = document.getElementById('WF_TORICODE_SAVE').value;
+        //SetDropDownList(document.getElementById('WF_TORINAME'), document.getElementById('WF_TORINAME_SAVE').value);
+        //document.getElementById('WF_ORGCODE').value = document.getElementById('WF_ORG_SAVE').value;
+        //SetDropDownList(document.getElementById('WF_ORGNAME'), document.getElementById('WF_ORGNAME_SAVE').value);
+        //document.getElementById('WF_KASANORGCODE').value = document.getElementById('WF_KASANORG_SAVE').value;
+        //SetDropDownList(document.getElementById('WF_KASANORGNAME'), document.getElementById('WF_KASANORGNAME_SAVE').value);
+        //document.getElementById('WF_BILLINGCYCLE').value = document.getElementById('WF_BILLINGCYCLE_SAVE').value;
+        //SetDropDownList(document.getElementById('WF_BILLINGCYCLENAME'), document.getElementById('WF_BILLINGCYCLENAME_SAVE').value);
+        //document.getElementById('WF_SURCHARGEPATTERNCODE').value = document.getElementById('WF_SURCHARGEPATTERNCODE_SAVE').value;
+        //SetDropDownList(document.getElementById('WF_SURCHARGEPATTERNNAME'), document.getElementById('WF_SURCHARGEPATTERNNAME_SAVE').value);
 
-        document.getElementById('WF_TORICODE').disabled = true;
-        document.getElementById('WF_TORINAME').disabled = true;
-        document.getElementById('WF_ORGCODE').disabled = true;
-        document.getElementById('WF_ORGNAME').disabled = true;
-        document.getElementById('WF_KASANORGCODE').disabled = true;
-        document.getElementById('WF_KASANORGNAME').disabled = true;
-        document.getElementById('WF_BILLINGCYCLE').disabled = true;
-        document.getElementById('WF_BILLINGCYCLENAME').disabled = true;
-        document.getElementById('WF_SURCHARGEPATTERNCODE').disabled = true;
-        document.getElementById('WF_SURCHARGEPATTERNNAME').disabled = true;
+        //非活性制御
+        document.getElementById('WF_TORICODE').readOnly = true;
+        document.getElementById('WF_TORINAME').classList.add('disabled-dropdown');
+        document.getElementById('WF_ORGCODE').readOnly = true;
+        document.getElementById('WF_ORGNAME').classList.add('disabled-dropdown');
+        document.getElementById('WF_KASANORGCODE').readOnly = true;
+        document.getElementById('WF_KASANORGNAME').classList.add('disabled-dropdown');
+        document.getElementById('WF_BILLINGCYCLE').readOnly = true;
+        document.getElementById('WF_BILLINGCYCLENAME').classList.add('disabled-dropdown');
+        document.getElementById('WF_SURCHARGEPATTERNCODE').readOnly = true;
+        document.getElementById('WF_SURCHARGEPATTERNNAME').classList.add('disabled-dropdown');
 
-        document.getElementById('WF_TORICODE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_TORINAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_ORGCODE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_ORGNAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_KASANORGCODE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_KASANORGNAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_BILLINGCYCLE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_BILLINGCYCLENAME').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_SURCHARGEPATTERNCODE').style.backgroundColor = "#F2F2F2";
-        document.getElementById('WF_SURCHARGEPATTERNNAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_TORICODE').disabled = true;
+        //document.getElementById('WF_TORINAME').disabled = true;
+        //document.getElementById('WF_ORGCODE').disabled = true;
+        //document.getElementById('WF_ORGNAME').disabled = true;
+        //document.getElementById('WF_KASANORGCODE').disabled = true;
+        //document.getElementById('WF_KASANORGNAME').disabled = true;
+        //document.getElementById('WF_BILLINGCYCLE').disabled = true;
+        //document.getElementById('WF_BILLINGCYCLENAME').disabled = true;
+        //document.getElementById('WF_SURCHARGEPATTERNCODE').disabled = true;
+        //document.getElementById('WF_SURCHARGEPATTERNNAME').disabled = true;
+
+        //document.getElementById('WF_TORICODE').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_TORINAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_ORGCODE').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_ORGNAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_KASANORGCODE').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_KASANORGNAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_BILLINGCYCLE').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_BILLINGCYCLENAME').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_SURCHARGEPATTERNCODE').style.backgroundColor = "#F2F2F2";
+        //document.getElementById('WF_SURCHARGEPATTERNNAME').style.backgroundColor = "#F2F2F2";
     }
 
     //ポップアップメッセージ
@@ -84,6 +96,11 @@ window.onload = function () {
         "実勢価格参照先の新規登録・変更が必要な場合は\n" +
         "「軽油価格参照先管理マスタ」でメンテナンスを行ってください。"
     document.getElementById("WF_DISPLAYNAME_L").title = wkmessage4;
+
+    let wkmessage5 = "小数点以下は、端数処理を行う桁数を指定してください。\n" +
+        "第3位を選択した場合、第3位に対して端数処理を行い、X.XXの桁数にします。"
+    document.getElementById("WF_DIESELPRICEROUNDING_L").title = wkmessage5;
+
 };
 
 

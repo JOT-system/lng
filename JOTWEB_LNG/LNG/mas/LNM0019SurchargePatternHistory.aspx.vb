@@ -271,6 +271,18 @@ Public Class LNM0019SurchargePatternHistory
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00062.VALUE1), '')                                   AS BILLINGCYCLENAME      ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.CALCMETHOD), '')                                AS CALCMETHOD            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00063.VALUE1), '')                                   AS CALCMETHODNAME        ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.DIESELPRICEROUNDLEN), '')                       AS DIESELPRICEROUNDLEN   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00064.VALUE1), '')                                   AS DIESELPRICEROUNDLENNAME    ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.DIESELPRICEROUNDMETHOD), '')                    AS DIESELPRICEROUNDMETHOD")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00065.VALUE1), '')                                   AS DIESELPRICEROUNDMETHODNAME ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.SURCHARGEROUNDMETHOD), '')                      AS SURCHARGEROUNDMETHOD  ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNS00066.VALUE1), '')                                   AS SURCHARGEROUNDMETHODNAME   ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.ACCOUNTCODE), '')                               AS ACCOUNTCODE           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM00181.ACCOUNTNAME), '')                              AS ACCOUNTNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.SEGMENTCODE), '')                               AS SEGMENTCODE           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNM00182.SEGMENTNAME), '')                              AS SEGMENTNAME           ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.JOTPERCENTAGE), '0.00')                         AS JOTPERCENTAGE         ")
+        SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.ENEXPERCENTAGE), '0.00')                        AS ENEXPERCENTAGE        ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNT0032.STYMD, '%Y/%m/%d'), '')                   AS STYMD                 ")
         SQLStr.AppendLine("   , COALESCE(DATE_FORMAT(LNT0032.ENDYMD, '%Y/%m/%d'), '')                  AS ENDYMD                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0032.DIESELPRICESITEID), '')                         AS DIESELPRICESITEID     ")
@@ -344,6 +356,74 @@ Public Class LNM0019SurchargePatternHistory
         SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDLEN'                                                                         ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00064                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0032.DIESELPRICEROUNDLEN = LNS00064.KEYCODE                                             ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDMETHOD'                                                                      ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00065                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0032.DIESELPRICEROUNDMETHOD = LNS00065.KEYCODE                                          ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          KEYCODE                                                                                    ")
+        SQLStr.AppendLine("         ,VALUE1                                                                                     ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0006_FIXVALUE                                                                       ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          CAMPCODE = @CAMPCODE                                                                       ")
+        SQLStr.AppendLine("      AND CLASS = 'ROUNDMETHOD'                                                                      ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS00066                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0032.DIESELPRICEROUNDMETHOD = LNS00066.KEYCODE                                          ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        SQLStr.AppendLine("          ACCOUNTCODE                                                                                ")
+        SQLStr.AppendLine("         ,ACCOUNTNAME                                                                                ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          LNG.LNM0018_ACCOUNT                                                                        ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN FROMYMD AND ENDYMD                                                       ")
+        SQLStr.AppendLine("    ) LNM00181                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0032.ACCOUNTCODE = LNM00181.ACCOUNTCODE                                                 ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT DISTINCT                                                                                ")
+        SQLStr.AppendLine("          ACCOUNTCODE                                                                                ")
+        SQLStr.AppendLine("         ,SEGMENTCODE                                                                                ")
+        SQLStr.AppendLine("         ,SEGMENTNAME                                                                                ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          LNG.LNM0018_ACCOUNT                                                                        ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN FROMYMD AND ENDYMD                                                       ")
+        SQLStr.AppendLine("    ) LNM00182                                                                                       ")
+        SQLStr.AppendLine("      ON  LNT0032.ACCOUNTCODE = LNM00182.ACCOUNTCODE                                                 ")
+        SQLStr.AppendLine("      AND LNT0032.SEGMENTCODE = LNM00182.SEGMENTCODE                                                 ")
+        SQLStr.AppendLine(" LEFT JOIN                                                                                           ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
         SQLStr.AppendLine("          DIESELPRICESITEID                                                                          ")
         SQLStr.AppendLine("         ,DIESELPRICESITENAME                                                                        ")
         SQLStr.AppendLine("         ,DIESELPRICESITEBRANCH                                                                      ")
@@ -371,7 +451,7 @@ Public Class LNM0019SurchargePatternHistory
         SQLStr.AppendLine("     LNT0032.MODIFYYMD DESC                                                                          ")
         SQLStr.AppendLine("    ,LNT0032.TORICODE                                                                                ")
         SQLStr.AppendLine("    ,LNT0032.ORGCODE                                                                                 ")
-        SQLStr.AppendLine("    ,LNT0032.KASANORGCODE                                                                            ")
+        SQLStr.AppendLine("    ,LNT0032.SURCHARGEPATTERNCODE                                                                    ")
         SQLStr.AppendLine("    ,LNT0032.MODIFYKBN                                                                               ")
 
         Try
@@ -931,6 +1011,18 @@ Public Class LNM0019SurchargePatternHistory
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.BILLINGCYCLENAME).Value = "請求サイクル名"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.CALCMETHOD).Value = "距離算定方式"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.CALCMETHODNAME).Value = "距離算定方式名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDLEN).Value = "実勢単価端数処理（桁数）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDLENNAME).Value = "実勢単価端数処理（桁数）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDMETHOD).Value = "実勢単価端数処理（方式）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDMETHODNAME).Value = "実勢単価端数処理（方式）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.SURCHARGEROUNDMETHOD).Value = "サーチャージ請求金額端数処理（方式）"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.SURCHARGEROUNDMETHODNAME).Value = "サーチャージ請求金額端数処理（方式）名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = "勘定科目コード"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = "勘定科目名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = "セグメントコード"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = "セグメント名"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = "割合JOT"
+        sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = "割合ENEX"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.STYMD).Value = "有効開始日"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.ENDYMD).Value = "有効終了日"
         sheet.Cells(WW_HEADERROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICESITEID).Value = "実勢軽油価格参照先ID"
@@ -953,6 +1045,10 @@ Public Class LNM0019SurchargePatternHistory
         Dim DecStyle As IStyle = wb.Styles.Add("DecStyle")
         DecStyle.NumberFormat = "#,##0.000_);[Red](#,##0.000)"
 
+        '数値書式(小数点含む)
+        Dim DecStyle2 As IStyle = wb.Styles.Add("DecStyle2")
+        DecStyle2.NumberFormat = "#,##0.00_);[Red](#,##0.00)"
+
         For Each Row As DataRow In LNM0019tbl.Rows
             '値
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.OPERATEKBNNAME).Value = Row("OPERATEKBNNAME") '操作区分
@@ -972,12 +1068,39 @@ Public Class LNM0019SurchargePatternHistory
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.BILLINGCYCLENAME).Value = Row("BILLINGCYCLENAME") '請求サイクル名
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.CALCMETHOD).Value = Row("CALCMETHOD") '距離算定方式
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.CALCMETHODNAME).Value = Row("CALCMETHODNAME") '距離算定方式名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDLEN).Value = Row("DIESELPRICEROUNDLEN") '実勢単価端数処理（桁数）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDLENNAME).Value = Row("DIESELPRICEROUNDLENNAME") '実勢単価端数処理（桁数）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDMETHOD).Value = Row("DIESELPRICEROUNDMETHOD") '実勢単価端数処理（方式）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICEROUNDMETHODNAME).Value = Row("DIESELPRICEROUNDMETHODNAME") '実勢単価端数処理（方式）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.SURCHARGEROUNDMETHOD).Value = Row("SURCHARGEROUNDMETHOD") 'サーチャージ請求金額端数処理（方式）
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.SURCHARGEROUNDMETHODNAME).Value = Row("SURCHARGEROUNDMETHODNAME") 'サーチャージ請求金額端数処理（方式）名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ACCOUNTCODE).Value = Row("ACCOUNTCODE") '勘定科目コード
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ACCOUNTNAME).Value = Row("ACCOUNTNAME") '勘定科目名
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.SEGMENTCODE).Value = Row("SEGMENTCODE") 'セグメントコード
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.SEGMENTNAME).Value = Row("SEGMENTNAME") 'セグメント名
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.STYMD).Value = Row("STYMD") '有効開始日
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ENDYMD).Value = Row("ENDYMD") '有効終了日
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICESITEID).Value = Row("DIESELPRICESITEID") '実勢軽油価格参照先ID
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICESITENAME).Value = Row("DIESELPRICESITENAME") '実勢軽油価格参照先名
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICESITEBRANCH).Value = Row("DIESELPRICESITEBRANCH") '実勢軽油価格参照先ID枝番
             sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.DIESELPRICESITEKBNNAME).Value = Row("DIESELPRICESITEKBNNAME")　'実勢軽油価格参照先区分名
+            '割合JOT
+            If Row("JOTPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = Row("JOTPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Value = CDbl(Row("JOTPERCENTAGE"))
+            End If
+
+            '割合ENEX
+            If Row("ENEXPERCENTAGE") = "" Then
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = Row("ENEXPERCENTAGE")
+            Else
+                sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Value = CDbl(Row("ENEXPERCENTAGE"))
+            End If
+
+            '金額を数値形式に変更
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.JOTPERCENTAGE).Style = DecStyle2
+            sheet.Cells(WW_ACTIVEROW, LNM0019WRKINC.HISTORYEXCELCOL.ENEXPERCENTAGE).Style = DecStyle2
 
             '変更区分が変更後の行の場合
             If Row("MODIFYKBN") = LNM0019WRKINC.MODIFYKBN.AFTDATA Then

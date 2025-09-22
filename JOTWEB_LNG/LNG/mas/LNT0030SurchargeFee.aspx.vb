@@ -77,6 +77,10 @@ Public Class LNT0030SurchargeFee
                 If Not String.IsNullOrEmpty(WF_ButtonClick.Value) Then
                     '○ 画面表示データ復元
                     Master.RecoverTable(LNT0030tbl)
+                    '○ 画面編集データ取得＆保存(サーバー側で設定した内容を取得し保存する。)
+                    If CS0013ProfView.SetDispListTextBoxValues(LNT0030tbl, pnlListArea) Then
+                        Master.SaveTable(LNT0030tbl)
+                    End If
 
                     Select Case WF_ButtonClick.Value
                         Case "WF_ButtonINSERT"                      '行追加ボタン押下
@@ -257,8 +261,7 @@ Public Class LNT0030SurchargeFee
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0030tbl)
-        '○ 初期データ保存
-        Master.SaveTable(LNT0030tbl, WF_XMLsaveF2.Value)
+        Master.SaveTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
         '〇 一覧ヘッダを設定
         Me.ListCount.Text = "件数：" + LNT0030tbl.Rows.Count.ToString()
@@ -351,18 +354,18 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.AVOCADOTODOKENAME), '')                         AS AVOCADOTODOKENAME     ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SHAGATA), '')                                   AS SHAGATA               ")
         SQLStr.AppendLine("   , CASE LNT0030.SHAGATA WHEN '1' THEN '単車' ELSE 'トレーラ' END          AS SHAGATANAME           ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.SHABARA, 0)                                           AS SHABARA               ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.SHABARA, '0.000')                                     AS SHABARA               ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.SHABAN), '')                                    AS SHABAN                ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICESTANDARD, 0)                               AS DIESELPRICESTANDARD   ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICECURRENT, 0)                                AS DIESELPRICECURRENT    ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICESTANDARD, '0.00')                          AS DIESELPRICESTANDARD   ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DIESELPRICECURRENT, '0.00')                           AS DIESELPRICECURRENT    ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.CALCMETHOD), '')                                AS CALCMETHOD            ")
         SQLStr.AppendLine("   , ''                                                                     AS CALCMETHODNAME        ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.DISTANCE, 0)                                          AS DISTANCE              ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.SHIPPINGCOUNT, 0)                                     AS SHIPPINGCOUNT         ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.NENPI, 0)                                             AS NENPI                 ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELBASE, 0)                                          AS FUELBASE              ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELRESULT, 0)                                        AS FUELRESULT            ")
-        SQLStr.AppendLine("   , COALESCE(LNT0030.ADJUSTMENT, 0)                                        AS ADJUSTMENT            ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.DISTANCE, '0.00')                                     AS DISTANCE              ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.SHIPPINGCOUNT, '0')                                   AS SHIPPINGCOUNT         ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.NENPI, '0.00')                                        AS NENPI                 ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELBASE, '0.00')                                     AS FUELBASE              ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.FUELRESULT, '0.00')                                   AS FUELRESULT            ")
+        SQLStr.AppendLine("   , COALESCE(LNT0030.ADJUSTMENT, '0.00')                                   AS ADJUSTMENT            ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.MEMO), '')                                      AS MEMO                  ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNT0030.DELFLG), '')                                    AS DELFLG                ")
         SQLStr.AppendLine("   , COALESCE(RTRIM(LNS0006.VALUE1), '')                                    AS DELFLGNAME            ")
@@ -390,6 +393,8 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine(" AND LNT0030.DELFLG = '0'                                                                            ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
         SQLStr.AppendLine("     LNT0030.SEIKYUYM                                                                                ")
+        SQLStr.AppendLine("    ,LNT0030.SEIKYUDATEFROM                                                                          ")
+        SQLStr.AppendLine("    ,LNT0030.SEIKYUDATETO                                                                            ")
         SQLStr.AppendLine("    ,LNT0030.TORICODE                                                                                ")
         SQLStr.AppendLine("    ,LNT0030.ORGCODE                                                                                 ")
         SQLStr.AppendLine("    ,LNT0030.PATTERNCODE                                                                             ")
@@ -522,7 +527,7 @@ Public Class LNT0030SurchargeFee
         End If
 
         '初期取得データの戻し
-        Master.RecoverTable(LNT0030tbl, WF_XMLsaveF2.Value)
+        Master.RecoverTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
         '変更チェック
         '○ 追加変更判定
@@ -539,7 +544,7 @@ Public Class LNT0030SurchargeFee
                     If LNT0030row("DELFLG") = LNT0030INProw("DELFLG") AndAlso
                         LNT0030row("SEIKYUYM") = LNT0030INProw("SEIKYUYM") AndAlso                                      '請求年月
                         LNT0030row("SEIKYUDATEFROM") = LNT0030INProw("SEIKYUDATEFROM") AndAlso                          '請求対象期間From
-                        LNT0030row("SEIKYUDATETO") = LNT0030INProw("SEIKYUDATETO") AndAlso                               '請求対象期間To
+                        LNT0030row("SEIKYUDATETO") = LNT0030INProw("SEIKYUDATETO") AndAlso                              '請求対象期間To
                         LNT0030row("AVOCADOSHUKABASHO") = LNT0030INProw("AVOCADOSHUKABASHO") AndAlso                    '出荷場所コード
                         LNT0030row("AVOCADOTODOKECODE") = LNT0030INProw("AVOCADOTODOKECODE") AndAlso                    '届先コード
                         LNT0030row("SHAGATA") = LNT0030INProw("SHAGATA") AndAlso                                        '車型
@@ -610,7 +615,7 @@ Public Class LNT0030SurchargeFee
         Next
 
         '○ 画面表示データ保存
-        Master.SaveTable(LNT0030tbl)
+        Master.SaveTable(LNT0030tbl, work.WF_SEL_INPTBL.Text)
 
     End Sub
 
@@ -660,7 +665,7 @@ Public Class LNT0030SurchargeFee
 
             '請求年月
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (i + 1))) Then
-                WW_TEXT = Convert.ToString(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (i + 1)))
+                WW_TEXT = Convert.ToString(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (i + 1))).Replace("/", "")
                 WW_DATATYPE = LNT0030INProw("SEIKYUYM").GetType.Name.ToString
                 LNT0030INProw("SEIKYUYM") = LNT0030WRKINC.DataConvert("請求年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
                 If WW_RESULT = False Then
@@ -755,7 +760,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("SHABARA"))
             Else
-                LNT0030INProw("SHABARA") = ""
+                LNT0030INProw("SHABARA") = "0.000"
             End If
             '車番
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "SHABAN" & (i + 1))) Then
@@ -781,7 +786,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("DIESELPRICESTANDARD"))
             Else
-                LNT0030INProw("DIESELPRICESTANDARD") = ""
+                LNT0030INProw("DIESELPRICESTANDARD") = "0.00"
             End If
             '実勢単価
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "DIESELPRICECURRENT" & (i + 1))) Then
@@ -794,7 +799,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("DIESELPRICECURRENT"))
             Else
-                LNT0030INProw("DIESELPRICECURRENT") = ""
+                LNT0030INProw("DIESELPRICECURRENT") = "0.00"
             End If
             '距離
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "DISTANCE" & (i + 1))) Then
@@ -807,7 +812,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("DISTANCE"))
             Else
-                LNT0030INProw("DISTANCE") = ""
+                LNT0030INProw("DISTANCE") = "0.00"
             End If
             '輸送回数
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "SHIPPINGCOUNT" & (i + 1))) Then
@@ -820,7 +825,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("SHIPPINGCOUNT"))
             Else
-                LNT0030INProw("SHIPPINGCOUNT") = ""
+                LNT0030INProw("SHIPPINGCOUNT") = "0"
             End If
             '燃費
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "NENPI" & (i + 1))) Then
@@ -833,7 +838,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("NENPI"))
             Else
-                LNT0030INProw("NENPI") = ""
+                LNT0030INProw("NENPI") = "0.00"
             End If
             '基準燃料使用量
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "FUELBASE" & (i + 1))) Then
@@ -846,7 +851,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("FUELBASE"))
             Else
-                LNT0030INProw("FUELBASE") = ""
+                LNT0030INProw("FUELBASE") = "0.00"
             End If
             '燃料使用量
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "FUELRESULT" & (i + 1))) Then
@@ -859,7 +864,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("FUELRESULT"))
             Else
-                LNT0030INProw("FUELRESULT") = ""
+                LNT0030INProw("FUELRESULT") = "0.00"
             End If
             '精算調整幅
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "ADJUSTMENT" & (i + 1))) Then
@@ -872,7 +877,7 @@ Public Class LNT0030SurchargeFee
                 End If
                 Master.EraseCharToIgnore(LNT0030INProw("ADJUSTMENT"))
             Else
-                LNT0030INProw("ADJUSTMENT") = ""
+                LNT0030INProw("ADJUSTMENT") = "0.00"
             End If
             '計算式メモ
             If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "MEMO" & (i + 1))) Then
@@ -1100,7 +1105,7 @@ Public Class LNT0030SurchargeFee
 
         '請求年月
         If Not IsNothing(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (WW_GridDBclick))) Then
-            WW_TEXT = Convert.ToString(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (WW_GridDBclick)))
+            WW_TEXT = Convert.ToString(Request.Form("txt" & pnlListArea.ID & "SEIKYUYM" & (WW_GridDBclick))).Replace("/", "")
             WW_DATATYPE = LNT0030tbl.Rows(0)("SEIKYUYM").GetType.Name.ToString
             LNT0030row("SEIKYUYM") = LNT0030WRKINC.DataConvert("請求年月", WW_TEXT, WW_DATATYPE, WW_RESULT, WW_CheckMES1, WW_CheckMES2)
             If WW_RESULT = False Then
@@ -1662,7 +1667,7 @@ Public Class LNT0030SurchargeFee
     ''' </summary>
     ''' <remarks></remarks>
     Public Sub WW_CreateXMLSaveFile()
-        WF_XMLsaveF2.Value = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
+        work.WF_SEL_INPTBL.Text = CS0050SESSION.UPLOAD_PATH & "\XML_TMP\" & Date.Now.ToString("yyyyMMdd") & "-" &
             Master.USERID & "-" & Master.MAPID & "-" & CS0050SESSION.VIEW_MAP_VARIANT & "-" & Date.Now.ToString("HHmmss") & "INITTBL.txt"
 
     End Sub
@@ -2250,17 +2255,17 @@ Public Class LNT0030SurchargeFee
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.AVOCADOTODOKECODE).Value = Row("AVOCADOTODOKECODE") '届先コード
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.AVOCADOTODOKENAME).Value = Row("AVOCADOTODOKENAME") '届先名
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHAGATA).Value = Row("SHAGATA") '車型
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHABARA).Value = Row("SHABARA") '車腹
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHABARA).Value = CDbl(Row("SHABARA")) '車腹
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHABAN).Value = Row("SHABAN") '車番
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = Row("DIESELPRICESTANDARD") '基準単価
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Value = Row("DIESELPRICECURRENT") '実勢単価
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DIESELPRICESTANDARD).Value = CDbl(Row("DIESELPRICESTANDARD")) '基準単価
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DIESELPRICECURRENT).Value = CDbl(Row("DIESELPRICECURRENT")) '実勢単価
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.CALCMETHOD).Value = Row("CALCMETHOD") '距離計算方式
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DISTANCE).Value = Row("DISTANCE") '距離
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = Row("SHIPPINGCOUNT") '輸送回数
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.NENPI).Value = Row("NENPI") '燃費
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.FUELBASE).Value = Row("FUELBASE") '基準燃料使用量
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.FUELRESULT).Value = Row("FUELRESULT") '燃料使用量
-            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.ADJUSTMENT).Value = Row("ADJUSTMENT") '精算調整幅
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DISTANCE).Value = CDbl(Row("DISTANCE")) '距離
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.SHIPPINGCOUNT).Value = CInt(Row("SHIPPINGCOUNT")) '輸送回数
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.NENPI).Value = CDbl(Row("NENPI")) '燃費
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.FUELBASE).Value = CDbl(Row("FUELBASE")) '基準燃料使用量
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.FUELRESULT).Value = CDbl(Row("FUELRESULT")) '燃料使用量
+            sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.ADJUSTMENT).Value = CDbl(Row("ADJUSTMENT")) '精算調整幅
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.MEMO).Value = Row("MEMO") '計算式メモ
             sheet.Cells(WW_ACTIVEROW, LNT0030WRKINC.INOUTEXCELCOL.DELFLG).Value = Row("DELFLG") '削除フラグ
 
@@ -2976,32 +2981,32 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine("        LNG.LNT0030_SURCHARGEFEE")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(SEIKYUYM, '')            = @SEIKYUYM ")
-        SQLStr.AppendLine("    AND  COALESCE(SEIKYUDATEFROM, '')      = @SEIKYUDATEFROM ")
-        SQLStr.AppendLine("    AND  COALESCE(SEIKYUDATETO, '')        = @SEIKYUDATETO ")
+        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(SEIKYUDATEFROM, '%Y/%m/%d'), '')      = @SEIKYUDATEFROM ")
+        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(SEIKYUDATETO, '%Y/%m/%d'), '')        = @SEIKYUDATETO ")
         SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')            = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(KASANORGCODE, '')        = @KASANORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
         SQLStr.AppendLine("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
-        SQLStr.AppendLine("    AND  COALESCE(SHABARA, '')             = @SHABARA ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABARA, '0')            = @SHABARA ")
         SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
-        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESTANDARD, '') = @DIESELPRICESTANDARD ")
-        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICECURRENT, '')  = @DIESELPRICECURRENT ")
-        SQLStr.AppendLine("    AND  COALESCE(DISTANCE, '')            = @DISTANCE ")
-        SQLStr.AppendLine("    AND  COALESCE(SHIPPINGCOUNT, '')       = @SHIPPINGCOUNT ")
-        SQLStr.AppendLine("    AND  COALESCE(NENPI, '')               = @NENPI ")
-        SQLStr.AppendLine("    AND  COALESCE(FUELBASE, '')            = @FUELBASE ")
-        SQLStr.AppendLine("    AND  COALESCE(FUELRESULT, '')          = @FUELRESULT ")
-        SQLStr.AppendLine("    AND  COALESCE(ADJUSTMENT, '')          = @ADJUSTMENT ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICESTANDARD, '0')= @DIESELPRICESTANDARD ")
+        SQLStr.AppendLine("    AND  COALESCE(DIESELPRICECURRENT, '0') = @DIESELPRICECURRENT ")
+        SQLStr.AppendLine("    AND  COALESCE(DISTANCE, '0')           = @DISTANCE ")
+        SQLStr.AppendLine("    AND  COALESCE(SHIPPINGCOUNT, '0')      = @SHIPPINGCOUNT ")
+        SQLStr.AppendLine("    AND  COALESCE(NENPI, '0')              = @NENPI ")
+        SQLStr.AppendLine("    AND  COALESCE(FUELBASE, '0')           = @FUELBASE ")
+        SQLStr.AppendLine("    AND  COALESCE(FUELRESULT, '0')         = @FUELRESULT ")
+        SQLStr.AppendLine("    AND  COALESCE(ADJUSTMENT, '0')         = @ADJUSTMENT ")
         SQLStr.AppendLine("    AND  COALESCE(MEMO, '')                = @MEMO ")
         SQLStr.AppendLine("    AND  COALESCE(DELFLG, '')              = @DELFLG ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_SEIKYUYM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUYM", MySqlDbType.VarChar)                          '請求年月
-                Dim P_SEIKYUDATEFROM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATEFROM", MySqlDbType.Date)              '請求対象期間From
-                Dim P_SEIKYUDATETO As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATETO", MySqlDbType.Date)                  '請求対象期間To
+                Dim P_SEIKYUDATEFROM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATEFROM", MySqlDbType.Date)                 '請求対象期間From
+                Dim P_SEIKYUDATETO As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATETO", MySqlDbType.Date)                     '請求対象期間To
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                          '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar)                            '部門コード
                 Dim P_KASANORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@KASANORGCODE", MySqlDbType.VarChar)                  '加算先部門コード
@@ -3165,18 +3170,24 @@ Public Class LNT0030SurchargeFee
         SQLStr.Append("   , UPDPGID              = @UPDPGID         ")
         SQLStr.Append(" WHERE                                       ")
         SQLStr.Append("         COALESCE(SEIKYUYM, '')            = @SEIKYUYM ")
+        SQLStr.Append("    AND  COALESCE(SEIKYUBRANCH, '')        = @SEIKYUBRANCH ")
+        SQLStr.Append("    AND  COALESCE(DATE_FORMAT(SEIKYUDATEFROM, '%Y/%m/%d'), '')      = @SEIKYUDATEFROM ")
+        SQLStr.Append("    AND  COALESCE(DATE_FORMAT(SEIKYUDATETO, '%Y/%m/%d'), '')        = @SEIKYUDATETO ")
         SQLStr.Append("    AND  COALESCE(TORICODE, '')            = @TORICODE ")
         SQLStr.Append("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.Append("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
         SQLStr.Append("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.Append("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
         SQLStr.Append("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
-        SQLStr.Append("    AND  SHABARA                           = @SHABARA ")
+        SQLStr.Append("    AND  COALESCE(SHABARA, 0)              = @SHABARA ")
         SQLStr.Append("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_SEIKYUYM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUYM", MySqlDbType.VarChar)                          '請求年月
+                Dim P_SEIKYUBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUBRANCH", MySqlDbType.VarChar)                  '請求年月枝番
+                Dim P_SEIKYUDATEFROM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATEFROM", MySqlDbType.Date)                 '請求対象期間From
+                Dim P_SEIKYUDATETO As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATETO", MySqlDbType.Date)                     '請求対象期間To
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                          '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar)                            '部門コード
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
@@ -3192,6 +3203,9 @@ Public Class LNT0030SurchargeFee
                 Dim P_UPDPGID As MySqlParameter = SQLcmd.Parameters.Add("@UPDPGID", MySqlDbType.VarChar, 40)                                '更新プログラムＩＤ
 
                 P_SEIKYUYM.Value = WW_ROW("SEIKYUYM")                           '請求年月
+                P_SEIKYUBRANCH.Value = WW_ROW("SEIKYUBRANCH")                   '請求年月
+                P_SEIKYUDATEFROM.Value = WW_ROW("SEIKYUDATEFROM")               '請求対象期間From
+                P_SEIKYUDATETO.Value = WW_ROW("SEIKYUDATETO")                   '請求対象期間To
                 P_TORICODE.Value = WW_ROW("TORICODE")                           '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE")                             '部門コード
                 P_PATTERNCODE.Value = WW_ROW("PATTERNCODE")                     'パターンコード
@@ -3485,6 +3499,8 @@ Public Class LNT0030SurchargeFee
                 WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
                 WW_LineErr = "ERR"
                 O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            Else
+                WW_ROW("SEIKYUYM") = WW_result.ToString("yyyyMM")
             End If
         Else
             WW_CheckMES1 = "・請求年月エラーです。"
@@ -3655,7 +3671,7 @@ Public Class LNT0030SurchargeFee
         End If
         ' 車型(バリデーションチェック)
         If WW_ROW("PATTERNCODE") = "03" Then
-            If String.IsNullOrEmpty(WW_ROW("SHAGATA")) Then
+            If String.IsNullOrEmpty(WW_ROW("SHAGATA")) OrElse WW_ROW("SHAGATA") = "0" Then
                 WW_CheckMES1 = "・車型エラーです。"
                 WW_CheckMES2 = "必須入力項目です。"
                 WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -3907,18 +3923,24 @@ Public Class LNT0030SurchargeFee
         SQLStr.AppendLine("        LNG.LNT0030_SURCHARGEFEE")
         SQLStr.AppendLine("    WHERE")
         SQLStr.AppendLine("         COALESCE(SEIKYUYM, '')            = @SEIKYUYM ")
+        SQLStr.AppendLine("    AND  COALESCE(SEIKYUBRANCH, '')        = @SEIKYUBRANCH ")
+        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(SEIKYUDATEFROM, '%Y/%m/%d'), '')      = @SEIKYUDATEFROM ")
+        SQLStr.AppendLine("    AND  COALESCE(DATE_FORMAT(SEIKYUDATETO, '%Y/%m/%d'), '')        = @SEIKYUDATETO ")
         SQLStr.AppendLine("    AND  COALESCE(TORICODE, '')            = @TORICODE ")
         SQLStr.AppendLine("    AND  COALESCE(ORGCODE, '')             = @ORGCODE ")
         SQLStr.AppendLine("    AND  COALESCE(PATTERNCODE, '')         = @PATTERNCODE ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOSHUKABASHO, '')   = @AVOCADOSHUKABASHO ")
         SQLStr.AppendLine("    AND  COALESCE(AVOCADOTODOKECODE, '')   = @AVOCADOTODOKECODE ")
         SQLStr.AppendLine("    AND  COALESCE(SHAGATA, '')             = @SHAGATA ")
-        SQLStr.AppendLine("    AND  SHABARA                           = @SHABARA ")
+        SQLStr.AppendLine("    AND  COALESCE(SHABARA,'0')             = @SHABARA ")
         SQLStr.AppendLine("    AND  COALESCE(SHABAN, '')              = @SHABAN ")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
                 Dim P_SEIKYUYM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUYM", MySqlDbType.VarChar)                          '請求年月
+                Dim P_SEIKYUBRANCH As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUBRANCH", MySqlDbType.VarChar)                  '請求年月枝番
+                Dim P_SEIKYUDATEFROM As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATEFROM", MySqlDbType.Date)                 '請求対象期間From
+                Dim P_SEIKYUDATETO As MySqlParameter = SQLcmd.Parameters.Add("@SEIKYUDATETO", MySqlDbType.Date)                     '請求対象期間To
                 Dim P_TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                          '取引先コード
                 Dim P_ORGCODE As MySqlParameter = SQLcmd.Parameters.Add("@ORGCODE", MySqlDbType.VarChar)                            '部門コード
                 Dim P_PATTERNCODE As MySqlParameter = SQLcmd.Parameters.Add("@PATTERNCODE", MySqlDbType.VarChar)                    'パターンコード
@@ -3929,6 +3951,9 @@ Public Class LNT0030SurchargeFee
                 Dim P_SHABAN As MySqlParameter = SQLcmd.Parameters.Add("@SHABAN", MySqlDbType.VarChar)                              '車番
 
                 P_SEIKYUYM.Value = WW_ROW("SEIKYUYM")                           '請求年月
+                P_SEIKYUBRANCH.Value = WW_ROW("SEIKYUBRANCH")                   '請求年月枝番
+                P_SEIKYUDATEFROM.Value = WW_ROW("SEIKYUDATEFROM")               '請求対象期間From
+                P_SEIKYUDATETO.Value = WW_ROW("SEIKYUDATETO")                   '請求対象期間To
                 P_TORICODE.Value = WW_ROW("TORICODE")                           '取引先コード
                 P_ORGCODE.Value = WW_ROW("ORGCODE")                             '部門コード
                 P_PATTERNCODE.Value = WW_ROW("PATTERNCODE")                     'パターンコード

@@ -25,6 +25,15 @@
     <asp:TextBox ID="WF_SEL_BILLINGCYCLENAME" runat="server"></asp:TextBox>        <!-- 請求サイクル名 -->
     <asp:TextBox ID="WF_SEL_CALCMETHOD" runat="server"></asp:TextBox>              <!-- 距離算定方式 -->
     <asp:TextBox ID="WF_SEL_CALCMETHODNAME" runat="server"></asp:TextBox>          <!-- 距離算定方式名 -->
+
+    <asp:TextBox ID="WF_SEL_DIESELPRICEROUNDLEN" runat="server"></asp:TextBox>     <!-- 実勢単価端数処理（桁数） -->
+    <asp:TextBox ID="WF_SEL_DIESELPRICEROUNDMETHOD" runat="server"></asp:TextBox>  <!-- 実勢単価端数処理（方式） -->
+    <asp:TextBox ID="WF_SEL_SURCHARGEROUNDMETHOD" runat="server"></asp:TextBox>    <!-- サーチャージ請求金額端数処理（方式） -->
+    <asp:TextBox ID="WF_SEL_ACCOUNTCODE" runat="server"></asp:TextBox>             <!-- 勘定科目コード -->
+    <asp:TextBox ID="WF_SEL_SEGMENTCODE" runat="server"></asp:TextBox>             <!-- セグメントコード -->
+    <asp:TextBox ID="WF_SEL_JOTPERCENTAGE" runat="server"></asp:TextBox>           <!-- 割合JOT -->
+    <asp:TextBox ID="WF_SEL_ENEXPERCENTAGE" runat="server"></asp:TextBox>          <!-- 割合ENEX -->
+
     <asp:TextBox ID="WF_SEL_STYMD" runat="server"></asp:TextBox>                   <!-- 有効開始日 -->
     <asp:TextBox ID="WF_SEL_ENDYMD" runat="server"></asp:TextBox>                  <!-- 有効終了日 -->
     <asp:TextBox ID="WF_SEL_DIESELPRICESITEID" runat="server"></asp:TextBox>       <!-- 実勢軽油価格参照先ID -->

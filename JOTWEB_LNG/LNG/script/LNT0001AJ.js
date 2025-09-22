@@ -1,8 +1,8 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, false, true, true, false);
+    /* 共通一覧のスクロールイベント紐づけ 　　　下段の方に同じロジックがあるため一旦コメント 2025/09/10 */
+    //bindListCommonEvents(pnlListAreaId, IsPostBack, false, true, true, false);
 
     //// カレンダー表示
     //document.querySelectorAll('.datetimepicker').forEach(picker => {
@@ -87,6 +87,7 @@ function InitDisplay() {
 
     /* 共通一覧のスクロールイベント紐づけ */
     bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    bindListCommonEvents(pnlListAreaId2, IsPostBack, false, true, true, false);
 
     setTimeout(function () {
         // テキストボックスEnter縦移動イベントバインド
@@ -96,6 +97,8 @@ function InitDisplay() {
     // チェックボックス
     ChangeCheckBox();
 
+    // サーチャージ画面制御
+    SurchargeScrCtrl();
 }
 
 /**
@@ -368,6 +371,80 @@ function SelectCheckBox(obj, lineCnt) {
         document.getElementById("WF_ButtonClick").value = "WF_CheckBoxSELECT";
         document.body.style.cursor = "wait";
         document.forms[0].submit();
+    }
+
+}
+
+// ○表示／非表示ボタン
+function ButtonHIDDEN() {
+    if (document.getElementById("WF_ButtonHIDDEN").value === "実勢単価（非表示）") {
+        document.getElementById("pnlListArea2").style.height = "0px";
+        document.getElementById("WF_ButtonHIDDEN").value = "実勢単価（表示）"
+    } else {
+        document.getElementById("pnlListArea2").style.height = "100px";
+        document.getElementById("WF_ButtonHIDDEN").value = "実勢単価（非表示）"
+    }
+}
+
+// ○サーチャージ画面制御
+function SurchargeScrCtrl() {
+
+    if (document.getElementById("WF_TARGETTABLE").value === "1") {
+        return;
+    }
+    //-----------------------------
+    //サーチャージ料金エリア
+    //-----------------------------
+    var objDRTable = document.getElementById("pnlListArea_DR").children[0];
+
+    for (var i = 0; i < objDRTable.rows.length; i++) {
+        //ロック行の場合
+        var j = i + 1;
+        if (document.getElementById("txtpnlListAreaDISTANCEUPDFLG" + j).value == "0") {
+            document.getElementById("txtpnlListAreaDISTANCE" + j).style.backgroundColor = "yellow";
+        } else {
+            document.getElementById("txtpnlListAreaDISTANCE" + j).style.backgroundColor = "lightgreen";
+        }
+        if (document.getElementById("txtpnlListAreaSHIPPINGCOUNTUPDFLG" + j).value == "0") {
+            document.getElementById("txtpnlListAreaSHIPPINGCOUNT" + j).style.backgroundColor = "yellow";
+        } else {
+            document.getElementById("txtpnlListAreaSHIPPINGCOUNT" + j).style.backgroundColor = "lightgreen";
+        }
+        if (document.getElementById("txtpnlListAreaFUELRESULTUPDFLG" + j).value == "0") {
+            document.getElementById("txtpnlListAreaFUELRESULT" + j).style.backgroundColor = "yellow";
+        } else {
+            document.getElementById("txtpnlListAreaFUELRESULT" + j).style.backgroundColor = "lightgreen";
+        }
+        if (document.getElementById("txtpnlListAreaCALCMETHOD" + j).value == "1") {
+            document.getElementById("txtpnlListAreaDISTANCE" + j).disabled = true;
+            document.getElementById("txtpnlListAreaDISTANCE" + j).style.backgroundColor = "";
+        }
+        //オートコンプリートを無効にする
+        document.getElementById("txtpnlListAreaDISTANCE" + j).setAttribute('autocomplete', 'off');
+        document.getElementById("txtpnlListAreaSHIPPINGCOUNT" + j).setAttribute('autocomplete', 'off');
+        document.getElementById("txtpnlListAreaFUELRESULT" + j).setAttribute('autocomplete', 'off');
+    }
+
+    //-----------------------------
+    //実勢単価エリア
+    //-----------------------------
+    if (document.getElementById("pnlListArea2_DR") === null) {
+        return;
+    }
+
+    //一旦コメント（動作確認済：2025/09/10）
+    var objDRTable = document.getElementById("pnlListArea2_DR").children[0];
+    var images = objDRTable.getElementsByTagName("img");
+    for (var i = 0; i < images.length; i++) {
+        //ロック行の場合
+        var j = i + 1;
+        var dynamicName = "imgLock" + j;
+        if (images[i].id === dynamicName) {
+            if (images[i].src.includes("unlock")) {
+            } else {
+                objDRTable.rows[i].style.backgroundColor = "lightgray";
+            }
+        }
     }
 
 }
