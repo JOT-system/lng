@@ -29,7 +29,7 @@ input#WF_UPLOAD_BTN {
 
 #pnlListArea {
     margin: 0 0px;
-    height: 69% !important;
+    /*height: 69% !important;*/
 }
 
 :root, [data-bs-theme=light] {

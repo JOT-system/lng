@@ -1519,10 +1519,16 @@ function commonListAdjustHeight(listId) {
     var parentRect = listObjParent.getBoundingClientRect();
     var listRect = listObj.getBoundingClientRect();
 
+    /*2025/09/22 変更
     var listHeight = parentRect.top + listObjParent.clientHeight - listRect.top;
 
-    //alert(parentBottom);
     listObj.style.height = (listHeight + browserAjust - 15).toString() + 'px';
+     ↓↓↓↓　*/
+    //2025/09/22 変更（ブラウザーの高さを取得し、パネルの先頭位置をパネルの高さとする
+    // ブラウザの高さ取得 
+    var windowHeight = window.innerHeight;
+    // パネルのサイズ（高さ）＝ ブラウザの高さ － パネルの先頭位置 
+    listObj.style.height = (windowHeight - listRect.top).toString() + 'px';
 }
 /**
  * リストの横スクロール位置をwebStrage(セッションストレージ)に保持した値より取得する
