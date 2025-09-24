@@ -160,10 +160,10 @@ function BtnHistOutputClick(obj, lineCnt, fieldNM) {
 // ○請求調整列編集
 function f_InvoiceCtrlCol() {
     var Col = {
-        SPRATE: 2 //特別料金列
-        , TANKA: 3 //単価調整列
-        , KOTEIHI: 4 //固定費調整列
-        , SURCHARGE: 5 //サーチャージ列
+        SPRATE: 3 //特別料金列
+        , TANKA: 4 //単価調整列
+        , KOTEIHI: 5 //固定費調整列
+        , SURCHARGE: 6 //サーチャージ列
     };
 
     //**********ヘッダ********************/
@@ -182,7 +182,7 @@ function f_InvoiceCtrlCol() {
     objTableHR.rows[0].cells[Col.SPRATE].style.width = objNewWidth
    
     //表示名称
-    objTableHR.rows[0].cells[Col.SPRATE].innerHTML = "　請求調整";
+    objTableHR.rows[0].cells[Col.SPRATE].innerHTML = "　請求調整対象";
     //ID追加
     objTableHR.rows[0].cells[Col.SPRATE].id = "seikyuchosei";
     //タイトル(吹き出し)

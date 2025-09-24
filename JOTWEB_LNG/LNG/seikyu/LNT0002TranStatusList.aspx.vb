@@ -1564,8 +1564,34 @@ Public Class LNT0002TranStatusList
             & "     ,coalesce(LT1.TODOKEBIKO2, '')                        AS TODOKEBIKO2			" _
             & "     ,coalesce(LT1.TODOKEBIKO3, '')                        AS TODOKEBIKO3			" _
             & "     ,coalesce(LT1.SHUKASLCT, '')                          AS SHUKASLCT			" _
-            & "     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			" _
-            & "     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			" _
+            & "     ,CASE LT1.SHUKABASHO WHEN '006928' " _
+            & "       THEN (SELECT SHUKABASHO " _
+            & "               FROM LNG.LNT0001_ZISSEKI" _
+            & "              WHERE " _
+            & "                   TORICODE     = LT1.TORICODE " _
+            & "               AND ORDERORG     = LT1.ORDERORG " _
+            & "               AND GYOMUTANKNUM = LT1.GYOMUTANKNUM " _
+            & "               AND TRIP         = LT1.TRIP -1 " _
+            & "               AND TODOKEDATE   = LT1.TODOKEDATE " _
+            & "               AND ZISSEKI      > 0 " _
+            & "               AND DELFLG       = '0' " _
+            & "             ) " _
+            & "       ELSE LT1.SHUKABASHO " _
+            & "      END AS SHUKABASHO " _
+            & "     ,CASE SHUKABASHO WHEN '006928' " _
+            & "       THEN (SELECT SHUKANAME " _
+            & "               FROM LNG.LNT0001_ZISSEKI" _
+            & "              WHERE " _
+            & "                   TORICODE     = LT1.TORICODE " _
+            & "               AND ORDERORG     = LT1.ORDERORG " _
+            & "               AND GYOMUTANKNUM = LT1.GYOMUTANKNUM " _
+            & "               AND TRIP         = LT1.TRIP -1 " _
+            & "               AND TODOKEDATE   = LT1.TODOKEDATE " _
+            & "               AND ZISSEKI      > 0 " _
+            & "               AND DELFLG       = '0' " _
+            & "             ) " _
+            & "       ELSE LT1.SHUKANAME " _
+            & "      END AS SHUKANAME " _
             & "     ,coalesce(LT1.SHUKANAMES, '')                         AS SHUKANAMES			" _
             & "     ,coalesce(LT1.SHUKATORICODE, '')                      AS SHUKATORICODE		" _
             & "     ,coalesce(LT1.SHUKATORINAME, '')                      AS SHUKATORINAME		" _
