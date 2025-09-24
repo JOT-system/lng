@@ -232,7 +232,7 @@ Public Class LNM0014SprateDetail
         Me.WF_ORG.Items.Clear()
         Me.WF_ORG.Items.Add("")
         Dim retOrgList As New DropDownList
-        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        retOrgList = LNM0014WRKINC.getDowpDownOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
 
         If retOrgList.Items.Count > 0 Then
             '情シス、高圧ガス以外
@@ -258,7 +258,7 @@ Public Class LNM0014SprateDetail
         Me.WF_KASANORG.Items.Clear()
         Me.WF_KASANORG.Items.Add("")
         Dim retKasanOrgList As New DropDownList
-        retKasanOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_CREATEFLG:=True)
+        retKasanOrgList = LNM0014WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_CREATEFLG:=True)
         '★編集の場合(加算先部門を対象の部門のみ選択できるように設定)
         If work.WF_SEL_LINECNT.Text <> "" Then
             retKasanOrgList = LNM0007WRKINC.getDowpDownKasanOrgList(Master.MAPID, Master.ROLE_ORG, I_TORICODE:=work.WF_SEL_TORICODE.Text, I_ORGCODE:=work.WF_SEL_ORGCODE.Text, I_CREATEFLG:=True)
