@@ -47,14 +47,12 @@
                                     <!-- 対象年月 -->
                                     <div class="d-flex align-items-center gap-2 me-3">
                                         <strong class="flex-shrink-0">対象年月</strong>
-                                        <b class="calendararea">
-                                            <b class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
-                                                <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
-                                                <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
-                                                    <span class="material-symbols-outlined">calendar_month</span>
-                                                </span>
-                                            </b>
-                                        </b>
+                                        <div class="position-relative input-group calendar datetimepicker" data-target-input="nearest">
+                                            <input type="text" id="WF_TaishoYm" runat="server" class="WF_TEXTBOX_CSS" onchange="ButtonClick('WF_SelectCALENDARChange');" data-input>
+                                            <span id="WF_StYMD_CALENDAR" class="input-group-text" data-toggle>
+                                                <span class="material-symbols-outlined">calendar_month</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="rightSide">
