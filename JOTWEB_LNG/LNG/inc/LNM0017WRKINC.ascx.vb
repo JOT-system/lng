@@ -319,8 +319,8 @@ Public Class LNM0017WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE")
         SQLStr.AppendLine("      ,RTRIM(TORINAME) AS TORINAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
-        SQLStr.AppendLine(" WHERE CURDATE() BETWEEN STYMD AND ENDYMD")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE")
+        SQLStr.AppendLine(" WHERE DELFLG = '0'")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -360,8 +360,8 @@ Public Class LNM0017WRKINC
         SQLStr.AppendLine("       ORGCODE AS ORGCODE")
         SQLStr.AppendLine("      ,RTRIM(ORGNAME) AS ORGNAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
-        SQLStr.AppendLine(" WHERE CURDATE() BETWEEN STYMD AND ENDYMD")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE")
+        SQLStr.AppendLine(" WHERE DELFLG = '0'")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -398,11 +398,11 @@ Public Class LNM0017WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       AVOCADOSHUKABASHO AS SHUKABASHO")
-        SQLStr.AppendLine("      ,RTRIM(AVOCADOSHUKANAME) AS SHUKANAME")
+        SQLStr.AppendLine("       SHUKABASHO AS SHUKABASHO")
+        SQLStr.AppendLine("      ,RTRIM(SHUKANAME) AS SHUKANAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
-        SQLStr.AppendLine(" WHERE CURDATE() BETWEEN STYMD AND ENDYMD")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE")
+        SQLStr.AppendLine(" WHERE DELFLG = '0'")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
@@ -439,11 +439,11 @@ Public Class LNM0017WRKINC
         '○ 対象データ取得
         Dim SQLStr = New StringBuilder
         SQLStr.AppendLine(" SELECT DISTINCT")
-        SQLStr.AppendLine("       AVOCADOTODOKECODE AS TODOKECODE")
-        SQLStr.AppendLine("      ,RTRIM(AVOCADOTODOKENAME) AS TODOKENAME")
+        SQLStr.AppendLine("       TODOKECODE AS TODOKECODE")
+        SQLStr.AppendLine("      ,RTRIM(TODOKENAME) AS TODOKENAME")
         SQLStr.AppendLine(" FROM")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA")
-        SQLStr.AppendLine(" WHERE CURDATE() BETWEEN STYMD AND ENDYMD")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE")
+        SQLStr.AppendLine(" WHERE DELFLG = '0'")
 
         Try
             Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)

@@ -138,7 +138,7 @@
                                 <span>
                                     <asp:Label ID="Label1" runat="server" Text="届先名称" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <a class="ef" id="WF_TODOKECODE_L" ondblclick="Field_DBclick('WF_TODOKECODE_TEXT', <%=LIST_BOX_CLASSIFICATION.LC_FIX_VALUE%>);" onchange="TextBox_change('WF_TODOKECODE_TEXT');">
-                                        <asp:TextBox ID="WF_TODOKECODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" ></asp:TextBox>
+                                        <asp:TextBox ID="WF_TODOKECODE" runat="server" CssClass="boxIcon" onblur="MsgClear();" autocomplete="off"></asp:TextBox>
                                     </a>
                                     <asp:TextBox ID="WF_TODOKECODE_TEXT" runat="server" CssClass="WF_TEXTBOX_CSS" Enabled="false"></asp:TextBox>
                                 </span>
@@ -169,11 +169,11 @@
                                 <span>
                                     <!-- 車番（開始） -->
                                     <asp:Label ID="WF_GYOMUTANKNUMFROM_L" runat="server" Text="車番（開始）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="WF_GYOMUTANKNUMFROM" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
+                                    <asp:TextBox ID="WF_GYOMUTANKNUMFROM" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"  autocomplete="off"></asp:TextBox>
                                     <asp:Label ID="WF_GYOMUTANKNUMFROM_TEXT" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <!-- 車番（終了） -->
                                     <asp:Label ID="WF_GYOMUTANKNUMTO_L" runat="server" Text="車番（終了）" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="WF_GYOMUTANKNUMTO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
+                                    <asp:TextBox ID="WF_GYOMUTANKNUMTO" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"  autocomplete="off"></asp:TextBox>
                                     <asp:Label ID="WF_GYOMUTANKNUMTO_TEXT" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
@@ -182,7 +182,7 @@
                                 <span>
                                     <!-- 単価 -->
                                     <asp:Label ID="WF_TANKA_L" runat="server" Text="単価" CssClass="WF_TEXT_LEFT  requiredMark"></asp:Label>
-                                    <asp:TextBox ID="WF_TANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"></asp:TextBox>
+                                    <asp:TextBox ID="WF_TANKA" runat="server" CssClass="WF_TEXTBOX_CSS" MaxLength="8"  autocomplete="off"></asp:TextBox>
                                     <asp:Label ID="WF_TANKA_TEXT" runat="server" Text="" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>
