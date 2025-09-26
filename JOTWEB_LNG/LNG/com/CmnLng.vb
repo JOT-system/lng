@@ -282,6 +282,118 @@ Public Class CmnLng
     End Function
 
     ''' <summary>
+    ''' ドロップダウンリスト(届先マスタ) データ取得
+    ''' </summary>
+    ''' <param name="blnBlank">空白追加フラグ</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownList(ByVal prmKeyWard As String,
+                                           Optional ByVal iToricode As String = "",
+                                           Optional ByVal iOrgcode As String = "",
+                                           Optional ByVal iShukabasho As String = "",
+                                           Optional ByVal blnBlank As Boolean = False) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim sqlStat As New StringBuilder
+
+        Select Case prmKeyWard
+            Case "TORI"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM21.TORICODE as CODE")
+                sqlStat.AppendLine("      ,LNM21.TORINAME as NAME")
+            Case "ORG"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM21.ORGCODE as CODE")
+                sqlStat.AppendLine("      ,LNM21.ORGNAME as NAME")
+            Case "SHUKABASHO"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM21.SHUKABASHO as CODE")
+                sqlStat.AppendLine("      ,LNM21.SHUKANAME as NAME")
+            Case "TODOKE"
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM21.TODOKECODE as CODE")
+                sqlStat.AppendLine("      ,LNM21.TODOKENAME as NAME")
+            Case Else
+                sqlStat.AppendLine("SELECT")
+                sqlStat.AppendLine("       LNM21.TORICODE as CODE")
+                sqlStat.AppendLine("      ,LNM21.TORINAME as NAME")
+        End Select
+
+        sqlStat.AppendLine("  FROM LNG.LNM0021_TODOKE as LNM21")
+        sqlStat.AppendLine(" WHERE")
+        sqlStat.AppendLine("      LNM21.DELFLG = @DELFLG")
+
+        Select Case prmKeyWard
+            Case "TORI"
+                sqlStat.AppendLine(" GROUP BY  LNM21.TORICODE, LNM21.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  LNM21.TORICODE")
+            Case "ORG"
+                If Not String.IsNullOrEmpty(iToricode) Then
+                    sqlStat.AppendLine(" AND       LNM21.TORICODE = @TORICODE")
+                End If
+                sqlStat.AppendLine(" GROUP BY  LNM21.ORGCODE, LNM21.ORGNAME")
+                sqlStat.AppendLine(" ORDER BY  LNM21.ORGCODE")
+            Case "SHUKABASHO"
+                If Not String.IsNullOrEmpty(iToricode) Then
+                    sqlStat.AppendLine(" AND       LNM21.TORICODE = @TORICODE")
+                End If
+                If Not String.IsNullOrEmpty(iOrgcode) Then
+                    sqlStat.AppendLine(" AND       LNM21.ORGCODE = @ORGCODE")
+                End If
+                sqlStat.AppendLine(" GROUP BY  LNM21.SHUKABASHO, LNM21.SHUKANAME")
+                sqlStat.AppendLine(" ORDER BY  LNM21.SHUKABASHO")
+            Case "TODOKE"
+                If Not String.IsNullOrEmpty(iToricode) Then
+                    sqlStat.AppendLine(" AND       LNM21.TORICODE = @TORICODE")
+                End If
+                If Not String.IsNullOrEmpty(iOrgcode) Then
+                    sqlStat.AppendLine(" AND       LNM21.ORGCODE = @ORGCODE")
+                End If
+                If Not String.IsNullOrEmpty(iShukabasho) Then
+                    sqlStat.AppendLine(" AND       LNM21.SHUKABASHO = @SHUKABASHO")
+                End If
+                sqlStat.AppendLine(" GROUP BY  LNM21.TODOKECODE, LNM21.TODOKENAME")
+                sqlStat.AppendLine(" ORDER BY  LNM21.TODOKECODE")
+            Case Else
+                sqlStat.AppendLine(" GROUP BY  LNM21.TORICODE, LNM21.TORINAME")
+                sqlStat.AppendLine(" ORDER BY  LNM21.TORICODE")
+        End Select
+
+
+        Try
+            '空白行判定
+            If blnBlank = True Then
+                Dim listBlankItm As New ListItem("", "")
+                retList.Items.Add(listBlankItm)
+            End If
+
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(sqlStat.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@DELFLG", MySqlDbType.VarChar).Value = C_DELETE_FLG.ALIVE
+                    .Add("@TORICODE", MySqlDbType.VarChar).Value = iToricode
+                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = iOrgcode
+                    .Add("@SHUKABASHO", MySqlDbType.VarChar).Value = iShukabasho
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    While sqlDr.Read
+                        Dim listItm As New ListItem(Convert.ToString(sqlDr("NAME")), Convert.ToString(sqlDr("CODE")))
+                        retList.Items.Add(listItm)
+                    End While
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+    ''' <summary>
     ''' ドロップダウンリスト(軽油価格参照先) データ取得
     ''' </summary>
     ''' <param name="blnBlank">空白追加フラグ</param>

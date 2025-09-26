@@ -162,7 +162,7 @@ Public Class CmnSearchSQL
     End Function
 
     ''' <summary>
-    ''' 単価取引先名称検索タイトル取得
+    ''' 取引先名称検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
     Public Shared Function GetTankaToriNameTitle() As IEnumerable(Of DispFieldItem)
@@ -177,27 +177,27 @@ Public Class CmnSearchSQL
     End Function
 
     ''' <summary>
-    ''' 単価実績出荷場所検索タイトル取得
+    ''' 出荷場所検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoShukabashoTitle() As IEnumerable(Of DispFieldItem)
+    Public Shared Function GetTankaShukabashoTitle() As IEnumerable(Of DispFieldItem)
         Dim colTitle As IEnumerable(Of DispFieldItem)
         colTitle = {
-                New DispFieldItem("AVOCADOSHUKABASHO", "出荷場所", "100"),
-                New DispFieldItem("AVOCADOSHUKANAME", "出荷場所名称", "300")
+                New DispFieldItem("SHUKABASHO", "出荷場所", "100"),
+                New DispFieldItem("SHUKANAME", "出荷場所名称", "300")
             }
         Return colTitle
     End Function
 
     ''' <summary>
-    ''' 単価実績届先検索タイトル取得
+    ''' 届先検索タイトル取得
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoTodokeTitle() As IEnumerable(Of DispFieldItem)
+    Public Shared Function GetTankaTodokeTitle() As IEnumerable(Of DispFieldItem)
         Dim colTitle As IEnumerable(Of DispFieldItem)
         colTitle = {
-                New DispFieldItem("AVOCADOTODOKECODE", "届先", "100"),
-                New DispFieldItem("AVOCADOTODOKENAME", "届先名称", "300")
+                New DispFieldItem("TODOKECODE", "届先", "100"),
+                New DispFieldItem("TODOKENAME", "届先名称", "300")
             }
         Return colTitle
     End Function
@@ -222,84 +222,62 @@ Public Class CmnSearchSQL
 
     End Function
 
+
     ''' <summary>
-    ''' 単価実績出荷場所取得SQL
+    ''' 届先（届先マスタ）取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoShukabashoSQL(Optional ByVal prmOrgCode As String = "") As String
+    Public Shared Function GetTankaTodokeSQL(Optional ByVal prmToriCode As String = "",
+                                             Optional ByVal prmOrgCode As String = "",
+                                             Optional ByVal prmShukabasho As String = "") As String
 
         Dim SQLBldr As New StringBuilder
 
         '-- 届先取得
         SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     AVOCADOSHUKABASHO AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(AVOCADOSHUKABASHO) AS AVOCADOSHUKABASHO")
-        SQLBldr.AppendLine("    , RTRIM(AVOCADOSHUKANAME) AS AVOCADOSHUKANAME")
+        SQLBldr.AppendLine("     TODOKECODE AS KEYCODE")
+        SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS TODOKECODE")
+        SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS TODOKENAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0006_NEWTANKA")
+        SQLBldr.AppendLine("     LNG.LNM0021_TODOKE")
         SQLBldr.AppendLine(" WHERE")
         SQLBldr.AppendLine("     DELFLG = '0'")
-        SQLBldr.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN STYMD AND ENDYMD")
         '部門コードが入力されている場合条件に含める
+        If Not prmToriCode = "" Then
+            SQLBldr.AppendLine("  AND TORICODE LIKE '%" & prmToriCode & "%'")
+        End If
         If Not prmOrgCode = "" Then
             SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
         End If
+        If Not prmShukabasho = "" Then
+            SQLBldr.AppendLine("  AND SHUKABASHO LIKE '%" & prmShukabasho & "%'")
+        End If
         SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     AVOCADOSHUKABASHO")
+        SQLBldr.AppendLine("     TODOKECODE")
 
         Return SQLBldr.ToString
 
     End Function
-
-    ''' <summary>
-    ''' 単価実績届先取得SQL
-    ''' </summary>
-    ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoTodokeSQL(Optional ByVal prmOrgCode As String = "") As String
-
-        Dim SQLBldr As New StringBuilder
-
-        '-- 届先取得
-        SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     AVOCADOTODOKECODE AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(AVOCADOTODOKECODE) AS AVOCADOTODOKECODE")
-        SQLBldr.AppendLine("    , RTRIM(AVOCADOTODOKENAME) AS AVOCADOTODOKENAME")
-        SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.LNM0006_NEWTANKA")
-        SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     DELFLG = '0'")
-        SQLBldr.AppendLine("     AND DATE_FORMAT(CURDATE(),'%Y/%m/%d') BETWEEN STYMD AND ENDYMD")
-        '部門コードが入力されている場合条件に含める
-        If Not prmOrgCode = "" Then
-            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
-        End If
-        SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     AVOCADOTODOKECODE")
-
-        Return SQLBldr.ToString
-
-    End Function
-
     ''' <summary>
     ''' 単価実績出荷場所取得SQL
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoShukabashoSQL2(Optional ByVal prmOrgCode As String = "", Optional ByVal prmToriCode As String = "") As String
+    Public Shared Function GetTankaShukabashoSQL(Optional ByVal prmOrgCode As String = "", Optional ByVal prmToriCode As String = "") As String
 
         Dim SQLBldr As New StringBuilder
 
         '-- 届先取得
         SQLBldr.AppendLine(" SELECT DISTINCT")
         SQLBldr.AppendLine("     SHUKABASHO AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(SHUKABASHO) AS AVOCADOSHUKABASHO")
-        SQLBldr.AppendLine("    , RTRIM(SHUKANAME)  AS AVOCADOSHUKANAME")
+        SQLBldr.AppendLine("    , RTRIM(SHUKABASHO) AS SHUKABASHO")
+        SQLBldr.AppendLine("    , RTRIM(SHUKANAME)  AS SHUKANAME")
         SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.VIW0006_TODOKE")
+        SQLBldr.AppendLine("     LNG.LNM0021_TODOKE")
         SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     '1' = '1'")
+        SQLBldr.AppendLine("     DELFLG = '0'")
         '部門コードが入力されている場合条件に含める
         If Not prmOrgCode = "" Then
-            SQLBldr.AppendLine("  AND ORDERORGCODE LIKE '%" & prmOrgCode & "%'")
+            SQLBldr.AppendLine("  AND ORGCODE LIKE '%" & prmOrgCode & "%'")
         End If
         '取引先コードが入力されている場合条件に含める
         If Not prmToriCode = "" Then
@@ -307,38 +285,6 @@ Public Class CmnSearchSQL
         End If
         SQLBldr.AppendLine(" ORDER BY")
         SQLBldr.AppendLine("     SHUKABASHO")
-
-        Return SQLBldr.ToString
-
-    End Function
-
-    ''' <summary>
-    ''' 単価実績届先取得SQL
-    ''' </summary>
-    ''' <returns></returns>
-    Public Shared Function GetTankaAvocadoTodokeSQL2(Optional ByVal prmOrgCode As String = "", Optional ByVal prmToriCode As String = "") As String
-
-        Dim SQLBldr As New StringBuilder
-
-        '-- 届先取得
-        SQLBldr.AppendLine(" SELECT DISTINCT")
-        SQLBldr.AppendLine("     TODOKECODE AS KEYCODE")
-        SQLBldr.AppendLine("    , RTRIM(TODOKECODE) AS AVOCADOTODOKECODE")
-        SQLBldr.AppendLine("    , RTRIM(TODOKENAME) AS AVOCADOTODOKENAME")
-        SQLBldr.AppendLine(" FROM")
-        SQLBldr.AppendLine("     LNG.VIW0006_TODOKE")
-        SQLBldr.AppendLine(" WHERE")
-        SQLBldr.AppendLine("     '1' = '1'")
-        '部門コードが入力されている場合条件に含める
-        If Not prmOrgCode = "" Then
-            SQLBldr.AppendLine("  AND ORDERORGCODE LIKE '%" & prmOrgCode & "%'")
-        End If
-        '取引先コードが入力されている場合条件に含める
-        If Not prmToriCode = "" Then
-            SQLBldr.AppendLine("  AND TORICODE LIKE '%" & prmToriCode & "%'")
-        End If
-        SQLBldr.AppendLine(" ORDER BY")
-        SQLBldr.AppendLine("     TODOKECODE")
 
         Return SQLBldr.ToString
 
