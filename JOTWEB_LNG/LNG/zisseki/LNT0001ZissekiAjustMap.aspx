@@ -72,7 +72,7 @@
                                     <input type="button" id="WF_ButtonUPDATE" class="btn-sticky btn-action" value="保存" onclick="ButtonClick('WF_ButtonUPDATE');" />
                                     <input type="button" id="WF_ButtonCLEAR" class="btn-sticky" value="戻る"  onclick="ButtonClick('WF_ButtonCLEAR');" />
                                     <%--戻るボタンは、メニューへ、ログアウトボタンを追加するキーワードとして必要なので非表示とする--%>
-                                    <input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" hidden="hidden"/> 
+                                    <%--<input type="button" id="WF_ButtonEND" class="btn-sticky" value="戻る"     onclick="ButtonClick('WF_ButtonEND');" hidden="hidden"/>--%> 
                                 </div>
                             </div> <!-- End class=actionButtonBox -->
                         </div> <!-- End class="Operation" -->
