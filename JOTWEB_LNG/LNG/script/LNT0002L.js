@@ -1,12 +1,9 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-
 }
 
-// 画面読み込み時処理
+// ページのすべてのリソースが読み込まれた後に実行される
 window.onload = function () {
     document.getElementById('WF_ButtonLogOut').style.display = 'inline';
 
@@ -15,6 +12,9 @@ window.onload = function () {
 
     //請求調整列編集
     f_InvoiceCtrlCol();
+
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 /**

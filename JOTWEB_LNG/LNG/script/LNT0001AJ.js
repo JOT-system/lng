@@ -85,10 +85,6 @@ function InitDisplay() {
         });
     });
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-    bindListCommonEvents(pnlListAreaId2, IsPostBack, false, true, true, false);
-
     setTimeout(function () {
         // テキストボックスEnter縦移動イベントバインド
         commonBindEnterToVerticalTabStep();
@@ -99,6 +95,15 @@ function InitDisplay() {
 
     // サーチャージ画面制御
     SurchargeScrCtrl();
+}
+// ページのすべてのリソースが読み込まれた後に実行される
+window.onload = function () {
+    document.getElementById('WF_ButtonLogOut').style.display = 'inline';
+
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
+    bindListCommonEvents(pnlListAreaId2, IsPostBack, false, true, true, false);
+
 }
 
 /**
@@ -384,6 +389,7 @@ function ButtonHIDDEN() {
         document.getElementById("pnlListArea2").style.height = "100px";
         document.getElementById("WF_ButtonHIDDEN").value = "実勢単価（非表示）"
     }
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 // ○サーチャージ画面制御

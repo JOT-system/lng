@@ -6,17 +6,16 @@
 // ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-
-
 }
 
-// 画面読み込み時処理
+// ページのすべてのリソースが読み込まれた後に実行される
 window.onload = function () {
     try {
         document.getElementById('WF_ButtonLogOut').style.display = 'inline';
     } catch (e) {}
+
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 // ○ダウンロード処理

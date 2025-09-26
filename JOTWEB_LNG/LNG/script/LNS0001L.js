@@ -10,12 +10,9 @@ function InitDisplay() {
     //    spread.ondblclick = DblClick;
     //}
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-
 }
 
-// 画面読み込み時処理
+// ページのすべてのリソースが読み込まれた後に実行される
 window.onload = function () {
     document.getElementById('WF_ButtonLogOut').style.display = 'inline';
 
@@ -26,6 +23,9 @@ window.onload = function () {
     if (DisabledKeySystem == "") {
         document.getElementById('WF_ButtonHISTORY').style.display = "none";
     }
+
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 /**

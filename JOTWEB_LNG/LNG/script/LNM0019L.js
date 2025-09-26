@@ -1,9 +1,6 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-
     //　届先複数選択
     $(document).ready(function () {
         $("#contents1_WF_TODOKE").multiselect({
@@ -41,6 +38,8 @@ window.onload = function () {
     //ヘッダコメント編集
     f_CommentCtrlCol();
 
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 /**

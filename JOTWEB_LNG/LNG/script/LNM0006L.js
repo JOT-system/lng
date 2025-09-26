@@ -1,9 +1,6 @@
 ﻿// ○OnLoad用処理（左右Box非表示）
 function InitDisplay() {
 
-    /* 共通一覧のスクロールイベント紐づけ */
-    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
-
     //　届先複数選択
     $(document).ready(function () {
         $("#contents1_WF_TODOKE").multiselect({
@@ -23,7 +20,7 @@ function InitDisplay() {
 
 }
 
-// 画面読み込み時処理
+// ページのすべてのリソースが読み込まれた後に実行される
 window.onload = function () {
     document.getElementById('WF_ButtonLogOut').style.display = 'inline';
 
@@ -37,6 +34,9 @@ window.onload = function () {
 
     //削除行灰色表示
     f_DeleteRowGray()
+
+    /* 共通一覧のスクロールイベント紐づけ */
+    bindListCommonEvents(pnlListAreaId, IsPostBack, true);
 }
 
 /**
