@@ -1430,10 +1430,10 @@ Public Class LNT0030SurchargeFee
         Me.mspTodokeCode.InitPopUp()
         Me.mspTodokeCode.SelectionMode = ListSelectionMode.Multiple
 
-        Me.mspTodokeCode.SQL = CmnSearchSQL.GetTankaAvocadoTodokeSQL2(work.WF_SEL_ORGCODE.Text, work.WF_SEL_TORICODE.Text)
+        Me.mspTodokeCode.SQL = CmnSearchSQL.GetTankaTodokeSQL(prmOrgCode:=work.WF_SEL_ORGCODE.Text, prmToriCode:=work.WF_SEL_TORICODE.Text)
 
         Me.mspTodokeCode.KeyFieldName = "KEYCODE"
-        Me.mspTodokeCode.DispFieldList.AddRange(CmnSearchSQL.GetTankaAvocadoTodokeTitle)
+        Me.mspTodokeCode.DispFieldList.AddRange(CmnSearchSQL.GetTankaTodokeTitle)
 
         Me.mspTodokeCode.ShowPopUpList()
 
@@ -1447,10 +1447,10 @@ Public Class LNT0030SurchargeFee
         Me.mspTodokeCode.InitPopUp()
         Me.mspTodokeCode.SelectionMode = ListSelectionMode.Single
 
-        Me.mspTodokeCode.SQL = CmnSearchSQL.GetTankaAvocadoTodokeSQL2(work.WF_SEL_ORGCODE.Text, work.WF_SEL_TORICODE.Text)
+        Me.mspTodokeCode.SQL = CmnSearchSQL.GetTankaTodokeSQL(prmOrgCode:=work.WF_SEL_ORGCODE.Text, prmToriCode:=work.WF_SEL_TORICODE.Text)
 
         Me.mspTodokeCode.KeyFieldName = "KEYCODE"
-        Me.mspTodokeCode.DispFieldList.AddRange(CmnSearchSQL.GetTankaAvocadoTodokeTitle)
+        Me.mspTodokeCode.DispFieldList.AddRange(CmnSearchSQL.GetTankaTodokeTitle)
 
         Me.mspTodokeCode.ShowPopUpList()
 
@@ -1464,10 +1464,10 @@ Public Class LNT0030SurchargeFee
         Me.mspShukabasho.InitPopUp()
         Me.mspShukabasho.SelectionMode = ListSelectionMode.Single
 
-        Me.mspShukabasho.SQL = CmnSearchSQL.GetTankaAvocadoShukabashoSQL2(work.WF_SEL_ORGCODE.Text, work.WF_SEL_TORICODE.Text)
+        Me.mspShukabasho.SQL = CmnSearchSQL.GetTankaShukabashoSQL(prmOrgCode:=work.WF_SEL_ORGCODE.Text, prmToriCode:=work.WF_SEL_TORICODE.Text)
 
         Me.mspShukabasho.KeyFieldName = "KEYCODE"
-        Me.mspShukabasho.DispFieldList.AddRange(CmnSearchSQL.GetTankaAvocadoShukabashoTitle)
+        Me.mspShukabasho.DispFieldList.AddRange(CmnSearchSQL.GetTankaShukabashoTitle)
 
         Me.mspShukabasho.ShowPopUpList()
 
@@ -1506,8 +1506,8 @@ Public Class LNT0030SurchargeFee
             LNT0030row("PATTERNNAME") = work.WF_SEL_SURCHARGEPATTERNNAME.Text
             LNT0030row("AVOCADOSHUKABASHO") = ""
             LNT0030row("AVOCADOSHUKANAME") = ""
-            LNT0030row("AVOCADOTODOKECODE") = selData(i)("AVOCADOTODOKECODE")
-            LNT0030row("AVOCADOTODOKENAME") = selData(i)("AVOCADOTODOKENAME")
+            LNT0030row("AVOCADOTODOKECODE") = selData(i)("TODOKECODE")
+            LNT0030row("AVOCADOTODOKENAME") = selData(i)("TODOKENAME")
             LNT0030row("SHAGATA") = ""
             LNT0030row("SHAGATANAME") = ""
             LNT0030row("SHABARA") = "0.000"
@@ -1555,8 +1555,8 @@ Public Class LNT0030SurchargeFee
 
         Dim LNT0030row As DataRow = LNT0030tbl(WW_GridDBclick - 1)
         LNT0030row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        LNT0030row("AVOCADOTODOKECODE") = selData("AVOCADOTODOKECODE")
-        LNT0030row("AVOCADOTODOKENAME") = selData("AVOCADOTODOKENAME")
+        LNT0030row("AVOCADOTODOKECODE") = selData("TODOKECODE")
+        LNT0030row("AVOCADOTODOKENAME") = selData("TODOKENAME")
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0030tbl)
@@ -1583,8 +1583,8 @@ Public Class LNT0030SurchargeFee
 
         Dim LNT0030row As DataRow = LNT0030tbl(WW_GridDBclick - 1)
         LNT0030row("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
-        LNT0030row("AVOCADOSHUKABASHO") = selData("AVOCADOSHUKABASHO")
-        LNT0030row("AVOCADOSHUKANAME") = selData("AVOCADOSHUKANAME")
+        LNT0030row("AVOCADOSHUKABASHO") = selData("SHUKABASHO")
+        LNT0030row("AVOCADOSHUKANAME") = selData("SHUKANAME")
 
         '○ 画面表示データ保存
         Master.SaveTable(LNT0030tbl)

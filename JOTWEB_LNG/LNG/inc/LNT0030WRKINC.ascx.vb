@@ -116,7 +116,7 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       ORGNAME AS NAME                                                                               ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     ORGCODE = @ORGCODE                                                                              ")
 
@@ -166,7 +166,7 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("       KASANORGCODE AS KASANORGCODE                                                                  ")
         SQLStr.AppendLine("      ,KASANORGNAME AS KASANORGNAME                                                                  ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     ORGCODE = @ORGCODE                                                                              ")
 
@@ -216,7 +216,7 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE = @TORICODE                                                                            ")
 
@@ -266,7 +266,7 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       SHUKABASHO AS SHUKABASHO                                                                      ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE     = @TORICODE                                                                        ")
         SQLStr.AppendLine(" AND ORGCODE      = @ORGCODE                                                                         ")
@@ -321,10 +321,10 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       SHUKANAME AS SHUKANAME                                                                        ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TODOKE                                                                              ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE     = @TORICODE                                                                        ")
-        SQLStr.AppendLine(" AND ORDERORGCODE = @ORDERORGCODE                                                                    ")
+        SQLStr.AppendLine(" AND ORGCODE      = @ORGCODE                                                                         ")
         SQLStr.AppendLine(" AND SHUKABASHO   = @SHUKABASHO                                                                      ")
 
         Try
@@ -334,7 +334,7 @@ Public Class LNT0030WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
-                    .Add("@ORDERORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
                     .Add("@SHUKABASHO", MySqlDbType.VarChar).Value = I_SHUKABASHO
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
@@ -375,10 +375,10 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       TODOKECODE AS TODOKECODE                                                                      ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TODOKE                                                                              ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE     = @TORICODE                                                                        ")
-        SQLStr.AppendLine(" AND ORDERORGCODE = @ORDERORGCODE                                                                    ")
+        SQLStr.AppendLine(" AND ORGCODE      = @ORGCODE                                                                         ")
         SQLStr.AppendLine(" AND TODOKENAME   = @TODOKENAME                                                                      ")
 
         Try
@@ -388,7 +388,7 @@ Public Class LNT0030WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
-                    .Add("@ORDERORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
                     .Add("@TODOKENAME", MySqlDbType.VarChar).Value = I_TODOKENAME
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
@@ -430,10 +430,10 @@ Public Class LNT0030WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       TODOKENAME AS TODOKENAME                                                                      ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TODOKE                                                                              ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE     = @TORICODE                                                                        ")
-        SQLStr.AppendLine(" AND ORDERORGCODE = @ORDERORGCODE                                                                    ")
+        SQLStr.AppendLine(" AND ORGCODE      = @ORGCODE                                                                         ")
         SQLStr.AppendLine(" AND TODOKECODE   = @TODOKECODE                                                                      ")
 
         Try
@@ -443,7 +443,7 @@ Public Class LNT0030WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
-                    .Add("@ORDERORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@ORGCODE", MySqlDbType.VarChar).Value = I_ORGCODE
                     .Add("@TODOKECODE", MySqlDbType.VarChar).Value = I_TODOKECODE
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()

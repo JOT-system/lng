@@ -53,7 +53,7 @@ input[type=text], input[type=password], input[type=number], textarea {
 
 #pnlListArea {
     margin: 0 0px;
-    height: 69% !important;
+    /*height: 69% !important;*/
 }
 
 :root, [data-bs-theme=light] {
