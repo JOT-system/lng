@@ -106,12 +106,7 @@ Public Class LNM0019SurchargePatternList
                         Case "WF_StYMDChange"           '対象日チェンジ
                             GridViewInitialize()
                         Case "WF_TORIChange"            '荷主チェンジ
-                            Me.WF_ORG.Items.Clear()
-                            Dim retOrgList As New DropDownList
-                            retOrgList = LNM0019WRKINC.getDowpDownOrgList(Master.MAPID, WF_TORI.SelectedValue, Master.ROLE_ORG)
-                            For index As Integer = 0 To retOrgList.Items.Count - 1
-                                WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
-                            Next
+                            createListBox("ORG")
                         Case "WF_ButtonFeeClick"        '料金設定
                             InputSave()
                             SurchargeFeeSave()
@@ -181,11 +176,11 @@ Public Class LNM0019SurchargePatternList
         rightview.PROFID = Master.PROF_REPORT
         rightview.Initialize("")
 
-        '○ ドロップダウンリスト生成
-        createListBox()
-
         '○ 画面の値設定
         WW_MAPValueSet()
+
+        '○ ドロップダウンリスト生成
+        createListBox()
 
         Select Case Context.Handler.ToString().ToUpper()
             '○ 登録・履歴画面からの遷移
@@ -209,22 +204,26 @@ Public Class LNM0019SurchargePatternList
     ''' ドロップダウン生成処理
     ''' </summary>
     ''' <remarks></remarks>
-    Protected Sub createListBox()
+    Protected Sub createListBox(Optional I_KBN As String = "INIT")
         '荷主
-        Me.WF_TORI.Items.Clear()
-        Dim retToriList As New DropDownList
-        retToriList = LNM0019WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
-        For index As Integer = 0 To retToriList.Items.Count - 1
-            WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
-        Next
+        If I_KBN = "INIT" OrElse I_KBN = "TORI" Then
+            Me.WF_TORI.Items.Clear()
+            Dim retToriList As New DropDownList
+            retToriList = LNM0019WRKINC.getDowpDownToriListL(Master.ROLE_ORG, WF_StYMD.Value)
+            For index As Integer = 0 To retToriList.Items.Count - 1
+                WF_TORI.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
+            Next
+        End If
 
         '部門
-        Me.WF_ORG.Items.Clear()
-        Dim retOrgList As New DropDownList
-        retOrgList = LNM0019WRKINC.getDowpDownOrgList(Master.MAPID, "", Master.ROLE_ORG)
-        For index As Integer = 0 To retOrgList.Items.Count - 1
-            WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
-        Next
+        If I_KBN = "INIT" OrElse I_KBN = "ORG" Then
+            Me.WF_ORG.Items.Clear()
+            Dim retOrgList As New DropDownList
+            retOrgList = LNM0019WRKINC.getDowpDownOrgListL(Master.ROLE_ORG, WF_TORI.SelectedValue, WF_StYMD.Value)
+            For index As Integer = 0 To retOrgList.Items.Count - 1
+                WF_ORG.Items.Add(New ListItem(retOrgList.Items(index).Text, retOrgList.Items(index).Value))
+            Next
+        End If
 
     End Sub
 

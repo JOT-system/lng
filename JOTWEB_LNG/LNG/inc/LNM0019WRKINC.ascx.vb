@@ -207,10 +207,9 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
         SQLStr.AppendLine("       TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.LNM0006_NEWTANKA                                                                            ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE                                                                              ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
         SQLStr.AppendLine("     TORICODE = @TORICODE                                                                            ")
-        SQLStr.AppendLine(" AND CURDATE() BETWEEN STYMD AND ENDYMD                                                              ")
         SQLStr.AppendLine(" AND DELFLG = @DELFLG                                                                                ")
 
         Try
@@ -247,10 +246,9 @@ Public Class LNM0019WRKINC
     ''' <summary>
     ''' ドロップダウンリスト荷主データ取得
     ''' </summary>
-    ''' <param name="I_MAPID">MAPID</param>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownToriList(ByVal I_MAPID As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownToriListL(ByVal I_ORGCODE As String, ByVal I_YMD As String) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
@@ -259,7 +257,7 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
         SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
+        SQLStr.AppendLine("     LNG.LNM0019_SURCHARGEPATTERN LNM0019                                                            ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -272,11 +270,12 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  VIEW0006.ORGCODE = LNS0005.CODE                                                            ")
+        SQLStr.AppendLine("      ON  LNM0019.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     1 = 1                                                                                           ")
+        SQLStr.AppendLine("          @YMD BETWEEN STYMD AND ENDYMD                                                              ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     VIEW0006.TORICODE                                                                               ")
+        SQLStr.AppendLine("     LNM0019.TORICODE                                                                                ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -285,6 +284,7 @@ Public Class LNM0019WRKINC
                 MySqlConnection.ClearPool(sqlCon)
                 With sqlCmd.Parameters
                     .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@YMD", MySqlDbType.VarChar).Value = I_YMD
                 End With
                 Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
                     If sqlDr.HasRows = False Then
@@ -297,7 +297,7 @@ Public Class LNM0019WRKINC
                     Next
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
-                    If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
+                    If WW_Tbl.Rows.Count > 1 Then
                         If AdminCheck(I_ORGCODE) Then
                             Dim listBlankItm As New ListItem("全て表示", "")
                             retList.Items.Add(listBlankItm)
@@ -318,22 +318,20 @@ Public Class LNM0019WRKINC
     End Function
 
     ''' <summary>
-    ''' ドロップダウンリスト部門データ取得
+    ''' ドロップダウンリスト荷主データ取得
     ''' </summary>
-    ''' <param name="I_MAPID">MAPID</param>
-    ''' <param name="I_TORICODE">取引先コード</param>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownOrgList(ByVal I_MAPID As String, ByVal I_TORICODE As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownToriListD(ByVal I_ORGCODE As String) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
         SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       VIW0006.ORGCODE AS ORGCODE                                                                    ")
-        SQLStr.AppendLine("      ,VIW0006.ORGNAME AS ORGNAME                                                                    ")
+        SQLStr.AppendLine("       TORICODE AS TORICODE                                                                          ")
+        SQLStr.AppendLine("      ,TORINAME AS TORINAME                                                                          ")
         SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIW0006                                                                        ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE LNM0021                                                                      ")
         SQLStr.AppendLine(" INNER JOIN                                                                                          ")
         SQLStr.AppendLine("    (                                                                                                ")
         SQLStr.AppendLine("      SELECT                                                                                         ")
@@ -346,11 +344,153 @@ Public Class LNM0019WRKINC
         SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
         SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine("    ) LNS0005                                                                                        ")
-        SQLStr.AppendLine("      ON  VIW0006.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine("      ON  LNM0021.ORGCODE = LNS0005.CODE                                                             ")
         SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("     TORICODE     LIKE CONCAT(@TORICODE, '%')                                                        ")
+        SQLStr.AppendLine("          DELFLG <> '1'                                                                              ")
         SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     VIW0006.ORGCODE                                                                                 ")
+        SQLStr.AppendLine("     LNM0021.TORICODE                                                                                ")
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        Dim listItm As New ListItem(WW_ROW("TORINAME"), WW_ROW("TORICODE"))
+                        retList.Items.Add(listItm)
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+    ''' <summary>
+    ''' ドロップダウンリスト部門データ取得
+    ''' </summary>
+    ''' <param name="I_TORICODE">取引先コード</param>
+    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownOrgListL(ByVal I_ORGCODE As String, ByVal I_TORICODE As String, ByVal I_YMD As String) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       LNM0019.ORGCODE AS ORGCODE                                                                    ")
+        SQLStr.AppendLine("      ,LNM0019.ORGNAME AS ORGNAME                                                                    ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0019_SURCHARGEPATTERN LNM0019                                                            ")
+        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          CODE                                                                                       ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+        SQLStr.AppendLine("      ON  LNM0019.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("          TORICODE     LIKE CONCAT(@TORICODE, '%')                                                   ")
+        SQLStr.AppendLine("      AND @YMD BETWEEN STYMD AND ENDYMD                                                              ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     LNM0019.ORGCODE                                                                                 ")
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              sqlCmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With sqlCmd.Parameters
+                    .Add("@ROLE", MySqlDbType.VarChar).Value = I_ORGCODE
+                    .Add("@TORICODE", MySqlDbType.VarChar).Value = I_TORICODE
+                    .Add("@YMD", MySqlDbType.VarChar).Value = I_YMD
+                End With
+                Using sqlDr As MySqlDataReader = sqlCmd.ExecuteReader()
+                    If sqlDr.HasRows = False Then
+                        Return retList
+                    End If
+                    Dim WW_Tbl = New DataTable
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To sqlDr.FieldCount - 1
+                        WW_Tbl.Columns.Add(sqlDr.GetName(index), sqlDr.GetFieldType(index))
+                    Next
+                    '○ テーブル検索結果をテーブル格納
+                    WW_Tbl.Load(sqlDr)
+                    If WW_Tbl.Rows.Count > 1 Then
+                        Dim listBlankItm As New ListItem("全て表示", "")
+                        retList.Items.Add(listBlankItm)
+                    End If
+                    For Each WW_ROW As DataRow In WW_Tbl.Rows
+                        Dim listItm As New ListItem(WW_ROW("ORGNAME"), WW_ROW("ORGCODE"))
+                        retList.Items.Add(listItm)
+                    Next
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw ex '呼び出し元の例外にスロー
+        End Try
+
+        Return retList
+
+    End Function
+
+    ''' <summary>
+    ''' ドロップダウンリスト部門データ取得
+    ''' </summary>
+    ''' <param name="I_TORICODE">取引先コード</param>
+    ''' <param name="I_ORGCODE">部門コード</param>
+    ''' <returns></returns>
+    Public Shared Function getDowpDownOrgListD(ByVal I_ORGCODE As String, ByVal I_TORICODE As String) As DropDownList
+        Dim retList As New DropDownList
+        Dim CS0050Session As New CS0050SESSION
+        Dim SQLStr As New StringBuilder
+
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
+        SQLStr.AppendLine("       LNM0021.ORGCODE AS ORGCODE                                                                    ")
+        SQLStr.AppendLine("      ,LNM0021.ORGNAME AS ORGNAME                                                                    ")
+        SQLStr.AppendLine(" FROM                                                                                                ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE LNM0021                                                                      ")
+        SQLStr.AppendLine(" INNER JOIN                                                                                          ")
+        SQLStr.AppendLine("    (                                                                                                ")
+        SQLStr.AppendLine("      SELECT                                                                                         ")
+        SQLStr.AppendLine("          CODE                                                                                       ")
+        SQLStr.AppendLine("      FROM                                                                                           ")
+        SQLStr.AppendLine("          COM.LNS0005_ROLE                                                                           ")
+        SQLStr.AppendLine("      WHERE                                                                                          ")
+        SQLStr.AppendLine("          OBJECT = 'ORG'                                                                             ")
+        SQLStr.AppendLine("      AND ROLE = @ROLE                                                                               ")
+        SQLStr.AppendLine("      AND CURDATE() BETWEEN STYMD AND ENDYMD                                                         ")
+        SQLStr.AppendLine("      AND DELFLG <> '1'                                                                              ")
+        SQLStr.AppendLine("    ) LNS0005                                                                                        ")
+        SQLStr.AppendLine("      ON  LNM0021.ORGCODE = LNS0005.CODE                                                             ")
+        SQLStr.AppendLine(" WHERE                                                                                               ")
+        SQLStr.AppendLine("      TORICODE     LIKE CONCAT(@TORICODE, '%')                                                       ")
+        SQLStr.AppendLine(" AND  DELFLG <> '1'                                                                                  ")
+        SQLStr.AppendLine(" ORDER BY                                                                                            ")
+        SQLStr.AppendLine("     LNM0021.ORGCODE                                                                                 ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
@@ -372,10 +512,6 @@ Public Class LNM0019WRKINC
                     Next
                     '○ テーブル検索結果をテーブル格納
                     WW_Tbl.Load(sqlDr)
-                    If I_MAPID = MAPIDL And WW_Tbl.Rows.Count > 1 Then
-                        Dim listBlankItm As New ListItem("全て表示", "")
-                        retList.Items.Add(listBlankItm)
-                    End If
                     For Each WW_ROW As DataRow In WW_Tbl.Rows
                         Dim listItm As New ListItem(WW_ROW("ORGNAME"), WW_ROW("ORGCODE"))
                         retList.Items.Add(listItm)
@@ -389,27 +525,27 @@ Public Class LNM0019WRKINC
         Return retList
 
     End Function
-
     ''' <summary>
     ''' ドロップダウンリスト加算先部門データ取得
     ''' </summary>
     ''' <param name="I_ORGCODE">部門コード</param>
     ''' <returns></returns>
-    Public Shared Function getDowpDownKasanOrgList(ByVal I_TORICODE As String, ByVal I_ORGCODE As String) As DropDownList
+    Public Shared Function getDowpDownKasanOrgListD(ByVal I_TORICODE As String, ByVal I_ORGCODE As String) As DropDownList
         Dim retList As New DropDownList
         Dim CS0050Session As New CS0050SESSION
         Dim SQLStr As New StringBuilder
 
-        SQLStr.AppendLine("SELECT DISTINCT                                                                                      ")
-        SQLStr.AppendLine("       VIEW0006.KASANORGCODE AS KASANORGCODE                                                         ")
-        SQLStr.AppendLine("      ,VIEW0006.KASANORGNAME AS KASANORGNAME                                                         ")
-        SQLStr.AppendLine(" FROM                                                                                                ")
-        SQLStr.AppendLine("     LNG.VIW0006_TORI VIEW0006                                                                       ")
-        SQLStr.AppendLine(" WHERE                                                                                               ")
-        SQLStr.AppendLine("      VIEW0006.TORICODE like CONCAT(@TORICODE, '%')                                                  ")
-        SQLStr.AppendLine(" AND  VIEW0006.ORGCODE  like CONCAT(@ORGCODE, '%')                                                   ")
-        SQLStr.AppendLine(" ORDER BY                                                                                            ")
-        SQLStr.AppendLine("     VIEW0006.KASANORGCODE                                                                           ")
+        SQLStr.AppendLine("SELECT DISTINCT                                                                                     ")
+        SQLStr.AppendLine("       LNM0021.KASANORGCODE AS KASANORGCODE                                                         ")
+        SQLStr.AppendLine("      ,LNM0021.KASANORGNAME AS KASANORGNAME                                                         ")
+        SQLStr.AppendLine(" FROM                                                                                               ")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE LNM0021                                                                     ")
+        SQLStr.AppendLine(" WHERE                                                                                              ")
+        SQLStr.AppendLine("      LNM0021.TORICODE like CONCAT(@TORICODE, '%')                                                  ")
+        SQLStr.AppendLine(" AND  LNM0021.ORGCODE  like CONCAT(@ORGCODE, '%')                                                   ")
+        SQLStr.AppendLine(" AND  DELFLG <> '1'                                                                                 ")
+        SQLStr.AppendLine(" ORDER BY                                                                                           ")
+        SQLStr.AppendLine("     LNM0021.KASANORGCODE                                                                           ")
 
         Try
             Using sqlCon As New MySqlConnection(CS0050Session.DBCon),

@@ -221,11 +221,11 @@
                                 <span>
                                     <!-- 割合JOT -->
                                     <asp:Label ID="WF_JOTPERCENTAGE_L" runat="server" Text="割合JOT" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="WF_JOTPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6"></asp:TextBox>
+                                    <asp:TextBox ID="WF_JOTPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6" autocomplete="off"></asp:TextBox>
                                     <asp:Label ID="WF_JOTPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
                                     <!-- 割合ENEX -->
                                     <asp:Label ID="WF_ENEXPERCENTAGE_L" runat="server" Text="割合ENEX" CssClass="WF_TEXT_LEFT"></asp:Label>
-                                    <asp:TextBox ID="WF_ENEXPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6"></asp:TextBox>
+                                    <asp:TextBox ID="WF_ENEXPERCENTAGE" runat="server" CssClass="WF_TEXTBOX_RIGHT" MaxLength="6" autocomplete="off"></asp:TextBox>
                                     <asp:Label ID="WF_ENEXPERCENTAGE_TEXT" runat="server" Text="%" CssClass="WF_TEXT_LEFT"></asp:Label>
                                 </span>
                             </p>

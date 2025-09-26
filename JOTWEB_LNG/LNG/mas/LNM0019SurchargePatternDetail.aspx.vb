@@ -189,7 +189,7 @@ Public Class LNM0019SurchargePatternDetail
             Me.WF_TORINAME.Items.Add("")
 
             Dim retToriList As New DropDownList
-            retToriList = LNM0019WRKINC.getDowpDownToriList(Master.MAPID, Master.ROLE_ORG)
+            retToriList = LNM0019WRKINC.getDowpDownToriListD(Master.ROLE_ORG)
             For index As Integer = 0 To retToriList.Items.Count - 1
                 WF_TORINAME.Items.Add(New ListItem(retToriList.Items(index).Text, retToriList.Items(index).Value))
             Next
@@ -201,7 +201,7 @@ Public Class LNM0019SurchargePatternDetail
             Me.WF_ORGNAME.Items.Clear()
             Me.WF_ORGNAME.Items.Add("")
             Dim retOrgList As New DropDownList
-            retOrgList = LNM0019WRKINC.getDowpDownOrgList(Master.MAPID, WF_TORICODE.Text, Master.ROLE_ORG)
+            retOrgList = LNM0019WRKINC.getDowpDownOrgListD(Master.ROLE_ORG, WF_TORICODE.Text)
 
             If retOrgList.Items.Count > 0 Then
                 '情シス、高圧ガス以外
@@ -222,6 +222,10 @@ Public Class LNM0019SurchargePatternDetail
                     Next
                 End If
             End If
+            If retOrgList.Items.Count = 1 Then
+                WF_ORGNAME.SelectedIndex = 1
+                WF_ORGCODE.Text = WF_ORGNAME.SelectedValue
+            End If
         End If
 
         '加算先部門
@@ -230,10 +234,14 @@ Public Class LNM0019SurchargePatternDetail
             Me.WF_KASANORGNAME.Items.Clear()
             Me.WF_KASANORGNAME.Items.Add("")
             Dim retKasanOrgList As New DropDownList
-            retKasanOrgList = LNM0019WRKINC.getDowpDownKasanOrgList(WF_TORICODE.Text, WF_ORGCODE.Text)
+            retKasanOrgList = LNM0019WRKINC.getDowpDownKasanOrgListD(WF_TORICODE.Text, WF_ORGCODE.Text)
             For index As Integer = 0 To retKasanOrgList.Items.Count - 1
                 WF_KASANORGNAME.Items.Add(New ListItem(retKasanOrgList.Items(index).Text, retKasanOrgList.Items(index).Value))
             Next
+            If retKasanOrgList.Items.Count = 1 Then
+                WF_KASANORGNAME.SelectedIndex = 1
+                WF_KASANORGCODE.Text = WF_KASANORGNAME.SelectedValue
+            End If
         End If
 
         '請求サイクル
