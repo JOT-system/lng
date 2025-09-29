@@ -661,8 +661,8 @@ input[type=text][readonly].boxIcon:not(.iconOnly) {
     width: 100%;
     display: flex;
     box-sizing: border-box;
-    flex-wrap: nowrap; /* 小さくリサイズしても折り返さない設定 */
-    white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */
+    /*flex-wrap: nowrap; /* 小さくリサイズしても折り返さない設定 */*/
+    /*white-space: nowrap; /* 小さくリサイズしても折り返さない設定 */*/
     align-items: center;
 }
 /* 左寄せの箱 */
