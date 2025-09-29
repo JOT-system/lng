@@ -1569,6 +1569,16 @@ Public Class LNM0006TankaList
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "DELFLG"))
                 Case "SYAGATA"           '車型
                     leftview.CodeToName(LIST_BOX_CLASSIFICATION.LC_FIX_VALUE, I_VALUE, O_TEXT, O_RTN, work.CreateFIXParam(Master.USERCAMP, "SYAGATA"))
+                Case "TORICODE"          '取引先コード
+                    work.CODENAMEGetCOM(I_FIELD, I_VALUE, O_TEXT, O_RTN)
+                Case "ORGCODE"           '部門コード
+                    work.CODENAMEGetCOM(I_FIELD, I_VALUE, O_TEXT, O_RTN)
+                Case "KASANORGCODE"      '加算先部門コード
+                    work.CODENAMEGetCOM(I_FIELD, I_VALUE, O_TEXT, O_RTN)
+                Case "SHUKABASHO"        '出荷場所コード
+                    work.CODENAMEGetCOM(I_FIELD, I_VALUE, O_TEXT, O_RTN)
+                Case "TODOKECODE"        '届先コード
+                    work.CODENAMEGetCOM(I_FIELD, I_VALUE, O_TEXT, O_RTN)
             End Select
         Catch ex As Exception
             O_RTN = C_MESSAGE_NO.FILE_NOT_EXISTS_ERROR
@@ -3783,6 +3793,7 @@ Public Class LNM0006TankaList
     Protected Sub INPTableCheck(ByVal WW_ROW As DataRow, ByRef O_RTN As String)
         O_RTN = C_MESSAGE_NO.NORMAL
 
+        Dim WW_TEXT As String = ""
         Dim WW_LineErr As String = ""
         Dim WW_CheckMES1 As String = ""
         Dim WW_CheckMES2 As String = ""
@@ -3814,7 +3825,17 @@ Public Class LNM0006TankaList
 
         '取引先コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TORICODE", WW_ROW("TORICODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("TORICODE", WW_ROW("TORICODE"), WW_ROW("TORINAME"), WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・取引先コード入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
             WW_CheckMES1 = "・取引先コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -3822,14 +3843,14 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '取引先名称(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・取引先名称エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "TORINAME", WW_ROW("TORINAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・取引先名称エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         ' 部門コード(バリデーションチェック）
         Master.CheckField(Master.USERCAMP, "ORGCODE", WW_ROW("ORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If isNormal(WW_CS0024FCheckerr) Then
@@ -3847,8 +3868,28 @@ Public Class LNM0006TankaList
                         WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
                         WW_LineErr = "ERR"
                         O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                    Else
+                        ' 名称存在チェック
+                        CODENAME_get("ORGCODE", WW_ROW("ORGCODE"), WW_ROW("ORGNAME"), WW_RtnSW)
+                        If Not isNormal(WW_RtnSW) Then
+                            WW_CheckMES1 = "・部門コード入力エラーです。"
+                            WW_CheckMES2 = "マスタに存在しません。"
+                            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                            WW_LineErr = "ERR"
+                            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                        End If
                     End If
                 End Using
+            Else
+                ' 名称存在チェック
+                CODENAME_get("ORGCODE", WW_ROW("ORGCODE"), WW_ROW("ORGNAME"), WW_RtnSW)
+                If Not isNormal(WW_RtnSW) Then
+                    WW_CheckMES1 = "・部門コード入力エラーです。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
             End If
         Else
             WW_CheckMES1 = "・部門コードエラーです。"
@@ -3858,17 +3899,27 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '部門名称(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・部門名称エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "ORGNAME", WW_ROW("ORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・部門名称エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         '加算先部門コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "KASANORGCODE", WW_ROW("KASANORGCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("KASANORGCODE", WW_ROW("KASANORGCODE"), WW_ROW("KASANORGNAME"), WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・加算先部門コード入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
             WW_CheckMES1 = "・加算先部門コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -3876,17 +3927,27 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '加算先部門名称(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・加算先部門名称エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "KASANORGNAME", WW_ROW("KASANORGNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・加算先部門名称エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         '実績出荷場所コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "AVOCADOSHUKABASHO", WW_ROW("AVOCADOSHUKABASHO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("SHUKABASHO", WW_ROW("AVOCADOSHUKABASHO"), WW_ROW("AVOCADOSHUKANAME"), WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・実績出荷場所コード入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
             WW_CheckMES1 = "・実績出荷場所コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -3894,14 +3955,14 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '実績出荷場所名称(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "AVOCADOSHUKANAME", WW_ROW("AVOCADOSHUKANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・実績出荷場所名称エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "AVOCADOSHUKANAME", WW_ROW("AVOCADOSHUKANAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・実績出荷場所名称エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         '変換後出荷場所コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "SHUKABASHO", WW_ROW("SHUKABASHO"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
@@ -3922,7 +3983,17 @@ Public Class LNM0006TankaList
         End If
         '実績届先コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "AVOCADOTODOKECODE", WW_ROW("AVOCADOTODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("TODOKECODE", WW_ROW("AVOCADOTODOKECODE"), WW_ROW("AVOCADOTODOKENAME"), WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・実績届先コード入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
             WW_CheckMES1 = "・実績届先コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -3930,14 +4001,14 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '実績届先名称(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "AVOCADOTODOKENAME", WW_ROW("AVOCADOTODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・実績届先名称エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "AVOCADOTODOKENAME", WW_ROW("AVOCADOTODOKENAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・実績届先名称エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         '変換後届先コード(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "TODOKECODE", WW_ROW("TODOKECODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
@@ -4013,8 +4084,30 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '勘定科目コード(バリデーションチェック)
+        WW_ROW("ACCOUNTNAME") = ""
         Master.CheckField(Master.USERCAMP, "ACCOUNTCODE", WW_ROW("ACCOUNTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            If WW_ROW("ACCOUNTCODE") <> "0" Then
+                'アップロード時に空白の場合、ゼロが設定されるため
+                Dim WW_find As Boolean = False
+                Dim retAccountList As New DropDownList
+                retAccountList = LNM0006WRKINC.getDowpDownAccountList(WF_StYMD.Value)
+                For Each item As ListItem In retAccountList.Items
+                    If item.Value = WW_ROW("ACCOUNTCODE") Then
+                        WW_ROW("ACCOUNTNAME") = item.Text
+                        WW_find = True
+                        Exit For
+                    End If
+                Next
+                If WW_find = False Then
+                    WW_CheckMES1 = "・勘定科目コード入力エラーです。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
+        Else
             WW_CheckMES1 = "・勘定科目コードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -4022,17 +4115,39 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         '勘定科目名(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "ACCOUNTNAME", WW_ROW("ACCOUNTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・勘定科目名エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "ACCOUNTNAME", WW_ROW("ACCOUNTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・勘定科目名エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         'セグメントコード(バリデーションチェック)
+        WW_ROW("SEGMENTNAME") = ""
         Master.CheckField(Master.USERCAMP, "SEGMENTCODE", WW_ROW("SEGMENTCODE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            If WW_ROW("SEGMENTCODE") <> "0" Then
+                'アップロード時に空白の場合、ゼロが設定されるため
+                Dim WW_find As Boolean = False
+                Dim retSegmentList As New DropDownList
+                retSegmentList = LNM0006WRKINC.getDowpDownSegmentList(WF_StYMD.Value, WW_ROW("ACCOUNTCODE"))
+                For Each item As ListItem In retSegmentList.Items
+                    If item.Value = WW_ROW("SEGMENTCODE") Then
+                        WW_ROW("SEGMENTNAME") = item.Text
+                        WW_find = True
+                        Exit For
+                    End If
+                Next
+                If WW_find = False Then
+                    WW_CheckMES1 = "・セグメントコード入力エラーです。"
+                    WW_CheckMES2 = "マスタに存在しません。"
+                    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                    WW_LineErr = "ERR"
+                    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+                End If
+            End If
+        Else
             WW_CheckMES1 = "・セグメントコードエラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
@@ -4040,14 +4155,14 @@ Public Class LNM0006TankaList
             O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
         End If
         'セグメント名(バリデーションチェック)
-        Master.CheckField(Master.USERCAMP, "SEGMENTNAME", WW_ROW("SEGMENTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
-            WW_CheckMES1 = "・セグメント名エラーです。"
-            WW_CheckMES2 = WW_CS0024FCheckReport
-            WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
-            WW_LineErr = "ERR"
-            O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
-        End If
+        'Master.CheckField(Master.USERCAMP, "SEGMENTNAME", WW_ROW("SEGMENTNAME"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
+        'If Not isNormal(WW_CS0024FCheckerr) Then
+        '    WW_CheckMES1 = "・セグメント名エラーです。"
+        '    WW_CheckMES2 = WW_CS0024FCheckReport
+        '    WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+        '    WW_LineErr = "ERR"
+        '    O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+        'End If
         '割合JOT(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "JOTPERCENTAGE", WW_ROW("JOTPERCENTAGE"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
         If Not isNormal(WW_CS0024FCheckerr) Then
@@ -4095,7 +4210,17 @@ Public Class LNM0006TankaList
         End If
         '車型(バリデーションチェック)
         Master.CheckField(Master.USERCAMP, "SYAGATA", WW_ROW("SYAGATA"), WW_CS0024FCheckerr, WW_CS0024FCheckReport)
-        If Not isNormal(WW_CS0024FCheckerr) Then
+        If isNormal(WW_CS0024FCheckerr) Then
+            ' 名称存在チェック
+            CODENAME_get("SYAGATA", WW_ROW("SYAGATA"), WW_ROW("SYAGATANAME"), WW_RtnSW)
+            If Not isNormal(WW_RtnSW) Then
+                WW_CheckMES1 = "・車型入力エラーです。"
+                WW_CheckMES2 = "マスタに存在しません。"
+                WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)
+                WW_LineErr = "ERR"
+                O_RTN = C_MESSAGE_NO.INVALID_REGIST_RECORD_ERROR
+            End If
+        Else
             WW_CheckMES1 = "・車型エラーです。"
             WW_CheckMES2 = WW_CS0024FCheckReport
             WW_CheckERR(WW_ROW("LINECNT"), WW_CheckMES1, WW_CheckMES2)

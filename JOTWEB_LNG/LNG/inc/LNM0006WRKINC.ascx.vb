@@ -1202,6 +1202,85 @@ Public Class LNM0006WRKINC
     End Function
 
     ''' <summary>
+    ''' 名称取得(届先マスタ)
+    ''' </summary>
+    ''' <param name="I_FIELD">フィールド名</param>
+    ''' <param name="I_VALUE">値</param>
+    ''' <param name="O_TEXT">名格納</param>
+    ''' <param name="O_RTN">リターンコード</param>
+    Public Sub CODENAMEGetCOM(ByVal I_FIELD As String, ByVal I_VALUE As String, ByRef O_TEXT As String, ByRef O_RTN As String)
+
+        O_TEXT = ""
+        O_RTN = C_MESSAGE_NO.MASTER_NOT_FOUND_ERROR
+
+        Dim CS0050Session As New CS0050SESSION
+
+        '○ 対象データ取得
+        Dim SQLStr = New StringBuilder
+        SQLStr.AppendLine(" Select DISTINCT")
+        If I_FIELD = "TORICODE" Then
+            SQLStr.AppendLine("       TORICODE As CODE")
+            SQLStr.AppendLine("      ,RTRIM(TORINAME) As NAME")
+        End If
+        If I_FIELD = "ORGCODE" Then
+            SQLStr.AppendLine("       ORGCODE As CODE")
+            SQLStr.AppendLine("      ,RTRIM(ORGNAME) As NAME")
+        End If
+        If I_FIELD = "KASANORGCODE" Then
+            SQLStr.AppendLine("       KASANORGCODE As CODE")
+            SQLStr.AppendLine("      ,RTRIM(KASANORGNAME) As NAME")
+        End If
+        If I_FIELD = "SHUKABASHO" Then
+            SQLStr.AppendLine("       SHUKABASHO As CODE")
+            SQLStr.AppendLine("      ,RTRIM(SHUKANAME) As NAME")
+        End If
+        If I_FIELD = "TODOKECODE" Then
+            SQLStr.AppendLine("       TODOKECODE As CODE")
+            SQLStr.AppendLine("      ,RTRIM(TODOKENAME) As NAME")
+        End If
+        SQLStr.AppendLine(" FROM")
+        SQLStr.AppendLine("     LNG.LNM0021_TODOKE")
+        SQLStr.AppendLine(" WHERE")
+        SQLStr.AppendLine("       DELFLG <> '1'")
+
+        If I_FIELD = "TORICODE" Then
+            SQLStr.AppendLine("   AND TORICODE = @CODE")
+        End If
+        If I_FIELD = "ORGCODE" Then
+            SQLStr.AppendLine("   AND ORGCODE = @CODE")
+        End If
+        If I_FIELD = "KASANORGCODE" Then
+            SQLStr.AppendLine("   AND KASANORGCODE = @CODE")
+        End If
+        If I_FIELD = "SHUKABASHO" Then
+            SQLStr.AppendLine("   AND SHUKABASHO = @CODE")
+        End If
+        If I_FIELD = "TODOKECODE" Then
+            SQLStr.AppendLine("   AND TODOKECODE = @CODE")
+        End If
+
+        Try
+            Using sqlCon As New MySqlConnection(CS0050Session.DBCon),
+              SQLcmd As New MySqlCommand(SQLStr.ToString, sqlCon)
+                sqlCon.Open()
+                MySqlConnection.ClearPool(sqlCon)
+                With SQLcmd.Parameters
+                    .Add("@CODE", MySqlDbType.VarChar).Value = I_VALUE
+                End With
+                Using sqlDr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    If sqlDr.Read Then
+                        O_TEXT = Convert.ToString(sqlDr("NAME"))
+                        O_RTN = C_MESSAGE_NO.NORMAL
+                    End If
+                End Using
+            End Using
+        Catch ex As Exception
+            O_RTN = C_MESSAGE_NO.DB_ERROR
+        End Try
+
+    End Sub
+
+    ''' <summary>
     ''' 名称取得(実績届先名)
     ''' </summary>
     ''' <param name="SQLcon"></param>
