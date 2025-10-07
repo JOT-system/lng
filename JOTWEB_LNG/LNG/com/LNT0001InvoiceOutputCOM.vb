@@ -338,12 +338,11 @@ Public Class LNT0001InvoiceOutputCOM
             Dim srcRange As IRange = Nothing
             Dim destRange As IRange = Nothing
             Dim hiddenA As Boolean = False
-            Dim hiddenB As Boolean = True
-            Dim hiddenC As Boolean = True
-            Dim hiddenD As Boolean = True
-            Dim hiddenE As Boolean = True
-            Dim hiddenF As Boolean = True
-            Dim hiddenG As Boolean = True
+            Dim hiddenB As Boolean = False
+            Dim hiddenC As Boolean = False
+            Dim hiddenD As Boolean = False
+            Dim hiddenE As Boolean = False
+            Dim hiddenF As Boolean = False
 
             Const COL_NO As String = "A"              '№
             Const COL_ORGNAME As String = "B"         '営業所
@@ -351,11 +350,10 @@ Public Class LNT0001InvoiceOutputCOM
             Const COL_SYABARA As String = "D"         '車腹
             Const COL_SYABAN As String = "E"          '車番
             Const COL_RIKUBAN As String = "F"         '陸事番号
-            Const COL_COUNT As String = "G"           '数量（回数・台数）
-            Const COL_KOTEIHI As String = "H"         '固定費
-            Const COL_CHOSEI As String = "I"          '調整額
-            Const COL_TOTAL As String = "J"           '小計
-            Const COL_COMMENT As String = "K"         '調整事由
+            Const COL_KOTEIHI As String = "G"         '固定費
+            Const COL_CHOSEI As String = "H"          '調整額
+            Const COL_TOTAL As String = "I"           '小計
+            Const COL_COMMENT As String = "J"         '調整事由
 
             '一旦、明細をクリアしておく（行削除）
             '固定費明細の最終行を取得
@@ -403,11 +401,6 @@ Public Class LNT0001InvoiceOutputCOM
                     WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_RIKUBAN & lineUcnt.ToString).Value = PrintDatarow("RIKUBAN").ToString()
                     hiddenF = False
                 End If
-                '◯ 数量（回数・台数）
-                If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
-                    WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_COUNT & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("COUNT").ToString())
-                    hiddenG = False
-                End If
                 '◯ 固定費
                 If Not String.IsNullOrEmpty(PrintDatarow("KOTEIHI").ToString) Then
                     WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_KOTEIHI & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("KOTEIHI").ToString())
@@ -436,8 +429,6 @@ Public Class LNT0001InvoiceOutputCOM
 
             If PrintData.Rows.Count > 0 Then
                 '◯ 固定費
-                WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_COUNT & lineUcnt.ToString).Formula = "=SUM(" & COL_COUNT & stLine.ToString & ":" & COL_COUNT & (lineUcnt - 1).ToString & ")"
-                '◯ 固定費
                 WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_KOTEIHI & lineUcnt.ToString).Formula = "=SUM(" & COL_KOTEIHI & stLine.ToString & ":" & COL_KOTEIHI & (lineUcnt - 1).ToString & ")"
                 '◯ 調整額
                 WW_Workbook.Worksheets(WW_SheetNoKotei).Range(COL_CHOSEI & lineUcnt.ToString).Formula = "=SUM(" & COL_CHOSEI & stLine.ToString & ":" & COL_CHOSEI & (lineUcnt - 1).ToString & ")"
@@ -451,7 +442,6 @@ Public Class LNT0001InvoiceOutputCOM
             WW_Workbook.Worksheets(WW_SheetNoKotei).Range("D:D").Hidden = hiddenD
             WW_Workbook.Worksheets(WW_SheetNoKotei).Range("E:E").Hidden = hiddenE
             WW_Workbook.Worksheets(WW_SheetNoKotei).Range("F:F").Hidden = hiddenF
-            WW_Workbook.Worksheets(WW_SheetNoKotei).Range("G:G").Hidden = hiddenG
 
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = Me.GetType.Name                'SUBクラス名
@@ -534,7 +524,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TAXRATE") = dtRow.TAXRATE
             prtRow("TANKA") = dtRow.TANKA
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -583,7 +573,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TODOKENAME") = dtRow.TODOKENAME
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
     End Sub
@@ -631,7 +621,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -670,7 +660,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -711,7 +701,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABARA") = dtRow.SYABARA
             prtRow("TANKA") = dtRow.TANKA
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -743,8 +733,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow = oTbl.NewRow
             prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
-            prtRow("TSUKORYO") = dtRow.TSUKORYO
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("TSUKORYO") = Rounding(dtRow.TSUKORYO * 0.55 / 1.1, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -792,7 +782,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -840,7 +830,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -885,7 +875,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = dtRow.YUSOUHI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -898,20 +888,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYAGATA,SYABARA,RIKUBAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
                         SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
+                        .ORGNAME = ORGNAME,
                         .SYAGATANAME = SYAGATANAME,
-                        .RIKUBAN = RIKUBAN,
                         .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -921,8 +915,10 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
             prtRow("SYAGATANAME") = dtRow.SYAGATANAME
             prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
@@ -939,20 +935,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYABAN,SYABARA"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
                         ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
                         SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
                         .ORGNAME = ORGNAME,
-                        .SYABAN = SYABAN,
+                        .SYAGATANAME = SYAGATANAME,
                         .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -963,8 +963,10 @@ Public Class LNT0001InvoiceOutputCOM
         For Each dtRow In query
             prtRow = oTbl.NewRow
             prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
             prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
@@ -980,20 +982,25 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYABAN,SYABARA"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
-                        SYABAN = row.Field(Of String)("SYABAN"),
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
                         SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
-                        .SYABAN = SYABAN,
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
                         .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
-                        .COUNT = Group.Count(),
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
                     }
@@ -1002,10 +1009,12 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
-            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
             prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("COUNT") = dtRow.COUNT
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
@@ -1020,16 +1029,25 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
-                        ORGCODE = row.Field(Of String)("ORGCODE")
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
-                        .ORGCODE = ORGCODE,
-                        .COUNT = Group.Count(),
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
                     }
@@ -1038,10 +1056,14 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
-            prtRow("ORGCODE") = dtRow.ORGCODE
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("COUNT") = dtRow.COUNT
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -1054,16 +1076,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYABAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
                         SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
                         .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -1073,7 +1103,11 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
             prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
@@ -1089,16 +1123,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYABAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
                         SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
                         .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -1108,7 +1150,11 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
             prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
@@ -1124,16 +1170,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYABAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
                         SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
                         .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -1143,7 +1197,11 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
             prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
@@ -1159,16 +1217,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SYABAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
                         SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
                         .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -1178,7 +1244,11 @@ Public Class LNT0001InvoiceOutputCOM
 
         For Each dtRow In query
             prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
             prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
@@ -1194,20 +1264,24 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYABARA,SYABAN"
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
                         ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
                         SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
                         COMMENT = row.Field(Of String)("BIKOU3")
                     Into Group
                     Select New With {
                         .ORGNAME = ORGNAME,
-                        .SYABAN = SYABAN,
+                        .SYAGATANAME = SYAGATANAME,
                         .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
                         .COMMENT = COMMENT,
                         .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
                         .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
@@ -1218,8 +1292,10 @@ Public Class LNT0001InvoiceOutputCOM
         For Each dtRow In query
             prtRow = oTbl.NewRow
             prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
             prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
             prtRow("CHOSEI") = dtRow.CHOSEI * -1
             prtRow("COMMENT") = dtRow.COMMENT
