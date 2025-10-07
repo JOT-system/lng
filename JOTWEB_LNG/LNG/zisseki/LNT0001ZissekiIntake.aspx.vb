@@ -2843,6 +2843,7 @@ Public Class LNT0001ZissekiIntake
             & "     TANNI,                                                                                                              " _
             & "     TANKNUM,                                                                                                            " _
             & "     TANKNUMBER,                                                                                                         " _
+            & "     GYOMUTANKNUM,                                                                                                       " _
             & "     SYAGATA,                                                                                                            " _
             & "     SYABARA,                                                                                                            " _
             & "     NINUSHINAME,                                                                                                        " _
@@ -2910,6 +2911,7 @@ Public Class LNT0001ZissekiIntake
             & "     ZISSEKIMAIN.TANNI             AS TANNI,                                                                             " _
             & "     ZISSEKIMAIN.TANKNUM           AS TANKNUM,                                                                           " _
             & "     ZISSEKIMAIN.TANKNUMBER        AS TANKNUMBER,                                                                        " _
+            & "     ZISSEKIMAIN.GYOMUTANKNUM      AS GYOMUTANKNUM,                                                                      " _
             & "     ZISSEKIMAIN.SYAGATA           AS SYAGATA,                                                                           " _
             & "     ZISSEKIMAIN.SYABARA           AS SYABARA,                                                                           " _
             & "     ZISSEKIMAIN.NINUSHINAME       AS NINUSHINAME,                                                                       " _
@@ -2962,8 +2964,34 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.TODOKENAMES       AS TODOKENAMES,                                                                      " _
             & "          ZISSEKI.TORICODE          AS TORICODE,                                                                         " _
             & "          ZISSEKI.TORINAME          AS TORINAME,                                                                         " _
-            & "          ZISSEKI.SHUKABASHO        AS SHUKABASHO,                                                                       " _
-            & "          ZISSEKI.SHUKANAME         AS SHUKANAME,                                                                        " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                          " _
+            & "          THEN (SELECT SHUKABASHO                                                                                        " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                               " _
+            & "                 WHERE                                                                                                   " _
+            & "                       TORICODE     = ZISSEKI.TORICODE                                                                   " _
+            & "                   AND ORDERORG     = ZISSEKI.ORDERORG                                                                   " _
+            & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
+            & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
+            & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
+            & "                   AND ZISSEKI      > 0                                                                                  " _
+            & "                   AND DELFLG       = '0'                                                                                " _
+            & "               )                                                                                                         " _
+            & "          ELSE ZISSEKI.SHUKABASHO                                                                                        " _
+            & "          END AS SHUKABASHO,                                                                                             " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                          " _
+            & "          THEN (SELECT SHUKANAME                                                                                         " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                               " _
+            & "                 WHERE                                                                                                   " _
+            & "                       TORICODE     = ZISSEKI.TORICODE                                                                   " _
+            & "                   AND ORDERORG     = ZISSEKI.ORDERORG                                                                   " _
+            & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
+            & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
+            & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
+            & "                   AND ZISSEKI      > 0                                                                                  " _
+            & "                   AND DELFLG       = '0'                                                                                " _
+            & "               )                                                                                                         " _
+            & "          ELSE ZISSEKI.SHUKANAME                                                                                         " _
+            & "          END AS SHUKANAME,                                                                                              " _
             & "          ZISSEKI.SHUKANAMES        AS SHUKANAMES,                                                                       " _
             & "          ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                                                                    " _
             & "          ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                                                                    " _
@@ -2978,6 +3006,7 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.TANNI             AS TANNI,                                                                            " _
             & "          ZISSEKI.TANKNUM           AS TANKNUM,                                                                          " _
             & "          ZISSEKI.TANKNUMBER        AS TANKNUMBER,                                                                       " _
+            & "          ZISSEKI.GYOMUTANKNUM      AS GYOMUTANKNUM,                                                                     " _
             & "          ZISSEKI.SYAGATA           AS SYAGATA,                                                                          " _
             & "          ZISSEKI.SYABARA           AS SYABARA,                                                                          " _
             & "          ZISSEKI.NINUSHINAME       AS NINUSHINAME,                                                                      " _
@@ -3063,6 +3092,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                                      " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                                    " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                                 " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                               " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                                    " _
             & "         SYABARA                   = VALUES(SYABARA),                                                                    " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                                " _
@@ -3261,6 +3291,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                               " _
             & "        TANKNUM,                                                                                             " _
             & "        TANKNUMBER,                                                                                          " _
+            & "        GYOMUTANKNUM,                                                                                        " _
             & "        SYAGATA,                                                                                             " _
             & "        SYABARA,                                                                                             " _
             & "        NINUSHINAME,                                                                                         " _
@@ -3312,8 +3343,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                           " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                              " _
-            & "        ZISSEKI.SHUKABASHO         AS SHUKABASHO,                                                            " _
-            & "        ZISSEKI.SHUKANAME          AS SHUKANAME,                                                             " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "               WHERE                                                                                         " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                                         " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                         " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
+            & "                 AND ZISSEKI      > 0                                                                        " _
+            & "                 AND DELFLG       = '0'                                                                      " _
+            & "             )                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "               WHERE                                                                                         " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                                         " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                         " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
+            & "                 AND ZISSEKI      > 0                                                                        " _
+            & "                 AND DELFLG       = '0'                                                                      " _
+            & "             )                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                            " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                         " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                         " _
@@ -3328,6 +3385,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI              AS TANNI,                                                                 " _
             & "        ZISSEKI.TANKNUM            AS TANKNUM,                                                               " _
             & "        ZISSEKI.TANKNUMBER         AS TANKNUMBER,                                                            " _
+            & "        ZISSEKI.GYOMUTANKNUM       AS GYOMUTANKNUM,                                                          " _
             & "        ZISSEKI.SYAGATA            AS SYAGATA,                                                               " _
             & "        ZISSEKI.SYABARA            AS SYABARA,                                                               " _
             & "        ZISSEKI.NINUSHINAME        AS NINUSHINAME,                                                           " _
@@ -3423,6 +3481,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                          " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                        " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                     " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                   " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                        " _
             & "         SYABARA                   = VALUES(SYABARA),                                                        " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                    " _
@@ -3621,6 +3680,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                           " _
             & "        TANKNUM,                                                                         " _
             & "        TANKNUMBER,                                                                      " _
+            & "        GYOMUTANKNUM,                                                                    " _
             & "        SYAGATA,                                                                         " _
             & "        SYABARA,                                                                         " _
             & "        NINUSHINAME,                                                                     " _
@@ -3672,8 +3732,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                       " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                          " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                          " _
-            & "        ZISSEKI.SHUKABASHO         AS SHUKABASHO,                                        " _
-            & "        ZISSEKI.SHUKANAME          AS SHUKANAME,                                         " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                            " _
+            & "        THEN (SELECT SHUKABASHO                                                          " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                 " _
+            & "               WHERE                                                                     " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                     " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                     " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
+            & "                 AND ZISSEKI      > 0                                                    " _
+            & "                 AND DELFLG       = '0'                                                  " _
+            & "             )                                                                           " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                          " _
+            & "        END AS SHUKABASHO,                                                               " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                            " _
+            & "        THEN (SELECT SHUKANAME                                                           " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                 " _
+            & "               WHERE                                                                     " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                     " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                     " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
+            & "                 AND ZISSEKI      > 0                                                    " _
+            & "                 AND DELFLG       = '0'                                                  " _
+            & "             )                                                                           " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                           " _
+            & "        END AS SHUKANAME,                                                                " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                        " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                     " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                     " _
@@ -3688,6 +3774,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI              AS TANNI,                                             " _
             & "        ZISSEKI.TANKNUM            AS TANKNUM,                                           " _
             & "        ZISSEKI.TANKNUMBER         AS TANKNUMBER,                                        " _
+            & "        ZISSEKI.GYOMUTANKNUM       AS GYOMUTANKNUM,                                      " _
             & "        ZISSEKI.SYAGATA            AS SYAGATA,                                           " _
             & "        ZISSEKI.SYABARA            AS SYABARA,                                           " _
             & "        ZISSEKI.NINUSHINAME        AS NINUSHINAME,                                       " _
@@ -3776,6 +3863,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                      " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                    " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                 " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                               " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                    " _
             & "         SYABARA                   = VALUES(SYABARA),                                    " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                " _
@@ -3974,6 +4062,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                                                               " _
             & "        TANKNUM,                                                                                                                             " _
             & "        TANKNUMBER,                                                                                                                          " _
+            & "        GYOMUTANKNUM,                                                                                                                        " _
             & "        SYAGATA,                                                                                                                             " _
             & "        SYABARA,                                                                                                                             " _
             & "        NINUSHINAME,                                                                                                                         " _
@@ -4025,8 +4114,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                                                           " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                                                              " _
-            & "        ZISSEKI.SHUKABASHO         AS SHUKABASHO,                                                                                            " _
-            & "        ZISSEKI.SHUKANAME          AS SHUKANAME,                                                                                             " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                " _
+            & "        THEN (SELECT SHUKABASHO                                                                                                              " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                                                     " _
+            & "               WHERE                                                                                                                         " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                                                                         " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                                                         " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
+            & "                 AND ZISSEKI      > 0                                                                                                        " _
+            & "                 AND DELFLG       = '0'                                                                                                      " _
+            & "             )                                                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                " _
+            & "        THEN (SELECT SHUKANAME                                                                                                               " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                                                     " _
+            & "               WHERE                                                                                                                         " _
+            & "                     TORICODE     = ZISSEKI.TORICODE                                                                                         " _
+            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                                                         " _
+            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
+            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
+            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
+            & "                 AND ZISSEKI      > 0                                                                                                        " _
+            & "                 AND DELFLG       = '0'                                                                                                      " _
+            & "             )                                                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                                                               " _
+            & "        END AS SHUKANAME,                                                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                                                            " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                                                         " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                                                         " _
@@ -4041,6 +4156,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI              AS TANNI,                                                                                                 " _
             & "        ZISSEKI.TANKNUM            AS TANKNUM,                                                                                               " _
             & "        ZISSEKI.TANKNUMBER         AS TANKNUMBER,                                                                                            " _
+            & "        ZISSEKI.GYOMUTANKNUM       AS GYOMUTANKNUM,                                                                                          " _
             & "        ZISSEKI.SYAGATA            AS SYAGATA,                                                                                               " _
             & "        ZISSEKI.SYABARA            AS SYABARA,                                                                                               " _
             & "        ZISSEKI.NINUSHINAME        AS NINUSHINAME,                                                                                           " _
@@ -4158,6 +4274,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                                                          " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                                                        " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                                                     " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                                                   " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                                                        " _
             & "         SYABARA                   = VALUES(SYABARA),                                                                                        " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                                                    " _
@@ -4356,6 +4473,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                                                                                             " _
             & "        TANKNUM,                                                                                                                                                           " _
             & "        TANKNUMBER,                                                                                                                                                        " _
+            & "        GYOMUTANKNUM,                                                                                                                                                      " _
             & "        SYAGATA,                                                                                                                                                           " _
             & "        SYABARA,                                                                                                                                                           " _
             & "        NINUSHINAME,                                                                                                                                                       " _
@@ -4423,6 +4541,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKIMAIN.TANNI             AS TANNI,                                                                                                                            " _
             & "        ZISSEKIMAIN.TANKNUM           AS TANKNUM,                                                                                                                          " _
             & "        ZISSEKIMAIN.TANKNUMBER        AS TANKNUMBER,                                                                                                                       " _
+            & "        ZISSEKIMAIN.GYOMUTANKNUM      AS GYOMUTANKNUM,                                                                                                                     " _
             & "        ZISSEKIMAIN.SYAGATA           AS SYAGATA,                                                                                                                          " _
             & "        ZISSEKIMAIN.SYABARA           AS SYABARA,                                                                                                                          " _
             & "        ZISSEKIMAIN.NINUSHINAME       AS NINUSHINAME,                                                                                                                      " _
@@ -4478,8 +4597,34 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                                                                                    " _
             & "             ZISSEKI.TORICODE           AS TORICODE,                                                                                                                       " _
             & "             ZISSEKI.TORINAME           AS TORINAME,                                                                                                                       " _
-            & "             ZISSEKI.SHUKABASHO         AS SHUKABASHO,                                                                                                                     " _
-            & "             ZISSEKI.SHUKANAME          AS SHUKANAME,                                                                                                                      " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                                         " _
+            & "             THEN (SELECT SHUKABASHO                                                                                                                                       " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                                                                              " _
+            & "                     WHERE                                                                                                                                                 " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                                                                                   " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                                                                                   " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
+            & "                     AND ZISSEKI      > 0                                                                                                                                  " _
+            & "                     AND DELFLG       = '0'                                                                                                                                " _
+            & "                 )                                                                                                                                                         " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                                                                                                                       " _
+            & "             END AS SHUKABASHO,                                                                                                                                            " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                                         " _
+            & "             THEN (SELECT SHUKANAME                                                                                                                                        " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                                                                              " _
+            & "                     WHERE                                                                                                                                                 " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                                                                                   " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                                                                                   " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
+            & "                     AND ZISSEKI      > 0                                                                                                                                  " _
+            & "                     AND DELFLG       = '0'                                                                                                                                " _
+            & "                 )                                                                                                                                                         " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                                                                                                        " _
+            & "             END AS SHUKANAME,                                                                                                                                             " _
             & "             ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                                                                                     " _
             & "             ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                                                                                  " _
             & "             ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                                                                                  " _
@@ -4494,6 +4639,7 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TANNI              AS TANNI,                                                                                                                          " _
             & "             ZISSEKI.TANKNUM            AS TANKNUM,                                                                                                                        " _
             & "             ZISSEKI.TANKNUMBER         AS TANKNUMBER,                                                                                                                     " _
+            & "             ZISSEKI.GYOMUTANKNUM       AS GYOMUTANKNUM,                                                                                                                   " _
             & "             ZISSEKI.SYAGATA            AS SYAGATA,                                                                                                                        " _
             & "             ZISSEKI.SYABARA            AS SYABARA,                                                                                                                        " _
             & "             ZISSEKI.NINUSHINAME        AS NINUSHINAME,                                                                                                                    " _
@@ -4586,6 +4732,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                                                                                        " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                                                                                      " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                                                                                   " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                                                                                 " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                                                                                      " _
             & "         SYABARA                   = VALUES(SYABARA),                                                                                                                      " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                                                                                  " _
@@ -4784,6 +4931,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                     " _
             & "        TANKNUM,                                                                   " _
             & "        TANKNUMBER,                                                                " _
+            & "        GYOMUTANKNUM,                                                              " _
             & "        SYAGATA,                                                                   " _
             & "        SYABARA,                                                                   " _
             & "        NINUSHINAME,                                                               " _
@@ -4851,6 +4999,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKIMAIN.TANNI             AS TANNI,                                    " _
             & "        ZISSEKIMAIN.TANKNUM           AS TANKNUM,                                  " _
             & "        ZISSEKIMAIN.TANKNUMBER        AS TANKNUMBER,                               " _
+            & "        ZISSEKIMAIN.GYOMUTANKNUM      AS GYOMUTANKNUM,                             " _
             & "        ZISSEKIMAIN.SYAGATA           AS SYAGATA,                                  " _
             & "        ZISSEKIMAIN.SYABARA           AS SYABARA,                                  " _
             & "        ZISSEKIMAIN.NINUSHINAME       AS NINUSHINAME,                              " _
@@ -4903,8 +5052,34 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TODOKENAMES       AS TODOKENAMES,                             " _
             & "             ZISSEKI.TORICODE          AS TORICODE,                                " _
             & "             ZISSEKI.TORINAME          AS TORINAME,                                " _
-            & "             ZISSEKI.SHUKABASHO        AS SHUKABASHO,                              " _
-            & "             ZISSEKI.SHUKANAME         AS SHUKANAME,                               " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
+            & "             THEN (SELECT SHUKABASHO                                               " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
+            & "                     WHERE                                                         " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
+            & "                     AND ZISSEKI      > 0                                          " _
+            & "                     AND DELFLG       = '0'                                        " _
+            & "                 )                                                                 " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                               " _
+            & "             END AS SHUKABASHO,                                                    " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
+            & "             THEN (SELECT SHUKANAME                                                " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
+            & "                     WHERE                                                         " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
+            & "                     AND ZISSEKI      > 0                                          " _
+            & "                     AND DELFLG       = '0'                                        " _
+            & "                 )                                                                 " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                " _
+            & "             END AS SHUKANAME,                                                     " _
             & "             ZISSEKI.SHUKANAMES        AS SHUKANAMES,                              " _
             & "             ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                           " _
             & "             ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                           " _
@@ -4919,6 +5094,7 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TANNI             AS TANNI,                                   " _
             & "             ZISSEKI.TANKNUM           AS TANKNUM,                                 " _
             & "             ZISSEKI.TANKNUMBER        AS TANKNUMBER,                              " _
+            & "             ZISSEKI.GYOMUTANKNUM      AS GYOMUTANKNUM,                            " _
             & "             ZISSEKI.SYAGATA           AS SYAGATA,                                 " _
             & "             ZISSEKI.SYABARA           AS SYABARA,                                 " _
             & "             ZISSEKI.NINUSHINAME       AS NINUSHINAME,                             " _
@@ -4948,7 +5124,6 @@ Public Class LNT0001ZissekiIntake
             & "             AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                              " _
             & "             AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                    " _
             & "             AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                      " _
-            & "             AND ZISSEKI.SYABARA = TANKA.SYABARA                                   " _
             & "             AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                " _
             & "             AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                " _
             & "             AND TANKA.DELFLG = @DELFLG                                            " _
@@ -5009,6 +5184,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                " _
             & "         TANKNUM                   = VALUES(TANKNUM),                              " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                           " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                         " _
             & "         SYAGATA                   = VALUES(SYAGATA),                              " _
             & "         SYABARA                   = VALUES(SYABARA),                              " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                          " _
@@ -5207,6 +5383,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                     " _
             & "        TANKNUM,                                                                   " _
             & "        TANKNUMBER,                                                                " _
+            & "        GYOMUTANKNUM,                                                              " _
             & "        SYAGATA,                                                                   " _
             & "        SYABARA,                                                                   " _
             & "        NINUSHINAME,                                                               " _
@@ -5274,6 +5451,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKIMAIN.TANNI             AS TANNI,                                    " _
             & "        ZISSEKIMAIN.TANKNUM           AS TANKNUM,                                  " _
             & "        ZISSEKIMAIN.TANKNUMBER        AS TANKNUMBER,                               " _
+            & "        ZISSEKIMAIN.GYOMUTANKNUM      AS GYOMUTANKNUM,                             " _
             & "        ZISSEKIMAIN.SYAGATA           AS SYAGATA,                                  " _
             & "        ZISSEKIMAIN.SYABARA           AS SYABARA,                                  " _
             & "        ZISSEKIMAIN.NINUSHINAME       AS NINUSHINAME,                              " _
@@ -5326,8 +5504,34 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TODOKENAMES       AS TODOKENAMES,                             " _
             & "             ZISSEKI.TORICODE          AS TORICODE,                                " _
             & "             ZISSEKI.TORINAME          AS TORINAME,                                " _
-            & "             ZISSEKI.SHUKABASHO        AS SHUKABASHO,                              " _
-            & "             ZISSEKI.SHUKANAME         AS SHUKANAME,                               " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
+            & "             THEN (SELECT SHUKABASHO                                               " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
+            & "                     WHERE                                                         " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
+            & "                     AND ZISSEKI      > 0                                          " _
+            & "                     AND DELFLG       = '0'                                        " _
+            & "                 )                                                                 " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                               " _
+            & "             END AS SHUKABASHO,                                                    " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
+            & "             THEN (SELECT SHUKANAME                                                " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
+            & "                     WHERE                                                         " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
+            & "                     AND ZISSEKI      > 0                                          " _
+            & "                     AND DELFLG       = '0'                                        " _
+            & "                 )                                                                 " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                " _
+            & "             END AS SHUKANAME,                                                     " _
             & "             ZISSEKI.SHUKANAMES        AS SHUKANAMES,                              " _
             & "             ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                           " _
             & "             ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                           " _
@@ -5342,6 +5546,7 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.TANNI             AS TANNI,                                   " _
             & "             ZISSEKI.TANKNUM           AS TANKNUM,                                 " _
             & "             ZISSEKI.TANKNUMBER        AS TANKNUMBER,                              " _
+            & "             ZISSEKI.GYOMUTANKNUM      AS GYOMUTANKNUM,                            " _
             & "             ZISSEKI.SYAGATA           AS SYAGATA,                                 " _
             & "             ZISSEKI.SYABARA           AS SYABARA,                                 " _
             & "             ZISSEKI.NINUSHINAME       AS NINUSHINAME,                             " _
@@ -5430,6 +5635,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                " _
             & "         TANKNUM                   = VALUES(TANKNUM),                              " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                           " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                         " _
             & "         SYAGATA                   = VALUES(SYAGATA),                              " _
             & "         SYABARA                   = VALUES(SYABARA),                              " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                          " _
@@ -5628,6 +5834,7 @@ Public Class LNT0001ZissekiIntake
             & "     TANNI,                                                                    " _
             & "     TANKNUM,                                                                  " _
             & "     TANKNUMBER,                                                               " _
+            & "     GYOMUTANKNUM,                                                             " _
             & "     SYAGATA,                                                                  " _
             & "     SYABARA,                                                                  " _
             & "     NINUSHINAME,                                                              " _
@@ -5695,6 +5902,7 @@ Public Class LNT0001ZissekiIntake
             & "     ZISSEKIMAIN.TANNI             AS TANNI,                                   " _
             & "     ZISSEKIMAIN.TANKNUM           AS TANKNUM,                                 " _
             & "     ZISSEKIMAIN.TANKNUMBER        AS TANKNUMBER,                              " _
+            & "     ZISSEKIMAIN.GYOMUTANKNUM      AS GYOMUTANKNUM,                            " _
             & "     ZISSEKIMAIN.SYAGATA           AS SYAGATA,                                 " _
             & "     ZISSEKIMAIN.SYABARA           AS SYABARA,                                 " _
             & "     ZISSEKIMAIN.NINUSHINAME       AS NINUSHINAME,                             " _
@@ -5747,8 +5955,34 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.TODOKENAMES       AS TODOKENAMES,                            " _
             & "          ZISSEKI.TORICODE          AS TORICODE,                               " _
             & "          ZISSEKI.TORINAME          AS TORINAME,                               " _
-            & "          ZISSEKI.SHUKABASHO        AS SHUKABASHO,                             " _
-            & "          ZISSEKI.SHUKANAME         AS SHUKANAME,                              " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                " _
+            & "          THEN (SELECT SHUKABASHO                                              " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                     " _
+            & "                  WHERE                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
+            & "                  AND ZISSEKI      > 0                                         " _
+            & "                  AND DELFLG       = '0'                                       " _
+            & "              )                                                                " _
+            & "          ELSE ZISSEKI.SHUKABASHO                                              " _
+            & "          END AS SHUKABASHO,                                                   " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                " _
+            & "          THEN (SELECT SHUKANAME                                               " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                     " _
+            & "                  WHERE                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
+            & "                  AND ZISSEKI      > 0                                         " _
+            & "                  AND DELFLG       = '0'                                       " _
+            & "              )                                                                " _
+            & "          ELSE ZISSEKI.SHUKANAME                                               " _
+            & "          END AS SHUKANAME,                                                    " _
             & "          ZISSEKI.SHUKANAMES        AS SHUKANAMES,                             " _
             & "          ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                          " _
             & "          ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                          " _
@@ -5763,6 +5997,7 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.TANNI             AS TANNI,                                  " _
             & "          ZISSEKI.TANKNUM           AS TANKNUM,                                " _
             & "          ZISSEKI.TANKNUMBER        AS TANKNUMBER,                             " _
+            & "          ZISSEKI.GYOMUTANKNUM      AS GYOMUTANKNUM,                           " _
             & "          ZISSEKI.SYAGATA           AS SYAGATA,                                " _
             & "          ZISSEKI.SYABARA           AS SYABARA,                                " _
             & "          ZISSEKI.NINUSHINAME       AS NINUSHINAME,                            " _
@@ -5842,6 +6077,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                            " _
             & "         TANKNUM                   = VALUES(TANKNUM),                          " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                       " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                     " _
             & "         SYAGATA                   = VALUES(SYAGATA),                          " _
             & "         SYABARA                   = VALUES(SYABARA),                          " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                      " _
@@ -6040,6 +6276,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                               " _
             & "        TANKNUM,                                                                                             " _
             & "        TANKNUMBER,                                                                                          " _
+            & "        GYOMUTANKNUM,                                                                                        " _
             & "        SYAGATA,                                                                                             " _
             & "        SYABARA,                                                                                             " _
             & "        NINUSHINAME,                                                                                         " _
@@ -6091,8 +6328,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES           AS TODOKENAMES,                                                        " _
             & "        ZISSEKI.TORICODE              AS TORICODE,                                                           " _
             & "        ZISSEKI.TORINAME              AS TORINAME,                                                           " _
-            & "        ZISSEKI.SHUKABASHO            AS SHUKABASHO,                                                         " _
-            & "        ZISSEKI.SHUKANAME             AS SHUKANAME,                                                          " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND ZISSEKI      > 0                                                                         " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            )                                                                                                " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND ZISSEKI      > 0                                                                         " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            )                                                                                                " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES            AS SHUKANAMES,                                                         " _
             & "        ZISSEKI.SHUKATORICODE         AS SHUKATORICODE,                                                      " _
             & "        ZISSEKI.SHUKATORINAME         AS SHUKATORINAME,                                                      " _
@@ -6107,6 +6370,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI                 AS TANNI,                                                              " _
             & "        ZISSEKI.TANKNUM               AS TANKNUM,                                                            " _
             & "        ZISSEKI.TANKNUMBER            AS TANKNUMBER,                                                         " _
+            & "        ZISSEKI.GYOMUTANKNUM          AS GYOMUTANKNUM,                                                       " _
             & "        ZISSEKI.SYAGATA               AS SYAGATA,                                                            " _
             & "        ZISSEKI.SYABARA               AS SYABARA,                                                            " _
             & "        ZISSEKI.NINUSHINAME           AS NINUSHINAME,                                                        " _
@@ -6201,6 +6465,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                          " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                        " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                     " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                   " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                        " _
             & "         SYABARA                   = VALUES(SYABARA),                                                        " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                    " _
@@ -6399,6 +6664,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                               " _
             & "        TANKNUM,                                                                                             " _
             & "        TANKNUMBER,                                                                                          " _
+            & "        GYOMUTANKNUM,                                                                                        " _
             & "        SYAGATA,                                                                                             " _
             & "        SYABARA,                                                                                             " _
             & "        NINUSHINAME,                                                                                         " _
@@ -6450,8 +6716,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                           " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                              " _
-            & "        ZISSEKI.SHUKABASHO         AS SHUKABASHO,                                                            " _
-            & "        ZISSEKI.SHUKANAME          AS SHUKANAME,                                                             " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND ZISSEKI      > 0                                                                         " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            )                                                                                                " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND ZISSEKI      > 0                                                                         " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            )                                                                                                " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                            " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                         " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                         " _
@@ -6466,6 +6758,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI              AS TANNI,                                                                 " _
             & "        ZISSEKI.TANKNUM            AS TANKNUM,                                                               " _
             & "        ZISSEKI.TANKNUMBER         AS TANKNUMBER,                                                            " _
+            & "        ZISSEKI.GYOMUTANKNUM       AS GYOMUTANKNUM,                                                          " _
             & "        ZISSEKI.SYAGATA            AS SYAGATA,                                                               " _
             & "        ZISSEKI.SYABARA            AS SYABARA,                                                               " _
             & "        ZISSEKI.NINUSHINAME        AS NINUSHINAME,                                                           " _
@@ -6560,6 +6853,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                          " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                        " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                     " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                   " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                        " _
             & "         SYABARA                   = VALUES(SYABARA),                                                        " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                    " _
@@ -6758,6 +7052,7 @@ Public Class LNT0001ZissekiIntake
             & "        TANNI,                                                                                                              " _
             & "        TANKNUM,                                                                                                            " _
             & "        TANKNUMBER,                                                                                                         " _
+            & "        GYOMUTANKNUM,                                                                                                       " _
             & "        SYAGATA,                                                                                                            " _
             & "        SYABARA,                                                                                                            " _
             & "        NINUSHINAME,                                                                                                        " _
@@ -6809,8 +7104,34 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TODOKENAMES           AS TODOKENAMES,                                                                       " _
             & "        ZISSEKI.TORICODE              AS TORICODE,                                                                          " _
             & "        ZISSEKI.TORINAME              AS TORINAME,                                                                          " _
-            & "        ZISSEKI.SHUKABASHO            AS SHUKABASHO,                                                                        " _
-            & "        ZISSEKI.SHUKANAME             AS SHUKANAME,                                                                         " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                               " _
+            & "        THEN (SELECT SHUKABASHO                                                                                             " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                                    " _
+            & "                WHERE                                                                                                       " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                                         " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                                         " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
+            & "                AND ZISSEKI      > 0                                                                                        " _
+            & "                AND DELFLG       = '0'                                                                                      " _
+            & "            )                                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                                             " _
+            & "        END AS SHUKABASHO,                                                                                                  " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                               " _
+            & "        THEN (SELECT SHUKANAME                                                                                              " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                                    " _
+            & "                WHERE                                                                                                       " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                                         " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                                         " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
+            & "                AND ZISSEKI      > 0                                                                                        " _
+            & "                AND DELFLG       = '0'                                                                                      " _
+            & "            )                                                                                                               " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                                              " _
+            & "        END AS SHUKANAME,                                                                                                   " _
             & "        ZISSEKI.SHUKANAMES            AS SHUKANAMES,                                                                        " _
             & "        ZISSEKI.SHUKATORICODE         AS SHUKATORICODE,                                                                     " _
             & "        ZISSEKI.SHUKATORINAME         AS SHUKATORINAME,                                                                     " _
@@ -6825,6 +7146,7 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.TANNI                 AS TANNI,                                                                             " _
             & "        ZISSEKI.TANKNUM               AS TANKNUM,                                                                           " _
             & "        ZISSEKI.TANKNUMBER            AS TANKNUMBER,                                                                        " _
+            & "        ZISSEKI.GYOMUTANKNUM          AS GYOMUTANKNUM,                                                                      " _
             & "        ZISSEKI.SYAGATA               AS SYAGATA,                                                                           " _
             & "        ZISSEKI.SYABARA               AS SYABARA,                                                                           " _
             & "        ZISSEKI.NINUSHINAME           AS NINUSHINAME,                                                                       " _
@@ -6839,13 +7161,13 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.SUBSTAFFNUM           AS SUBSTAFFNUM,                                                                       " _
             & "        ZISSEKI.SHUKODATE             AS SHUKODATE,                                                                         " _
             & "        ZISSEKI.KIKODATE              AS KIKODATE,                                                                          " _
-            & "        HOLIDAYRATE.TANKA             AS KYUZITUTANKA,                                                                      " _
             & "        CASE                                                                                                                " _
             & "            WHEN ZISSEKI.TODOKECODE = '004460' THEN TANKA_TETSUGEN.TANKA                                                    " _
             & "            ELSE TANKA.TANKA                                                                                                " _
             & "        END                           AS TANKA,                                                                             " _
             & "        NULL                          AS JURYORYOKIN,                                                                       " _
             & "        NULL                          AS TSUKORYO,                                                                          " _
+            & "        HOLIDAYRATE.TANKA             AS KYUZITUTANKA,                                                                      " _
             & "        CASE                                                                                                                " _
             & "            WHEN ZISSEKI.TODOKECODE = '004460' THEN COALESCE(TANKA_TETSUGEN.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)      " _
             & "            ELSE COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                                  " _
@@ -6935,6 +7257,7 @@ Public Class LNT0001ZissekiIntake
             & "         TANNI                     = VALUES(TANNI),                                                                         " _
             & "         TANKNUM                   = VALUES(TANKNUM),                                                                       " _
             & "         TANKNUMBER                = VALUES(TANKNUMBER),                                                                    " _
+            & "         GYOMUTANKNUM              = VALUES(GYOMUTANKNUM),                                                                  " _
             & "         SYAGATA                   = VALUES(SYAGATA),                                                                       " _
             & "         SYABARA                   = VALUES(SYABARA),                                                                       " _
             & "         NINUSHINAME               = VALUES(NINUSHINAME),                                                                   " _
