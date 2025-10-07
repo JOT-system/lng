@@ -6777,7 +6777,7 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                       AS JURYORYOKIN,                                                           " _
             & "        NULL                       AS TSUKORYO,                                                              " _
             & "        HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                          " _
-            & "        COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI, " _
+            & "        COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI,                                " _
             & "        CALENDAR.WORKINGDAY AS WORKINGDAY,                                                                   " _
             & "        CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                     " _
             & "        ZISSEKI.DELFLG             AS DELFLG,                                                                " _
