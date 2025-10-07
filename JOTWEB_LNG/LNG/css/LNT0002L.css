@@ -74,15 +74,15 @@ p {
 
 
 
-#btnAdd, #btnOut, #btnRef, #btnHistOut {
+#btnAdd, #btnOut, #btnComOut, #btnRef, #btnHistOut {
     padding: 0px;
     height: 20px;
-    width: 60px;
+    width: 75px;
     background-color: #04ADE2;
     color: #FFFFFF;
 }
 
-    #btnAdd:hover, #btnOut:hover, #btnRef:hover, #btnHistOut:hover {
+    #btnAdd:hover, #btnOut:hover, #btnComOut:hover, #btnRef:hover, #btnHistOut:hover {
         cursor: pointer;
     }
 
@@ -158,4 +158,10 @@ div [data-generated="1"][data-scrolltype="1"] div[id$="pnlHISTListArea_HR"] {
 div [data-generated="1"][data-scrolltype="1"] div[id$="pnlHISTListArea_DR"] {
     right: auto;
     overflow: auto;
+}
+div[data-generated="1"] div[id$="_HL"] th, div[data-generated="1"] div[id$="_HR"] th {
+    height: 40px;
+}
+div[data-generated="1"] div[id$="_DL"], div[data-generated="1"] div[id$="_DR"] {
+    top: 40px;
 }

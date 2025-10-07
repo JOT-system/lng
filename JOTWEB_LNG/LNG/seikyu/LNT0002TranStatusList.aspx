@@ -127,6 +127,7 @@
 
         <asp:DropDownList ID="WF_TORI" runat="server" class="form-select rounded-0" />
         <asp:DropDownList ID="WF_TORIEXL" runat="server" class="form-select rounded-0" />
+        <asp:DropDownList ID="WF_COMEXL" runat="server" class="form-select rounded-0" />
         <asp:DropDownList ID="WF_FILENAME" runat="server" class="form-select rounded-0" />
         <asp:DropDownList ID="WF_TORIORG" runat="server" class="form-select rounded-0" />
     </div>

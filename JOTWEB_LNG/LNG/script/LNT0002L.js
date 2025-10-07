@@ -133,6 +133,7 @@ window.addEventListener('load', function () {
 function BtnAddClick(obj, lineCnt, fieldNM) {
     document.getElementById("WF_SelectedIndex").value = lineCnt
     document.getElementById("WF_ButtonClick").value = "WF_ButtonAddClick";
+    commonDispWait();
     document.forms[0].submit();
 }
 
@@ -140,6 +141,15 @@ function BtnAddClick(obj, lineCnt, fieldNM) {
 function BtnOutputClick(obj, lineCnt, fieldNM) {
     document.getElementById("WF_SelectedIndex").value = lineCnt
     document.getElementById("WF_ButtonClick").value = "WF_ButtonOutClick";
+    commonDispWait();
+    document.forms[0].submit();
+}
+
+//出力（共通）ボタン押下時
+function BtnComOutputClick(obj, lineCnt, fieldNM) {
+    document.getElementById("WF_SelectedIndex").value = lineCnt
+    document.getElementById("WF_ButtonClick").value = "WF_ButtonComOutClick";
+    commonDispWait();
     document.forms[0].submit();
 }
 
@@ -147,6 +157,7 @@ function BtnOutputClick(obj, lineCnt, fieldNM) {
 function BtnReferenceClick(obj, lineCnt, fieldNM) {
     document.getElementById("WF_SelectedIndex").value = lineCnt
     document.getElementById("WF_ButtonClick").value = "WF_ButtonRefClick";
+    commonDispWait();
     document.forms[0].submit();
 }
 
@@ -154,16 +165,17 @@ function BtnReferenceClick(obj, lineCnt, fieldNM) {
 function BtnHistOutputClick(obj, lineCnt, fieldNM) {
     document.getElementById("WF_SelectedIndex").value = lineCnt
     document.getElementById("WF_ButtonClick").value = "WF_ButtonHistOutClick";
+    commonDispWait();
     document.forms[0].submit();
 }
 
 // ○請求調整列編集
 function f_InvoiceCtrlCol() {
     var Col = {
-        SPRATE: 3 //特別料金列
-        , TANKA: 4 //単価調整列
-        , KOTEIHI: 5 //固定費調整列
-        , SURCHARGE: 6 //サーチャージ列
+        SPRATE: 4 //特別料金列
+        , TANKA: 5 //単価調整列
+        , KOTEIHI: 6 //固定費調整列
+        , SURCHARGE: 7 //サーチャージ列
     };
 
     //**********ヘッダ********************/

@@ -248,6 +248,15 @@ Partial Public Class LNT0002TranStatusList
     Protected WithEvents WF_TORIEXL As Global.System.Web.UI.WebControls.DropDownList
     
     '''<summary>
+    '''WF_COMEXL コントロール。
+    '''</summary>
+    '''<remarks>
+    '''自動生成されたフィールド。
+    '''変更するには、フィールドの宣言をデザイナー ファイルから分離コード ファイルに移動します。
+    '''</remarks>
+    Protected WithEvents WF_COMEXL As Global.System.Web.UI.WebControls.DropDownList
+    
+    '''<summary>
     '''WF_FILENAME コントロール。
     '''</summary>
     '''<remarks>

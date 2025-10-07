@@ -43,6 +43,7 @@ Public Class LNT0002TranStatusList
     Private UploadFileTbl As New DataTable    '添付ファイルテーブル
     Private LNT0002Exceltbl As New DataTable  'Excelデータ格納用テーブル
     Private LNT0002Shippers As New DataTable  '荷主一覧格納
+    Private LNS0012tbl As DataTable           'プロファイルマスタ（レポート)
 
     ''' <summary>
     ''' 定数
@@ -52,6 +53,7 @@ Public Class LNT0002TranStatusList
 
     Private Const CONST_BTNADD As String = "<div><input class=""btn-sticky"" id=""btnAdd""　type=""button"" value=""追加"" readonly onclick=""BtnAddClick();"" /></div>"
     Private Const CONST_BTNOUT As String = "<div><input class=""btn-sticky"" id=""btnOut""　type=""button"" value=""出力"" readonly onclick=""BtnOutputClick();"" /></div>"
+    Private Const CONST_BTNCOMOUT As String = "<div><input class=""btn-sticky"" id=""btnComOut""　type=""button"" value=""出力(共通)"" readonly onclick=""BtnComOutputClick();"" /></div>"
     Private Const CONST_BTNREF As String = "<div><input class=""btn-sticky"" id=""btnRef""　type=""button"" value=""参照"" readonly onclick=""BtnReferenceClick();"" /></div>"
 
     Private Const CONST_BTNHISTOUT As String = "<div><input class=""btn-sticky"" id=""btnHistOut""　type=""button"" value=""出力"" readonly onclick=""BtnHistOutputClick();"" /></div>"
@@ -92,19 +94,19 @@ Public Class LNT0002TranStatusList
                     Master.RecoverTable(LNT0002tbl)
 
                     Select Case WF_ButtonClick.Value
-                        Case "WF_ButtonEND" '戻るボタン押下
+                        Case "WF_ButtonEND"             '戻るボタン押下
                             WF_ButtonEND_Click()
                         Case "WF_GridDBclick"           'GridViewダブルクリック
                             WF_Grid_DBClick()
-                        Case "WF_SelectCALENDARChange" 'カレンダー変更時
+                        Case "WF_SelectCALENDARChange"  'カレンダー変更時
                             GridViewInitialize()
-                        Case "WF_ButtonRefClick" '参照ボタン押下時
+                        Case "WF_ButtonRefClick"        '参照ボタン押下時
                             work.WF_HIST.Text = "visible"
                             WF_ButtonRefClick()
-                        Case "WF_ButtonAddClick" '追加ボタン押下時
+                        Case "WF_ButtonAddClick"        '追加ボタン押下時
                             'WF_ButtonAddClick()
                             WF_ButtonAJUST_Click()
-                        Case "WF_ButtonOutClick" '出力ボタン押下時
+                        Case "WF_ButtonOutClick"        '出力ボタン押下時
                             Master.MAPID = LNT0001WRKINC.MAPIDI
                             WF_ButtonOutClick()
                             Master.MAPID = LNT0002WRKINC.MAPIDL
@@ -116,14 +118,26 @@ Public Class LNT0002TranStatusList
                                 End Using
                             End If
                             GridViewInitialize()
-                        '閉じるボタン押下時
-                        Case "WF_ButtonCLOSE"
+                        Case "WF_ButtonComOutClick"     '出力（共通）ボタン押下時
+                            Master.MAPID = LNT0001WRKINC.MAPIDI
+                            WF_ButtonComOutClick()
+                            Master.MAPID = LNT0002WRKINC.MAPIDL
+                            If isNormal(WW_ErrSW) Then
+                                '出力履歴登録
+                                Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                                    SQLcon.Open()  ' DataBase接続
+                                    INSHIST(SQLcon)
+                                End Using
+                            End If
+                            GridViewInitialize()
+                        Case "WF_ButtonCLOSE"           '閉じるボタン押下時
                             work.WF_HIST.Text = "hidden"
 
                     End Select
 
                     '○ 一覧再表示処理
                     If Not WF_ButtonClick.Value = "WF_ButtonOutClick" And
+                        Not WF_ButtonClick.Value = "WF_ButtonComOutClick" And
                         Not WF_ButtonClick.Value = "WF_SelectCALENDARChange" Then
                         DisplayGrid()
                     End If
@@ -362,6 +376,7 @@ Public Class LNT0002TranStatusList
         '画面ボタン用
         SQLStr.AppendLine("   ,  ''                                                                      AS DETAIL              ")　'明細列
         SQLStr.AppendLine("   ,  ''                                                                      AS CONTROL             ")　'操作列
+        SQLStr.AppendLine("   ,  ''                                                                      AS COMCONTROL          ")　'操作列(共通明細）
         SQLStr.AppendLine("   ,  ''                                                                      AS HISTORY             ")　'履歴列
 
         '画面請求調整用
@@ -581,6 +596,7 @@ Public Class LNT0002TranStatusList
 
                     LNT0002row("DETAIL") = CONST_BTNADD
                     LNT0002row("CONTROL") = CONST_BTNOUT
+                    LNT0002row("COMCONTROL") = CONST_BTNCOMOUT
                     LNT0002row("HISTORY") = CONST_BTNREF
 
                 Next
@@ -1092,6 +1108,17 @@ Public Class LNT0002TranStatusList
         Next
         WF_TORIEXL.SelectedIndex = 0
 
+        WF_COMEXL.Items.Clear()
+        WF_COMEXL.Items.Add(New ListItem("選択してください", ""))
+        For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
+            Dim wOrg As String = EditOrgCsv(LNT0002Shippers.Rows(i))
+            Dim exists As Boolean = orgList.Any(Function(p) wOrg Like "*" + p + "*")
+            If exists Then
+                WF_COMEXL.Items.Add(New ListItem(LNT0002Shippers.Rows(i)("VALUE20"), LNT0002Shippers.Rows(i)("KEYCODE")))
+            End If
+        Next
+        WF_COMEXL.SelectedIndex = 0
+
         WF_FILENAME.Items.Clear()
         WF_FILENAME.Items.Add(New ListItem("選択してください", ""))
         For i As Integer = 0 To LNT0002Shippers.Rows.Count - 1
@@ -1118,8 +1145,8 @@ Public Class LNT0002TranStatusList
     End Sub
     Protected Function EditOrgCsv(ByVal iRow As DataRow) As String
         Dim rtnStr As String = ""
-
-        For i As Integer = 6 To 20
+        '固定値のVALUE6～VALUE19を対象とする（VALUE20に共通レイアウトを設定したため）2025/09/30
+        For i As Integer = 6 To 19
             Dim colName As String = "VALUE" & i.ToString
             If iRow(colName) <> "" Then
                 If rtnStr.Length = 0 Then
@@ -1499,6 +1526,129 @@ Public Class LNT0002TranStatusList
 
 
     End Sub
+    ''' <summary>
+    '''  出力（共通）ボタン押下時
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Sub WF_ButtonComOutClick()
+        Dim WW_LINECNT As Integer = 0
+
+        '○ LINECNT取得
+        Try
+            Integer.TryParse(Me.WF_SelectedIndex.Value, WW_LINECNT)
+            WW_LINECNT -= 1
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        Dim WW_ROW As DataRow
+        WW_ROW = LNT0002tbl.Rows(WW_LINECNT)
+
+        '対象年月
+        Dim Itype As Integer
+        If Integer.TryParse(Replace(WF_TaishoYm.Value, "/", ""), Itype) Then
+            work.WF_SEL_TARGETYM.Text = Itype
+        End If
+
+        Me.WF_TORI.SelectedValue = WW_ROW("KEYCODE")
+        Me.WF_COMEXL.SelectedIndex = Me.WF_TORI.SelectedIndex
+        Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
+        Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
+
+        '------------------------------
+        ' データ取得
+        '------------------------------
+        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+            SQLcon.Open()  ' DataBase接続
+
+            '実績データ取得（輸送費明細）
+            ToriINVOICEDataGet(SQLcon)
+
+            '固定費データ取得（固定費明細）
+            ToriFIXEDDataGet(SQLcon)
+        End Using
+
+        WW_ErrSW = C_MESSAGE_NO.NORMAL
+        If LNT0001tbl.Rows.Count = 0 AndAlso LNT0001Koteihi.Rows.Count = 0 Then
+            Master.Output(C_MESSAGE_NO.CTN_SELECT_EXIST, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
+            WW_ErrSW = C_MESSAGE_NO.CTN_SELECT_EXIST
+            Exit Sub
+        End If
+
+
+        '------------------------------
+        '帳票出力準備処理
+        '------------------------------
+        Dim LNT0001InvoiceOutputCOM As New LNT0001InvoiceOutputCOM(Master.MAPID, Me.WF_COMEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, taishoYm:=Me.WF_TaishoYm.Value)
+
+        '運賃明細（共通化）出力TBL
+        Dim PrintUnchin = New DataTable
+        LNT0001InvoiceOutputCOM.CreUnchinTable(PrintUnchin)
+
+        '固定費明細（共通化）出力TBL
+        Dim PrintKotei = New DataTable
+        LNT0001InvoiceOutputCOM.CreKoteiTable(PrintKotei)
+
+        '------------------------------
+        '集計処理
+        '------------------------------
+        Select Case WF_TORIORG.SelectedItem.Text
+            Case BaseDllConst.CONST_TORICODE_0005700000     'ENEOS（八戸、水島）
+                LNT0001InvoiceOutputCOM.SumUnchinENEOS(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedENEOS(LNT0001Koteihi, PrintKotei)
+            Case BaseDllConst.CONST_TORICODE_0175300000     '東北天然ガス
+                LNT0001InvoiceOutputCOM.SumUnchinTNG(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedTNG(LNT0001Koteihi, PrintKotei)
+            Case BaseDllConst.CONST_TORICODE_0175400000     '東北電力
+                LNT0001InvoiceOutputCOM.SumUnchinTOHOKU(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedTOHOKU(LNT0001Koteihi, PrintKotei)
+            Case BaseDllConst.CONST_TORICODE_0045300000     'エスジーリキッドサービス（西部ガス）
+                LNT0001InvoiceOutputCOM.SumUnchinSAIBU(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedSAIBU(LNT0001Koteihi, PrintKotei)
+            Case BaseDllConst.CONST_TORICODE_0045200000     'エスケイ産業
+                LNT0001InvoiceOutputCOM.SumUnchinESUKEI(LNT0001tbl, PrintUnchin)
+            Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発
+                If WF_TORIORG.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    '(本州分)新潟・庄内・東北・茨城
+                    LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGEN(LNT0001tbl, PrintUnchin)
+                    LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGEN(LNT0001Koteihi, PrintKotei)
+                End If
+                If WF_TORIORG.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    '(北海道)石狩
+                    LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGENHokkaido(LNT0001tbl, PrintUnchin)
+                    LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGENHokkaido(LNT0001Koteihi, PrintKotei)
+                End If
+            Case BaseDllConst.CONST_TORICODE_0051200000     'OG（西日本、姫路）
+                LNT0001InvoiceOutputCOM.SumUnchinDAIGAS(LNT0001tbl, PrintUnchin)
+                If Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "02" AndAlso
+                   Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "03" Then
+                    '★[Daigas泉北、姫路]選択時
+                    LNT0001InvoiceOutputCOM.SumFixedDAIGAS(LNT0001Koteihi, PrintKotei)
+                End If
+            Case BaseDllConst.CONST_TORICODE_0239900000     '北海道ＬＮＧ
+                LNT0001InvoiceOutputCOM.SumUnchinHOKKAIDOLNG(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedHOKKAIDOLNG(LNT0001Koteihi, PrintKotei)
+            Case BaseDllConst.CONST_TORICODE_0110600000     'シーエナジー・エルネス
+                LNT0001InvoiceOutputCOM.SumUnchinCENERGY(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedCENERGY(LNT0001Koteihi, PrintKotei)
+        End Select
+
+        '----------------------------------------
+        '帳票出力処理
+        '----------------------------------------
+        Dim PrintUrl As String
+        Try
+            PrintUrl = LNT0001InvoiceOutputCOM.CreateExcelPrintData(PrintUnchin, PrintKotei)
+        Catch ex As Exception
+            Return
+        End Try
+        '○ 別画面でExcelを表示
+        WF_PrintURL.Value = PrintUrl
+        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
+
+
+    End Sub
 
     ''' <summary>
     ''' 出力データ取得
@@ -1826,805 +1976,460 @@ Public Class LNT0002TranStatusList
         End Try
 
     End Sub
-
     ''' <summary>
-    ''' (帳票)項目チェック処理(ENEOS)
+    ''' 荷主毎の輸送費データ取得
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckEneos(ByVal reportName As String, ByVal reportCode As String)
-        Dim dtEneosTank As New DataTable
-        Dim dtEneosTodoke As New DataTable
-        'Dim dtENEOSHachinoheTanka As New DataTable
-        Dim eneosTankClass As String = ""
-        Dim eneosTodokeClass As String = ""
-        Dim arrToriCode As String() = {"", "", ""}
-        Dim fuzumiLimit As Decimal = 1.7                                    '--★不積(しきい値)
+    Protected Sub ToriINVOICEDataGet(ByVal SQLcon As MySqlConnection)
 
-        Select Case reportCode
-            '"ENEOS_八戸　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_020202
-                eneosTankClass = "ENEOS_HACHINOHE_TANK"
-                eneosTodokeClass = "AVOCADO_TODOKE_MAS"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0005700000
-                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020202
+        If IsNothing(LNT0001tbl) Then
+            LNT0001tbl = New DataTable
+        End If
 
-            '"ENEOS_水島　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_023301
-                eneosTankClass = "ENEOS_MIZUSHIMA_TANK"
-                eneosTodokeClass = "MIZUSHIMA_TODOKE_MAS"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0005700000
-                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_023301
+        If LNT0001tbl.Columns.Count <> 0 Then
+            LNT0001tbl.Columns.Clear()
+        End If
 
-            '"DAIGAS_姫路　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_022801
-                eneosTankClass = "DAIGAS_HIMEGI_TANK"
-                eneosTodokeClass = "HIMEGI_TODOKE_MAS"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0051200000
-                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_022801
-                arrToriCode(2) = Nothing
+        LNT0001tbl.Clear()
 
-            Case Else
-                Exit Sub
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを荷主マスタから取得する
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" Select                                                                          ")
+        SQLStr.Append("      1                                                    AS 'SELECT'           ")
+        SQLStr.Append("     ,0                                                    AS HIDDEN             ")
+        SQLStr.Append("     ,0                                                    AS LINECNT            ")
+        SQLStr.Append("     ,''                                                   AS OPERATION          ")
+        SQLStr.Append("     ,coalesce(LT1.RECONO, '')                             AS RECONO			    ")
+        SQLStr.Append("     ,coalesce(LT1.LOADUNLOTYPE, '')                       AS LOADUNLOTYPE		")
+        SQLStr.Append("     ,coalesce(LT1.STACKINGTYPE, '')                       AS STACKINGTYPE		")
+        SQLStr.Append("     ,coalesce(LT1.ORDERORGNAME, '')                       AS ORDERORGNAME		")
+        SQLStr.Append("     ,coalesce(LT1.ORDERORGCODE, '')                       AS ORDERORGCODE		")
+        SQLStr.Append("     ,coalesce(LT1.KASANAMEORDERORG, '')                   AS KASANAMEORDERORG	")
+        SQLStr.Append("     ,coalesce(LT1.KASANCODEORDERORG, '')                  AS KASANCODEORDERORG	")
+        SQLStr.Append("     ,coalesce(LT1.ORDERORG, '')                           AS ORDERORG			")
+        SQLStr.Append("     ,coalesce(LT1.PRODUCT2NAME, '')                       AS PRODUCT2NAME		")
+        SQLStr.Append("     ,coalesce(LT1.PRODUCT2, '')                           AS PRODUCT2			")
+        SQLStr.Append("     ,coalesce(LT1.PRODUCT1NAME, '')                       AS PRODUCT1NAME		")
+        SQLStr.Append("     ,coalesce(LT1.PRODUCT1, '')                           AS PRODUCT1			")
+        SQLStr.Append("     ,coalesce(LT1.OILNAME, '')                            AS OILNAME			")
+        SQLStr.Append("     ,coalesce(LT1.OILTYPE, '')                            AS OILTYPE			")
+        SQLStr.Append("     ,coalesce(LT1.TODOKECODE, '')                         AS TODOKECODE			")
+        SQLStr.Append("     ,coalesce(LT1.TODOKENAME, '')                         AS TODOKENAME			")
+        SQLStr.Append("     ,coalesce(LT1.TODOKENAMES, '')                        AS TODOKENAMES		")
+        SQLStr.Append("     ,coalesce(LT1.TORICODE, '')                           AS TORICODE			")
+        SQLStr.Append("     ,coalesce(LT1.TORINAME, '')                           AS TORINAME			")
+        SQLStr.Append("     ,coalesce(LT1.SHUKABASHO, '')                         AS SHUKABASHO			")
+        SQLStr.Append("     ,coalesce(LT1.SHUKANAME, '')                          AS SHUKANAME			")
+        SQLStr.Append("     ,coalesce(LT1.SHUKANAMES, '')                         AS SHUKANAMES			")
+        SQLStr.Append("     ,coalesce(LT1.SHUKATORICODE, '')                      AS SHUKATORICODE		")
+        SQLStr.Append("     ,coalesce(LT1.SHUKATORINAME, '')                      AS SHUKATORINAME		")
+        SQLStr.Append("     ,coalesce(LT1.SHUKADATE, '')                          AS SHUKADATE			")
+        SQLStr.Append("     ,coalesce(LT1.LOADTIME, '')                           AS LOADTIME			")
+        SQLStr.Append("     ,coalesce(LT1.LOADTIMEIN, '')                         AS LOADTIMEIN			")
+        SQLStr.Append("     ,coalesce(LT1.TODOKEDATE, '')                         AS TODOKEDATE			")
+        SQLStr.Append("     ,coalesce(LT1.SHITEITIME, '')                         AS SHITEITIME			")
+        SQLStr.Append("     ,coalesce(LT1.SHITEITIMEIN, '')                       AS SHITEITIMEIN		")
+        SQLStr.Append("     ,coalesce(LT1.ZYUTYU, '')                             AS ZYUTYU				")
+        SQLStr.Append("     ,coalesce(LT1.ZISSEKI, '')                            AS ZISSEKI			")
+        SQLStr.Append("     ,coalesce(LT1.TANNI, '')                              AS TANNI				")
+        SQLStr.Append("     ,coalesce(LT1.TANKNUM, '')                            AS TANKNUM			")
+        SQLStr.Append("     ,coalesce(LT1.TANKNUMBER, '')                         AS TANKNUMBER			")
+        SQLStr.Append("     ,coalesce(LT1.GYOMUTANKNUM, '')                       AS GYOMUTANKNUM	    ")
+        SQLStr.Append("     ,coalesce(LT1.SYAGATA, '')                            AS SYAGATA			")
+        SQLStr.Append("     ,coalesce(LT1.SYABARA, '')                            AS SYABARA			")
+        SQLStr.Append("     ,coalesce(LT1.NINUSHINAME, '')                        AS NINUSHINAME		")
+        SQLStr.Append("     ,coalesce(LT1.CONTYPE, '')                            AS CONTYPE			")
+        SQLStr.Append("     ,coalesce(LT1.TRIP, '')                               AS TRIP				")
+        SQLStr.Append("     ,coalesce(LT1.DRP, '')                                AS DRP				")
+        SQLStr.Append("     ,coalesce(LT1.STAFFSLCT, '')                          AS STAFFSLCT			")
+        SQLStr.Append("     ,coalesce(LT1.STAFFNAME, '')                          AS STAFFNAME			")
+        SQLStr.Append("     ,coalesce(LT1.STAFFCODE, '')                          AS STAFFCODE			")
+        SQLStr.Append("     ,coalesce(LT1.SUBSTAFFSLCT, '')                       AS SUBSTAFFSLCT		")
+        SQLStr.Append("     ,coalesce(LT1.SUBSTAFFNAME, '')                       AS SUBSTAFFNAME		")
+        SQLStr.Append("     ,coalesce(LT1.SUBSTAFFNUM, '')                        AS SUBSTAFFNUM		")
+        SQLStr.Append("     ,coalesce(LT1.SHUKODATE, '')                          AS SHUKODATE			")
+        SQLStr.Append("     ,coalesce(LT1.KIKODATE, '')                           AS KIKODATE			")
+        SQLStr.Append("     ,coalesce(LT1.TANKA, '0')                             AS TANKA				")
+        SQLStr.Append("     ,coalesce(LT1.JURYORYOKIN, '0')                       AS JURYORYOKIN		")
+        SQLStr.Append("     ,coalesce(LT1.TSUKORYO, '0')                          AS TSUKORYO			")
+        SQLStr.Append("     ,coalesce(LT1.KYUZITUTANKA, '0')                      AS KYUZITUTANKA		")
+        SQLStr.Append("     ,coalesce(LT1.YUSOUHI, '0')                           AS YUSOUHI			")
+        SQLStr.Append("     ,coalesce(LT1.WORKINGDAY, '')                         AS WORKINGDAY		    ")
+        SQLStr.Append("     ,coalesce(LT1.PUBLICHOLIDAYNAME, '')                  AS PUBLICHOLIDAYNAME	")
+        SQLStr.Append("     ,coalesce(LT1.DELFLG, '')                             AS DELFLG				")
+        SQLStr.Append("     ,(SELECT VALUE1                                                             ")
+        SQLStr.Append("         FROM COM.LNS0006_FIXVALUE                                               ")
+        SQLStr.Append("        WHERE CAMPCODE = @CAMPCODE                                               ")
+        SQLStr.Append("          AND CLASS    = 'TAXRATE'                                               ")
+        SQLStr.Append("          AND KEYCODE  = '1'                                                     ")
+        SQLStr.Append("          AND CURDATE() BETWEEN STYMD AND ENDYMD                                 ")
+        SQLStr.Append("          AND DELFLG  = @DELFLG                                                  ")
+        SQLStr.Append("      )                                                   AS TAXRATE             ")
+        SQLStr.Append("     ,'1'                                                 AS COUNT   			")
+        SQLStr.Append("     ,'0'                                                 AS TOTAL   			")
+        SQLStr.Append(" FROM                                                                            ")
+        Select Case WF_TORIORG.SelectedItem.Text
+            Case BaseDllConst.CONST_TORICODE_0005700000     'ENEOS（八戸、水島）
+                SQLStr.Append(" LNG.LNT0016_ENEOSYUSOUHI LT1                                            ")
+            Case BaseDllConst.CONST_TORICODE_0175300000     '東北天然ガス
+                SQLStr.Append(" LNG.LNT0017_TNGYUSOUHI LT1                                              ")
+            Case BaseDllConst.CONST_TORICODE_0175400000     '東北電力
+                SQLStr.Append(" LNG.LNT0018_TOHOKUYUSOUHI LT1                                           ")
+            Case BaseDllConst.CONST_TORICODE_0045300000     'エスジーリキッドサービス（西部ガス）
+                SQLStr.Append(" LNG.LNT0019_SAIBUGUSYUSOUHI LT1                                         ")
+            Case BaseDllConst.CONST_TORICODE_0045200000     'エスケイ産業
+                SQLStr.Append(" LNG.LNT0020_ESUKEIYUSOUHI LT1                                           ")
+            Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発
+                If WF_TORIORG.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    '(本州分)新潟・庄内・東北・茨城
+                    SQLStr.Append(" LNG.LNT0021_SEKIYUHONSYUYUSOUHI LT1                                 ")
+                End If
+                If WF_TORIORG.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                    '(北海道)石狩
+                    SQLStr.Append(" LNG.LNT0023_SEKIYUHOKKAIDOYUSOUHI LT1                               ")
+                End If
+            Case BaseDllConst.CONST_TORICODE_0051200000     'OG（西日本、姫路）
+                SQLStr.Append(" LNG.LNT0022_OGYUSOUHI LT1                                               ")
+            Case BaseDllConst.CONST_TORICODE_0239900000     '北海道ＬＮＧ
+                SQLStr.Append(" LNG.LNT0024_HOKKAIDOLNGYUSOUHI LT1                                      ")
+            Case BaseDllConst.CONST_TORICODE_0110600000     'シーエナジー・エルネス
+                SQLStr.Append(" LNG.LNT0025_CENALNESUYUSOUHI LT1                                        ")
         End Select
+        SQLStr.Append(" WHERE                                                                           ")
+        SQLStr.Append("     date_format(LT1.TODOKEDATE, '%Y/%m/%d') >= @TODOKEDATE_FR                   ")
+        SQLStr.Append(" AND date_format(LT1.TODOKEDATE, '%Y/%m/%d') <= @TODOKEDATE_TO                   ")
 
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, eneosTankClass, dtEneosTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, eneosTodokeClass, dtEneosTodoke)
-            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
-            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", eneosTodokeClass, LNT0001Tanktbl)
-            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=eneosTankClass)
-            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=eneosTankClass)
-            CMNPTS.SelectHACHINOHESPRATEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001HachinoheSprate)
-            CMNPTS.SelectENEOSCOMFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001EneosComfee)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1))
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtEneosTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=eneosTodokeClass)
-        End Using
+        '〇シーエナジー
+        If WF_TORIORG.SelectedItem.Text = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '★北陸エルネスも含める
+            Dim whereStr As String = String.Format(" AND LT1.TORICODE IN (@TORICODE, '{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
+            SQLStr.Append(whereStr)
+        Else
+            Dim whereStr As String = String.Format(" AND LT1.TORICODE IN (@TORICODE) ")
+            SQLStr.Append(whereStr)
+        End If
+        SQLStr.Append(" AND LT1.ORDERORGCODE in (" & WF_TORIORG.SelectedValue & ")")
 
-        '〇(帳票)使用項目の設定
-        WW_ReportMeisaiAdd(LNT0001tbl)
-#Region "コメント"
-        'LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
-        'LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
-        'LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
-        'LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
-        'LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
-        'LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
-        'LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-        'LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-        'LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
-        'LNT0001tbl.Columns.Add("ZISSEKI_FUZUMI", Type.GetType("System.Decimal"))        '// EXCELシート①(車腹 - 不積(しきい値))設定用
-        'LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
-        'LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
-#End Region
+        '〇西日本支店車庫
+        If Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022702 + "01" Then
+            '★[Daigas泉北]選択時
+            SQLStr.Append(" AND LT1.TODOKECODE <> @TODOKECODE ")
+        ElseIf Me.WF_TORI.SelectedValue = CONST_ORDERORGCODE_022702 + "02" Then
+            '★[Daigas新宮]選択時
+            SQLStr.Append(" AND LT1.TODOKECODE = @TODOKECODE ")
+        End If
 
-        '〇陸事番号マスタ設定
-        For Each dtEneosTankrow As DataRow In dtEneosTank.Rows
-            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtEneosTankrow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                '★届日より日を取得(セル(行数)の設定のため)
-                Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
-                Dim lastMonth As Boolean = False
-                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                    setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-                    lastMonth = True
-                End If
-                Dim iLine As Integer = Integer.Parse(setDay) - 1
-                iLine = (iLine * Integer.Parse(dtEneosTankrow("VALUE06"))) + Integer.Parse(dtEneosTankrow("VALUE05"))
-                '★トリップより位置を取得
-                Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-                iTrip += iLine
-                LNT0001tblrow("ROWSORTNO") = dtEneosTankrow("VALUE01")
-                LNT0001tblrow("SETCELL01") = dtEneosTankrow("VALUE02") + iTrip.ToString()
-                LNT0001tblrow("SETCELL02") = dtEneosTankrow("VALUE03") + iTrip.ToString()
-                LNT0001tblrow("SETCELL03") = dtEneosTankrow("VALUE04") + iTrip.ToString()
-                LNT0001tblrow("SETLINE") = iTrip.ToString()
+        SQLStr.Append(" AND LT1.DELFLG = @DELFLG ")
+        SQLStr.Append(" ORDER BY ")
+        SQLStr.Append(" LT1.ORDERORGCODE, LT1.SHUKADATE, LT1.TODOKEDATE, LT1.TODOKECODE ")
 
-                '# 不積の判断 ----------------------------------------------------------------------------
-                Dim todokeCode As String = LNT0001tblrow("TODOKECODE").ToString()
-                Dim decFuzumi As Decimal = Decimal.Parse(LNT0001tblrow("SYABARA").ToString()) - fuzumiLimit
-                Dim decZisseki As Decimal = Decimal.Parse(LNT0001tblrow("ZISSEKI").ToString())
-                LNT0001tblrow("ZISSEKI_FUZUMI") = decFuzumi
-                LNT0001tblrow("FUZUMI_REFVALUE") = decFuzumi - decZisseki
-                If Decimal.Parse(LNT0001tblrow("FUZUMI_REFVALUE").ToString()) >= 0 Then
-                    LNT0001tblrow("ZISSEKI_FUZUMIFLG") = "TRUE"
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar)            '会社コード
+                Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)            '取引先コード
+                Dim TODOKEDATE_FR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE_FR", MySqlDbType.Date)     '届日FROM
+                Dim TODOKEDATE_TO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE_TO", MySqlDbType.Date)     '届日TO
+                Dim TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@@TODOKECODE", MySqlDbType.VarChar)       '届先コード
+                Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)                '削除フラグ
+
+                CAMPCODE.Value = Master.USERCAMP
+                TORICODE.Value = WF_TORIORG.SelectedItem.Text
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
+                    TODOKEDATE_FR.Value = WF_TaishoYm.Value & "/01"
+                    TODOKEDATE_TO.Value = WF_TaishoYm.Value & DateTime.DaysInMonth(CDate(WF_TaishoYm.Value).Year, CDate(WF_TaishoYm.Value).Month).ToString("/00")
                 Else
-                    LNT0001tblrow("ZISSEKI_FUZUMIFLG") = "FALSE"
+                    TODOKEDATE_FR.Value = Date.Now.ToString("yyyy/MM") & "/01"
+                    TODOKEDATE_TO.Value = Date.Now.ToString("yyyy/MM") & DateTime.DaysInMonth(Date.Now.Year, Date.Now.Month).ToString("/00")
                 End If
-                ' ---------------------------------------------------------------------------------------/
+                TODOKECODE.Value = BaseDllConst.CONST_TODOKECODE_001640
+                DELFLG.Value = BaseDllConst.C_DELETE_FLG.ALIVE
 
-                '★表示セルフラグ(1:表示)
-                If dtEneosTankrow("VALUE07").ToString() = "1" Then
-                    LNT0001tblrow("DISPLAYCELL_START") = dtEneosTankrow("VALUE02").ToString()
-                    LNT0001tblrow("DISPLAYCELL_END") = dtEneosTankrow("VALUE04").ToString()
-                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtEneosTankrow("VALUE08").ToString()
-                Else
-                    LNT0001tblrow("DISPLAYCELL_START") = ""
-                    LNT0001tblrow("DISPLAYCELL_END") = ""
-                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
-                End If
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNT0001tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
 
-                '★備考設定用(出荷日と届日が不一致の場合)
-                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-                    If lastMonth = True Then
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-                    Else
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                    '○ テーブル検索結果をテーブル格納
+                    LNT0001tbl.Load(SQLdr)
+                End Using
+
+                Dim i As Integer = 0
+                For Each LNT0001row As DataRow In LNT0001tbl.Rows
+                    i += 1
+                    LNT0001row("LINECNT") = i        'LINECNT
+                Next
+            End Using
+        Catch ex As Exception
+            Dim tblName As String = ""
+            Select Case WF_TORIORG.SelectedItem.Text
+                Case BaseDllConst.CONST_TORICODE_0005700000     'ENEOS（八戸、水島）
+                    tblName = "LNT0016_ENEOSYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0175300000     '東北天然ガス
+                    tblName = "LNT0017_TNGYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0175400000     '東北電力
+                    tblName = "LNT0018_TOHOKUYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0045300000     'エスジーリキッドサービス（西部ガス）
+                    tblName = "LNT0019_SAIBUGUSYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0045200000     'エスケイ産業
+                    tblName = "LNT0020_ESUKEIYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発(本州分)新潟・庄内・東北・茨城
+                    If WF_TORI.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                        tblName = "LNT0021_SEKIYUHONSYUYUSOUHI"
                     End If
-                End If
-            Next
-        Next
-
-        '〇(ENEOS)届先出荷場所車庫マスタ設定
-        For Each dtEneosTodokerow As DataRow In dtEneosTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}'", dtEneosTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETSORTNO_REP") = dtEneosTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01")
-                LNT0001tblrow("SHEETNAME_REP") = dtEneosTodokerow("VALUE06")
-#Region "コメント"
-                ''〇八戸営業所(東部瓦斯)独自仕様
-                'If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005487 Then
-                '    '★[３台目]に納入
-                '    If LNT0001tblrow("TODOKEDATE_ORDER").ToString() = "3" Then
-                '        LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01") + LNT0001tblrow("TODOKEDATE_ORDER").ToString()
-                '    End If
-                'End If
-                ''〇水島営業所 ----------------------------------------------------------------------------
-                ''■コカ・コーラボトラーズジャパン株式会社(独自仕様)
-                'If LNT0001tblrow("TODOKECODE").ToString() = BaseDllConst.CONST_TODOKECODE_005509 Then
-                '    '--コカ・コーラ　ボトラーズジャパン(12.3t, 12.5t, 13.2t, 14t, 不積)
-                '    Dim arrFuriwake005509 As String() = {"②", "③", "④", "不積"}
-
-                '    '-- 不積判定の設定
-                '    If LNT0001tblrow("ZISSEKI_FUZUMIFLG").ToString() = "TRUE" Then
-                '        LNT0001tblrow("TODOKENAME_REP") = dtEneosTodokerow("VALUE01") + arrFuriwake005509(3)
-                '    End If
-                'End If
-                '' ---------------------------------------------------------------------------------------/
-#End Region
-                '〇届先が追加された場合
-                If dtEneosTodokerow("VALUE02").ToString() = "1" Then
-                    LNT0001tblrow("TODOKECELL_REP") = dtEneosTodokerow("VALUE03")
-                    LNT0001tblrow("MASTERCELL_REP") = dtEneosTodokerow("VALUE04")
-                    LNT0001tblrow("SHEETDISPLAY_REP") = dtEneosTodokerow("VALUE05")
-                Else
-                    LNT0001tblrow("TODOKECELL_REP") = ""
-                    LNT0001tblrow("MASTERCELL_REP") = ""
-                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
-                End If
-            Next
-        Next
-
-        ''○各シート(届先名)抽出処理
-        'Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-        '    SQLcon.Open()  ' DataBase接続
-        '    '〇実績WORK作成
-        '    WW_InsertHachinoheMoment(SQLcon, reportName)
-        'End Using
-
-    End Sub
-
-    ''' <summary>
-    ''' (帳票)項目チェック処理(DAIGAS)
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckDaigas(ByVal reportName As String, ByVal reportCode As String)
-        Dim dtDaigasTank As New DataTable
-        Dim dtDaigasTodoke As New DataTable
-        Dim daigasTankClass As String = ""
-        Dim daigasTodokeClass As String = ""
-        Dim arrToriCode As String() = {"", "", ""}
-
-        Select Case reportCode
-            '"DAIGAS_泉北　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_022702
-                daigasTankClass = "DAIGAS_SENBOKU_TANK"
-                daigasTodokeClass = "SENBOKU_TODOKE_MAS"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0051200000
-                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_022702
-                '"DAIGAS_新宮　輸送費請求書"を指定した場合
-                If Me.WF_TORI.SelectedValue = "02270202" Then
-                    daigasTodokeClass = "NIIMIYA_TODOKE_MAS"
-                    arrToriCode(2) = BaseDllConst.CONST_TODOKECODE_001640
-                ElseIf Me.WF_TORI.SelectedValue = "02270203" Then
-                    '"エスケイ産業　輸送費請求書"を指定した場合
-                    daigasTankClass = "DAIGAS_ESUKEI_TANK"
-                    daigasTodokeClass = "ESUKEI_TODOKE_MAS"
-                    arrToriCode(0) = BaseDllConst.CONST_TORICODE_0045200000
-                    arrToriCode(2) = BaseDllConst.CONST_TODOKECODE_004559
-                Else
-                    arrToriCode(2) = Nothing
-                End If
-
-            Case Else
-                Exit Sub
-        End Select
-
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, daigasTankClass, dtDaigasTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, daigasTodokeClass, dtDaigasTodoke)
-            CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
-            'CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", daigasTodokeClass, LNT0001Tanktbl, I_TODOKECODE:=arrToriCode(2))
-            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=daigasTankClass)
-            'CMNPTS.SelectKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=daigasTankClass)
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtDaigasTodoke, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=daigasTodokeClass)
-        End Using
-
-        '〇(帳票)使用項目の設定
-        WW_ReportMeisaiAdd(LNT0001tbl)
-#Region "コメント"
-        'LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
-        'LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
-        'LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
-        'LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
-        'LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
-        'LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
-        'LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-        'LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-        'LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
-#End Region
-
-        '〇陸事番号マスタ設定
-        For Each dtDaigasTankrow As DataRow In dtDaigasTank.Rows
-            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtDaigasTankrow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                '★届日より日を取得(セル(行数)の設定のため)
-                Dim setDay As String = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("dd")
-                Dim lastMonth As Boolean = False
-                If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-                    setDay = "1"
-                    lastMonth = True
-                End If
-                Dim iLine As Integer = Integer.Parse(setDay) - 1
-                iLine = (iLine * Integer.Parse(dtDaigasTankrow("VALUE06"))) + Integer.Parse(dtDaigasTankrow("VALUE05"))
-                ''★トリップより位置を取得
-                'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-                'iTrip += iLine
-
-                LNT0001tblrow("ROWSORTNO") = dtDaigasTankrow("VALUE01")
-                If LNT0001tblrow("TODOKEDATE_ROWNUM") = "1" Then
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE02") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE03") + iLine.ToString()
-                ElseIf LNT0001tblrow("TODOKEDATE_ROWNUM") = "2" Then
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE04") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE09") + iLine.ToString()
-                ElseIf LNT0001tblrow("TODOKEDATE_ROWNUM") = "3" Then
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE10") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE11") + iLine.ToString()
-                ElseIf LNT0001tblrow("TODOKEDATE_ROWNUM") = "4" Then
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE12") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE13") + iLine.ToString()
-                ElseIf LNT0001tblrow("TODOKEDATE_ROWNUM") = "5" Then
-                    '★単車の枠が４つしかないが５つあった場合はSKIP
-                    If LNT0001tblrow("SYAGATA") = "単車" Then Continue For
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE14") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE15") + iLine.ToString()
-                ElseIf LNT0001tblrow("TODOKEDATE_ROWNUM") = "6" Then
-                    '★単車の枠が４つしかないが６つあった場合はSKIP
-                    If LNT0001tblrow("SYAGATA") = "単車" Then Continue For
-                    LNT0001tblrow("SETCELL01") = dtDaigasTankrow("VALUE16") + iLine.ToString()
-                    LNT0001tblrow("SETCELL02") = dtDaigasTankrow("VALUE17") + iLine.ToString()
-                Else
-                    '★枠が７つ以上の場合はSKIP
-                    Continue For
-                End If
-                LNT0001tblrow("SETLINE") = iLine
-
-                '★表示セルフラグ(1:表示)
-                If dtDaigasTankrow("VALUE07").ToString() = "1" Then
-                    LNT0001tblrow("DISPLAYCELL_START") = dtDaigasTankrow("VALUE02").ToString()
-                    LNT0001tblrow("DISPLAYCELL_END") = dtDaigasTankrow("VALUE04").ToString()
-                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtDaigasTankrow("VALUE08").ToString()
-                Else
-                    LNT0001tblrow("DISPLAYCELL_START") = ""
-                    LNT0001tblrow("DISPLAYCELL_END") = ""
-                    LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
-                End If
-
-                '★備考設定用(出荷日と届日が不一致の場合)
-                If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-                    If lastMonth = True Then
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-                    Else
-                        LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
+                Case BaseDllConst.CONST_TORICODE_0051200000     'OG（西日本、姫路）
+                    tblName = "LNT0022_OGYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発(北海道)石狩
+                    If WF_TORI.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                        tblName = "LNT0023_SEKIYUHOKKAIDOYUSOUHI"
                     End If
-                End If
-            Next
-        Next
-
-        '〇(DAIGAS)届先出荷場所車庫マスタ設定
-        For Each dtDaigasTodokerow As DataRow In dtDaigasTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}'", dtDaigasTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETSORTNO_REP") = dtDaigasTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = dtDaigasTodokerow("VALUE01")
-                LNT0001tblrow("SHEETNAME_REP") = dtDaigasTodokerow("VALUE06")
-
-                '〇届先が追加された場合
-                If dtDaigasTodokerow("VALUE02").ToString() = "1" Then
-                    LNT0001tblrow("TODOKECELL_REP") = dtDaigasTodokerow("VALUE03")
-                    LNT0001tblrow("MASTERCELL_REP") = dtDaigasTodokerow("VALUE04")
-                    LNT0001tblrow("SHEETDISPLAY_REP") = dtDaigasTodokerow("VALUE05")
-                Else
-                    LNT0001tblrow("TODOKECELL_REP") = ""
-                    LNT0001tblrow("MASTERCELL_REP") = ""
-                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
-                End If
-            Next
-        Next
-
-    End Sub
-
-    ''' <summary>
-    ''' (帳票)項目チェック処理(石油資源開発(本州分))
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckSekiyuSigen(ByVal reportName As String, ByVal reportCode As String,
-                                           ByRef dcNigataList As Dictionary(Of String, String), ByRef dcSyonaiList As Dictionary(Of String, String),
-                                           ByRef dcTouhokuList As Dictionary(Of String, String), ByRef dcIbarakiList As Dictionary(Of String, String))
-        Dim dtSekiyuSigenTank As New DataTable
-        Dim dtSekiyuSigenTankSub As New DataTable
-        Dim dtSekiyuSigenTodoke As New DataTable
-        Dim sekiyuSigenTankClass As String = ""
-        Dim sekiyuSigenTankSubClass As String = ""
-        Dim sekiyuSigenTodokeClass As String = ""
-        Dim sekiyuSigenSGKoteihiClass As String = ""
-        Dim arrToriCode As String() = {"", "", ""}
-        Dim listOrderOrgCode As New List(Of String)
-        Dim commaOrderOrgCode As String = ""
-        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
-        Dim arrFuzumi002022_302 As String() = {"T", "U"}    '--（ＳＫ）本田金属　喜多方サテライト(302号車(11.4t車)不積)
-        Dim arrFuzumi002019_333 As String() = {"T", "U"}    '--（ＳＫ）テーブルマーク　塩沢      (333号車(14.0t車)不積)
-        Dim arrFuzumi002019_334 As String() = {"Z", "AA"}   '--（ＳＫ）テーブルマーク　塩沢      (334号車(15.7t車)不積)
-
-        Dim arrOPFCycle_002025_326 As String() = {"Z", "AA"}    ' （ＳＫ）若松ガス　玉川(326号車(若松1.5回転))
-
-        Select Case reportCode
-            '"石油資源開発　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_021502
-                sekiyuSigenTankClass = "SEKIYUSIGEN_TANK"
-                sekiyuSigenTankSubClass = "SEKIYUSIGEN_TANK_OTR"
-                sekiyuSigenTodokeClass = "SEKIYUSIG_TODOKE_MAS"
-                sekiyuSigenSGKoteihiClass = "SEKIYUSIGEN_KOTEIHI"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
-                arrToriCode(1) = Nothing
-                arrToriCode(2) = Nothing
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021502)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020601)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020402)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_020804)
-                commaOrderOrgCode = String.Join(",", listOrderOrgCode)
-            Case Else
-                Exit Sub
-        End Select
-
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankClass, dtSekiyuSigenTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankSubClass, dtSekiyuSigenTankSub)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeClass, dtSekiyuSigenTodoke)
-            'CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeClass, LNT0001Tanktbl)
-            CMNPTS.SelectSKFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
-            'CMNPTS.SelectSKKOTEIHIMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001Koteihi, I_CLASS:=sekiyuSigenSGKoteihiClass)
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectSKKOTEICHIMaster(SQLcon, LNT0001Tanktbl, LNT0001SKKoteichi)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=commaOrderOrgCode, I_CLASS:=sekiyuSigenTodokeClass)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtSekiyuSigenTodoke, I_ORDERORGCODE:=commaOrderOrgCode, I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenTodokeClass)
-        End Using
-
-        '〇(帳票)使用項目の設定
-        WW_ReportMeisaiAdd(LNT0001tbl)
-#Region "コメント"
-        'LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
-        'LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
-        'LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
-        ''LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
-        'LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
-        'LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
-        'LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
-        'LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
-        ''LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-        'LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
-        'LNT0001tbl.Columns.Add("ORDERORGCODE_REP", Type.GetType("System.String"))       '// EXCELシート(受注受付部署コード)設定用
-        'LNT0001tbl.Columns.Add("GYOMUTANKNUM_REP", Type.GetType("System.String"))       '// EXCELシート(業務車番)設定用
-        'LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-        'LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-        'LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
-        'LNT0001tbl.Columns.Add("GROUPNO_REP", Type.GetType("System.String"))            '// EXCELシート(届先GRP)設定用
-        'LNT0001tbl.Columns.Add("ZISSEKI_FUZUMI", Type.GetType("System.Decimal"))        '// EXCELシート①(車腹 - 不積(しきい値))設定用
-        'LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
-        'LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
-#End Region
-
-        '〇陸事番号マスタ設定
-        For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTank.Rows
-            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
-            If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
-                condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
-            End If
-            '★届先(個別設定)は除く
-            condition &= String.Format(" AND TODOKECODE NOT IN ('{0}', '{1}')",
-                                       BaseDllConst.CONST_TODOKECODE_004012,
-                                       BaseDllConst.CONST_TODOKECODE_005890)
-            '届先(明細)セル値設定
-            WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
-#Region "コメント"
-            'For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-            '    '★届日より日を取得(セル(行数)の設定のため)
-            '    Dim setDay As String = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-            '    Dim lastMonth As Boolean = False
-            '    If Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("yyyy/MM") = Date.Parse(WF_TaishoYm.Value + "/01").AddMonths(-1).ToString("yyyy/MM") Then
-            '        setDay = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("dd")
-            '        lastMonth = True
-            '    End If
-            '    Dim iLine As Integer = Integer.Parse(setDay) - 1
-            '    iLine = (iLine * Integer.Parse(dtSekiyuSigenTankrow("VALUE06"))) + Integer.Parse(dtSekiyuSigenTankrow("VALUE05"))
-            '    ''★トリップより位置を取得
-            '    'Dim iTrip As Integer = Integer.Parse(LNT0001tblrow("TRIP_REP").ToString()) - 1
-            '    'iTrip += iLine
-            '    LNT0001tblrow("ROWSORTNO") = dtSekiyuSigenTankrow("VALUE01")
-            '    LNT0001tblrow("SETCELL01") = dtSekiyuSigenTankrow("VALUE02") + iLine.ToString()
-            '    LNT0001tblrow("SETCELL02") = dtSekiyuSigenTankrow("VALUE03") + iLine.ToString()
-            '    'LNT0001tblrow("SETCELL03") = dtSekiyuSigenTankrow("VALUE04") + iLine.ToString()
-            '    LNT0001tblrow("SETLINE") = iLine
-            '    LNT0001tblrow("ORDERORGCODE_REP") = dtSekiyuSigenTankrow("KEYCODE04")
-            '    LNT0001tblrow("GYOMUTANKNUM_REP") = dtSekiyuSigenTankrow("KEYCODE05")
-            '    '★表示セルフラグ(1:表示)
-            '    If dtSekiyuSigenTankrow("VALUE07").ToString() = "1" Then
-            '        LNT0001tblrow("DISPLAYCELL_START") = dtSekiyuSigenTankrow("VALUE02").ToString()
-            '        LNT0001tblrow("DISPLAYCELL_END") = dtSekiyuSigenTankrow("VALUE03").ToString()
-            '        'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = dtSekiyuSigenTankrow("VALUE08").ToString()
-            '    Else
-            '        LNT0001tblrow("DISPLAYCELL_START") = ""
-            '        LNT0001tblrow("DISPLAYCELL_END") = ""
-            '        'LNT0001tblrow("DISPLAYCELL_KOTEICHI") = ""
-            '    End If
-
-            '    '★備考設定用(出荷日と届日が不一致の場合)
-            '    If LNT0001tblrow("SHUKADATE").ToString() <> LNT0001tblrow("TODOKEDATE").ToString() Then
-            '        If lastMonth = True Then
-            '            LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("SHUKADATE").ToString()).ToString("M/d") + "積"
-            '        Else
-            '            LNT0001tblrow("REMARK_REP") = Date.Parse(LNT0001tblrow("TODOKEDATE").ToString()).ToString("M/d") + "届"
-            '        End If
-            '    End If
-            'Next
-#End Region
-        Next
-        '〇陸事番号マスタ設定(※個別設定用)
-        Dim todokeMerge = CMNPTS.filterItem(dtSekiyuSigenTankSub, "KEYCODE07", "KEYCODE08")
-        For Each dtSekiyuSigenTankrow As DataRow In dtSekiyuSigenTankSub.Rows
-            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenTankrow("KEYCODE01"))
-            If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_021502 Then
-                condition &= String.Format(" AND SHUKABASHO='{0}'", dtSekiyuSigenTankrow("KEYCODE05"))
-            End If
-            '★届先(個別設定)のみ
-            'condition &= String.Format(" AND TODOKECODE IN ('{0}', '{1}', '{2}')",
-            '                           BaseDllConst.CONST_TODOKECODE_004012,
-            '                           BaseDllConst.CONST_TODOKECODE_005890,
-            '                           BaseDllConst.CONST_TODOKECODE_007273)
-            condition &= String.Format(" AND TODOKECODE IN ({0})", todokeMerge)
-            '届先(明細)セル値設定
-            WW_SekiyuSigenRikugiMas(dtSekiyuSigenTankrow, condition, fuzumiLimit, LNT0001tbl)
-        Next
-
-        '〇石油資源開発(不積判定の設定) ----------------------------------------------------------
-        '■若松ｶﾞｽ(喜多方) 
-        '  --302号車(11.4t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002022, arrFuzumi002022_302, "302")
-        '■ﾃｰﾌﾞﾙﾏｰｸ新潟魚沼工場
-        '  --333号車(14.0t車)不積 
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_333, "333")
-        '  --334号車(15.7t車)不積
-        WW_SetSekiyuSigenFuzumi(BaseDllConst.CONST_TODOKECODE_002019, arrFuzumi002019_334, "334")
-        ' ---------------------------------------------------------------------------------------/
-
-        '〇石油資源開発(1.5回転の設定) -----------------------------------------------------------
-        '■若松ｶﾞｽ(玉川)
-        '  --326号車(若松1.5回転)
-        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "積込", "積置", "326", arrOPFCycle_002025_326, judgeDate:="SHUKADATE")
-        WW_SetSekiyuSigenOnePointFiveCycle(BaseDllConst.CONST_TODOKECODE_002025, "荷卸", "積配", "326", arrOPFCycle_002025_326)
-        ' ---------------------------------------------------------------------------------------/
-
-        '〇(石油資源開発)届先出荷場所車庫マスタ設定
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}'", SekiyuSigenTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETSORTNO_REP") = SekiyuSigenTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = SekiyuSigenTodokerow("VALUE01")
-                LNT0001tblrow("SHEETNAME_REP") = SekiyuSigenTodokerow("VALUE06")
-                'LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
-
-                '〇届先が追加された場合
-                If SekiyuSigenTodokerow("VALUE02").ToString() = "1" Then
-                    LNT0001tblrow("TODOKECELL_REP") = SekiyuSigenTodokerow("VALUE03")
-                    LNT0001tblrow("MASTERCELL_REP") = SekiyuSigenTodokerow("VALUE04")
-                    LNT0001tblrow("SHEETDISPLAY_REP") = SekiyuSigenTodokerow("VALUE05")
-                Else
-                    LNT0001tblrow("TODOKECELL_REP") = ""
-                    LNT0001tblrow("MASTERCELL_REP") = ""
-                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
-                End If
-            Next
-        Next
-
-        '〇各部署ごとの情報取得
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}' AND SHUKABASHO='{1}'", SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE06"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
-            Next
-        Next
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenTodoke.Select("", "KEYCODE08, KEYCODE01")
-            Select Case SekiyuSigenTodokerow("KEYCODE08").ToString()
-                Case "1"
-                    Try
-                        dcNigataList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
-                    Catch ex As Exception
-                    End Try
-                Case "2"
-                    dcSyonaiList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
-                Case "3"
-                    dcTouhokuList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
-                Case "4"
-                    dcIbarakiList.Add(SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE09"))
+                Case BaseDllConst.CONST_TORICODE_0239900000     '北海道ＬＮＧ
+                    tblName = "LNT0024_HOKKAIDOLNGYUSOUHI"
+                Case BaseDllConst.CONST_TORICODE_0110600000     'シーエナジー・エルネス
+                    tblName = "LNT0025_CENALNESUYUSOUHI"
             End Select
-        Next
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, tblName & " Select")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:" & tblName & " Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
     ''' <summary>
-    ''' (帳票)項目チェック処理(シーエナジー・エルネス)
+    ''' 荷主毎の固定費データ取得
     ''' </summary>
+    ''' <param name="SQLcon"></param>
     ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckCenergyElNess(ByVal reportName As String, ByVal reportCode As String,
-                                              ByRef dcCenergyList As Dictionary(Of String, String), ByRef dcElNessList As Dictionary(Of String, String))
-        Dim dtCenergyElNessTank As New DataTable
-        Dim dtCenergyTodoke As New DataTable
-        Dim dtElNessTodoke As New DataTable
-        Dim cenergyElNessTankClass As String = ""
-        Dim cenergyTodokeClass As String = ""
-        Dim elNessTodokeClass As String = ""
-        'Dim cenergyElNessKoteihiClass As String = ""
-        Dim arrToriCode As String() = {"", "", ""}
-        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
-        Dim listOrderOrgCode As New List(Of String)
-        Dim commaOrderOrgCode As String = ""
+    Protected Sub ToriFIXEDDataGet(ByVal SQLcon As MySqlConnection)
 
-        Select Case reportCode
-            '"シーエナジー・エルネス　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_022302
-                cenergyElNessTankClass = "CENERGY_TANK"
-                cenergyTodokeClass = "CENERGY_TODOKE"
-                elNessTodokeClass = "ELNESS_TODOKE"
-                'cenergyElNessKoteihiClass = ""
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0110600000
-                arrToriCode(1) = Nothing
-                arrToriCode(2) = Nothing
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021502)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022302)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021504)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_021601)
-                listOrderOrgCode.Add(BaseDllConst.CONST_ORDERORGCODE_022401)
-                commaOrderOrgCode = String.Join(",", listOrderOrgCode)
-        End Select
+        If IsNothing(LNT0001Koteihi) Then
+            LNT0001Koteihi = New DataTable
+        End If
 
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, cenergyElNessTankClass, dtCenergyElNessTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, cenergyTodokeClass, dtCenergyTodoke)
-            CMNPTS.SelectCONVERTMaster(SQLcon, elNessTodokeClass, dtElNessTodoke)
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectFIXEDMaster(SQLcon, arrToriCode(0), commaOrderOrgCode, Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001Koteihi, I_CLASS:=cenergyElNessTankClass)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=dtCenergyElNessTank, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=cenergyElNessTankClass)
-        End Using
+        If LNT0001Koteihi.Columns.Count <> 0 Then
+            LNT0001Koteihi.Columns.Clear()
+        End If
 
-        '〇(帳票)使用項目の設定
-        WW_ReportMeisaiAdd(LNT0001tbl)
+        LNT0001Koteihi.Clear()
 
-        '〇陸事番号マスタ設定
-        For Each dtCenergyElNessTankrow As DataRow In dtCenergyElNessTank.Rows
-            '届先(明細)セル値設定
-            Dim condition As String = String.Format("GYOMUTANKNUM='{0}'", dtCenergyElNessTankrow("KEYCODE04"))
-            WW_CenergyElnessRikugiMas(dtCenergyElNessTankrow, condition, fuzumiLimit, LNT0001tbl)
-        Next
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを荷主マスタから取得する
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" Select                                                                          ")
+        SQLStr.Append("      coalesce(LNM7.TORICODE, '')                           AS TORICODE			")
+        SQLStr.Append("     ,coalesce(LNM7.TORINAME, '')                           AS TORINAME			")
+        SQLStr.Append("     ,coalesce(LNM7.ORGCODE, '')                            AS ORGCODE		    ")
+        SQLStr.Append("     ,coalesce(LNM7.ORGNAME, '')                            AS ORGNAME		    ")
+        SQLStr.Append("     ,coalesce(LNM7.KASANORGCODE, '')                       AS KASANORGCODE		")
+        SQLStr.Append("     ,coalesce(LNM7.KASANORGNAME, '')                       AS KASANORGNAME		")
+        SQLStr.Append("     ,coalesce(LNM7.TARGETYM, '')                           AS TARGETYM			")
+        SQLStr.Append("     ,coalesce(LNM7.SYABAN, '')                             AS SYABAN			")
+        SQLStr.Append("     ,coalesce(LNM7.RIKUBAN, '')                            AS RIKUBAN			")
+        SQLStr.Append("     ,coalesce(LNM7.SYAGATA, '')                            AS SYAGATA			")
+        SQLStr.Append("     ,coalesce(LNM7.SYAGATANAME, '')                        AS SYAGATANAME		")
+        SQLStr.Append("     ,coalesce(LNM7.SYABARA, '')                            AS SYABARA		    ")
+        SQLStr.Append("     ,coalesce(LNM7.SEASONKBN, '')                          AS SEASONKBN			")
+        SQLStr.Append("     ,coalesce(LNM7.SEASONSTART, '')                        AS SEASONSTART		")
+        SQLStr.Append("     ,coalesce(LNM7.SEASONEND, '')                          AS SEASONEND			")
+        SQLStr.Append("     ,coalesce(LNM7.KOTEIHIM, '0')                          AS KOTEIHIM			")
+        SQLStr.Append("     ,coalesce(LNM7.KOTEIHID, '0')                          AS KOTEIHID			")
+        SQLStr.Append("     ,coalesce(LNM7.KAISU, '0')                             AS KAISU		        ")
+        SQLStr.Append("     ,coalesce(LNM7.GENGAKU, '0')                           AS GENGAKU			")
+        SQLStr.Append("     ,coalesce(LNM7.AMOUNT, '0')                            AS AMOUNT			")
+        SQLStr.Append("     ,coalesce(LNM7.BIKOU1, '')                             AS BIKOU1			")
+        SQLStr.Append("     ,coalesce(LNM7.BIKOU2, '')                             AS BIKOU2			")
+        SQLStr.Append("     ,coalesce(LNM7.BIKOU3, '')                             AS BIKOU3		    ")
+        SQLStr.Append("     ,coalesce(LNM7.DELFLG, '')                             AS DELFLG		    ")
+        SQLStr.Append("     ,(SELECT VALUE1                                                             ")
+        SQLStr.Append("         FROM COM.LNS0006_FIXVALUE                                               ")
+        SQLStr.Append("        WHERE CAMPCODE = @CAMPCODE                                               ")
+        SQLStr.Append("          AND CLASS    = 'TAXRATE'                                               ")
+        SQLStr.Append("          AND KEYCODE  = '1'                                                     ")
+        SQLStr.Append("          AND CURDATE() BETWEEN STYMD AND ENDYMD                                 ")
+        SQLStr.Append("          AND DELFLG  = @DELFLG                                                  ")
+        SQLStr.Append("      )                                                   AS TAXRATE             ")
+        SQLStr.Append(" FROM                                                                            ")
+        SQLStr.Append(" LNG.LNM0007_FIXED LNM7                                                          ")
+        SQLStr.Append(" WHERE                                                                           ")
+        SQLStr.Append("     LNM7.TARGETYM = @TARGETYM                                                   ")
+        '〇シーエナジー
+        If WF_TORIORG.SelectedItem.Text = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '★北陸エルネスも含める
+            Dim whereStr As String = String.Format(" AND LNM7.TORICODE IN (@TORICODE, '{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
+            SQLStr.Append(whereStr)
+        Else
+            Dim whereStr As String = String.Format(" AND LNM7.TORICODE IN (@TORICODE) ")
+            SQLStr.Append(whereStr)
+        End If
+        SQLStr.Append(" AND LNM7.ORGCODE in (" & WF_TORIORG.SelectedValue & ")")
+        SQLStr.Append(" AND LNM7.DELFLG = @DELFLG ")
+        SQLStr.Append(" ORDER BY ")
+        SQLStr.Append(" LNM7.TORICODE, LNM7.ORGCODE, LNM7.SYABARA ")
 
-        '〇業務車番(3XX)取得用
-        For Each CenergyElNessTankrow As DataRow In dtCenergyElNessTank.Select("KEYCODE04<>''", "KEYCODE04")
-            If CenergyElNessTankrow("KEYCODE04").ToString().Substring(0, 1) <> "3" Then Continue For
-            Try
-                dcCenergyList.Add(CenergyElNessTankrow("KEYCODE04"), CenergyElNessTankrow("KEYCODE01"))
-            Catch ex As Exception
-            End Try
-        Next
-        '〇(シーエナジー)届先出荷場所車庫マスタ設定(3XX)
-        For Each CenergyTodokerow As DataRow In dtCenergyTodoke.Select("KEYCODE01<>''", "KEYCODE01")
-            If CenergyTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
-            Dim condition As String = String.Format("TODOKECODE='{0}'", CenergyTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "3" Then Continue For
-                Try
-                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = CenergyTodokerow("KEYCODE07").ToString()
-                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = CenergyTodokerow("KEYCODE08").ToString()
-                    LNT0001tblrow("CENERGYELNESS_TODOKECODE") = CenergyTodokerow("KEYCODE03").ToString()
-                    LNT0001tblrow("CENERGYELNESS_TODOKENAME") = CenergyTodokerow("KEYCODE04").ToString()
-                Catch ex As Exception
-                End Try
-            Next
-        Next
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar)            '会社コード
+                Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)            '取引先コード
+                Dim TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar)            '対象年月
+                Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)                '削除フラグ
 
-        '〇業務車番(6XX)取得用
-        For Each CenergyElNessTankrow As DataRow In dtCenergyElNessTank.Select("KEYCODE04<>''", "KEYCODE04")
-            If CenergyElNessTankrow("KEYCODE04").ToString().Substring(0, 1) <> "6" Then Continue For
-            Try
-                dcElNessList.Add(CenergyElNessTankrow("KEYCODE04"), CenergyElNessTankrow("KEYCODE01"))
-            Catch ex As Exception
-            End Try
-        Next
-        '〇(エルネス)届先出荷場所車庫マスタ設定(6XX)
-        For Each ElNessTodokerow As DataRow In dtElNessTodoke.Select("KEYCODE01<>''", "KEYCODE01")
-            If ElNessTodokerow("KEYCODE01").ToString().Substring(0, 3) = "TMP" Then Continue For
-            Dim condition As String = String.Format("TODOKECODE='{0}'", ElNessTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                If LNT0001tblrow("GYOMUTANKNUM").ToString().Substring(0, 1) <> "6" Then Continue For
-                Try
-                    LNT0001tblrow("CENERGYELNESS_SHUKACODE") = ElNessTodokerow("KEYCODE07").ToString()
-                    LNT0001tblrow("CENERGYELNESS_SHUKANAME") = ElNessTodokerow("KEYCODE08").ToString()
-                    LNT0001tblrow("CENERGYELNESS_TODOKECODE") = ElNessTodokerow("KEYCODE03").ToString()
-                    LNT0001tblrow("CENERGYELNESS_TODOKENAME") = ElNessTodokerow("KEYCODE04").ToString()
-                Catch ex As Exception
-                End Try
-            Next
-        Next
-
-    End Sub
-
-    ''' <summary>
-    ''' (帳票)項目チェック処理(石油資源開発(北海道))
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Sub WW_ReportCheckSekiyuSigenHokaido(ByVal reportName As String, ByVal reportCode As String, ByRef dcIshikariList As Dictionary(Of String, String))
-        Dim dtSekiyuSigenHKDTank As New DataTable
-        Dim dtSekiyuSigenHKDTodoke As New DataTable
-        Dim sekiyuSigenTankHKDClass As String = ""
-        Dim sekiyuSigenTodokeHKDClass As String = ""
-        Dim sekiyuSigenKoteihiHKDClass As String = ""
-        Dim arrToriCode As String() = {"", "", ""}
-        Dim fuzumiLimit As Decimal = 1.7                    '--★不積(しきい値)
-
-        Select Case reportCode
-            '"石油資源開発(北海道)　輸送費請求書"
-            Case BaseDllConst.CONST_ORDERORGCODE_020104
-                sekiyuSigenTankHKDClass = "SEKIYUSIGEN_HKD_TANK"
-                sekiyuSigenTodokeHKDClass = "SEKIYUSIG_HKD_TODOKE"
-                sekiyuSigenKoteihiHKDClass = "SEKIYU_HKD_KOTEIHI"
-                arrToriCode(0) = BaseDllConst.CONST_TORICODE_0132800000
-                arrToriCode(1) = BaseDllConst.CONST_ORDERORGCODE_020104
-                arrToriCode(2) = Nothing
-        End Select
-
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTankHKDClass, dtSekiyuSigenHKDTank)
-            CMNPTS.SelectCONVERTMaster(SQLcon, sekiyuSigenTodokeHKDClass, dtSekiyuSigenHKDTodoke)
-            'CMNPTS.SelectNEWTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
-            CMNPTS.SelectTANKAMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", sekiyuSigenTodokeHKDClass, LNT0001Tanktbl)
-            CMNPTS.SelectSKSpecialFEEMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value + "/01", LNT0001SKSprate, I_CLASS:=sekiyuSigenKoteihiHKDClass)
-            CMNPTS.SelectSKFuelSurchargeMaster(SQLcon, arrToriCode(0), arrToriCode(1), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001SKSurcharge)
-            CMNPTS.SelectIntegrationSprateFEEMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value.Replace("/", ""), LNT0001TogouSprate, I_ORGCODE:=arrToriCode(1), I_CLASS:=sekiyuSigenKoteihiHKDClass)
-            CMNPTS.SelectCALENDARMaster(SQLcon, arrToriCode(0), Me.WF_TaishoYm.Value + "/01", LNT0001Calendar)
-            CMNPTS.SelectHOLIDAYRATEMaster(SQLcon, arrToriCode(0), LNT0001HolidayRate, I_dtTODOKEMas:=LNT0001SKSprate, I_ORDERORGCODE:=arrToriCode(1), I_SHUKABASHO:=arrToriCode(2), I_CLASS:=sekiyuSigenKoteihiHKDClass)
-        End Using
-
-        '〇(帳票)使用項目の設定
-        WW_ReportMeisaiAdd(LNT0001tbl)
-
-        '〇陸事番号マスタ設定
-        For Each dtSekiyuSigenHKDTankrow As DataRow In dtSekiyuSigenHKDTank.Rows
-            Dim condition As String = String.Format("TANKNUMBER='{0}'", dtSekiyuSigenHKDTankrow("KEYCODE01"))
-            If Mid(Me.WF_TORI.SelectedValue, 1, 6) = BaseDllConst.CONST_ORDERORGCODE_020104 Then
-                condition &= String.Format(" AND TODOKECODE='{0}'", dtSekiyuSigenHKDTankrow("KEYCODE05"))
-            End If
-            '届先(明細)セル値設定
-            WW_SekiyuSigenHKDRikugiMas(dtSekiyuSigenHKDTankrow, condition, fuzumiLimit, LNT0001tbl)
-        Next
-
-        '〇(石油資源開発)届先出荷場所車庫マスタ設定
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenHKDTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}'", SekiyuSigenTodokerow("KEYCODE01"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETSORTNO_REP") = SekiyuSigenTodokerow("KEYCODE03")
-                LNT0001tblrow("TODOKENAME_REP") = SekiyuSigenTodokerow("VALUE01")
-                'LNT0001tblrow("SHEETNAME_REP") = SekiyuSigenTodokerow("VALUE06")
-                'LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
-
-                '〇届先が追加された場合
-                If SekiyuSigenTodokerow("VALUE02").ToString() = "1" Then
-                    LNT0001tblrow("TODOKECELL_REP") = SekiyuSigenTodokerow("VALUE03")
-                    LNT0001tblrow("MASTERCELL_REP") = SekiyuSigenTodokerow("VALUE04")
-                    LNT0001tblrow("SHEETDISPLAY_REP") = SekiyuSigenTodokerow("VALUE05")
+                CAMPCODE.Value = Master.USERCAMP
+                TORICODE.Value = WF_TORIORG.SelectedItem.Text
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) Then
+                    TARGETYM.Value = WF_TaishoYm.Value.Replace("/", "")
                 Else
-                    LNT0001tblrow("TODOKECELL_REP") = ""
-                    LNT0001tblrow("MASTERCELL_REP") = ""
-                    LNT0001tblrow("SHEETDISPLAY_REP") = ""
+                    TARGETYM.Value = Date.Now.ToString("yyyyMM")
                 End If
-            Next
-        Next
-        '〇各種別ごとの情報取得
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenHKDTodoke.Rows
-            Dim condition As String = String.Format("TODOKECODE='{0}' AND SETCELL03='{1}'", SekiyuSigenTodokerow("KEYCODE01"), SekiyuSigenTodokerow("KEYCODE10"))
-            For Each LNT0001tblrow As DataRow In LNT0001tbl.Select(condition)
-                LNT0001tblrow("SHEETNAME_REP") = SekiyuSigenTodokerow("VALUE06")
-                LNT0001tblrow("GROUPNO_REP") = SekiyuSigenTodokerow("KEYCODE08")
-            Next
-        Next
-        'シート名取得用
-        For Each SekiyuSigenTodokerow As DataRow In dtSekiyuSigenHKDTodoke.Select("", "KEYCODE01")
-            If SekiyuSigenTodokerow("KEYCODE01").ToString() = "" Then Continue For
-            Dim subNo As String = SekiyuSigenTodokerow("KEYCODE08") + SekiyuSigenTodokerow("KEYCODE03")
-            Try
-                dcIshikariList.Add(SekiyuSigenTodokerow("KEYCODE01") + subNo, SekiyuSigenTodokerow("KEYCODE09"))
-                'dcIshikariList.Add(SekiyuSigenTodokerow("KEYCODE01") + subNo, SekiyuSigenTodokerow("KEYCODE10"))
-            Catch ex As Exception
-            End Try
-        Next
+                DELFLG.Value = BaseDllConst.C_DELETE_FLG.ALIVE
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNT0001Koteihi.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    LNT0001Koteihi.Load(SQLdr)
+                End Using
+
+                For Each LNT0001row In LNT0001Koteihi.Rows
+                    If LNT0001row("SEASONKBN") <> "0" Then
+                        LNT0001row("DELFLG") = "1"
+                        If LNT0001row("SEASONSTART") < LNT0001row("SEASONEND") Then
+                            '例） 0401　＜　1130 の場合、
+                            If LNT0001row("TARGETYM") >= Left(LNT0001row("TARGETYM"), 4) & Left(LNT0001row("SEASONSTART"), 2) AndAlso
+                               LNT0001row("TARGETYM") <= Left(LNT0001row("TARGETYM"), 4) & Left(LNT0001row("SEASONEND"), 2) Then
+                                LNT0001row("DELFLG") = "0"
+                            End If
+                        Else
+                            '例） 1201　＞　0331
+                            If LNT0001row("TARGETYM") >= Left(LNT0001row("TARGETYM"), 4) & Left(LNT0001row("SEASONSTART"), 2) AndAlso
+                               LNT0001row("TARGETYM") <= Left(LNT0001row("TARGETYM"), 4) + 1 & Left(LNT0001row("SEASONEND"), 2) Then
+                                LNT0001row("DELFLG") = "0"
+                            End If
+                        End If
+                    End If
+                Next
+                Dim view As DataView = LNT0001Koteihi.DefaultView
+                view.RowFilter = "DELFLG = '0'"
+                LNT0001Koteihi = view.ToTable
+
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0007_FIXED Select")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0007_FIXED Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
+
+    End Sub
+    ''' <summary>
+    ''' 出力項目指示データ取得（LNS0012_PROFMXLS)
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ProfmXlsGet(ByVal SQLcon As MySqlConnection)
+
+        If IsNothing(LNS0012tbl) Then
+            LNS0012tbl = New DataTable
+        End If
+
+        If LNS0012tbl.Columns.Count <> 0 Then
+            LNS0012tbl.Columns.Clear()
+        End If
+
+        LNS0012tbl.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを荷主マスタから取得する
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" Select                                                                      ")
+        SQLStr.Append("      coalesce(LS12.CAMPCODE, '')                            AS RECONO		")
+        SQLStr.Append("     ,coalesce(LS12.PROFID, '')                              AS PROFID		")
+        SQLStr.Append("     ,coalesce(LS12.MAPID, '')                               AS MAPID		")
+        SQLStr.Append("     ,coalesce(LS12.REPORTID, '')                            AS REPORTID		")
+        SQLStr.Append("     ,coalesce(LS12.TITLEKBN, '')                            AS TITLEKBN		")
+        SQLStr.Append("     ,coalesce(LS12.FIELD, '')                               AS FIELD	    ")
+        SQLStr.Append("     ,coalesce(LS12.STYMD, '')                               AS STYMD	    ")
+        SQLStr.Append("     ,coalesce(LS12.ENDYMD, '')                              AS ENDYMD		")
+        SQLStr.Append("     ,coalesce(LS12.FIELDNAMES, '')                          AS FIELDNAMES	")
+        SQLStr.Append("     ,coalesce(LS12.POSISTART, '')                           AS POSISTART	")
+        SQLStr.Append("     ,coalesce(LS12.POSIROW, '')                             AS POSIROW		")
+        SQLStr.Append("     ,coalesce(LS12.POSICOL, '')                             AS POSICOL		")
+        SQLStr.Append("     ,coalesce(LS12.WIDTH, '')                               AS WIDTH		")
+        SQLStr.Append("     ,coalesce(LS12.EXCELFILE, '')                           AS EXCELFILE	")
+        SQLStr.Append("     ,coalesce(LS12.STRUCTCODE, '')                          AS STRUCTCODE	")
+        SQLStr.Append("     ,coalesce(LS12.SORTORDER, '')                           AS SORTORDER	")
+        SQLStr.Append("     ,coalesce(LS12.EFFECT, '')                              AS EFFECT		")
+        SQLStr.Append("     ,coalesce(LS12.FORMATTYPE, '')                          AS FORMATTYPE	")
+        SQLStr.Append(" FROM                                                                        ")
+        SQLStr.Append("     COM.LNS0012_PROFMXLS LS12                                               ")
+        SQLStr.Append(" WHERE                                                                       ")
+        SQLStr.Append("     LS12.CAMPCODE  = @CAMPCODE                                              ")
+        SQLStr.Append(" AND LS12.PROFID    = @PROFID                                                ")
+        SQLStr.Append(" AND LS12.MAPID     = @MAPID                                                 ")
+        SQLStr.Append(" AND LS12.REPORTID  = @REPORTID                                              ")
+        SQLStr.Append(" AND LS12.TITLEKBN  = @TITLEKBN                                              ")
+        SQLStr.Append(" AND CURDATE() BETWEEN LS12.STYMD AND LS12.ENDYMD                            ")
+        SQLStr.Append(" AND LS12.DELFLG    = @DELFLG                                                ")
+        SQLStr.Append(" ORDER BY LS12.POSICOL                                                       ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar)            '会社コード
+                Dim PROFID As MySqlParameter = SQLcmd.Parameters.Add("@PROFID", MySqlDbType.VarChar)                'プロファイルＩＤ
+                Dim MAPID As MySqlParameter = SQLcmd.Parameters.Add("@MAPID", MySqlDbType.VarChar)                  '画面ＩＤ
+                Dim REPORTID As MySqlParameter = SQLcmd.Parameters.Add("@REPORTID", MySqlDbType.VarChar)            'レポートＩＤ
+                Dim TITLEKBN As MySqlParameter = SQLcmd.Parameters.Add("@@TITLEKBN", MySqlDbType.VarChar)           'タイトル区分
+                Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)                '削除フラグ
+
+                CAMPCODE.Value = Master.USERCAMP
+                PROFID.Value = "def"
+                MAPID.Value = LNT0002WRKINC.MAPIDL
+                REPORTID.Value = Me.WF_TORI.SelectedValue
+                TITLEKBN.Value = "I"
+                DELFLG.Value = BaseDllConst.C_DELETE_FLG.ALIVE
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNS0012tbl.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    LNS0012tbl.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNS0012_PROFMXLS Select")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNS0012_PROFMXLS Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Exit Sub
+        End Try
 
     End Sub
 
-    Protected Sub WW_ReportMeisaiAdd(ByRef LNT0001tbl As DataTable)
-        '〇(帳票)使用項目の設定
-        LNT0001tbl.Columns.Add("ROWSORTNO", Type.GetType("System.Int32"))               '// 【入力用】EXCEL用ソート番号
-        LNT0001tbl.Columns.Add("SETCELL01", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(届先名)
-        LNT0001tbl.Columns.Add("SETCELL02", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(実績数量)
-        LNT0001tbl.Columns.Add("SETCELL03", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(備考)
-        LNT0001tbl.Columns.Add("SETCELL04", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(予備)
-        LNT0001tbl.Columns.Add("SETCELL05", Type.GetType("System.String"))              '// 【入力用】EXCEL用セル(予備)
-        LNT0001tbl.Columns.Add("SETSTARTLINE", Type.GetType("System.Int32"))            '// 【入力用】EXCEL用(開始行)
-        LNT0001tbl.Columns.Add("SETLINE", Type.GetType("System.Int32"))                 '// 【入力用】EXCEL用(行数)
-        LNT0001tbl.Columns.Add("TODOKENAME_REP", Type.GetType("System.String"))         '// 【入力用】EXCEL用(届先名)
-        LNT0001tbl.Columns.Add("REMARK_REP", Type.GetType("System.String"))             '// 【入力用】EXCEL用(備考)
-        LNT0001tbl.Columns.Add("DISPLAYCELL_START", Type.GetType("System.String"))      '// 【入力用】EXCEL用(陸事番号)設定用
-        LNT0001tbl.Columns.Add("DISPLAYCELL_END", Type.GetType("System.String"))        '// 【入力用】EXCEL用(受注数量)設定用
-        LNT0001tbl.Columns.Add("DISPLAYCELL_KOTEICHI", Type.GetType("System.String"))   '// 【固定費】EXCEL用(陸事番号)表示用
-        LNT0001tbl.Columns.Add("TODOKECELL_REP", Type.GetType("System.String"))         '// 【届先毎】EXCEL用(届先名)表示用
-        LNT0001tbl.Columns.Add("MASTERCELL_REP", Type.GetType("System.String"))         '// 【マスタ】EXCEL用(届先名)表示用
-        LNT0001tbl.Columns.Add("ORDERORGCODE_REP", Type.GetType("System.String"))       '// EXCELシート(受注受付部署コード)設定用
-        LNT0001tbl.Columns.Add("GYOMUTANKNUM_REP", Type.GetType("System.String"))       '// EXCELシート(業務車番)設定用
-        LNT0001tbl.Columns.Add("SHEETDISPLAY_REP", Type.GetType("System.String"))       '// EXCELシート(届先名)表示用
-        LNT0001tbl.Columns.Add("SHEETSORTNO_REP", Type.GetType("System.Int32"))         '// EXCELシート(届先名)ソート用
-        LNT0001tbl.Columns.Add("SHEETNAME_REP", Type.GetType("System.String"))          '// EXCELシート(届先名)設定用
-        LNT0001tbl.Columns.Add("GROUPNO_REP", Type.GetType("System.String"))            '// EXCELシート(届先GRP)設定用
-        LNT0001tbl.Columns.Add("ZISSEKI_FUZUMI", Type.GetType("System.Decimal"))        '// EXCELシート①(車腹 - 不積(しきい値))設定用
-        LNT0001tbl.Columns.Add("FUZUMI_REFVALUE", Type.GetType("System.Decimal"))       '// EXCELシート②(① - 実績数量)設定用
-        LNT0001tbl.Columns.Add("ZISSEKI_FUZUMIFLG", Type.GetType("System.String"))      '// EXCELシート(不積フラグ)設定用
-        LNT0001tbl.Columns.Add("ROLLY_CONTAINER", Type.GetType("System.String"))        '// EXCELシート(ローリー・コンテナ)設定用
-        LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKACODE", Type.GetType("System.Int32"))      '// EXCELシート(シーエナジー・エルネス)出荷コード設定用
-        'LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKACODE", Type.GetType("System.String"))      '// EXCELシート(シーエナジー・エルネス)出荷コード設定用
-        LNT0001tbl.Columns.Add("CENERGYELNESS_SHUKANAME", Type.GetType("System.String"))      '// EXCELシート(シーエナジー・エルネス)出荷名　称設定用
-        LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKECODE", Type.GetType("System.Int32"))     '// EXCELシート(シーエナジー・エルネス)届先コード設定用
-        'LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKECODE", Type.GetType("System.String"))     '// EXCELシート(シーエナジー・エルネス)届先コード設定用
-        LNT0001tbl.Columns.Add("CENERGYELNESS_TODOKENAME", Type.GetType("System.String"))     '// EXCELシート(シーエナジー・エルネス)届先名　称設定用
-    End Sub
 
     ''' <summary>
     ''' 石油資源開発(届先(明細)セル値設定)
