@@ -1558,18 +1558,27 @@ Public Class LNT0002TranStatusList
         '------------------------------
         ' データ取得
         '------------------------------
-        Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
-            SQLcon.Open()  ' DataBase接続
+        Try
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()  ' DataBase接続
 
-            '実績データ取得（輸送費明細）
-            ToriINVOICEDataGet(SQLcon)
+                '実績データ取得（輸送費明細）
+                ToriINVOICEDataGet(SQLcon)
 
-            '固定費データ取得（固定費明細）
-            ToriFIXEDDataGet(SQLcon)
-        End Using
+                '固定費データ取得（固定費明細）
+                ToriFIXEDDataGet(SQLcon)
+
+                '特別料金データ取得（その他請求明細）
+                ToriSPRATEDataGet(SQLcon)
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True, I_PARA01:="異常終了")
+            WW_ErrSW = C_MESSAGE_NO.SYSTEM_ADM_ERROR
+            Exit Sub
+        End Try
 
         WW_ErrSW = C_MESSAGE_NO.NORMAL
-        If LNT0001tbl.Rows.Count = 0 AndAlso LNT0001Koteihi.Rows.Count = 0 Then
+        If LNT0001tbl.Rows.Count = 0 AndAlso LNT0001Koteihi.Rows.Count = 0 AndAlso LNT0001TogouSprate.Rows.Count = 0 Then
             Master.Output(C_MESSAGE_NO.CTN_SELECT_EXIST, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
             WW_ErrSW = C_MESSAGE_NO.CTN_SELECT_EXIST
             Exit Sub
@@ -1589,6 +1598,9 @@ Public Class LNT0002TranStatusList
         Dim PrintKotei = New DataTable
         LNT0001InvoiceOutputCOM.CreKoteiTable(PrintKotei)
 
+        'その他請求（特別料金）（共通化）出力TBL
+        Dim PrintEtc = New DataTable
+        LNT0001InvoiceOutputCOM.CreEtcTable(PrintEtc)
         '------------------------------
         '集計処理
         '------------------------------
@@ -1596,27 +1608,35 @@ Public Class LNT0002TranStatusList
             Case BaseDllConst.CONST_TORICODE_0005700000     'ENEOS（八戸、水島）
                 LNT0001InvoiceOutputCOM.SumUnchinENEOS(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedENEOS(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcENEOS(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0175300000     '東北天然ガス
                 LNT0001InvoiceOutputCOM.SumUnchinTNG(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedTNG(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcTNG(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0175400000     '東北電力
                 LNT0001InvoiceOutputCOM.SumUnchinTOHOKU(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedTOHOKU(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcTOHOKU(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0045300000     'エスジーリキッドサービス（西部ガス）
                 LNT0001InvoiceOutputCOM.SumUnchinSAIBU(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedSAIBU(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcSAIBU(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0045200000     'エスケイ産業
                 LNT0001InvoiceOutputCOM.SumUnchinESUKEI(LNT0001tbl, PrintUnchin)
+                LNT0001InvoiceOutputCOM.SumFixedESUKEI(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcESUKEI(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発
                 If WF_TORIORG.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
                     '(本州分)新潟・庄内・東北・茨城
                     LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGEN(LNT0001tbl, PrintUnchin)
                     LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGEN(LNT0001Koteihi, PrintKotei)
+                    LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGEN(LNT0001TogouSprate, PrintEtc)
                 End If
                 If WF_TORIORG.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
                     '(北海道)石狩
                     LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGENHokkaido(LNT0001tbl, PrintUnchin)
                     LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGENHokkaido(LNT0001Koteihi, PrintKotei)
+                    LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGENHokkaido(LNT0001TogouSprate, PrintEtc)
                 End If
             Case BaseDllConst.CONST_TORICODE_0051200000     'OG（西日本、姫路）
                 LNT0001InvoiceOutputCOM.SumUnchinDAIGAS(LNT0001tbl, PrintUnchin)
@@ -1624,13 +1644,16 @@ Public Class LNT0002TranStatusList
                    Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "03" Then
                     '★[Daigas泉北、姫路]選択時
                     LNT0001InvoiceOutputCOM.SumFixedDAIGAS(LNT0001Koteihi, PrintKotei)
+                    LNT0001InvoiceOutputCOM.SumEtcDAIGAS(LNT0001TogouSprate, PrintEtc)
                 End If
             Case BaseDllConst.CONST_TORICODE_0239900000     '北海道ＬＮＧ
                 LNT0001InvoiceOutputCOM.SumUnchinHOKKAIDOLNG(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedHOKKAIDOLNG(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcHOKKAIDOLNG(LNT0001TogouSprate, PrintEtc)
             Case BaseDllConst.CONST_TORICODE_0110600000     'シーエナジー・エルネス
                 LNT0001InvoiceOutputCOM.SumUnchinCENERGY(LNT0001tbl, PrintUnchin)
                 LNT0001InvoiceOutputCOM.SumFixedCENERGY(LNT0001Koteihi, PrintKotei)
+                LNT0001InvoiceOutputCOM.SumEtcCENERGY(LNT0001TogouSprate, PrintEtc)
         End Select
 
         '----------------------------------------
@@ -1638,14 +1661,16 @@ Public Class LNT0002TranStatusList
         '----------------------------------------
         Dim PrintUrl As String
         Try
-            PrintUrl = LNT0001InvoiceOutputCOM.CreateExcelPrintData(PrintUnchin, PrintKotei)
+            PrintUrl = LNT0001InvoiceOutputCOM.CreateExcelPrintData(PrintUnchin, PrintKotei, PrintEtc)
         Catch ex As Exception
-            Return
+            Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True, I_PARA01:="異常終了")
+            WW_ErrSW = C_MESSAGE_NO.SYSTEM_ADM_ERROR
+            Exit Sub
         End Try
+
         '○ 別画面でExcelを表示
         WF_PrintURL.Value = PrintUrl
         ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-
 
 
     End Sub
@@ -2199,7 +2224,7 @@ Public Class LNT0002TranStatusList
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
+            Throw '呼出し元にThrow
         End Try
 
     End Sub
@@ -2334,7 +2359,130 @@ Public Class LNT0002TranStatusList
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
+            Throw '呼出し元にThrow
+        End Try
+
+    End Sub
+    ''' <summary>
+    ''' 荷主毎の特別料金データ取得
+    ''' </summary>
+    ''' <param name="SQLcon"></param>
+    ''' <remarks></remarks>
+    Protected Sub ToriSPRATEDataGet(ByVal SQLcon As MySqlConnection)
+
+        If IsNothing(LNT0001TogouSprate) Then
+            LNT0001TogouSprate = New DataTable
+        End If
+
+        If LNT0001TogouSprate.Columns.Count <> 0 Then
+            LNT0001TogouSprate.Columns.Clear()
+        End If
+
+        LNT0001TogouSprate.Clear()
+
+        '○ 検索SQL
+        '　検索説明
+        '     条件指定に従い該当データを荷主マスタから取得する
+        Dim SQLStr As New StringBuilder
+        SQLStr.Append(" Select                                                                              ")
+        SQLStr.Append("      coalesce(LNM14.TARGETYM, '')                           AS TARGETYM			    ")
+        SQLStr.Append("     ,coalesce(LNM14.TORICODE, '')                           AS TORICODE			    ")
+        SQLStr.Append("     ,coalesce(LNM14.TORINAME, '')                           AS TORINAME		        ")
+        SQLStr.Append("     ,coalesce(LNM14.ORGCODE, '')                            AS ORGCODE		        ")
+        SQLStr.Append("     ,coalesce(LNM14.ORGNAME, '')                            AS ORGNAME		        ")
+        SQLStr.Append("     ,coalesce(LNM14.KASANORGCODE, '')                       AS KASANORGCODE		    ")
+        SQLStr.Append("     ,coalesce(LNM14.KASANORGNAME, '')                       AS KASANORGNAME		    ")
+        SQLStr.Append("     ,coalesce(LNM14.GROUPCODE, '')                          AS GROUPCODE		    ")
+        SQLStr.Append("     ,coalesce(LNM14.BIGCATECODE, '')                        AS BIGCATECODE		    ")
+        SQLStr.Append("     ,coalesce(LNM14.BIGCATENAME, '')                        AS BIGCATENAME		    ")
+        SQLStr.Append("     ,coalesce(LNM14.MIDCATECODE, '')                        AS MIDCATECODE		    ")
+        SQLStr.Append("     ,coalesce(LNM14.MIDCATENAME, '')                        AS MIDCATENAME		    ")
+        SQLStr.Append("     ,coalesce(LNM14.SMALLCATECODE, '')                      AS SMALLCATECODE	    ")
+        SQLStr.Append("     ,coalesce(LNM14.SMALLCATENAME, '')                      AS SMALLCATENAME        ")
+        SQLStr.Append("     ,coalesce(LNM14.TANKA, '0')                             AS TANKA		        ")
+        SQLStr.Append("     ,coalesce(LNM14.QUANTITY, '0')                          AS QUANTITY		        ")
+        SQLStr.Append("     ,coalesce(LNM14.CALCUNIT, '')                           AS CALCUNIT		        ")
+        SQLStr.Append("     ,coalesce(LNM14.DEPARTURE, '')                          AS DEPARTURE		    ")
+        SQLStr.Append("     ,coalesce(LNM14.MILEAGE, '0')                           AS MILEAGE			    ")
+        SQLStr.Append("     ,coalesce(LNM14.SHIPPINGCOUNT, '0')                     AS SHIPPINGCOUNT        ")
+        SQLStr.Append("     ,coalesce(LNM14.NENPI, '0')                             AS NENPI			    ")
+        SQLStr.Append("     ,coalesce(LNM14.DIESELPRICECURRENT, '0')                AS DIESELPRICECURRENT   ")
+        SQLStr.Append("     ,coalesce(LNM14.DIESELPRICESTANDARD, '0')               AS DIESELPRICESTANDARD  ")
+        SQLStr.Append("     ,coalesce(LNM14.DIESELCONSUMPTION, '0')                 AS DIESELCONSUMPTION    ")
+        SQLStr.Append("     ,coalesce(LNM14.DISPLAYFLG, '0')                        AS DISPLAYFLG           ")
+        SQLStr.Append("     ,coalesce(LNM14.ASSESSMENTFLG, '0')                     AS ASSESSMENTFLG        ")
+        SQLStr.Append("     ,coalesce(LNM14.ATENACOMPANYNAME, '')                   AS ATENACOMPANYNAME     ")
+        SQLStr.Append("     ,coalesce(LNM14.ATENACOMPANYDEVNAME, '')                AS ATENACOMPANYDEVNAME  ")
+        SQLStr.Append("     ,coalesce(LNM14.FROMORGNAME, '')                        AS FROMORGNAME          ")
+        SQLStr.Append("     ,coalesce(LNM14.MEISAICATEGORYID, '1')                  AS MEISAICATEGORYID     ")
+        SQLStr.Append("     ,coalesce(LNM14.BIKOU1, '')                             AS BIKOU1			    ")
+        SQLStr.Append("     ,coalesce(LNM14.BIKOU2, '')                             AS BIKOU2			    ")
+        SQLStr.Append("     ,coalesce(LNM14.BIKOU3, '')                             AS BIKOU3		        ")
+        SQLStr.Append("     ,coalesce(LNM14.DELFLG, '')                             AS DELFLG		        ")
+        SQLStr.Append("     ,(SELECT VALUE1                                                                 ")
+        SQLStr.Append("         FROM COM.LNS0006_FIXVALUE                                                   ")
+        SQLStr.Append("        WHERE CAMPCODE = @CAMPCODE                                                   ")
+        SQLStr.Append("          AND CLASS    = 'TAXRATE'                                                   ")
+        SQLStr.Append("          AND KEYCODE  = '1'                                                         ")
+        SQLStr.Append("          AND CURDATE() BETWEEN STYMD AND ENDYMD                                     ")
+        SQLStr.Append("          AND DELFLG  = @DELFLG                                                      ")
+        SQLStr.Append("      )                                                   AS TAXRATE                 ")
+        SQLStr.Append(" FROM                                                                                ")
+        SQLStr.Append(" LNG.LNM0014_SPRATE2 LNM14                                                           ")
+        SQLStr.Append(" WHERE                                                                               ")
+        SQLStr.Append("     LNM14.TARGETYM = @TARGETYM                                                      ")
+        '〇シーエナジー
+        If WF_TORIORG.SelectedItem.Text = BaseDllConst.CONST_TORICODE_0110600000 Then
+            '★北陸エルネスも含める
+            Dim whereStr As String = String.Format(" AND LNM14.TORICODE IN (@TORICODE, '{0}') ", BaseDllConst.CONST_TORICODE_0238900000)
+            SQLStr.Append(whereStr)
+        Else
+            Dim whereStr As String = String.Format(" AND LNM14.TORICODE IN (@TORICODE) ")
+            SQLStr.Append(whereStr)
+        End If
+        SQLStr.Append(" AND LNM14.ORGCODE in (" & WF_TORIORG.SelectedValue & ")")
+        SQLStr.Append(" AND LNM14.DISPLAYFLG = '1' ")
+        SQLStr.Append(" AND LNM14.MEISAICATEGORYID = '1' ")
+        SQLStr.Append(" AND LNM14.DELFLG = @DELFLG ")
+        SQLStr.Append(" ORDER BY ")
+        SQLStr.Append(" LNM14.ORGCODE, LNM14.BIGCATECODE, LNM14.MIDCATECODE, LNM14.SMALLCATECODE ")
+
+        Try
+            Using SQLcmd As New MySqlCommand(SQLStr.ToString, SQLcon)
+                Dim CAMPCODE As MySqlParameter = SQLcmd.Parameters.Add("@CAMPCODE", MySqlDbType.VarChar)            '会社コード
+                Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)            '取引先コード
+                Dim TARGETYM As MySqlParameter = SQLcmd.Parameters.Add("@TARGETYM", MySqlDbType.VarChar)            '対象年月
+                Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)                '削除フラグ
+
+                CAMPCODE.Value = Master.USERCAMP
+                TORICODE.Value = WF_TORIORG.SelectedItem.Text
+                If Not String.IsNullOrEmpty(WF_TaishoYm.Value) Then
+                    TARGETYM.Value = WF_TaishoYm.Value.Replace("/", "")
+                Else
+                    TARGETYM.Value = Date.Now.ToString("yyyyMM")
+                End If
+                DELFLG.Value = BaseDllConst.C_DELETE_FLG.ALIVE
+
+                Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                    '○ フィールド名とフィールドの型を取得
+                    For index As Integer = 0 To SQLdr.FieldCount - 1
+                        LNT0001TogouSprate.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                    Next
+
+                    '○ テーブル検索結果をテーブル格納
+                    LNT0001TogouSprate.Load(SQLdr)
+                End Using
+            End Using
+        Catch ex As Exception
+            Master.Output(C_MESSAGE_NO.DB_ERROR, C_MESSAGE_TYPE.ABORT, "LNM0014_SPRATE2 Select")
+
+            CS0011LOGWrite.INFSUBCLASS = "MAIN"                         'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "DB:LNM0014_SPRATE2 Select"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw '呼出し元にThrow
         End Try
 
     End Sub
@@ -2425,7 +2573,7 @@ Public Class LNT0002TranStatusList
             CS0011LOGWrite.TEXT = ex.ToString()
             CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.DB_ERROR
             CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
-            Exit Sub
+            Throw '呼出し元にThrow
         End Try
 
     End Sub

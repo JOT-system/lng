@@ -5,6 +5,7 @@ Public Class LNT0001InvoiceOutputCOM
     Private WW_Workbook As New Workbook  '共通
     Private WW_SheetNoUnchin As Integer = 0
     Private WW_SheetNoKotei As Integer = 0
+    Private WW_SheetNoSprate As Integer = 0
     Private WW_SheetNoTmp As Integer = 0
 
     ''' <summary>
@@ -81,6 +82,9 @@ Public Class LNT0001InvoiceOutputCOM
                 If WW_Workbook.Worksheets(i).Name = "固定費明細" Then
                     WW_SheetNoKotei = i
                 End If
+                If WW_Workbook.Worksheets(i).Name = "特別料金" Then
+                    WW_SheetNoSprate = i
+                End If
                 If WW_Workbook.Worksheets(i).Name = "TEMP" Then
                     WW_SheetNoTmp = i
                 End If
@@ -103,7 +107,7 @@ Public Class LNT0001InvoiceOutputCOM
     ''' </summary>
     ''' <returns>ダウンロード先URL</returns>
     ''' <remarks>作成メソッド、パブリックスコープはここに収める</remarks>
-    Public Function CreateExcelPrintData(ByVal UnchinData As DataTable, ByVal KoteiData As DataTable) As String
+    Public Function CreateExcelPrintData(ByVal UnchinData As DataTable, ByVal KoteiData As DataTable, ByVal EtcData As DataTable) As String
         Dim tmpFileName As String = Date.Parse(TaishoYm + "/" + "01").ToString("yyyy年MM月_") & Me.OutputFileName & "（共通）.xlsx"
         Dim tmpFilePath As String = IO.Path.Combine(Me.UploadRootPath, tmpFileName)
         Dim retByte() As Byte
@@ -118,7 +122,13 @@ Public Class LNT0001InvoiceOutputCOM
             '◯固定費明細の設定
             PrintData = KoteiData
             EditKoteiArea()
-            '***** TODO処理 ここまで *****
+
+            '◯その他請求（特別料金）明細の設定
+            PrintData = EtcData
+            EditEtcArea()
+
+            WW_Workbook.Worksheets(WW_SheetNoUnchin).Activate()
+            WW_Workbook.Worksheets(WW_SheetNoTmp).Delete()
 
             '保存処理実行
             Dim saveExcelLock As New Object
@@ -456,6 +466,147 @@ Public Class LNT0001InvoiceOutputCOM
     End Sub
 
     ''' <summary>
+    ''' 帳票のその他請求（特別料金）明細設定
+    ''' </summary>
+    Private Sub EditEtcArea()
+        Try
+            Dim stLine As Integer = 7
+            Dim lineUcnt As Integer = stLine
+            Dim rowInx As Integer = stLine
+            Dim no As Integer = 1
+            Dim srcRange As IRange = Nothing
+            Dim destRange As IRange = Nothing
+            Dim newWorkSheet As IWorksheet = Nothing
+            Dim hiddenA As Boolean = False
+            Dim hiddenB As Boolean = False
+            Dim hiddenC As Boolean = False
+            Dim hiddenD As Boolean = False
+            Dim hiddenE As Boolean = False
+
+            Const COL_NO As String = "A"              '№
+            Const COL_BIGCATENAME As String = "B"     '大分類
+            Const COL_MIDCATENAME As String = "C"     '中分類
+            Const COL_SMALLCATENAME As String = "D"   '小分類
+            Const COL_TANKA As String = "E"           '単価
+            Const COL_COUNT As String = "F"           '数量（回・台）
+            Const COL_QUANTITY As String = "G"        '数量
+            Const COL_TOTAL As String = "H"           '小計
+
+            Dim query = From row In PrintData.AsEnumerable()
+                        Group row By
+                            GROUPCODE = row.Field(Of String)("GROUPCODE")
+                        Into Group
+                        Select New With {
+                            .GROUPCODE = GROUPCODE
+                        }
+            For Each dtRow In query
+                newWorkSheet = WW_Workbook.Worksheets(Me.WW_SheetNoSprate).Copy()
+                newWorkSheet.Name = WW_Workbook.Worksheets(Me.WW_SheetNoSprate).Name & " " & dtRow.GROUPCODE
+
+                '一旦、明細をクリアしておく（行削除）
+                '固定費明細の最終行を取得
+                Dim lastRow As Integer = 0
+                lastRow = newWorkSheet.UsedRange.Row + newWorkSheet.UsedRange.Rows.Count - 1
+                newWorkSheet.Range(rowInx.ToString + ":" + lastRow.ToString).Delete()
+
+                If PrintData.Rows.Count = 0 Then
+                    'シートの非表示
+                    newWorkSheet.Visible = Visibility.Hidden
+                    Exit Sub
+                End If
+
+                '固定費明細
+                Dim whereStr As String = "GROUPCODE = '" & dtRow.GROUPCODE & "'"
+                For Each PrintDatarow As DataRow In PrintData.Select(whereStr)
+                    'TEMPシートからフォーマット（行）をコピー
+                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A12:K12")
+                    destRange = newWorkSheet.Range("A" & lineUcnt.ToString())
+                    srcRange.Copy(destRange)
+
+                    '◯ №
+                    newWorkSheet.Range(COL_NO & lineUcnt.ToString).Value = no
+                    '◯ 大分類
+                    If Not String.IsNullOrEmpty(PrintDatarow("BIGCATENAME").ToString) Then
+                        newWorkSheet.Range(COL_BIGCATENAME & lineUcnt.ToString).Value = PrintDatarow("BIGCATENAME").ToString()
+                        hiddenB = False
+                    End If
+                    '◯ 中分類
+                    If Not String.IsNullOrEmpty(PrintDatarow("MIDCATENAME").ToString) Then
+                        newWorkSheet.Range(COL_MIDCATENAME & lineUcnt.ToString).Value = PrintDatarow("MIDCATENAME").ToString()
+                        hiddenC = False
+                    End If
+                    '◯ 小分類
+                    If Not String.IsNullOrEmpty(PrintDatarow("SMALLCATENAME").ToString) Then
+                        newWorkSheet.Range(COL_SMALLCATENAME & lineUcnt.ToString).Value = PrintDatarow("SMALLCATENAME").ToString()
+                        hiddenD = False
+                    End If
+                    '◯ 単価
+                    If Not String.IsNullOrEmpty(PrintDatarow("TANKA").ToString) Then
+                        newWorkSheet.Range(COL_TANKA & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("TANKA").ToString())
+                        hiddenE = False
+                    End If
+                    '◯ 回数・台数
+                    If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
+                        newWorkSheet.Range(COL_COUNT & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("COUNT").ToString())
+                    End If
+                    '◯ 数量
+                    If Not String.IsNullOrEmpty(PrintDatarow("QUANTITY").ToString) Then
+                        newWorkSheet.Range(COL_QUANTITY & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("QUANTITY").ToString())
+                    End If
+                    '◯ 小計
+                    If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
+                        newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_TANKA & lineUcnt.ToString & "*" & COL_COUNT & lineUcnt.ToString
+                    End If
+                    If Not String.IsNullOrEmpty(PrintDatarow("QUANTITY").ToString) Then
+                        newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_TANKA & lineUcnt.ToString & "*" & COL_QUANTITY & lineUcnt.ToString
+                    End If
+
+                    no += 1
+                    lineUcnt += 1
+
+                Next
+
+                '合計行
+                'TEMPシートからフォーマット（行）をコピー
+                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A14:K14")
+                destRange = newWorkSheet.Range("A" & lineUcnt.ToString())
+                srcRange.Copy(destRange)
+
+                If PrintData.Rows.Count > 0 Then
+                    '◯ 回数・台数
+                    'newWorkSheet.Range(COL_COUNT & lineUcnt.ToString).Formula = "=SUM(" & COL_COUNT & stLine.ToString & ":" & COL_COUNT & (lineUcnt - 1).ToString & ")"
+                    '◯ 数量
+                    newWorkSheet.Range(COL_QUANTITY & lineUcnt.ToString).Formula = "=SUM(" & COL_QUANTITY & stLine.ToString & ":" & COL_QUANTITY & (lineUcnt - 1).ToString & ")"
+                    '◯ 小計
+                    newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL & stLine.ToString & ":" & COL_TOTAL & (lineUcnt - 1).ToString & ")"
+                End If
+
+                newWorkSheet.Range("A:A").Hidden = hiddenA
+                newWorkSheet.Range("B:B").Hidden = hiddenB
+                newWorkSheet.Range("C:C").Hidden = hiddenC
+                newWorkSheet.Range("D:D").Hidden = hiddenD
+                newWorkSheet.Range("E:E").Hidden = hiddenE
+
+                no = 1
+                lineUcnt = stLine
+            Next
+
+            WW_Workbook.Worksheets(Me.WW_SheetNoSprate).Delete()
+
+        Catch ex As Exception
+            CS0011LOGWrite.INFSUBCLASS = Me.GetType.Name                'SUBクラス名
+            CS0011LOGWrite.INFPOSI = "EditEtcArea"
+            CS0011LOGWrite.NIWEA = C_MESSAGE_TYPE.ABORT
+            CS0011LOGWrite.TEXT = ex.ToString()
+            CS0011LOGWrite.MESSAGENO = C_MESSAGE_NO.FILE_IO_ERROR
+            CS0011LOGWrite.CS0011LOGWrite()                             'ログ出力
+            Throw
+        Finally
+        End Try
+    End Sub
+
+#Region "運賃明細編集"
+    ''' <summary>
     ''' 運賃明細集計（ＥＮＥＯＳ）
     ''' </summary>
     Public Sub SumUnchinENEOS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
@@ -492,6 +643,141 @@ Public Class LNT0001InvoiceOutputCOM
 
     End Sub
 
+    ''' <summary>
+    ''' 運賃明細集計（東北天然ガス）
+    ''' </summary>
+    Public Sub SumUnchinTNG(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "SHUKABASHO,TODOKECODE"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        SHUKABASHO = row.Field(Of String)("SHUKABASHO"),
+                        SHUKANAME = row.Field(Of String)("SHUKANAME"),
+                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
+                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
+                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM"),
+                        TANKA = row.Field(Of String)("TANKA")
+                        Into Group
+                    Select New With {
+                        .SHUKABASHO = SHUKABASHO,
+                        .SHUKANAME = SHUKANAME,
+                        .TODOKECODE = TODOKECODE,
+                        .TODOKENAME = TODOKENAME,
+                        .GYOMUTANKNUM = GYOMUTANKNUM,
+                        .TANKA = TANKA,
+                        .COUNT = Group.Count(),
+                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
+                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
+                        }
+
+        Dim prtRow As DataRow
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("SHUKABASHO") = dtRow.SHUKABASHO
+            prtRow("SHUKANAME") = dtRow.SHUKANAME
+            prtRow("TODOKECODE") = dtRow.TODOKECODE
+            prtRow("TODOKENAME") = dtRow.TODOKENAME
+            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
+            prtRow("TANKA") = dtRow.TANKA
+            prtRow("COUNT") = dtRow.COUNT
+            prtRow("ZISSEKI") = dtRow.ZISSEKI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 運賃明細集計（東北電力）
+    ''' </summary>
+    Public Sub SumUnchinTOHOKU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "SHUKABASHO,TODOKECODE"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        SHUKABASHO = row.Field(Of String)("SHUKABASHO"),
+                        SHUKANAME = row.Field(Of String)("SHUKANAME"),
+                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
+                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
+                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM"),
+                        TANKA = row.Field(Of String)("TANKA")
+                        Into Group
+                    Select New With {
+                        .SHUKABASHO = SHUKABASHO,
+                        .SHUKANAME = SHUKANAME,
+                        .TODOKECODE = TODOKECODE,
+                        .TODOKENAME = TODOKENAME,
+                        .GYOMUTANKNUM = GYOMUTANKNUM,
+                        .TANKA = TANKA,
+                        .COUNT = Group.Count(),
+                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
+                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
+                        }
+
+        Dim prtRow As DataRow
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("SHUKABASHO") = dtRow.SHUKABASHO
+            prtRow("SHUKANAME") = dtRow.SHUKANAME
+            prtRow("TODOKECODE") = dtRow.TODOKECODE
+            prtRow("TODOKENAME") = dtRow.TODOKENAME
+            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
+            prtRow("TANKA") = dtRow.TANKA
+            prtRow("COUNT") = dtRow.COUNT
+            prtRow("ZISSEKI") = dtRow.ZISSEKI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 運賃明細集計（西部ガス（エスジーリキッドサービス））
+    ''' </summary>
+    Public Sub SumUnchinSAIBU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "TODOKECODE"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
+                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
+                        TANKA = row.Field(Of String)("TANKA")
+                        Into Group
+                    Select New With {
+                        .TODOKECODE = TODOKECODE,
+                        .TODOKENAME = TODOKENAME,
+                        .TANKA = TANKA,
+                        .COUNT = Group.Count(),
+                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
+                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
+                        }
+
+        Dim prtRow As DataRow
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("TODOKECODE") = dtRow.TODOKECODE
+            prtRow("TODOKENAME") = dtRow.TODOKENAME
+            prtRow("TANKA") = dtRow.TANKA
+            prtRow("COUNT") = dtRow.COUNT
+            prtRow("ZISSEKI") = dtRow.ZISSEKI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
     ''' <summary>
     ''' 運賃明細集計（エスケイ産業）
     ''' </summary>
@@ -627,45 +913,6 @@ Public Class LNT0001InvoiceOutputCOM
 
     End Sub
     ''' <summary>
-    ''' 運賃明細集計（西部ガス（エスジーリキッドサービス））
-    ''' </summary>
-    Public Sub SumUnchinSAIBU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "TODOKECODE"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
-                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
-                        TANKA = row.Field(Of String)("TANKA")
-                        Into Group
-                    Select New With {
-                        .TODOKECODE = TODOKECODE,
-                        .TODOKENAME = TODOKENAME,
-                        .TANKA = TANKA,
-                        .COUNT = Group.Count(),
-                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
-                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
-                        }
-
-        Dim prtRow As DataRow
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("TODOKECODE") = dtRow.TODOKECODE
-            prtRow("TODOKENAME") = dtRow.TODOKENAME
-            prtRow("TANKA") = dtRow.TANKA
-            prtRow("COUNT") = dtRow.COUNT
-            prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
     ''' 運賃明細集計（ＤＡＩＧＡＳ）
     ''' </summary>
     Public Sub SumUnchinDAIGAS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
@@ -699,136 +946,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TODOKECODE") = dtRow.TODOKECODE
             prtRow("TODOKENAME") = dtRow.TODOKENAME
             prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("TANKA") = dtRow.TANKA
-            prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 運賃明細集計（シーエナジー／エルネス）
-    ''' </summary>
-    Public Sub SumUnchinCENERGY(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "GYOMUTANKNUM"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM")
-                        Into Group
-                    Select New With {
-                        .GYOMUTANKNUM = GYOMUTANKNUM,
-                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
-                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI"))),
-                        .TSUKORYO = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("TSUKORYO")))
-                        }
-
-        Dim prtRow As DataRow
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
-            prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
-            prtRow("TSUKORYO") = Rounding(dtRow.TSUKORYO * 0.55 / 1.1, 0, CONST_ROUND)
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 運賃明細集計（東北天然ガス）
-    ''' </summary>
-    Public Sub SumUnchinTNG(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SHUKABASHO,TODOKECODE"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        SHUKABASHO = row.Field(Of String)("SHUKABASHO"),
-                        SHUKANAME = row.Field(Of String)("SHUKANAME"),
-                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
-                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
-                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM"),
-                        TANKA = row.Field(Of String)("TANKA")
-                        Into Group
-                    Select New With {
-                        .SHUKABASHO = SHUKABASHO,
-                        .SHUKANAME = SHUKANAME,
-                        .TODOKECODE = TODOKECODE,
-                        .TODOKENAME = TODOKENAME,
-                        .GYOMUTANKNUM = GYOMUTANKNUM,
-                        .TANKA = TANKA,
-                        .COUNT = Group.Count(),
-                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
-                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
-                        }
-
-        Dim prtRow As DataRow
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("SHUKABASHO") = dtRow.SHUKABASHO
-            prtRow("SHUKANAME") = dtRow.SHUKANAME
-            prtRow("TODOKECODE") = dtRow.TODOKECODE
-            prtRow("TODOKENAME") = dtRow.TODOKENAME
-            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
-            prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
-            prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 運賃明細集計（東北電力）
-    ''' </summary>
-    Public Sub SumUnchinTOHOKU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "SHUKABASHO,TODOKECODE"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        SHUKABASHO = row.Field(Of String)("SHUKABASHO"),
-                        SHUKANAME = row.Field(Of String)("SHUKANAME"),
-                        TODOKECODE = row.Field(Of String)("TODOKECODE"),
-                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
-                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM"),
-                        TANKA = row.Field(Of String)("TANKA")
-                        Into Group
-                    Select New With {
-                        .SHUKABASHO = SHUKABASHO,
-                        .SHUKANAME = SHUKANAME,
-                        .TODOKECODE = TODOKECODE,
-                        .TODOKENAME = TODOKENAME,
-                        .GYOMUTANKNUM = GYOMUTANKNUM,
-                        .TANKA = TANKA,
-                        .COUNT = Group.Count(),
-                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
-                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
-                        }
-
-        Dim prtRow As DataRow
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("SHUKABASHO") = dtRow.SHUKABASHO
-            prtRow("SHUKANAME") = dtRow.SHUKANAME
-            prtRow("TODOKECODE") = dtRow.TODOKECODE
-            prtRow("TODOKENAME") = dtRow.TODOKENAME
-            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
             prtRow("TANKA") = dtRow.TANKA
-            prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
@@ -881,244 +1000,47 @@ Public Class LNT0001InvoiceOutputCOM
 
     End Sub
     ''' <summary>
+    ''' 運賃明細集計（シーエナジー／エルネス）
+    ''' </summary>
+    Public Sub SumUnchinCENERGY(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GYOMUTANKNUM"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM")
+                        Into Group
+                    Select New With {
+                        .GYOMUTANKNUM = GYOMUTANKNUM,
+                        .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
+                        .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI"))),
+                        .TSUKORYO = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("TSUKORYO")))
+                        }
+
+        Dim prtRow As DataRow
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
+            prtRow("ZISSEKI") = dtRow.ZISSEKI
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("TSUKORYO") = Rounding(dtRow.TSUKORYO * 0.55 / 1.1, 0, CONST_ROUND)
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+
+#End Region
+
+#Region "固定費"
+
+    ''' <summary>
     ''' 固定費明細集計（ＥＮＥＯＳ）
     ''' </summary>
     Public Sub SumFixedENEOS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        SYABARA = row.Field(Of String)("SYABARA"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
-                        COMMENT = row.Field(Of String)("BIKOU3")
-                    Into Group
-                    Select New With {
-                        .ORGNAME = ORGNAME,
-                        .SYAGATANAME = SYAGATANAME,
-                        .SYABARA = SYABARA,
-                        .SYABAN = SYABAN,
-                        .RIKUBAN = RIKUBAN,
-                        .COMMENT = COMMENT,
-                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
-                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
-                    }
-
-        Dim prtRow As DataRow
-
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
-            prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("SYABAN") = dtRow.SYABAN
-            prtRow("RIKUBAN") = dtRow.RIKUBAN
-            prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
-            prtRow("COMMENT") = dtRow.COMMENT
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 固定費明細集計（石油資源開発（本州分））
-    ''' </summary>
-    Public Sub SumFixedSEKIYUSHIGEN(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        SYABARA = row.Field(Of String)("SYABARA"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
-                        COMMENT = row.Field(Of String)("BIKOU3")
-                    Into Group
-                    Select New With {
-                        .ORGNAME = ORGNAME,
-                        .SYAGATANAME = SYAGATANAME,
-                        .SYABARA = SYABARA,
-                        .SYABAN = SYABAN,
-                        .RIKUBAN = RIKUBAN,
-                        .COMMENT = COMMENT,
-                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
-                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
-                    }
-
-        Dim prtRow As DataRow
-
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
-            prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("SYABAN") = dtRow.SYABAN
-            prtRow("RIKUBAN") = dtRow.RIKUBAN
-            prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
-            prtRow("COMMENT") = dtRow.COMMENT
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 固定費明細集計（石油資源開発（北海道））
-    ''' </summary>
-    Public Sub SumFixedSEKIYUSHIGENHokkaido(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        SYABARA = row.Field(Of String)("SYABARA"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
-                        COMMENT = row.Field(Of String)("BIKOU3")
-                    Into Group
-                    Select New With {
-                        .ORGNAME = ORGNAME,
-                        .SYAGATANAME = SYAGATANAME,
-                        .SYABARA = SYABARA,
-                        .SYABAN = SYABAN,
-                        .RIKUBAN = RIKUBAN,
-                        .COMMENT = COMMENT,
-                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
-                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
-                    }
-
-        Dim prtRow As DataRow
-
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
-            prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("SYABAN") = dtRow.SYABAN
-            prtRow("RIKUBAN") = dtRow.RIKUBAN
-            prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
-            prtRow("COMMENT") = dtRow.COMMENT
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 固定費明細集計（西部ガス（エスジーリキッドサービス））
-    ''' </summary>
-    Public Sub SumFixedSAIBU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        SYABARA = row.Field(Of String)("SYABARA"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
-                        COMMENT = row.Field(Of String)("BIKOU3")
-                    Into Group
-                    Select New With {
-                        .ORGNAME = ORGNAME,
-                        .SYAGATANAME = SYAGATANAME,
-                        .SYABARA = SYABARA,
-                        .SYABAN = SYABAN,
-                        .RIKUBAN = RIKUBAN,
-                        .COMMENT = COMMENT,
-                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
-                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
-                    }
-
-        Dim prtRow As DataRow
-
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
-            prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("SYABAN") = dtRow.SYABAN
-            prtRow("RIKUBAN") = dtRow.RIKUBAN
-            prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
-            prtRow("COMMENT") = dtRow.COMMENT
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 固定費明細集計（ＤＡＩＧＡＳ）
-    ''' </summary>
-    Public Sub SumFixedDAIGAS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
-
-        oTbl.Clear()
-
-        Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
-        iTbl = view.ToTable
-
-        Dim query = From row In iTbl.AsEnumerable()
-                    Group row By
-                        ORGNAME = row.Field(Of String)("ORGNAME"),
-                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
-                        SYABARA = row.Field(Of String)("SYABARA"),
-                        SYABAN = row.Field(Of String)("SYABAN"),
-                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
-                        COMMENT = row.Field(Of String)("BIKOU3")
-                    Into Group
-                    Select New With {
-                        .ORGNAME = ORGNAME,
-                        .SYAGATANAME = SYAGATANAME,
-                        .SYABARA = SYABARA,
-                        .SYABAN = SYABAN,
-                        .RIKUBAN = RIKUBAN,
-                        .COMMENT = COMMENT,
-                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
-                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
-                    }
-
-        Dim prtRow As DataRow
-
-        For Each dtRow In query
-            prtRow = oTbl.NewRow
-            prtRow("ORGNAME") = dtRow.ORGNAME
-            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
-            prtRow("SYABARA") = dtRow.SYABARA
-            prtRow("SYABAN") = dtRow.SYABAN
-            prtRow("RIKUBAN") = dtRow.RIKUBAN
-            prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
-            prtRow("COMMENT") = dtRow.COMMENT
-            oTbl.Rows.Add(prtRow)
-        Next
-
-    End Sub
-    ''' <summary>
-    ''' 固定費明細集計（シーエナジー／エルネス）
-    ''' </summary>
-    Public Sub SumFixedCENERGY(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
 
         oTbl.Clear()
 
@@ -1257,6 +1179,241 @@ Public Class LNT0001InvoiceOutputCOM
 
     End Sub
     ''' <summary>
+    ''' 固定費明細集計（西部ガス（エスジーリキッドサービス））
+    ''' </summary>
+    Public Sub SumFixedSAIBU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 固定費明細集計（エスケイ産業）
+    ''' </summary>
+    Public Sub SumFixedESUKEI(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 固定費明細集計（石油資源開発（本州分））
+    ''' </summary>
+    Public Sub SumFixedSEKIYUSHIGEN(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 固定費明細集計（石油資源開発（北海道））
+    ''' </summary>
+    Public Sub SumFixedSEKIYUSHIGENHokkaido(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' 固定費明細集計（ＤＡＩＧＡＳ）
+    ''' </summary>
+    Public Sub SumFixedDAIGAS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
     ''' 固定費明細集計（北海道ＬＮＧ）
     ''' </summary>
     Public Sub SumFixedHOKKAIDOLNG(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
@@ -1303,6 +1460,412 @@ Public Class LNT0001InvoiceOutputCOM
         Next
 
     End Sub
+    ''' <summary>
+    ''' 固定費明細集計（シーエナジー／エルネス）
+    ''' </summary>
+    Public Sub SumFixedCENERGY(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "ORGCODE,SYAGATA,SYABAN,RIKUBAN,SYABARA"
+        iTbl = view.ToTable
+
+        Dim query = From row In iTbl.AsEnumerable()
+                    Group row By
+                        ORGNAME = row.Field(Of String)("ORGNAME"),
+                        SYAGATANAME = row.Field(Of String)("SYAGATANAME"),
+                        SYABARA = row.Field(Of String)("SYABARA"),
+                        SYABAN = row.Field(Of String)("SYABAN"),
+                        RIKUBAN = row.Field(Of String)("RIKUBAN"),
+                        COMMENT = row.Field(Of String)("BIKOU3")
+                    Into Group
+                    Select New With {
+                        .ORGNAME = ORGNAME,
+                        .SYAGATANAME = SYAGATANAME,
+                        .SYABARA = SYABARA,
+                        .SYABAN = SYABAN,
+                        .RIKUBAN = RIKUBAN,
+                        .COMMENT = COMMENT,
+                        .KOTEIHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KOTEIHIM"))),
+                        .CHOSEI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("GENGAKU")))
+                    }
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In query
+            prtRow = oTbl.NewRow
+            prtRow("ORGNAME") = dtRow.ORGNAME
+            prtRow("SYAGATANAME") = dtRow.SYAGATANAME
+            prtRow("SYABARA") = dtRow.SYABARA
+            prtRow("SYABAN") = dtRow.SYABAN
+            prtRow("RIKUBAN") = dtRow.RIKUBAN
+            prtRow("KOTEIHI") = dtRow.KOTEIHI
+            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("COMMENT") = dtRow.COMMENT
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+#End Region
+
+#Region "その他"
+
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（ＥＮＥＯＳ）
+    ''' </summary>
+    Public Sub SumEtcENEOS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（東北天然ガス）
+    ''' </summary>
+    Public Sub SumEtcTNG(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（東北電力）
+    ''' </summary>
+    Public Sub SumEtcTOHOKU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（西部ガス（エスケイリキッドサービス）
+    ''' </summary>
+    Public Sub SumEtcSAIBU(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（エスケイ産業）
+    ''' </summary>
+    Public Sub SumEtcESUKEI(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（石油資源開発（本州））
+    ''' </summary>
+    Public Sub SumEtcSEKIYUSHIGEN(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（石油資源開発（北海道））
+    ''' </summary>
+    Public Sub SumEtcSEKIYUSHIGENHokkaido(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（ＤＡＩＧＡＳ）
+    ''' </summary>
+    Public Sub SumEtcDAIGAS(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（北海道ＬＮＧ）
+    ''' </summary>
+    Public Sub SumEtcHOKKAIDOLNG(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+    ''' <summary>
+    ''' その他請求（特別料金）明細集計（シーエナジー／エルネス）
+    ''' </summary>
+    Public Sub SumEtcCENERGY(ByRef iTbl As DataTable, ByRef oTbl As DataTable)
+
+        oTbl.Clear()
+
+        Dim view As DataView = iTbl.DefaultView
+        view.Sort = "GROUPCODE,BIGCATECODE,BIGCATENAME,MIDCATECODE"
+        iTbl = view.ToTable
+
+        Dim prtRow As DataRow
+
+        For Each dtRow In iTbl.Rows
+            prtRow = oTbl.NewRow
+            prtRow("GROUPCODE") = dtRow("GROUPCODE")
+            prtRow("BIGCATENAME") = dtRow("BIGCATENAME")
+            prtRow("MIDCATENAME") = dtRow("MIDCATENAME")
+            prtRow("SMALLCATENAME") = dtRow("SMALLCATENAME")
+            prtRow("CALCUNIT") = dtRow("CALCUNIT")
+            prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
+            prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
+            prtRow("TANKA") = dtRow("TANKA")
+            If dtRow("CALCUNIT") = "トン単価" Then
+                prtRow("QUANTITY") = dtRow("QUANTITY")
+                prtRow("COUNT") = ""
+            Else
+                prtRow("QUANTITY") = ""
+                prtRow("COUNT") = dtRow("QUANTITY")
+            End If
+
+            oTbl.Rows.Add(prtRow)
+        Next
+
+    End Sub
+#End Region
+
+    ''' <summary>
+    ''' 端数処理
+    ''' </summary>
     Public Function Rounding(ByVal iNum As Double, ByVal iLength As Integer, ByVal iRoundMethod As Integer) As Decimal
         Dim rtnNum As Decimal = 0
         Select Case iRoundMethod
@@ -1353,7 +1916,7 @@ Public Class LNT0001InvoiceOutputCOM
 
     End Sub
     ''' <summary>
-    ''' 帳票の運賃明細設定
+    ''' 帳票の固定費明細設定
     ''' </summary>
     Public Sub CreKoteiTable(ByRef oTbl As DataTable)
         If IsNothing(oTbl) Then
@@ -1377,6 +1940,34 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Columns.Add("CHOSEI", Type.GetType("System.String"))          '調整額
         'oTbl.Columns.Add("TOTAL", Type.GetType("System.String"))           '小計
         oTbl.Columns.Add("COMMENT", Type.GetType("System.String"))         '調整事由
+
+    End Sub
+    ''' <summary>
+    ''' 帳票のその他請求（特別料金）明細設定
+    ''' </summary>
+    Public Sub CreEtcTable(ByRef oTbl As DataTable)
+        If IsNothing(oTbl) Then
+            oTbl = New DataTable
+        End If
+
+        If oTbl.Columns.Count <> 0 Then
+            oTbl.Columns.Clear()
+        End If
+
+        oTbl.Clear()
+        oTbl.Columns.Add("GROUPCODE", Type.GetType("System.String"))       '合算
+        oTbl.Columns.Add("BIGCATECODE", Type.GetType("System.String"))     '大分類コード
+        oTbl.Columns.Add("BIGCATENAME", Type.GetType("System.String"))     '大分類名
+        oTbl.Columns.Add("MIDCATECODE", Type.GetType("System.String"))     '中分類コード
+        oTbl.Columns.Add("MIDCATENAME", Type.GetType("System.String"))     '中分類名
+        oTbl.Columns.Add("SMALLCATECODE", Type.GetType("System.String"))   '小分類コード
+        oTbl.Columns.Add("SMALLCATENAME", Type.GetType("System.String"))   '小分類名
+        oTbl.Columns.Add("CALCUNIT", Type.GetType("System.String"))        '計算単位
+        oTbl.Columns.Add("DISPLAYFLG", Type.GetType("System.String"))      '表示フラグ
+        oTbl.Columns.Add("ASSESSMENTFLG", Type.GetType("System.String"))   '鑑分けフラグ
+        oTbl.Columns.Add("TANKA", Type.GetType("System.String"))           '単価
+        oTbl.Columns.Add("COUNT", Type.GetType("System.String"))           '回数・台数
+        oTbl.Columns.Add("QUANTITY", Type.GetType("System.String"))        '数量
 
     End Sub
 
