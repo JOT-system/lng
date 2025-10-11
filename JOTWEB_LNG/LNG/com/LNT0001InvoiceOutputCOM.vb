@@ -615,6 +615,7 @@ Public Class LNT0001InvoiceOutputCOM
 
         Dim view As DataView = iTbl.DefaultView
         view.Sort = "TODOKECODE"
+        iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
@@ -786,6 +787,7 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
         Dim view As DataView = iTbl.DefaultView
         view.Sort = "TODOKECODE"
+        iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
                     Group row By
@@ -824,7 +826,7 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Clear()
 
         Dim view As DataView = iTbl.DefaultView
-        view.Sort = "ORDERORGCODE,SHUKABASHO,TODOKECODE"
+        view.Sort = "ORDERORGCODE,SHUKABASHO,TODOKECODE,GYOMUTANKNUM"
         iTbl = view.ToTable
 
         Dim query = From row In iTbl.AsEnumerable()
@@ -834,8 +836,9 @@ Public Class LNT0001InvoiceOutputCOM
                         SHUKABASHO = row.Field(Of String)("SHUKABASHO"),
                         SHUKANAME = row.Field(Of String)("SHUKANAME"),
                         TODOKECODE = row.Field(Of String)("TODOKECODE"),
-                        TODOKENAME = row.Field(Of String)("TODOKENAME")
-                    Into Group
+                        TODOKENAME = row.Field(Of String)("TODOKENAME"),
+                        GYOMUTANKNUM = row.Field(Of String)("GYOMUTANKNUM")
+                        Into Group
                     Select New With {
                         .ORDERORGCODE = ORDERORGCODE,
                         .ORDERORGNAME = ORDERORGNAME,
@@ -843,6 +846,7 @@ Public Class LNT0001InvoiceOutputCOM
                         .SHUKANAME = SHUKANAME,
                         .TODOKECODE = TODOKECODE,
                         .TODOKENAME = TODOKENAME,
+                        .GYOMUTANKNUM = GYOMUTANKNUM,
                         .COUNT = Group.Count(),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
@@ -857,9 +861,10 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SHUKANAME") = dtRow.SHUKANAME
             prtRow("TODOKECODE") = dtRow.TODOKECODE
             prtRow("TODOKENAME") = dtRow.TODOKENAME
+            prtRow("GYOMUTANKNUM") = dtRow.GYOMUTANKNUM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
             oTbl.Rows.Add(prtRow)
         Next
     End Sub
@@ -1078,7 +1083,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1125,7 +1130,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1172,7 +1177,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1219,7 +1224,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1266,7 +1271,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1313,7 +1318,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1360,7 +1365,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1407,7 +1412,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1454,7 +1459,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next
@@ -1501,7 +1506,7 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("SYABAN") = dtRow.SYABAN
             prtRow("RIKUBAN") = dtRow.RIKUBAN
             prtRow("KOTEIHI") = dtRow.KOTEIHI
-            prtRow("CHOSEI") = dtRow.CHOSEI * -1
+            prtRow("CHOSEI") = dtRow.CHOSEI
             prtRow("COMMENT") = dtRow.COMMENT
             oTbl.Rows.Add(prtRow)
         Next

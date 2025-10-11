@@ -1584,94 +1584,156 @@ Public Class LNT0002TranStatusList
             Exit Sub
         End If
 
-
         '------------------------------
         '帳票出力準備処理
         '------------------------------
-        Dim LNT0001InvoiceOutputCOM As New LNT0001InvoiceOutputCOM(Master.MAPID, Me.WF_COMEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, taishoYm:=Me.WF_TaishoYm.Value)
-
-        '運賃明細（共通化）出力TBL
-        Dim PrintUnchin = New DataTable
-        LNT0001InvoiceOutputCOM.CreUnchinTable(PrintUnchin)
-
-        '固定費明細（共通化）出力TBL
-        Dim PrintKotei = New DataTable
-        LNT0001InvoiceOutputCOM.CreKoteiTable(PrintKotei)
-
-        'その他請求（特別料金）（共通化）出力TBL
-        Dim PrintEtc = New DataTable
-        LNT0001InvoiceOutputCOM.CreEtcTable(PrintEtc)
-        '------------------------------
-        '集計処理
-        '------------------------------
-        Select Case WF_TORIORG.SelectedItem.Text
-            Case BaseDllConst.CONST_TORICODE_0005700000     'ENEOS（八戸、水島）
-                LNT0001InvoiceOutputCOM.SumUnchinENEOS(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedENEOS(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcENEOS(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0175300000     '東北天然ガス
-                LNT0001InvoiceOutputCOM.SumUnchinTNG(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedTNG(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcTNG(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0175400000     '東北電力
-                LNT0001InvoiceOutputCOM.SumUnchinTOHOKU(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedTOHOKU(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcTOHOKU(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0045300000     'エスジーリキッドサービス（西部ガス）
-                LNT0001InvoiceOutputCOM.SumUnchinSAIBU(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedSAIBU(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcSAIBU(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0045200000     'エスケイ産業
-                LNT0001InvoiceOutputCOM.SumUnchinESUKEI(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedESUKEI(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcESUKEI(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0132800000     '石油資源開発
-                If WF_TORIORG.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
-                    '(本州分)新潟・庄内・東北・茨城
-                    LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGEN(LNT0001tbl, PrintUnchin)
-                    LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGEN(LNT0001Koteihi, PrintKotei)
-                    LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGEN(LNT0001TogouSprate, PrintEtc)
-                End If
-                If WF_TORIORG.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
-                    '(北海道)石狩
-                    LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGENHokkaido(LNT0001tbl, PrintUnchin)
-                    LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGENHokkaido(LNT0001Koteihi, PrintKotei)
-                    LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGENHokkaido(LNT0001TogouSprate, PrintEtc)
-                End If
-            Case BaseDllConst.CONST_TORICODE_0051200000     'OG（西日本、姫路）
-                LNT0001InvoiceOutputCOM.SumUnchinDAIGAS(LNT0001tbl, PrintUnchin)
-                If Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "02" AndAlso
-                   Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "03" Then
-                    '★[Daigas泉北、姫路]選択時
-                    LNT0001InvoiceOutputCOM.SumFixedDAIGAS(LNT0001Koteihi, PrintKotei)
-                    LNT0001InvoiceOutputCOM.SumEtcDAIGAS(LNT0001TogouSprate, PrintEtc)
-                End If
-            Case BaseDllConst.CONST_TORICODE_0239900000     '北海道ＬＮＧ
-                LNT0001InvoiceOutputCOM.SumUnchinHOKKAIDOLNG(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedHOKKAIDOLNG(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcHOKKAIDOLNG(LNT0001TogouSprate, PrintEtc)
-            Case BaseDllConst.CONST_TORICODE_0110600000     'シーエナジー・エルネス
-                LNT0001InvoiceOutputCOM.SumUnchinCENERGY(LNT0001tbl, PrintUnchin)
-                LNT0001InvoiceOutputCOM.SumFixedCENERGY(LNT0001Koteihi, PrintKotei)
-                LNT0001InvoiceOutputCOM.SumEtcCENERGY(LNT0001TogouSprate, PrintEtc)
-        End Select
-
-        '----------------------------------------
-        '帳票出力処理
-        '----------------------------------------
-        Dim PrintUrl As String
         Try
+            Dim LNT0001InvoiceOutputCOM As New LNT0001InvoiceOutputCOM(Master.MAPID, Me.WF_COMEXL.SelectedItem.Text, Me.WF_FILENAME.SelectedItem.Text, taishoYm:=Me.WF_TaishoYm.Value)
+
+            '運賃明細（共通化）出力TBL
+            Dim PrintUnchin = New DataTable
+            LNT0001InvoiceOutputCOM.CreUnchinTable(PrintUnchin)
+
+            '固定費明細（共通化）出力TBL
+            Dim PrintKotei = New DataTable
+            LNT0001InvoiceOutputCOM.CreKoteiTable(PrintKotei)
+
+            'その他請求（特別料金）（共通化）出力TBL
+            Dim PrintEtc = New DataTable
+            LNT0001InvoiceOutputCOM.CreEtcTable(PrintEtc)
+            '------------------------------
+            '集計処理
+            '------------------------------
+            Select Case WF_TORIORG.SelectedItem.Text
+                Case BaseDllConst.CONST_TORICODE_0005700000
+                    '------------------------------
+                    'ENEOS（八戸、水島）
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinENEOS(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedENEOS(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcENEOS(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0175300000
+                    '------------------------------
+                    '東北天然ガス
+                    '------------------------------
+                    '相互融通情報データ取得
+                    LNT0001Koteihi.Merge(GetTuikaData(WF_TORIORG.SelectedItem.Text))
+
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinTNG(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedTNG(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcTNG(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0175400000
+                    '------------------------------
+                    '東北電力
+                    '------------------------------
+                    '相互融通情報データ取得
+                    LNT0001Koteihi.Merge(GetTuikaData(WF_TORIORG.SelectedItem.Text))
+
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinTOHOKU(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedTOHOKU(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcTOHOKU(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0045300000
+                    '------------------------------
+                    'エスジーリキッドサービス（西部ガス）
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinSAIBU(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedSAIBU(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcSAIBU(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0045200000
+                    '------------------------------
+                    'エスケイ産業
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinESUKEI(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedESUKEI(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcESUKEI(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0132800000
+                    '------------------------------
+                    '石油資源開発
+                    '------------------------------
+                    If WF_TORIORG.SelectedValue <> BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                        '◆(本州分)新潟・庄内・東北・茨城
+                        '輸送費出力編集
+                        LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGEN(LNT0001tbl, PrintUnchin)
+                        '固定費出力編集
+                        LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGEN(LNT0001Koteihi, PrintKotei)
+                        'その他請求（特殊料金）出力編集
+                        LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGEN(LNT0001TogouSprate, PrintEtc)
+                    End If
+                    If WF_TORIORG.SelectedValue = BaseDllConst.CONST_ORDERORGCODE_020104 Then
+                        '◆(北海道)石狩
+                        '輸送費出力編集
+                        LNT0001InvoiceOutputCOM.SumUnchinSEKIYUSHIGENHokkaido(LNT0001tbl, PrintUnchin)
+                        '固定費出力編集
+                        LNT0001InvoiceOutputCOM.SumFixedSEKIYUSHIGENHokkaido(LNT0001Koteihi, PrintKotei)
+                        'その他請求（特殊料金）出力編集
+                        LNT0001InvoiceOutputCOM.SumEtcSEKIYUSHIGENHokkaido(LNT0001TogouSprate, PrintEtc)
+                    End If
+                Case BaseDllConst.CONST_TORICODE_0051200000
+                    '------------------------------
+                    'OG（西日本、姫路）
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinDAIGAS(LNT0001tbl, PrintUnchin)
+                    If Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "02" AndAlso
+                       Me.WF_TORI.SelectedValue <> CONST_ORDERORGCODE_022702 + "03" Then
+                        '★[Daigas泉北、姫路]選択時
+                        '固定費出力編集
+                        LNT0001InvoiceOutputCOM.SumFixedDAIGAS(LNT0001Koteihi, PrintKotei)
+                        'その他請求（特殊料金）出力編集
+                        LNT0001InvoiceOutputCOM.SumEtcDAIGAS(LNT0001TogouSprate, PrintEtc)
+                    End If
+                Case BaseDllConst.CONST_TORICODE_0239900000
+                    '------------------------------
+                    '北海道ＬＮＧ
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinHOKKAIDOLNG(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedHOKKAIDOLNG(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcHOKKAIDOLNG(LNT0001TogouSprate, PrintEtc)
+                Case BaseDllConst.CONST_TORICODE_0110600000
+                    '------------------------------
+                    'シーエナジー・エルネス
+                    '------------------------------
+                    '輸送費出力編集
+                    LNT0001InvoiceOutputCOM.SumUnchinCENERGY(LNT0001tbl, PrintUnchin)
+                    '固定費出力編集
+                    LNT0001InvoiceOutputCOM.SumFixedCENERGY(LNT0001Koteihi, PrintKotei)
+                    'その他請求（特殊料金）出力編集
+                    LNT0001InvoiceOutputCOM.SumEtcCENERGY(LNT0001TogouSprate, PrintEtc)
+            End Select
+
+            '----------------------------------------
+            '帳票出力処理
+            '----------------------------------------
+            Dim PrintUrl As String
             PrintUrl = LNT0001InvoiceOutputCOM.CreateExcelPrintData(PrintUnchin, PrintKotei, PrintEtc)
+
+            '○ 別画面でExcelを表示
+            WF_PrintURL.Value = PrintUrl
+            ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
+
         Catch ex As Exception
             Master.Output(C_MESSAGE_NO.SYSTEM_ADM_ERROR, C_MESSAGE_TYPE.ERR, needsPopUp:=True, I_PARA01:="異常終了")
             WW_ErrSW = C_MESSAGE_NO.SYSTEM_ADM_ERROR
             Exit Sub
         End Try
-
-        '○ 別画面でExcelを表示
-        WF_PrintURL.Value = PrintUrl
-        ClientScript.RegisterStartupScript(Me.GetType(), "key", "f_ExcelPrint();", True)
-
 
     End Sub
 
@@ -2578,6 +2640,103 @@ Public Class LNT0002TranStatusList
 
     End Sub
 
+
+    ''' <summary>
+    ''' 相互融通（東北電力、東北天然ガス情報データ取得）
+    ''' </summary>
+    Private Function GetTuikaData(ByVal iTORICODE As String) As DataTable
+
+        Dim dt As New DataTable
+
+        Dim SQLStr As String = ""
+        SQLStr &= " Select                                                                          "
+        SQLStr &= "      coalesce(LNM7.TORICODE, '')                           AS TORICODE			"
+        SQLStr &= "     ,coalesce(LNM7.TORINAME, '')                           AS TORINAME			"
+        SQLStr &= "     ,coalesce(LNM7.ORGCODE, '')                            AS ORGCODE		    "
+        SQLStr &= "     ,coalesce(LNM7.ORGNAME, '')                            AS ORGNAME		    "
+        SQLStr &= "     ,coalesce(LNM7.KASANORGCODE, '')                       AS KASANORGCODE		"
+        SQLStr &= "     ,coalesce(LNM7.KASANORGNAME, '')                       AS KASANORGNAME		"
+        SQLStr &= "     ,coalesce(LNM7.TARGETYM, '')                           AS TARGETYM			"
+        SQLStr &= "     ,coalesce(LNM7.SYABAN, '')                             AS SYABAN			"
+        SQLStr &= "     ,coalesce(LNM7.RIKUBAN, '')                            AS RIKUBAN			"
+        SQLStr &= "     ,coalesce(LNM7.SYAGATA, '')                            AS SYAGATA			"
+        SQLStr &= "     ,coalesce(LNM7.SYAGATANAME, '')                        AS SYAGATANAME		"
+        SQLStr &= "     ,coalesce(LNM7.SYABARA, '')                            AS SYABARA		    "
+        SQLStr &= "     ,coalesce(LNM7.SEASONKBN, '')                          AS SEASONKBN			"
+        SQLStr &= "     ,coalesce(LNM7.SEASONSTART, '')                        AS SEASONSTART		"
+        SQLStr &= "     ,coalesce(LNM7.SEASONEND, '')                          AS SEASONEND			"
+        '東北天然ガスの場合、回数×固定費（日額）
+        If iTORICODE = BaseDllConst.CONST_TORICODE_0175300000 Then
+            SQLStr &= "     ,'0'                                               AS KOTEIHIM	        "
+        End If
+        '東北電力の場合、回数×固定費（日額）
+        If iTORICODE = BaseDllConst.CONST_TORICODE_0175400000 Then
+            SQLStr &= "     ,CONVERT(IFNULL(A02.CNT,0) * IFNULL(LNM7.KOTEIHID,0),CHAR)  AS KOTEIHIM	"
+        End If
+        SQLStr &= "     ,coalesce(LNM7.KOTEIHID, '0')                          AS KOTEIHID			"
+        SQLStr &= "     ,coalesce(LNM7.KAISU, '0')                             AS KAISU		        "
+        '東北天然ガスの場合、回数×固定費（日額）
+        If iTORICODE = BaseDllConst.CONST_TORICODE_0175300000 Then
+            SQLStr &= "     ,CONVERT(IFNULL(A02.CNT,0) * IFNULL(LNM7.KOTEIHID,0) * -1,CHAR)  AS GENGAKU  "
+        End If
+        '東北電力の場合、そのまま
+        If iTORICODE = BaseDllConst.CONST_TORICODE_0175400000 Then
+            SQLStr &= "     ,coalesce(LNM7.GENGAKU, '0')                       AS GENGAKU			"
+        End If
+        SQLStr &= "     ,coalesce(LNM7.AMOUNT, '0')                            AS AMOUNT			"
+        SQLStr &= "     ,coalesce(LNM7.BIKOU1, '')                             AS BIKOU1			"
+        SQLStr &= "     ,coalesce(LNM7.BIKOU2, '')                             AS BIKOU2			"
+        SQLStr &= "     ,coalesce(LNM7.BIKOU3, '')                             AS BIKOU3		    "
+        SQLStr &= "     ,coalesce(LNM7.DELFLG, '')                             AS DELFLG		    "
+        SQLStr &= "     ,'10'                                                  AS TAXRATE           "
+        SQLStr &= " FROM LNG.LNM0007_FIXED  LNM7                                                    "
+        '-- LEFT JOIN
+        SQLStr &= " INNER JOIN("
+        SQLStr &= "     SELECT "
+        SQLStr &= "         GYOMUTANKNUM "
+        SQLStr &= "        ,COUNT(*) AS CNT "
+        SQLStr &= "     FROM LNG.LNT0001_ZISSEKI A01 "
+        SQLStr &= "    WHERE "
+        SQLStr &= String.Format("          A01.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format("      AND A01.TORICODE = '{0}' ", CONST_TORICODE_0175400000)
+        SQLStr &= String.Format("      AND A01.ORDERORG IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format("      AND A01.ZISSEKI <> '{0}' ", "0")
+        SQLStr &= String.Format("      AND A01.LOADUNLOTYPE <> '{0}' ", "積込")
+        SQLStr &= String.Format("      AND DATE_FORMAT(A01.TODOKEDATE,'%Y/%m') = '{0}' ", WF_TaishoYm.Value)
+        SQLStr &= "    GROUP BY "
+        SQLStr &= "         GYOMUTANKNUM "
+        SQLStr &= " )A02 "
+        SQLStr &= " ON A02.GYOMUTANKNUM = LNM7.SYABAN "
+        SQLStr &= " WHERE "
+        SQLStr &= String.Format("     LNM7.DELFLG <> '{0}' ", BaseDllConst.C_DELETE_FLG.DELETE)
+        SQLStr &= String.Format(" AND LNM7.TORICODE IN ({0}) ", CONST_TORICODE_0175300000)
+        SQLStr &= String.Format(" AND LNM7.ORGCODE IN ({0}) ", "'020402','021502'")
+        SQLStr &= String.Format(" AND LNM7.TARGETYM = '{0}' ", WF_TaishoYm.Value.Replace("/", ""))
+
+        '-- ORDER BY
+        SQLStr &= " ORDER BY LNM7.ORGCODE, LNM7.SYABAN"
+
+        Try
+            Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
+                SQLcon.Open()  ' DataBase接続
+                Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
+                    Using SQLdr As MySqlDataReader = SQLcmd.ExecuteReader()
+                        '○ フィールド名とフィールドの型を取得
+                        For index As Integer = 0 To SQLdr.FieldCount - 1
+                            dt.Columns.Add(SQLdr.GetName(index), SQLdr.GetFieldType(index))
+                        Next
+
+                        '○ テーブル検索結果をテーブル格納
+                        dt.Load(SQLdr)
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            Throw '呼び出し元の例外にスロー
+        End Try
+
+        Return dt
+    End Function
 
     ''' <summary>
     ''' 石油資源開発(届先(明細)セル値設定)
