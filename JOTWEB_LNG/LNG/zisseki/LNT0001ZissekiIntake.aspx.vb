@@ -1130,7 +1130,7 @@ Public Class LNT0001ZissekiIntake
                 Next
 
                 '更新された実績テーブルから輸送費テーブルの金額計算をし、更新
-                YusouhiUpdate(WF_TORIhdn.Value, WF_TaishoYm.ToString)
+                YusouhiUpdate(WF_TORIhdn.Value, WF_TaishoYm.Value)
                 If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
                     Exit Sub
                 End If
@@ -2757,7 +2757,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -2863,6 +2863,7 @@ Public Class LNT0001ZissekiIntake
             & "     TSUKORYO,                                                                                                           " _
             & "     KYUZITUTANKA,                                                                                                       " _
             & "     YUSOUHI,                                                                                                            " _
+            & "     CALCKBN,                                                                                                            " _
             & "     WORKINGDAY,                                                                                                         " _
             & "     PUBLICHOLIDAYNAME,                                                                                                  " _
             & "     DELFLG,                                                                                                             " _
@@ -2931,6 +2932,7 @@ Public Class LNT0001ZissekiIntake
             & "     NULL                          AS TSUKORYO,                                                                          " _
             & "     ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                                                                      " _
             & "     ZISSEKIMAIN.YUSOUHI           AS YUSOUHI,                                                                           " _
+            & "     ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                                                           " _
             & "     ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                                                                        " _
             & "     ZISSEKIMAIN.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                                 " _
             & "     ZISSEKIMAIN.DELFLG            AS DELFLG,                                                                            " _
@@ -2973,7 +2975,6 @@ Public Class LNT0001ZissekiIntake
             & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
             & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
             & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
-            & "                   AND ZISSEKI      > 0                                                                                  " _
             & "                   AND DELFLG       = '0'                                                                                " _
             & "               )                                                                                                         " _
             & "          ELSE ZISSEKI.SHUKABASHO                                                                                        " _
@@ -2987,7 +2988,6 @@ Public Class LNT0001ZissekiIntake
             & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
             & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
             & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
-            & "                   AND ZISSEKI      > 0                                                                                  " _
             & "                   AND DELFLG       = '0'                                                                                " _
             & "               )                                                                                                         " _
             & "          ELSE ZISSEKI.SHUKANAME                                                                                         " _
@@ -3023,17 +3023,25 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.KIKODATE          AS KIKODATE,                                                                         " _
             & "          HOLIDAYRATE.TANKA         AS KYUZITUTANKA,                                                                     " _
             & "          TANKA.TANKA               AS TANKA,                                                                            " _
-            & "          COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI,          " _
+            & "          CASE TANKA.CALCKBN                                                                                             " _
+            & "            WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "            WHEN '回'   THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "            WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "            WHEN '定数' THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "                        ELSE COALESCE(TANKA.TANKA, 0)                                                                    " _
+            & "          END                       AS YUSOUHI,                                                                          " _
+            & "          TANKA.CALCKBN             AS CALCKBN,                                                                          " _
             & "          CALENDAR.WORKINGDAY       AS WORKINGDAY,                                                                       " _
             & "          CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                               " _
             & "          ZISSEKI.DELFLG            AS DELFLG                                                                            " _
             & "      FROM LNG.LNT0001_ZISSEKI ZISSEKI                                                                                   " _
             & "      LEFT JOIN LNG.LNM0006_NEWTANKA TANKA                                                                               " _
             & "          ON @TORICODE = TANKA.TORICODE                                                                                  " _
-            & "          AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                       " _
-            & "          AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                             " _
-            & "          AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                               " _
-            & "          AND REPLACE(ZISSEKI.SYAGATA, '単車タンク', '単車') = TANKA.SYAGATANAME                                         " _
+            & "          And ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                       " _
+            & "          And ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                             " _
+            & "          And ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                               " _
+            & "          And REPLACE(ZISSEKI.SYAGATA, '単車タンク', '単車') = TANKA.SYAGATANAME                                         " _
+            & "          AND CASE WHEN ZISSEKI.TODOKECODE = '005509' THEN ZISSEKI.SYABARA = TANKA.SYABARA ELSE 1 = 1 END                " _
             & "          AND ZISSEKI.BRANCHCODE = TANKA.BRANCHCODE                                                                      " _
             & "          AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                                                         " _
             & "          AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                                                         " _
@@ -3042,12 +3050,33 @@ Public Class LNT0001ZissekiIntake
             & "          ON @TORICODE = CALENDAR.TORICODE                                                                               " _
             & "          AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                          " _
             & "          AND CALENDAR.DELFLG = @DELFLG                                                                                  " _
-            & "      LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                      " _
-            & "         ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                      " _
-            & "         AND ZISSEKI.ORDERORGCODE = HOLIDAYRATE.ORDERORGCODE                                                             " _
-            & "         AND ZISSEKI.TODOKECODE = HOLIDAYRATE.TODOKECODE                                                                 " _
-            & "         AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                             " _
-            & "         AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                " _
+            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
+            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
+            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
+            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "      WHERE                                                                                                              " _
             & "          ZISSEKI.TORICODE = @TORICODE                                                                                   " _
             & "          AND ZISSEKI.ZISSEKI <> 0                                                                                       " _
@@ -3112,6 +3141,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                                   " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                               " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                                    " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                                    " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                                 " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                                          " _
             & "         DELFLG                    = @DELFLG,                                                                            " _
@@ -3204,7 +3234,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -3311,6 +3341,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                            " _
             & "        KYUZITUTANKA,                                                                                        " _
             & "        YUSOUHI,                                                                                             " _
+            & "        CALCKBN,                                                                                             " _
             & "        WORKINGDAY,                                                                                          " _
             & "        PUBLICHOLIDAYNAME,                                                                                   " _
             & "        DELFLG,                                                                                              " _
@@ -3352,7 +3383,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
-            & "                 AND ZISSEKI      > 0                                                                        " _
             & "                 AND DELFLG       = '0'                                                                      " _
             & "             )                                                                                               " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
@@ -3366,7 +3396,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
-            & "                 AND ZISSEKI      > 0                                                                        " _
             & "                 AND DELFLG       = '0'                                                                      " _
             & "             )                                                                                               " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
@@ -3404,7 +3433,14 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                       AS JURYORYOKIN,                                                           " _
             & "        NULL                       AS TSUKORYO,                                                              " _
             & "        HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                          " _
-            & "        COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI, " _
+            & "        CASE TANKA.CALCKBN                                                                                   " _
+            & "          WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)     " _
+            & "          WHEN '回'   THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                     " _
+            & "          WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)     " _
+            & "          WHEN '定数' THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                     " _
+            & "                      ELSE COALESCE(TANKA.TANKA, 0)                                                                      " _
+            & "        END                         AS YUSOUHI,                                                              " _
+            & "        TANKA.CALCKBN               AS CALCKBN,                                                              " _
             & "        CALENDAR.WORKINGDAY        AS WORKINGDAY,                                                            " _
             & "        CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                     " _
             & "        ZISSEKI.DELFLG             AS DELFLG,                                                                " _
@@ -3431,10 +3467,33 @@ Public Class LNT0001ZissekiIntake
             & "        ON @TORICODE = CALENDAR.TORICODE                                                                     " _
             & "        AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                " _
             & "        AND CALENDAR.DELFLG = @DELFLG                                                                        " _
-            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                            " _
-            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                            " _
-            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                   " _
-            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                      " _
+            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
+            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
+            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
+            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "    WHERE                                                                                                    " _
             & "        ZISSEKI.TORICODE = @TORICODE                                                                         " _
             & "        AND ZISSEKI.ZISSEKI <> 0                                                                             " _
@@ -3501,6 +3560,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                       " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                   " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                        " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                        " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                     " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                              " _
             & "         DELFLG                    = @DELFLG,                                                                " _
@@ -3593,7 +3653,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -3700,6 +3760,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                        " _
             & "        KYUZITUTANKA,                                                                    " _
             & "        YUSOUHI,                                                                         " _
+            & "        CALCKBN,                                                                         " _
             & "        WORKINGDAY,                                                                      " _
             & "        PUBLICHOLIDAYNAME,                                                               " _
             & "        DELFLG,                                                                          " _
@@ -3741,7 +3802,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
-            & "                 AND ZISSEKI      > 0                                                    " _
             & "                 AND DELFLG       = '0'                                                  " _
             & "             )                                                                           " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                          " _
@@ -3755,7 +3815,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
-            & "                 AND ZISSEKI      > 0                                                    " _
             & "                 AND DELFLG       = '0'                                                  " _
             & "             )                                                                           " _
             & "        ELSE ZISSEKI.SHUKANAME                                                           " _
@@ -3793,7 +3852,14 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                       AS JURYORYOKIN,                                       " _
             & "        NULL                       AS TSUKORYO,                                          " _
             & "        NULL                       AS KYUZITUTANKA,                                      " _
-            & "        TANKA.TANKA * ZISSEKI.ZISSEKI AS YUSOUHI,                                        " _
+            & "        CASE TANKA.CALCKBN                                                               " _
+            & "          WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)       " _
+            & "          WHEN '回'   THEN COALESCE(TANKA.TANKA, 0)                                      " _
+            & "          WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)       " _
+            & "          WHEN '定数' THEN COALESCE(TANKA.TANKA, 0)                                      " _
+            & "                      ELSE COALESCE(TANKA.TANKA, 0)                                      " _
+            & "        END                        AS YUSOUHI,                                           " _
+            & "        TANKA.CALCKBN              AS CALCKBN,                                           " _
             & "        CALENDAR.WORKINGDAY        AS WORKINGDAY,                                        " _
             & "        CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                 " _
             & "        ZISSEKI.DELFLG             AS DELFLG,                                            " _
@@ -3883,6 +3949,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                   " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                               " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                    " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                    " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                 " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                          " _
             & "         DELFLG                    = @DELFLG,                                            " _
@@ -3975,7 +4042,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -4082,6 +4149,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                                                            " _
             & "        KYUZITUTANKA,                                                                                                                        " _
             & "        YUSOUHI,                                                                                                                             " _
+            & "        CALCKBN,                                                                                                                             " _
             & "        WORKINGDAY,                                                                                                                          " _
             & "        PUBLICHOLIDAYNAME,                                                                                                                   " _
             & "        DELFLG,                                                                                                                              " _
@@ -4123,7 +4191,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
-            & "                 AND ZISSEKI      > 0                                                                                                        " _
             & "                 AND DELFLG       = '0'                                                                                                      " _
             & "             )                                                                                                                               " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                                                              " _
@@ -4137,7 +4204,6 @@ Public Class LNT0001ZissekiIntake
             & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
             & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
             & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
-            & "                 AND ZISSEKI      > 0                                                                                                        " _
             & "                 AND DELFLG       = '0'                                                                                                      " _
             & "             )                                                                                                                               " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                                                               " _
@@ -4182,13 +4248,33 @@ Public Class LNT0001ZissekiIntake
             & "        HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                                                          " _
             & "        CASE                                                                                                                                 " _
             & "            WHEN ZISSEKI.ORDERORGCODE = '022702'                                                                                             " _
-            & "                THEN TANKA_SENBOKU.TANKA * ZISSEKI.ZISSEKI                                                                                   " _
+            & "                THEN                                                                                                                         " _
+            & "                     CASE TANKA_SENBOKU.CALCKBN                                                                                              " _
+            & "                         WHEN 'トン' THEN COALESCE(TANKA_SENBOKU.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)  " _
+            & "                         WHEN '回'   THEN COALESCE(TANKA_SENBOKU.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                  " _
+            & "                         WHEN '距離' THEN COALESCE(TANKA_SENBOKU.TANKA, 0) * COALESCE(TANKA_SENBOKU.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "                         WHEN '定数' THEN COALESCE(TANKA_SENBOKU.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                  " _
+            & "                                     ELSE COALESCE(TANKA_SENBOKU.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)  " _
+            & "                     END                                                                                                                     " _
             & "            WHEN ZISSEKI.ORDERORGCODE = '022801'                                                                                             " _
-            & "                THEN TANKA_HIMEZI.TANKA * ZISSEKI.ZISSEKI                                                                                    " _
-            & "        END AS YUSOUHI,                                                                                                                      " _
-            & "        CALENDAR.WORKINGDAY AS WORKINGDAY,                                                                                                   " _
+            & "                THEN                                                                                                                         " _
+            & "                     CASE TANKA_HIMEZI.CALCKBN                                                                                               " _
+            & "                         WHEN 'トン' THEN COALESCE(TANKA_HIMEZI.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "                         WHEN '回'   THEN COALESCE(TANKA_HIMEZI.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "                         WHEN '距離' THEN COALESCE(TANKA_HIMEZI.TANKA, 0) * COALESCE(TANKA_HIMEZI.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "                         WHEN '定数' THEN COALESCE(TANKA_HIMEZI.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "                                     ELSE COALESCE(TANKA_HIMEZI.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "                     END                                                                                                                     " _
+            & "        END                        AS YUSOUHI,                                                                                               " _
+            & "        CASE                                                                                                                                 " _
+            & "            WHEN ZISSEKI.ORDERORGCODE = '022702'                                                                                             " _
+            & "                THEN TANKA_SENBOKU.CALCKBN                                                                                                   " _
+            & "            WHEN ZISSEKI.ORDERORGCODE = '022801'                                                                                             " _
+            & "                THEN TANKA_HIMEZI.CALCKBN                                                                                                    " _
+            & "        END                        AS CALCKBN,                                                                                               " _
+            & "        CALENDAR.WORKINGDAY        AS WORKINGDAY,                                                                                            " _
             & "        CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                                                     " _
-            & "        ZISSEKI.DELFLG AS DELFLG,                                                                                                            " _
+            & "        ZISSEKI.DELFLG             AS DELFLG,                                                                                                " _
             & "        @INITYMD                   AS INITYMD,                                                                                               " _
             & "        @INITUSER                  AS INITUSER,                                                                                              " _
             & "        @INITTERMID                AS INITTERMID,                                                                                            " _
@@ -4225,12 +4311,33 @@ Public Class LNT0001ZissekiIntake
             & "        ON @TORICODE = CALENDAR.TORICODE                                                                                                     " _
             & "        AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                                                " _
             & "        AND CALENDAR.DELFLG = @DELFLG                                                                                                        " _
-            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                                            " _
-            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                                            " _
-            & "       AND (ZISSEKI.ORDERORGCODE = HOLIDAYRATE.ORDERORGCODE                                                                                  " _
-            & "            OR (ZISSEKI.ORDERORGCODE = HOLIDAYRATE.ORDERORGCODE OR ZISSEKI.TODOKECODE = HOLIDAYRATE.TODOKECODE))                             " _
-            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                                   " _
-            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                                      " _
+            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
+            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
+            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
+            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "    WHERE                                                                                                                                    " _
             & "        ZISSEKI.TORICODE = @TORICODE                                                                                                         " _
             & "        AND ZISSEKI.ZISSEKI <> 0                                                                                                             " _
@@ -4294,6 +4401,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                                                       " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                                                   " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                                                        " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                                                        " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                                                     " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                                                              " _
             & "         DELFLG                    = @DELFLG,                                                                                                " _
@@ -4386,7 +4494,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -4493,6 +4601,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                                                                                          " _
             & "        KYUZITUTANKA,                                                                                                                                                      " _
             & "        YUSOUHI,                                                                                                                                                           " _
+            & "        CALCKBN,                                                                                                                                                           " _
             & "        WORKINGDAY,                                                                                                                                                        " _
             & "        PUBLICHOLIDAYNAME,                                                                                                                                                 " _
             & "        DELFLG,                                                                                                                                                            " _
@@ -4560,10 +4669,8 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKIMAIN.JURYORYOKIN       AS JURYORYOKIN,                                                                                                                      " _
             & "        ZISSEKIMAIN.TSUKORYO          AS TSUKORYO,                                                                                                                         " _
             & "        ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                                                                                                                     " _
-            & "        CASE                                                                                                                                                               " _
-            & "            WHEN ZISSEKIMAIN.TORICODE = '0110600000' THEN COALESCE(ZISSEKIMAIN.JURYORYOKIN, 0) + COALESCE(ZISSEKIMAIN.TSUKORYO, 0) + COALESCE(ZISSEKIMAIN.KYUZITUTANKA, 0) " _
-            & "            WHEN ZISSEKIMAIN.TORICODE = '0238900000' THEN COALESCE(ZISSEKIMAIN.JURYORYOKIN, 0) + COALESCE(ZISSEKIMAIN.KYUZITUTANKA, 0)                                     " _
-            & "        END                           AS YUSOUHI,                                                                                                                          " _
+            & "        COALESCE(ZISSEKIMAIN.JURYORYOKIN, 0) + COALESCE(ZISSEKIMAIN.TSUKORYO, 0) + COALESCE(ZISSEKIMAIN.KYUZITUTANKA, 0) AS YUSOUHI,                                       " _
+            & "        ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                                                                                                          " _
             & "        ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                                                                                                                       " _
             & "        ZISSEKIMAIN.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                                                                                " _
             & "        ZISSEKIMAIN.DELFLG            AS DELFLG,                                                                                                                           " _
@@ -4606,7 +4713,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
-            & "                     AND ZISSEKI      > 0                                                                                                                                  " _
             & "                     AND DELFLG       = '0'                                                                                                                                " _
             & "                 )                                                                                                                                                         " _
             & "             ELSE ZISSEKI.SHUKABASHO                                                                                                                                       " _
@@ -4620,7 +4726,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
-            & "                     AND ZISSEKI      > 0                                                                                                                                  " _
             & "                     AND DELFLG       = '0'                                                                                                                                " _
             & "                 )                                                                                                                                                         " _
             & "             ELSE ZISSEKI.SHUKANAME                                                                                                                                        " _
@@ -4654,14 +4759,18 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.SUBSTAFFNUM        AS SUBSTAFFNUM,                                                                                                                    " _
             & "             ZISSEKI.SHUKODATE          AS SHUKODATE,                                                                                                                      " _
             & "             ZISSEKI.KIKODATE           AS KIKODATE,                                                                                                                       " _
-            & "             CASE                                                                                                                                                          " _
-            & "                 WHEN ZISSEKI.TORICODE = '0110600000' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)                                                         " _
-            & "                 WHEN ZISSEKI.TORICODE = '0238900000' THEN COALESCE(TANKA.TANKA, 0)                                                                                        " _
+            & "             CASE TANKA.CALCKBN                                                                                                                                            " _
+            & "                  WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)                                                                                 " _
+            & "                  WHEN '回'   THEN COALESCE(TANKA.TANKA, 0)                                                                                                                " _
+            & "                  WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)                                                                                 " _
+            & "                  WHEN '定数' THEN COALESCE(TANKA.TANKA, 0)                                                                                                                " _
+            & "                              ELSE COALESCE(TANKA.TANKA, 0)                                                                                                                " _
             & "             END                        AS JURYORYOKIN,                                                                                                                    " _
             & "             CASE                                                                                                                                                          " _
             & "                 WHEN ZISSEKI.TORICODE = '0110600000' THEN COALESCE(TANKA.TOLLFEE, 0)                                                                                      " _
             & "                 WHEN ZISSEKI.TORICODE = '0238900000' THEN 0                                                                                                               " _
             & "             END                        AS TSUKORYO,                                                                                                                       " _
+            & "             TANKA.CALCKBN              AS CALCKBN,                                                                                                                        " _
             & "             HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                                                                                   " _
             & "             CALENDAR.WORKINGDAY        AS WORKINGDAY,                                                                                                                     " _
             & "             CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                                                                              " _
@@ -4671,7 +4780,19 @@ Public Class LNT0001ZissekiIntake
             & "              ON @TORICODE = TANKA.TORICODE                                                                                                                                " _
             & "              AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                                                                     " _
             & "              AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                                                                           " _
-            & "              AND ZISSEKI.SHUKABASHO = TANKA.AVOCADOSHUKABASHO                                                                                                             " _
+            & "              AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "                                                 THEN (SELECT SHUKABASHO                                                                                                   " _
+            & "                                                         FROM LNG.LNT0001_ZISSEKI                                                                                          " _
+            & "                                                        WHERE                                                                                                              " _
+            & "                                                              TORICODE     = ZISSEKI.TORICODE                                                                              " _
+            & "                                                          AND ORDERORG     = ZISSEKI.ORDERORG                                                                              " _
+            & "                                                          AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                          " _
+            & "                                                          AND TRIP         = ZISSEKI.TRIP -1                                                                               " _
+            & "                                                          AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                            " _
+            & "                                                          AND DELFLG       = '0'                                                                                           " _
+            & "                                                      )                                                                                                                    " _
+            & "                                                 ELSE ZISSEKI.SHUKABASHO                                                                                                   " _
+            & "                                            END                                                                                                                            " _
             & "              AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                                                                             " _
             & "              AND ZISSEKI.GYOMUTANKNUM = TANKA.SHABAN                                                                                                                      " _
             & "              AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                                                                                                       " _
@@ -4682,10 +4803,31 @@ Public Class LNT0001ZissekiIntake
             & "             ON ZISSEKI.TORICODE = CALENDAR.TORICODE                                                                                                                       " _
             & "             AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                                                                         " _
             & "             AND CALENDAR.DELFLG = @DELFLG                                                                                                                                 " _
-            & "          LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                                                                    " _
-            & "             ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                                                                    " _
-            & "             AND ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                                                                                      " _
-            & "             AND ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                                                                        " _
+            & "         LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                                                                     " _
+            & "             ON  HOLIDAYRATE.TORICODE = @TORICNV                                                                                                                           " _
+            & "             AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                                                         " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                                                         " _
+            & "                  WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                                                           " _
+            & "                     ELSE 1 = 1                                                                                                                                            " _
+            & "                 END                                                                                                                                                       " _
+            & "             AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                                                                       " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                                                             " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                                                            " _
+            & "                     ELSE 1 = 1                                                                                                                                            " _
+            & "                  END                                                                                                                                                      " _
+            & "             AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                                                           " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                                                             " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                                                            " _
+            & "                     ELSE 1 = 1                                                                                                                                            " _
+            & "                 END                                                                                                                                                       " _
+            & "             AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                                                          " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                                                       " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                                                           " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                                                                     " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                                                          " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO                                                 " _
+            & "                     ELSE 1 = 1                                                                                                                                            " _
+            & "                 END                                                                                                                                                       " _
             & "             AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                                                           " _
             & "             AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                                                              " _
             & "         WHERE                                                                                                                                                             " _
@@ -4752,6 +4894,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                                                                                     " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                                                                                 " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                                                                                      " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                                                                                      " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                                                                                   " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                                                                                            " _
             & "         DELFLG                    = @DELFLG,                                                                                                                              " _
@@ -4765,6 +4908,7 @@ Public Class LNT0001ZissekiIntake
                 Using SQLcmd As New MySqlCommand(SQLStr, SQLcon)
                     ' DB更新用パラメータ(シーエナジーエルネス輸送費テーブル)
                     Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)                '取引先コード
+                    Dim TORICNV As MySqlParameter = SQLcmd.Parameters.Add("@TORICNV", MySqlDbType.VarChar)                  '変換取引先コード
                     Dim YMDFROM As MySqlParameter = SQLcmd.Parameters.Add("@YMDFROM", MySqlDbType.DateTime)                 '年月日FROM
                     Dim YMDTO As MySqlParameter = SQLcmd.Parameters.Add("@YMDTO", MySqlDbType.DateTime)                     '年月日TO
                     Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar, 1)                 '削除フラグ
@@ -4780,6 +4924,10 @@ Public Class LNT0001ZissekiIntake
 
                     ' DB更新
                     TORICODE.Value = iTori                                                  '取引先コード
+                    TORICNV.Value = iTori                                                   '変換取引先コード
+                    If iTori = CONST_TORICODE_0238900000 Then                               'エルネスの場合、シーエナジーコードで休日単価マスタを取得する
+                        TORICNV.Value = CONST_TORICODE_0110600000
+                    End If
                     DELFLG.Value = C_DELETE_FLG.ALIVE                                       '削除フラグ（削除）
                     If Not String.IsNullOrEmpty(WF_TaishoYm.Value) AndAlso IsDate(WF_TaishoYm.Value & "/01") Then
                         YMDFROM.Value = WF_TaishoYm.Value & "/01"
@@ -4844,7 +4992,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -4951,6 +5099,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                  " _
             & "        KYUZITUTANKA,                                                              " _
             & "        YUSOUHI,                                                                   " _
+            & "        CALCKBN,                                                                   " _
             & "        WORKINGDAY,                                                                " _
             & "        PUBLICHOLIDAYNAME,                                                         " _
             & "        DELFLG,                                                                    " _
@@ -5019,6 +5168,7 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                          AS TSUKORYO,                                 " _
             & "        ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                             " _
             & "        ZISSEKIMAIN.YUSOUHI + COALESCE(ZISSEKIMAIN.KYUZITUTANKA, 0) AS YUSOUHI,    " _
+            & "        ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                  " _
             & "        ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                               " _
             & "        ZISSEKIMAIN.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                        " _
             & "        ZISSEKIMAIN.DELFLG            AS DELFLG,                                   " _
@@ -5061,7 +5211,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND ZISSEKI      > 0                                          " _
             & "                     AND DELFLG       = '0'                                        " _
             & "                 )                                                                 " _
             & "             ELSE ZISSEKI.SHUKABASHO                                               " _
@@ -5075,7 +5224,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND ZISSEKI      > 0                                          " _
             & "                     AND DELFLG       = '0'                                        " _
             & "                 )                                                                 " _
             & "             ELSE ZISSEKI.SHUKANAME                                                " _
@@ -5109,12 +5257,16 @@ Public Class LNT0001ZissekiIntake
             & "             ZISSEKI.SUBSTAFFNUM       AS SUBSTAFFNUM,                             " _
             & "             ZISSEKI.SHUKODATE         AS SHUKODATE,                               " _
             & "             ZISSEKI.KIKODATE          AS KIKODATE,                                " _
-            & "             CASE WHEN HOLIDAYRATE.SHUKABASHOCATEGORY = '1'                        " _
-            & "                       AND HOLIDAYRATE.TODOKECATEGORY = '1' THEN HOLIDAYRATE.TANKA " _
-            & "                  ELSE NULL                                                        " _
-            & "             END                       AS KYUZITUTANKA,                            " _
+            & "             HOLIDAYRATE.TANKA         AS KYUZITUTANKA,                            " _
             & "             TANKA.TANKA               AS TANKA,                                   " _
-            & "             TANKA.TANKA * ZISSEKI.ZISSEKI AS YUSOUHI,                             " _
+            & "             CASE TANKA.CALCKBN                                                         " _
+            & "               WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) " _
+            & "               WHEN '回'   THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "               WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0) " _
+            & "               WHEN '定数' THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "                           ELSE COALESCE(TANKA.TANKA, 0)                                " _
+            & "             END                       AS YUSOUHI,                                      " _
+            & "             TANKA.CALCKBN             AS CALCKBN,                                 " _
             & "             CALENDAR.WORKINGDAY       AS WORKINGDAY,                              " _
             & "             CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                      " _
             & "             ZISSEKI.DELFLG            AS DELFLG                                   " _
@@ -5132,13 +5284,33 @@ Public Class LNT0001ZissekiIntake
             & "             ON @TORICODE = CALENDAR.TORICODE                                      " _
             & "             AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                 " _
             & "             AND CALENDAR.DELFLG = @DELFLG                                         " _
-            & "         LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                             " _
-            & "            ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                             " _
-            & "            AND ZISSEKI.ORDERORGCODE = HOLIDAYRATE.ORDERORGCODE                    " _
-            & "            AND ZISSEKI.SHUKABASHO = HOLIDAYRATE.SHUKABASHO                        " _
-            & "            AND ZISSEKI.TODOKECODE = HOLIDAYRATE.TODOKECODE                        " _
-            & "            AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')    " _
-            & "            AND HOLIDAYRATE.DELFLG = @DELFLG                                       " _
+            & "         LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                               " _
+            & "             ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                              " _
+            & "             AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                   " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                   " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                  " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                                 " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                       " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                      " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                     " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                       " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                      " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                    " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                 " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                     " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                               " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                    " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO           " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                     " _
+            & "             AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                        " _
             & "         WHERE                                                                     " _
             & "             ZISSEKI.TORICODE = @TORICODE                                          " _
             & "             AND ZISSEKI.ZISSEKI <> 0                                              " _
@@ -5204,6 +5376,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                             " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                         " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                              " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                              " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                           " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                    " _
             & "         DELFLG                    = @DELFLG,                                      " _
@@ -5296,7 +5469,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -5403,6 +5576,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                  " _
             & "        KYUZITUTANKA,                                                              " _
             & "        YUSOUHI,                                                                   " _
+            & "        CALCKBN,                                                                   " _
             & "        WORKINGDAY,                                                                " _
             & "        PUBLICHOLIDAYNAME,                                                         " _
             & "        DELFLG,                                                                    " _
@@ -5471,6 +5645,7 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                          AS TSUKORYO,                                 " _
             & "        ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                             " _
             & "        ZISSEKIMAIN.YUSOUHI + COALESCE(ZISSEKIMAIN.KYUZITUTANKA, 0) AS YUSOUHI,    " _
+            & "        ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                  " _
             & "        ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                               " _
             & "        ZISSEKIMAIN.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                        " _
             & "        ZISSEKIMAIN.DELFLG            AS DELFLG,                                   " _
@@ -5513,7 +5688,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND ZISSEKI      > 0                                          " _
             & "                     AND DELFLG       = '0'                                        " _
             & "                 )                                                                 " _
             & "             ELSE ZISSEKI.SHUKABASHO                                               " _
@@ -5527,7 +5701,6 @@ Public Class LNT0001ZissekiIntake
             & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
             & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
             & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND ZISSEKI      > 0                                          " _
             & "                     AND DELFLG       = '0'                                        " _
             & "                 )                                                                 " _
             & "             ELSE ZISSEKI.SHUKANAME                                                " _
@@ -5566,7 +5739,14 @@ Public Class LNT0001ZissekiIntake
             & "                  ELSE HOLIDAYRATE.TANKA                                           " _
             & "             END                       AS KYUZITUTANKA,                            " _
             & "             TANKA.TANKA               AS TANKA,                                   " _
-            & "             TANKA.TANKA * ZISSEKI.ZISSEKI AS YUSOUHI,                             " _
+            & "             CASE TANKA.CALCKBN                                                         " _
+            & "               WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) " _
+            & "               WHEN '回'   THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "               WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0) " _
+            & "               WHEN '定数' THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "                           ELSE COALESCE(TANKA.TANKA, 0)                                " _
+            & "             END                       AS YUSOUHI,                                      " _
+            & "             TANKA.CALCKBN             AS CALCKBN,                                 " _
             & "             CALENDAR.WORKINGDAY AS WORKINGDAY,                                    " _
             & "             CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                      " _
             & "             ZISSEKI.DELFLG AS DELFLG                                              " _
@@ -5576,6 +5756,19 @@ Public Class LNT0001ZissekiIntake
             & "             AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                              " _
             & "             AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                    " _
             & "             AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                      " _
+            & "             AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "                                                THEN (SELECT SHUKABASHO                                                                                                   " _
+            & "                                                        FROM LNG.LNT0001_ZISSEKI                                                                                          " _
+            & "                                                       WHERE                                                                                                              " _
+            & "                                                             TORICODE     = ZISSEKI.TORICODE                                                                              " _
+            & "                                                         AND ORDERORG     = ZISSEKI.ORDERORG                                                                              " _
+            & "                                                         AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                          " _
+            & "                                                         AND TRIP         = ZISSEKI.TRIP -1                                                                               " _
+            & "                                                         AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                            " _
+            & "                                                         AND DELFLG       = '0'                                                                                           " _
+            & "                                                     )                                                                                                                    " _
+            & "                                                ELSE ZISSEKI.SHUKABASHO                                                                                                   " _
+            & "                                           END                                                                                                                            " _
             & "             AND ZISSEKI.GYOMUTANKNUM = TANKA.SHABAN                               " _
             & "             AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                " _
             & "             AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                " _
@@ -5585,11 +5778,33 @@ Public Class LNT0001ZissekiIntake
             & "             ON @TORICODE = CALENDAR.TORICODE                                      " _
             & "             AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                 " _
             & "             AND CALENDAR.DELFLG = @DELFLG                                         " _
-            & "          LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                            " _
-            & "             ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                            " _
-            & "             AND ZISSEKI.ORDERORGCODE = HOLIDAYRATE.ORDERORGCODE                   " _
-            & "             AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')   " _
-            & "             AND HOLIDAYRATE.DELFLG = @DELFLG                                      " _
+            & "         LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                               " _
+            & "             ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                              " _
+            & "             AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                   " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                   " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                  " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                                 " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                       " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                      " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                     " _
+            & "                     WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                       " _
+            & "                     WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                      " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                    " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                 " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                     " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                               " _
+            & "                     WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                    " _
+            & "                             THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO           " _
+            & "                     ELSE 1 = 1                                                                                                      " _
+            & "                 END                                                                                                                 " _
+            & "             AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                     " _
+            & "             AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                        " _
             & "         WHERE                                                                     " _
             & "             ZISSEKI.TORICODE = @TORICODE                                          " _
             & "             AND ZISSEKI.ZISSEKI <> 0                                              " _
@@ -5655,6 +5870,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                             " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                         " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                              " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                              " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                           " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                    " _
             & "         DELFLG                    = @DELFLG,                                      " _
@@ -5747,7 +5963,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -5854,6 +6070,7 @@ Public Class LNT0001ZissekiIntake
             & "     TSUKORYO,                                                                 " _
             & "     KYUZITUTANKA,                                                             " _
             & "     YUSOUHI,                                                                  " _
+            & "     CALCKBN,                                                                  " _
             & "     WORKINGDAY,                                                               " _
             & "     PUBLICHOLIDAYNAME,                                                        " _
             & "     DELFLG,                                                                   " _
@@ -5922,6 +6139,7 @@ Public Class LNT0001ZissekiIntake
             & "     NULL                          AS TSUKORYO,                                " _
             & "     ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                            " _
             & "     ZISSEKIMAIN.YUSOUHI           AS YUSOUHI,                                 " _
+            & "     ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                 " _
             & "     ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                              " _
             & "     ZISSEKIMAIN.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                       " _
             & "     ZISSEKIMAIN.DELFLG            AS DELFLG,                                  " _
@@ -5964,7 +6182,6 @@ Public Class LNT0001ZissekiIntake
             & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
             & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
             & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
-            & "                  AND ZISSEKI      > 0                                         " _
             & "                  AND DELFLG       = '0'                                       " _
             & "              )                                                                " _
             & "          ELSE ZISSEKI.SHUKABASHO                                              " _
@@ -5978,7 +6195,6 @@ Public Class LNT0001ZissekiIntake
             & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
             & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
             & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
-            & "                  AND ZISSEKI      > 0                                         " _
             & "                  AND DELFLG       = '0'                                       " _
             & "              )                                                                " _
             & "          ELSE ZISSEKI.SHUKANAME                                               " _
@@ -6014,7 +6230,14 @@ Public Class LNT0001ZissekiIntake
             & "          ZISSEKI.KIKODATE          AS KIKODATE,                               " _
             & "          NULL                      AS KYUZITUTANKA,                           " _
             & "          TANKA.TANKA               AS TANKA,                                  " _
-            & "          COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) AS YUSOUHI,  " _
+            & "          CASE TANKA.CALCKBN                                                         " _
+            & "            WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) " _
+            & "            WHEN '回'   THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "            WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0) " _
+            & "            WHEN '定数' THEN COALESCE(TANKA.TANKA, 0)                                " _
+            & "                        ELSE COALESCE(TANKA.TANKA, 0)                                " _
+            & "          END                       AS YUSOUHI,                                      " _
+            & "          TANKA.CALCKBN             AS CALCKBN,                                " _
             & "          CALENDAR.WORKINGDAY       AS WORKINGDAY,                             " _
             & "          CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                     " _
             & "          ZISSEKI.DELFLG            AS DELFLG                                  " _
@@ -6023,7 +6246,19 @@ Public Class LNT0001ZissekiIntake
             & "          ON @TORICODE = TANKA.TORICODE                                        " _
             & "          AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                             " _
             & "          AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                   " _
-            & "          AND ZISSEKI.SHUKABASHO = TANKA.AVOCADOSHUKABASHO                     " _
+            & "          AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "                                             THEN (SELECT SHUKABASHO                                                                                                   " _
+            & "                                                     FROM LNG.LNT0001_ZISSEKI                                                                                          " _
+            & "                                                    WHERE                                                                                                              " _
+            & "                                                          TORICODE     = ZISSEKI.TORICODE                                                                              " _
+            & "                                                      AND ORDERORG     = ZISSEKI.ORDERORG                                                                              " _
+            & "                                                      AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                          " _
+            & "                                                      AND TRIP         = ZISSEKI.TRIP -1                                                                               " _
+            & "                                                      AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                            " _
+            & "                                                      AND DELFLG       = '0'                                                                                           " _
+            & "                                                  )                                                                                                                    " _
+            & "                                             ELSE ZISSEKI.SHUKABASHO                                                                                                   " _
+            & "                                        END                                                                                                                            " _
             & "          AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                     " _
             & "          AND ZISSEKI.BRANCHCODE = TANKA.BRANCHCODE                            " _
             & "          AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                               " _
@@ -6097,6 +6332,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                         " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                     " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                          " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                          " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                       " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                " _
             & "         DELFLG                    = @DELFLG,                                  " _
@@ -6189,7 +6425,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -6296,6 +6532,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                            " _
             & "        KYUZITUTANKA,                                                                                        " _
             & "        YUSOUHI,                                                                                             " _
+            & "        CALCKBN,                                                                                             " _
             & "        WORKINGDAY,                                                                                          " _
             & "        PUBLICHOLIDAYNAME,                                                                                   " _
             & "        DELFLG,                                                                                              " _
@@ -6337,7 +6574,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
-            & "                AND ZISSEKI      > 0                                                                         " _
             & "                AND DELFLG       = '0'                                                                       " _
             & "            )                                                                                                " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
@@ -6351,7 +6587,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
-            & "                AND ZISSEKI      > 0                                                                         " _
             & "                AND DELFLG       = '0'                                                                       " _
             & "            )                                                                                                " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
@@ -6389,7 +6624,14 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                          AS JURYORYOKIN,                                                        " _
             & "        NULL                          AS TSUKORYO,                                                           " _
             & "        HOLIDAYRATE.TANKA             AS KYUZITUTANKA,                                                       " _
-            & "        COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0) + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI, " _
+            & "        CASE TANKA.CALCKBN                                                                                             " _
+            & "          WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "          WHEN '回'   THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "          WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "          WHEN '定数' THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "                      ELSE COALESCE(TANKA.TANKA, 0)                                                                    " _
+            & "        END                           AS YUSOUHI,                                                                      " _
+            & "        TANKA.CALCKBN                 AS CALCKBN,                                                            " _
             & "        CALENDAR.WORKINGDAY           AS WORKINGDAY,                                                         " _
             & "        CALENDAR.PUBLICHOLIDAYNAME    AS PUBLICHOLIDAYNAME,                                                  " _
             & "        ZISSEKI.DELFLG                AS DELFLG,                                                             " _
@@ -6409,7 +6651,19 @@ Public Class LNT0001ZissekiIntake
             & "        AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                   " _
             & "        AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                     " _
             & "        AND ZISSEKI.GYOMUTANKNUM = TANKA.SHABAN                                                              " _
-            & "        AND ZISSEKI.SHUKABASHO = TANKA.AVOCADOSHUKABASHO                                                     " _
+            & "        AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "                                           THEN (SELECT SHUKABASHO                                                                                                   " _
+            & "                                                   FROM LNG.LNT0001_ZISSEKI                                                                                          " _
+            & "                                                  WHERE                                                                                                              " _
+            & "                                                        TORICODE     = ZISSEKI.TORICODE                                                                              " _
+            & "                                                    AND ORDERORG     = ZISSEKI.ORDERORG                                                                              " _
+            & "                                                    AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                          " _
+            & "                                                    AND TRIP         = ZISSEKI.TRIP -1                                                                               " _
+            & "                                                    AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                            " _
+            & "                                                    AND DELFLG       = '0'                                                                                           " _
+            & "                                                )                                                                                                                    " _
+            & "                                           ELSE ZISSEKI.SHUKABASHO                                                                                                   " _
+            & "                                      END                                                                                                                            " _
             & "        AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                                               " _
             & "        AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                                               " _
             & "        AND TANKA.DELFLG = @DELFLG                                                                           " _
@@ -6418,10 +6672,33 @@ Public Class LNT0001ZissekiIntake
             & "        ON @TORICODE = CALENDAR.TORICODE                                                                     " _
             & "        AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                " _
             & "        AND CALENDAR.DELFLG = @DELFLG                                                                        " _
-            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                            " _
-            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                            " _
-            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                   " _
-            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                      " _
+            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
+            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
+            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
+            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "    WHERE                                                                                                    " _
             & "        ZISSEKI.TORICODE = @TORICODE                                                                         " _
             & "        AND ZISSEKI.ZISSEKI <> 0                                                                             " _
@@ -6485,6 +6762,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                       " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                   " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                        " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                        " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                     " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                              " _
             & "         DELFLG                    = @DELFLG,                                                                " _
@@ -6577,7 +6855,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -6684,6 +6962,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                            " _
             & "        KYUZITUTANKA,                                                                                        " _
             & "        YUSOUHI,                                                                                             " _
+            & "        CALCKBN,                                                                                             " _
             & "        WORKINGDAY,                                                                                          " _
             & "        PUBLICHOLIDAYNAME,                                                                                   " _
             & "        DELFLG,                                                                                              " _
@@ -6725,7 +7004,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
-            & "                AND ZISSEKI      > 0                                                                         " _
             & "                AND DELFLG       = '0'                                                                       " _
             & "            )                                                                                                " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
@@ -6739,7 +7017,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
-            & "                AND ZISSEKI      > 0                                                                         " _
             & "                AND DELFLG       = '0'                                                                       " _
             & "            )                                                                                                " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
@@ -6777,7 +7054,14 @@ Public Class LNT0001ZissekiIntake
             & "        NULL                       AS JURYORYOKIN,                                                           " _
             & "        NULL                       AS TSUKORYO,                                                              " _
             & "        HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                          " _
-            & "        COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0) AS YUSOUHI,                                " _
+            & "        CASE TANKA.CALCKBN                                                                                             " _
+            & "          WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "          WHEN '回'   THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "          WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "          WHEN '定数' THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                   " _
+            & "                      ELSE COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)   " _
+            & "        END                        AS YUSOUHI,                                                                         " _
+            & "        TANKA.CALCKBN              AS CALCKBN,                                                               " _
             & "        CALENDAR.WORKINGDAY AS WORKINGDAY,                                                                   " _
             & "        CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                     " _
             & "        ZISSEKI.DELFLG             AS DELFLG,                                                                " _
@@ -6797,7 +7081,19 @@ Public Class LNT0001ZissekiIntake
             & "        AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                   " _
             & "        AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                     " _
             & "        AND ZISSEKI.GYOMUTANKNUM = TANKA.SHABAN                                                              " _
-            & "        AND ZISSEKI.SHUKABASHO = TANKA.AVOCADOSHUKABASHO                                                     " _
+            & "        AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "                                           THEN (SELECT SHUKABASHO                                                                                                   " _
+            & "                                                   FROM LNG.LNT0001_ZISSEKI                                                                                          " _
+            & "                                                  WHERE                                                                                                              " _
+            & "                                                        TORICODE     = ZISSEKI.TORICODE                                                                              " _
+            & "                                                    AND ORDERORG     = ZISSEKI.ORDERORG                                                                              " _
+            & "                                                    AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                          " _
+            & "                                                    AND TRIP         = ZISSEKI.TRIP -1                                                                               " _
+            & "                                                    AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                            " _
+            & "                                                    AND DELFLG       = '0'                                                                                           " _
+            & "                                                )                                                                                                                    " _
+            & "                                           ELSE ZISSEKI.SHUKABASHO                                                                                                   " _
+            & "                                      END                                                                                                                            " _
             & "        AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                                               " _
             & "        AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                                               " _
             & "        AND TANKA.DELFLG = @DELFLG                                                                           " _
@@ -6806,10 +7102,33 @@ Public Class LNT0001ZissekiIntake
             & "        ON @TORICODE = CALENDAR.TORICODE                                                                     " _
             & "        AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                " _
             & "        AND CALENDAR.DELFLG = @DELFLG                                                                        " _
-            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                            " _
-            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                            " _
-            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                   " _
-            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                      " _
+            & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
+            & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
+            & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
+            & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "    WHERE                                                                                                    " _
             & "        ZISSEKI.TORICODE = @TORICODE                                                                         " _
             & "        AND ZISSEKI.ZISSEKI <> 0                                                                             " _
@@ -6873,6 +7192,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                       " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                   " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                        " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                        " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                     " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                              " _
             & "         DELFLG                    = @DELFLG,                                                                " _
@@ -6965,7 +7285,7 @@ Public Class LNT0001ZissekiIntake
             & "   , UPDPGID     = @UPDPGID                                      " _
             & "   , RECEIVEYMD  = @RECEIVEYMD                                   " _
             & " WHERE                                                           " _
-            & "     TORICODE = " & iTori _
+            & "     TORICODE = @TORICODE                                        " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') >= @YMDFROM             " _
             & " AND date_format(TODOKEDATE, '%Y/%m/%d') <= @YMDTO               "
 
@@ -7072,6 +7392,7 @@ Public Class LNT0001ZissekiIntake
             & "        TSUKORYO,                                                                                                           " _
             & "        KYUZITUTANKA,                                                                                                       " _
             & "        YUSOUHI,                                                                                                            " _
+            & "        CALCKBN,                                                                                                            " _
             & "        WORKINGDAY,                                                                                                         " _
             & "        PUBLICHOLIDAYNAME,                                                                                                  " _
             & "        DELFLG,                                                                                                             " _
@@ -7113,7 +7434,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
-            & "                AND ZISSEKI      > 0                                                                                        " _
             & "                AND DELFLG       = '0'                                                                                      " _
             & "            )                                                                                                               " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                                             " _
@@ -7127,7 +7447,6 @@ Public Class LNT0001ZissekiIntake
             & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
-            & "                AND ZISSEKI      > 0                                                                                        " _
             & "                AND DELFLG       = '0'                                                                                      " _
             & "            )                                                                                                               " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                                              " _
@@ -7161,17 +7480,18 @@ Public Class LNT0001ZissekiIntake
             & "        ZISSEKI.SUBSTAFFNUM           AS SUBSTAFFNUM,                                                                       " _
             & "        ZISSEKI.SHUKODATE             AS SHUKODATE,                                                                         " _
             & "        ZISSEKI.KIKODATE              AS KIKODATE,                                                                          " _
-            & "        CASE                                                                                                                " _
-            & "            WHEN ZISSEKI.TODOKECODE = '004460' THEN TANKA_TETSUGEN.TANKA                                                    " _
-            & "            ELSE TANKA.TANKA                                                                                                " _
-            & "        END                           AS TANKA,                                                                             " _
+            & "        TANKA.TANKA                   AS TANKA,                                                                             " _
             & "        NULL                          AS JURYORYOKIN,                                                                       " _
             & "        NULL                          AS TSUKORYO,                                                                          " _
             & "        HOLIDAYRATE.TANKA             AS KYUZITUTANKA,                                                                      " _
-            & "        CASE                                                                                                                " _
-            & "            WHEN ZISSEKI.TODOKECODE = '004460' THEN COALESCE(TANKA_TETSUGEN.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)      " _
-            & "            ELSE COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                                  " _
+            & "        CASE TANKA.CALCKBN                                                                                                  " _
+            & "             WHEN 'トン' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(ZISSEKI.ZISSEKI, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)     " _
+            & "             WHEN '回'   THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                     " _
+            & "             WHEN '距離' THEN COALESCE(TANKA.TANKA, 0) * COALESCE(TANKA.ROUNDTRIP, 0)  + COALESCE(HOLIDAYRATE.TANKA, 0)     " _
+            & "             WHEN '定数' THEN COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                     " _
+            & "                         ELSE COALESCE(TANKA.TANKA, 0) + COALESCE(HOLIDAYRATE.TANKA, 0)                                     " _
             & "        END                           AS YUSOUHI,                                                                           " _
+            & "        TANKA.CALCKBN                 AS CALCKBN,                                                                           " _
             & "        CALENDAR.WORKINGDAY           AS WORKINGDAY,                                                                        " _
             & "        CALENDAR.PUBLICHOLIDAYNAME    AS PUBLICHOLIDAYNAME,                                                                 " _
             & "        ZISSEKI.DELFLG                AS DELFLG,                                                                            " _
@@ -7190,28 +7510,43 @@ Public Class LNT0001ZissekiIntake
             & "        AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                            " _
             & "        AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                                  " _
             & "        AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                                                                    " _
-            & "        AND TANKA.AVOCADOTODOKECODE <> '004460'                                                                             " _
+            & "        AND CASE WHEN COALESCE(TANKA.SYAGATANAME,'') = ''                                                                   " _
+            & "                 THEN TANKA.SYAGATANAME = ''                                                                                " _
+            & "                 ELSE TANKA.SYAGATANAME = REPLACE (ZISSEKI.SYAGATA, '単車タンク', '単車')                                   " _
+            & "            END                                                                                                             " _
             & "        AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                                                              " _
             & "        AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                                                              " _
             & "        AND TANKA.DELFLG = @DELFLG                                                                                          " _
-            & "        AND ZISSEKI.BRANCHCODE = TANKA.BRANCHCODE                                                                           " _
-            & "    LEFT JOIN LNG.LNM0006_NEWTANKA TANKA_TETSUGEN                                                                           " _
-            & "        ON @TORICODE = TANKA_TETSUGEN.TORICODE                                                                              " _
-            & "        AND ZISSEKI.ORDERORGCODE = TANKA_TETSUGEN.ORGCODE                                                                   " _
-            & "        AND ZISSEKI.KASANCODEORDERORG = TANKA_TETSUGEN.KASANORGCODE                                                         " _
-            & "        AND ZISSEKI.TODOKECODE = TANKA_TETSUGEN.AVOCADOTODOKECODE                                                           " _
-            & "        AND REPLACE(ZISSEKI.SYAGATA, '単車タンク', '単車') = TANKA_TETSUGEN.SYAGATANAME                                     " _
-            & "        AND TANKA_TETSUGEN.AVOCADOTODOKECODE = '004460'                                                                     " _
-            & "        AND TANKA_TETSUGEN.STYMD  <= ZISSEKI.TODOKEDATE                                                                     " _
-            & "        AND TANKA_TETSUGEN.ENDYMD >= ZISSEKI.TODOKEDATE                                                                     " _
-            & "        AND TANKA_TETSUGEN.DELFLG = @DELFLG                                                                                 " _
-            & "        AND ZISSEKI.BRANCHCODE = TANKA_TETSUGEN.BRANCHCODE                                                                  " _
+            & "        AND TANKA.BRANCHCODE = ZISSEKI.BRANCHCODE                                                                           " _
             & "     LEFT JOIN LNG.LNM0016_CALENDAR CALENDAR                                                                                " _
             & "        ON @TORICODE = CALENDAR.TORICODE                                                                                    " _
             & "        AND ZISSEKI.TODOKEDATE = CALENDAR.YMD                                                                               " _
             & "        AND CALENDAR.DELFLG = @DELFLG                                                                                       " _
             & "    LEFT JOIN LNG.LNM0017_HOLIDAYRATE HOLIDAYRATE                                                                           " _
             & "       ON ZISSEKI.TORICODE = HOLIDAYRATE.TORICODE                                                                           " _
+            & "       AND CASE HOLIDAYRATE.ORDERORGCATEGORY                                                                                " _
+            & "             WHEN '1' THEN HOLIDAYRATE.ORDERORGCODE = ZISSEKI.ORDERORGCODE                                                  " _
+            & "             WHEN '2' THEN HOLIDAYRATE.ORDERORGCODE <> ZISSEKI.ORDERORGCODE                                                 " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.SHUKABASHOCATEGORY                                                                              " _
+            & "             WHEN '1' THEN HOLIDAYRATE.SHUKABASHO = ZISSEKI.SHUKABASHO                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.SHUKABASHO <> ZISSEKI.SHUKABASHO                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE HOLIDAYRATE.TODOKECATEGORY                                                                                  " _
+            & "             WHEN '1' THEN HOLIDAYRATE.TODOKECODE = ZISSEKI.TODOKECODE                                                      " _
+            & "             WHEN '2' THEN HOLIDAYRATE.TODOKECODE <> ZISSEKI.TODOKECODE                                                     " _
+            & "             ELSE 1 = 1                                                                                                     " _
+            & "           END                                                                                                              " _
+            & "       AND CASE WHEN HOLIDAYRATE.GYOMUTANKNUMFROM = '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM <= HOLIDAYRATE.GYOMUTANKNUMTO                                                " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO = ''                                 " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM >= HOLIDAYRATE.GYOMUTANKNUMFROM                                              " _
+            & "                WHEN HOLIDAYRATE.GYOMUTANKNUMFROM <> '' and HOLIDAYRATE.GYOMUTANKNUMTO <> ''                                " _
+            & "                     THEN ZISSEKI.GYOMUTANKNUM BETWEEN HOLIDAYRATE.GYOMUTANKNUMFROM AND HOLIDAYRATE.GYOMUTANKNUMTO          " _
+            & "                ELSE 1 = 1                                                                                                  " _
+            & "           END                                                                                                              " _
             & "       AND HOLIDAYRATE.RANGECODE LIKE CONCAT('%',CALENDAR.WORKINGDAY, '%')                                                  " _
             & "       AND HOLIDAYRATE.DELFLG = @DELFLG                                                                                     " _
             & "    WHERE                                                                                                                   " _
@@ -7277,6 +7612,7 @@ Public Class LNT0001ZissekiIntake
             & "         TSUKORYO                  = VALUES(TSUKORYO),                                                                      " _
             & "         KYUZITUTANKA              = VALUES(KYUZITUTANKA),                                                                  " _
             & "         YUSOUHI                   = VALUES(YUSOUHI),                                                                       " _
+            & "         CALCKBN                   = VALUES(CALCKBN),                                                                       " _
             & "         WORKINGDAY                = VALUES(WORKINGDAY),                                                                    " _
             & "         PUBLICHOLIDAYNAME         = VALUES(PUBLICHOLIDAYNAME),                                                             " _
             & "         DELFLG                    = @DELFLG,                                                                               " _
