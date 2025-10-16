@@ -342,6 +342,10 @@ Public Module BaseDllConst
     ''' 東北電力
     ''' </summary>
     Public Const CONST_TORICODE_0175400000 As String = "0175400000"
+    ''' <summary>
+    ''' 東京ガスケミカル株式会社
+    ''' </summary>
+    Public Const CONST_TORICODE_0167600000 As String = "0167600000"
 #End Region
 
 #Region "受注受付部署"
