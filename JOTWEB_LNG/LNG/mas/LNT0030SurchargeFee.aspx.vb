@@ -2600,7 +2600,7 @@ Public Class LNT0030SurchargeFee
                 If String.IsNullOrEmpty(WW_TEXT) Then
                     If Not String.IsNullOrEmpty(LNT0030Exceltblrow("TORICODE")) Then
                         WW_CheckMES1 = "・取引先エラー。"
-                        WW_CheckMES2 = "マスターに存在しません"
+                        WW_CheckMES2 = "届先マスターに存在しません"
                         WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                         O_RTN = "ERR"
                     End If
@@ -2619,7 +2619,7 @@ Public Class LNT0030SurchargeFee
                 If String.IsNullOrEmpty(WW_TEXT) Then
                     If Not String.IsNullOrEmpty(LNT0030Exceltblrow("ORGCODE")) Then
                         WW_CheckMES1 = "・部門エラー。"
-                        WW_CheckMES2 = "マスターに存在しません"
+                        WW_CheckMES2 = "届先マスターに存在しません"
                         WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                         O_RTN = "ERR"
                     End If
@@ -2652,7 +2652,7 @@ Public Class LNT0030SurchargeFee
                 If String.IsNullOrEmpty(WW_TEXT) Then
                     If Not String.IsNullOrEmpty(LNT0030Exceltblrow("AVOCADOSHUKABASHO")) Then
                         WW_CheckMES1 = "・出荷場所エラー。"
-                        WW_CheckMES2 = "マスターに存在しません"
+                        WW_CheckMES2 = "届先マスターに存在しません"
                         WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                         O_RTN = "ERR"
                     End If
@@ -2671,7 +2671,7 @@ Public Class LNT0030SurchargeFee
                 If String.IsNullOrEmpty(WW_TEXT) Then
                     If Not String.IsNullOrEmpty(LNT0030Exceltblrow("AVOCADOTODOKECODE")) Then
                         WW_CheckMES1 = "・届先エラー。"
-                        WW_CheckMES2 = "マスターに存在しません"
+                        WW_CheckMES2 = "届先マスターに存在しません"
                         WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                         O_RTN = "ERR"
                     End If
@@ -2690,7 +2690,7 @@ Public Class LNT0030SurchargeFee
                     If String.IsNullOrEmpty(WW_TEXT) Then
                         If Not String.IsNullOrEmpty(LNT0030Exceltblrow("TORICODE")) Then
                             WW_CheckMES1 = "・車型エラー。"
-                            WW_CheckMES2 = "マスターに存在しません"
+                            WW_CheckMES2 = "固定値マスターに存在しません"
                             WW_CheckERR(WW_LINECNT, WW_CheckMES1, WW_CheckMES2)
                             O_RTN = "ERR"
                         End If
