@@ -2056,16 +2056,19 @@ Public Class YusouhiUpdate
             & "                 WHEN ZISSEKI.TORICODE = '0238900000' THEN 0                                                                                                               " _
             & "             END                        AS TSUKORYO,                                                                                                                       " _
             & "             TANKA.CALCKBN              AS CALCKBN,                                                                                                                        " _
-            & "             HOLIDAYRATE.TANKA          AS KYUZITUTANKA,                                                                                                                   " _
+            & "             CASE WHEN ZISSEKI.TRIP = '1'                                                                                                                                  " _
+            & "                  THEN HOLIDAYRATE.TANKA                                                                                                                                   " _
+            & "                  ELSE NULL                                                                                                                                                " _
+            & "             END                        AS KYUZITUTANKA,                                                                                                                   " _
             & "             CALENDAR.WORKINGDAY        AS WORKINGDAY,                                                                                                                     " _
             & "             CALENDAR.PUBLICHOLIDAYNAME AS PUBLICHOLIDAYNAME,                                                                                                              " _
             & "             ZISSEKI.DELFLG             AS DELFLG                                                                                                                          " _
             & "         FROM LNG.LNT0001_ZISSEKI ZISSEKI                                                                                                                                  " _
             & "          LEFT JOIN LNG.LNM0006_NEWTANKA TANKA                                                                                                                             " _
             & "              ON @TORICODE = TANKA.TORICODE                                                                                                                                " _
-            & "              AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                                                                     " _
-            & "              AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                                                                           " _
-            & "              AND TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
+            & "              And ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                                                                                                                     " _
+            & "              And ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                                                                                                           " _
+            & "              And TANKA.AVOCADOSHUKABASHO = CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                          " _
             & "                                                 THEN (SELECT SHUKABASHO                                                                                                   " _
             & "                                                         FROM LNG.LNT0001_ZISSEKI                                                                                          " _
             & "                                                        WHERE                                                                                                              " _
@@ -2441,7 +2444,7 @@ Public Class YusouhiUpdate
             & "        ZISSEKIMAIN.TANKA             AS TANKA,                                    " _
             & "        NULL                          AS JURYORYOKIN,                              " _
             & "        NULL                          AS TSUKORYO,                                 " _
-            & "        ZISSEKIMAIN.KYUZITUTANKA      AS KYUZITUTANKA,                             " _
+            & "        NULL                          AS KYUZITUTANKA,                             " _
             & "        ZISSEKIMAIN.YUSOUHI           AS YUSOUHI,                                  " _
             & "        ZISSEKIMAIN.CALCKBN           AS CALCKBN,                                  " _
             & "        ZISSEKIMAIN.WORKINGDAY        AS WORKINGDAY,                               " _

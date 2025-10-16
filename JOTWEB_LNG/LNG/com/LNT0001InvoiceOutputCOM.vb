@@ -215,9 +215,7 @@ Public Class LNT0001InvoiceOutputCOM
             Const COL_KYUZITUCNT As String = "L"      '休日輸送回数
             Const COL_KYUZITUHI As String = "M"       '小計（割増料金）
             Const COL_TSUKORYO As String = "N"        '通行料
-            Const COL_TOTAL1 As String = "O"          '合計（税抜）
-            Const COL_TAXAMT As String = "P"          '税額
-            Const COL_TOTAL2 As String = "Q"          '合計（税込）
+            Const COL_TOTAL As String = "O"           '合計（税抜）
 
             '一旦、明細をクリアしておく（行削除）
             '運賃明細の最終行を取得
@@ -228,7 +226,7 @@ Public Class LNT0001InvoiceOutputCOM
             '運賃明細
             For Each PrintDatarow As DataRow In PrintData.Rows
                 'TEMPシートからフォーマット（行）をコピー
-                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A2:Q2")
+                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A2:O2")
                 destRange = WW_Workbook.Worksheets(Me.WW_SheetNoUnchin).Range("A" & lineUcnt.ToString())
                 srcRange.Copy(destRange)
 
@@ -297,21 +295,14 @@ Public Class LNT0001InvoiceOutputCOM
                     hiddenN = False
                 End If
                 '◯ 合計（税抜）:輸送費＋休日割増＋通行料
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL1 & lineUcnt.ToString).Formula = "=" & COL_YUSOUHI & lineUcnt.ToString & "+" & COL_KYUZITUHI & lineUcnt.ToString & "+" & COL_TSUKORYO & lineUcnt.ToString
-                '◯ 税額
-                If Not String.IsNullOrEmpty(PrintDatarow("TAXRATE").ToString) Then
-                    '合計（税抜）×税率
-                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=" & COL_TOTAL1 & lineUcnt.ToString & "*" & (Int32.Parse(PrintDatarow("TAXRATE").ToString()) / 100)
-                End If
-                '◯ 合計：合計（税抜）＋税額
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL2 & lineUcnt.ToString).Formula = "=" & COL_TOTAL1 & lineUcnt.ToString & "+" & COL_TAXAMT & lineUcnt.ToString
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_YUSOUHI & lineUcnt.ToString & "+" & COL_KYUZITUHI & lineUcnt.ToString & "+" & COL_TSUKORYO & lineUcnt.ToString
 
                 lineUcnt += 1
             Next
 
             '合計行
             'TEMPシートからフォーマット（行）をコピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4:Q4")
+            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4:O4")
             destRange = WW_Workbook.Worksheets(Me.WW_SheetNoUnchin).Range("A" & lineUcnt.ToString())
             srcRange.Copy(destRange)
 
@@ -329,11 +320,7 @@ Public Class LNT0001InvoiceOutputCOM
                 '◯ 通行料
                 WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TSUKORYO & lineUcnt.ToString).Formula = "=SUM(" & COL_TSUKORYO & stLine.ToString & ":" & COL_TSUKORYO & (lineUcnt - 1).ToString & ")"
                 '◯ 合計（税抜）
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL1 & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL1 & stLine.ToString & ":" & COL_TOTAL1 & (lineUcnt - 1).ToString & ")"
-                '◯ 税額
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=SUM(" & COL_TAXAMT & stLine.ToString & ":" & COL_TAXAMT & (lineUcnt - 1).ToString & ")"
-                '◯ 合計
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL2 & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL2 & stLine.ToString & ":" & COL_TOTAL2 & (lineUcnt - 1).ToString & ")"
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL & stLine.ToString & ":" & COL_TOTAL & (lineUcnt - 1).ToString & ")"
             End If
 
             '列の非表示
@@ -509,8 +496,8 @@ Public Class LNT0001InvoiceOutputCOM
             Const COL_MIDCATENAME As String = "C"     '中分類
             Const COL_SMALLCATENAME As String = "D"   '小分類
             Const COL_TANKA As String = "E"           '単価
-            Const COL_COUNT As String = "F"           '数量（回・台）
-            Const COL_QUANTITY As String = "G"        '数量
+            Const COL_QUANTITY As String = "F"        '数量
+            Const COL_UNIT As String = "G"            '単位
             Const COL_TOTAL As String = "H"           '小計
 
             Dim query = From row In PrintData.AsEnumerable()
@@ -540,7 +527,7 @@ Public Class LNT0001InvoiceOutputCOM
                 Dim whereStr As String = "GROUPCODE = '" & dtRow.GROUPCODE & "'"
                 For Each PrintDatarow As DataRow In PrintData.Select(whereStr)
                     'TEMPシートからフォーマット（行）をコピー
-                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A12:K12")
+                    srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A12:H12")
                     destRange = newWorkSheet.Range("A" & lineUcnt.ToString())
                     srcRange.Copy(destRange)
 
@@ -566,21 +553,16 @@ Public Class LNT0001InvoiceOutputCOM
                         newWorkSheet.Range(COL_TANKA & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("TANKA").ToString())
                         hiddenE = False
                     End If
-                    '◯ 回数・台数
-                    If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
-                        newWorkSheet.Range(COL_COUNT & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("COUNT").ToString())
-                    End If
                     '◯ 数量
                     If Not String.IsNullOrEmpty(PrintDatarow("QUANTITY").ToString) Then
                         newWorkSheet.Range(COL_QUANTITY & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("QUANTITY").ToString())
                     End If
+                    '◯ 計算単位
+                    If Not String.IsNullOrEmpty(PrintDatarow("UNIT").ToString) Then
+                        newWorkSheet.Range(COL_UNIT & lineUcnt.ToString).Value = PrintDatarow("UNIT").ToString()
+                    End If
                     '◯ 小計
-                    If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
-                        newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_TANKA & lineUcnt.ToString & "*" & COL_COUNT & lineUcnt.ToString
-                    End If
-                    If Not String.IsNullOrEmpty(PrintDatarow("QUANTITY").ToString) Then
-                        newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_TANKA & lineUcnt.ToString & "*" & COL_QUANTITY & lineUcnt.ToString
-                    End If
+                    newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_TANKA & lineUcnt.ToString & "*" & COL_QUANTITY & lineUcnt.ToString
 
                     no += 1
                     lineUcnt += 1
@@ -589,15 +571,11 @@ Public Class LNT0001InvoiceOutputCOM
 
                 '合計行
                 'TEMPシートからフォーマット（行）をコピー
-                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A14:K14")
+                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A14:H14")
                 destRange = newWorkSheet.Range("A" & lineUcnt.ToString())
                 srcRange.Copy(destRange)
 
                 If PrintData.Rows.Count > 0 Then
-                    '◯ 回数・台数
-                    'newWorkSheet.Range(COL_COUNT & lineUcnt.ToString).Formula = "=SUM(" & COL_COUNT & stLine.ToString & ":" & COL_COUNT & (lineUcnt - 1).ToString & ")"
-                    '◯ 数量
-                    newWorkSheet.Range(COL_QUANTITY & lineUcnt.ToString).Formula = "=SUM(" & COL_QUANTITY & stLine.ToString & ":" & COL_QUANTITY & (lineUcnt - 1).ToString & ")"
                     '◯ 小計
                     newWorkSheet.Range(COL_TOTAL & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL & stLine.ToString & ":" & COL_TOTAL & (lineUcnt - 1).ToString & ")"
                 End If
@@ -1620,13 +1598,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1655,13 +1628,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1690,13 +1658,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1725,13 +1688,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1760,13 +1718,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1795,13 +1748,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1830,13 +1778,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1865,13 +1808,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1900,13 +1838,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -1935,13 +1868,8 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("DISPLAYFLG") = dtRow("DISPLAYFLG")
             prtRow("ASSESSMENTFLG") = dtRow("ASSESSMENTFLG")
             prtRow("TANKA") = dtRow("TANKA")
-            If dtRow("CALCUNIT") = "トン単価" Then
-                prtRow("QUANTITY") = dtRow("QUANTITY")
-                prtRow("COUNT") = ""
-            Else
-                prtRow("QUANTITY") = ""
-                prtRow("COUNT") = dtRow("QUANTITY")
-            End If
+            prtRow("QUANTITY") = dtRow("QUANTITY")
+            prtRow("UNIT") = dtRow("UNIT")
 
             oTbl.Rows.Add(prtRow)
         Next
@@ -2055,6 +1983,7 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Columns.Add("TANKA", Type.GetType("System.String"))           '単価
         oTbl.Columns.Add("COUNT", Type.GetType("System.String"))           '回数・台数
         oTbl.Columns.Add("QUANTITY", Type.GetType("System.String"))        '数量
+        oTbl.Columns.Add("UNIT", Type.GetType("System.String"))            '単位
 
     End Sub
 
