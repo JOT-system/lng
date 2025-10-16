@@ -1555,10 +1555,16 @@ Public Class LNT0002TranStatusList
         Me.WF_FILENAME.SelectedIndex = Me.WF_TORI.SelectedIndex
         Me.WF_TORIORG.SelectedIndex = Me.WF_TORI.SelectedIndex
 
-        '------------------------------
-        ' データ取得
-        '------------------------------
         Try
+            '------------------------------
+            ' 荷主別輸送費テーブル作成
+            '------------------------------
+            Dim YusouhiUpdate = New YusouhiUpdate(Master, WF_TaishoYm.Value)
+            YusouhiUpdate.YusouhiTblUpd(WF_TORIORG.SelectedItem.Text)
+
+            '------------------------------
+            ' データ取得
+            '------------------------------
             Using SQLcon As MySqlConnection = CS0050SESSION.getConnection
                 SQLcon.Open()  ' DataBase接続
 
@@ -2219,7 +2225,7 @@ Public Class LNT0002TranStatusList
                 Dim TORICODE As MySqlParameter = SQLcmd.Parameters.Add("@TORICODE", MySqlDbType.VarChar)            '取引先コード
                 Dim TODOKEDATE_FR As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE_FR", MySqlDbType.Date)     '届日FROM
                 Dim TODOKEDATE_TO As MySqlParameter = SQLcmd.Parameters.Add("@TODOKEDATE_TO", MySqlDbType.Date)     '届日TO
-                Dim TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@@TODOKECODE", MySqlDbType.VarChar)       '届先コード
+                Dim TODOKECODE As MySqlParameter = SQLcmd.Parameters.Add("@TODOKECODE", MySqlDbType.VarChar)        '届先コード
                 Dim DELFLG As MySqlParameter = SQLcmd.Parameters.Add("@DELFLG", MySqlDbType.VarChar)                '削除フラグ
 
                 CAMPCODE.Value = Master.USERCAMP

@@ -168,6 +168,8 @@ Public Class LNT0001InvoiceOutputCOM
             WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("A3").Value = ymEdit
             '固定費明細
             WW_Workbook.Worksheets(WW_SheetNoKotei).Range("A3").Value = ymEdit
+            '固定費明細
+            WW_Workbook.Worksheets(WW_SheetNoSprate).Range("A3").Value = ymEdit
 
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = Me.GetType.Name                'SUBクラス名
@@ -196,9 +198,8 @@ Public Class LNT0001InvoiceOutputCOM
             Dim hiddenD As Boolean = True
             Dim hiddenE As Boolean = True
             Dim hiddenF As Boolean = True
-            Dim hiddenH As Boolean = True
-            Dim hiddenI As Boolean = True
-            Dim hiddenL As Boolean = True
+
+            Dim hiddenN As Boolean = True
 
             Const COL_ORDERORGNAME As String = "A"    '営業所
             Const COL_SHUKANAME As String = "B"       '出荷場所
@@ -210,9 +211,13 @@ Public Class LNT0001InvoiceOutputCOM
             Const COL_COUNT As String = "H"           '数量（回数・台数）
             Const COL_ZISSEKI As String = "I"         '数量
             Const COL_YUSOUHI As String = "J"         '小計（輸送費）
-            Const COL_TAXAMT As String = "K"          '税額
-            Const COL_TSUKORYO As String = "L"        '通行料
-            Const COL_TOTAL As String = "M"           '合計
+            Const COL_KYUZITUTANKA As String = "K"    '休日割増単価
+            Const COL_KYUZITUCNT As String = "L"      '休日輸送回数
+            Const COL_KYUZITUHI As String = "M"       '小計（割増料金）
+            Const COL_TSUKORYO As String = "N"        '通行料
+            Const COL_TOTAL1 As String = "O"          '合計（税抜）
+            Const COL_TAXAMT As String = "P"          '税額
+            Const COL_TOTAL2 As String = "Q"          '合計（税込）
 
             '一旦、明細をクリアしておく（行削除）
             '運賃明細の最終行を取得
@@ -223,7 +228,7 @@ Public Class LNT0001InvoiceOutputCOM
             '運賃明細
             For Each PrintDatarow As DataRow In PrintData.Rows
                 'TEMPシートからフォーマット（行）をコピー
-                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A2:M2")
+                srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A2:Q2")
                 destRange = WW_Workbook.Worksheets(Me.WW_SheetNoUnchin).Range("A" & lineUcnt.ToString())
                 srcRange.Copy(destRange)
 
@@ -265,36 +270,48 @@ Public Class LNT0001InvoiceOutputCOM
                 '◯ 数量（回数・台数）
                 If Not String.IsNullOrEmpty(PrintDatarow("COUNT").ToString) Then
                     WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_COUNT & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("COUNT").ToString())
-                    hiddenH = False
                 End If
                 '◯ 数量
                 If Not String.IsNullOrEmpty(PrintDatarow("ZISSEKI").ToString) Then
                     WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_ZISSEKI & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("ZISSEKI").ToString())
-                    hiddenI = False
                 End If
                 '◯ 小計（輸送費）
                 If Not String.IsNullOrEmpty(PrintDatarow("YUSOUHI").ToString) Then
                     WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_YUSOUHI & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("YUSOUHI").ToString())
                 End If
-                '◯ 税額
-                If Not String.IsNullOrEmpty(PrintDatarow("TAXRATE").ToString) Then
-                    '小計（輸送費）×税率
-                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=" & COL_YUSOUHI & lineUcnt.ToString & "*" & (Int32.Parse(PrintDatarow("TAXRATE").ToString()) / 100)
+                '◯ 休日割増単価
+                If Not String.IsNullOrEmpty(PrintDatarow("KYUZITUTANKA").ToString) AndAlso PrintDatarow("KYUZITUTANKA").ToString <> "0" Then
+                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_KYUZITUTANKA & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("KYUZITUTANKA").ToString())
+                End If
+                '◯ 休日輸送回数
+                If Not String.IsNullOrEmpty(PrintDatarow("KYUZITUCNT").ToString) AndAlso PrintDatarow("KYUZITUCNT").ToString <> "0" Then
+                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_KYUZITUCNT & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("KYUZITUCNT").ToString())
+                End If
+                '◯ 小計（割増料金）
+                If Not String.IsNullOrEmpty(PrintDatarow("KYUZITUHI").ToString) AndAlso PrintDatarow("KYUZITUHI").ToString <> "0" Then
+                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_KYUZITUHI & lineUcnt.ToString).Value = Int32.Parse(PrintDatarow("KYUZITUHI").ToString())
                 End If
                 '◯ 通行料
                 If Not String.IsNullOrEmpty(PrintDatarow("TSUKORYO").ToString) Then
                     WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TSUKORYO & lineUcnt.ToString).Value = Double.Parse(PrintDatarow("TSUKORYO").ToString())
-                    hiddenL = False
+                    hiddenN = False
                 End If
-                '◯ 合計
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL & lineUcnt.ToString).Formula = "=" & COL_YUSOUHI & lineUcnt.ToString & "+" & COL_TAXAMT & lineUcnt.ToString & "+" & COL_TSUKORYO & lineUcnt.ToString  'J+K+L
+                '◯ 合計（税抜）:輸送費＋休日割増＋通行料
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL1 & lineUcnt.ToString).Formula = "=" & COL_YUSOUHI & lineUcnt.ToString & "+" & COL_KYUZITUHI & lineUcnt.ToString & "+" & COL_TSUKORYO & lineUcnt.ToString
+                '◯ 税額
+                If Not String.IsNullOrEmpty(PrintDatarow("TAXRATE").ToString) Then
+                    '合計（税抜）×税率
+                    WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=" & COL_TOTAL1 & lineUcnt.ToString & "*" & (Int32.Parse(PrintDatarow("TAXRATE").ToString()) / 100)
+                End If
+                '◯ 合計：合計（税抜）＋税額
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL2 & lineUcnt.ToString).Formula = "=" & COL_TOTAL1 & lineUcnt.ToString & "+" & COL_TAXAMT & lineUcnt.ToString
 
                 lineUcnt += 1
             Next
 
             '合計行
             'TEMPシートからフォーマット（行）をコピー
-            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4:M4")
+            srcRange = WW_Workbook.Worksheets(WW_SheetNoTmp).Range("A4:Q4")
             destRange = WW_Workbook.Worksheets(Me.WW_SheetNoUnchin).Range("A" & lineUcnt.ToString())
             srcRange.Copy(destRange)
 
@@ -303,14 +320,20 @@ Public Class LNT0001InvoiceOutputCOM
                 WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_COUNT & lineUcnt.ToString).Formula = "=SUM(" & COL_COUNT & stLine.ToString & ":" & COL_COUNT & (lineUcnt - 1).ToString & ")"
                 '◯ 数量
                 WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_ZISSEKI & lineUcnt.ToString).Formula = "=SUM(" & COL_ZISSEKI & stLine.ToString & ":" & COL_ZISSEKI & (lineUcnt - 1).ToString & ")"
-                '◯ 小計
+                '◯ 小計（輸送費）
                 WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_YUSOUHI & lineUcnt.ToString).Formula = "=SUM(" & COL_YUSOUHI & stLine.ToString & ":" & COL_YUSOUHI & (lineUcnt - 1).ToString & ")"
-                '◯ 税額
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=SUM(" & COL_TAXAMT & stLine.ToString & ":" & COL_TAXAMT & (lineUcnt - 1).ToString & ")"
+                '◯ 休日輸送回数
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_KYUZITUCNT & lineUcnt.ToString).Formula = "=SUM(" & COL_KYUZITUCNT & stLine.ToString & ":" & COL_KYUZITUCNT & (lineUcnt - 1).ToString & ")"
+                '◯ 小計（割増料金）
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_KYUZITUHI & lineUcnt.ToString).Formula = "=SUM(" & COL_KYUZITUHI & stLine.ToString & ":" & COL_KYUZITUHI & (lineUcnt - 1).ToString & ")"
                 '◯ 通行料
                 WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TSUKORYO & lineUcnt.ToString).Formula = "=SUM(" & COL_TSUKORYO & stLine.ToString & ":" & COL_TSUKORYO & (lineUcnt - 1).ToString & ")"
+                '◯ 合計（税抜）
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL1 & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL1 & stLine.ToString & ":" & COL_TOTAL1 & (lineUcnt - 1).ToString & ")"
+                '◯ 税額
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TAXAMT & lineUcnt.ToString).Formula = "=SUM(" & COL_TAXAMT & stLine.ToString & ":" & COL_TAXAMT & (lineUcnt - 1).ToString & ")"
                 '◯ 合計
-                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL & stLine.ToString & ":" & COL_TOTAL & (lineUcnt - 1).ToString & ")"
+                WW_Workbook.Worksheets(WW_SheetNoUnchin).Range(COL_TOTAL2 & lineUcnt.ToString).Formula = "=SUM(" & COL_TOTAL2 & stLine.ToString & ":" & COL_TOTAL2 & (lineUcnt - 1).ToString & ")"
             End If
 
             '列の非表示
@@ -320,9 +343,7 @@ Public Class LNT0001InvoiceOutputCOM
             WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("D:D").Hidden = hiddenD
             WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("E:E").Hidden = hiddenE
             WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("F:F").Hidden = hiddenF
-            WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("H:H").Hidden = hiddenH
-            WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("I:I").Hidden = hiddenI
-            WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("L:L").Hidden = hiddenL
+            WW_Workbook.Worksheets(WW_SheetNoUnchin).Range("N:N").Hidden = hiddenN
 
         Catch ex As Exception
             CS0011LOGWrite.INFSUBCLASS = Me.GetType.Name                'SUBクラス名
@@ -626,6 +647,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .TODOKECODE = TODOKECODE,
                         .TODOKENAME = TODOKENAME,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                     }
@@ -639,6 +663,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -672,6 +699,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .GYOMUTANKNUM = GYOMUTANKNUM,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -688,6 +718,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -720,6 +753,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .GYOMUTANKNUM = GYOMUTANKNUM,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -736,6 +772,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -762,6 +801,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .TODOKENAME = TODOKENAME,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -774,7 +816,10 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
-            prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
+            prtRow("YUSOUHI") = Rounding(dtRow.TANKA * dtRow.ZISSEKI, 0, CONST_FLOOR)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_FLOOR)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -801,6 +846,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .TODOKENAME = TODOKENAME,
                         .TAXRATE = TAXRATE,
                         .TANKA = TANKA,
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -813,6 +861,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -848,6 +899,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .TODOKENAME = TODOKENAME,
                         .GYOMUTANKNUM = GYOMUTANKNUM,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -865,6 +919,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_FLOOR)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
     End Sub
@@ -897,6 +954,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .SYABARA = SYABARA,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -913,6 +973,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -941,6 +1004,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .SYABARA = SYABARA,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -955,6 +1021,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("TANKA") = dtRow.TANKA
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -985,6 +1054,9 @@ Public Class LNT0001InvoiceOutputCOM
                         .TODOKENAME = TODOKENAME,
                         .TANKA = TANKA,
                         .COUNT = Group.Count(),
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI")))
                         }
@@ -1000,6 +1072,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("COUNT") = dtRow.COUNT
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -1021,6 +1096,9 @@ Public Class LNT0001InvoiceOutputCOM
                         Into Group
                     Select New With {
                         .GYOMUTANKNUM = GYOMUTANKNUM,
+                        .KYUZITUCNT = Group.Count(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA")) <> 0),
+                        .KYUZITUTANKA = Group.Max(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
+                        .KYUZITUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("KYUZITUTANKA"))),
                         .ZISSEKI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("ZISSEKI"))),
                         .YUSOUHI = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("YUSOUHI"))),
                         .TSUKORYO = Group.Sum(Function(r) Convert.ToDecimal(r.Field(Of String)("TSUKORYO")))
@@ -1033,6 +1111,9 @@ Public Class LNT0001InvoiceOutputCOM
             prtRow("ZISSEKI") = dtRow.ZISSEKI
             prtRow("YUSOUHI") = Rounding(dtRow.YUSOUHI, 0, CONST_ROUND)
             prtRow("TSUKORYO") = Rounding(dtRow.TSUKORYO * 0.55 / 1.1, 0, CONST_ROUND)
+            prtRow("KYUZITUCNT") = dtRow.KYUZITUCNT
+            prtRow("KYUZITUTANKA") = dtRow.KYUZITUTANKA
+            prtRow("KYUZITUHI") = Rounding(dtRow.KYUZITUHI, 0, CONST_ROUND)
             oTbl.Rows.Add(prtRow)
         Next
 
@@ -1914,10 +1995,12 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Columns.Add("COUNT", Type.GetType("System.String"))           '回数・台数
         oTbl.Columns.Add("ZISSEKI", Type.GetType("System.String"))         '実績数量
         oTbl.Columns.Add("YUSOUHI", Type.GetType("System.String"))         '輸送費
+        oTbl.Columns.Add("KYUZITUCNT", Type.GetType("System.String"))      '休日割増（回数・台数）
+        oTbl.Columns.Add("KYUZITUTANKA", Type.GetType("System.String"))    '休日割増単価
+        oTbl.Columns.Add("KYUZITUHI", Type.GetType("System.String"))       '休日割増費
         oTbl.Columns.Add("TAXRATE", Type.GetType("System.String"))         '税率
         oTbl.Columns.Add("TAXAMT", Type.GetType("System.String"))          '税額
         oTbl.Columns.Add("TSUKORYO", Type.GetType("System.String"))        '通行料
-        'oTbl.Columns.Add("TOTAL", Type.GetType("System.String"))           '合計額
 
     End Sub
     ''' <summary>
@@ -1943,7 +2026,6 @@ Public Class LNT0001InvoiceOutputCOM
         oTbl.Columns.Add("COUNT", Type.GetType("System.String"))           '回数・台数
         oTbl.Columns.Add("KOTEIHI", Type.GetType("System.String"))         '固定費
         oTbl.Columns.Add("CHOSEI", Type.GetType("System.String"))          '調整額
-        'oTbl.Columns.Add("TOTAL", Type.GetType("System.String"))           '小計
         oTbl.Columns.Add("COMMENT", Type.GetType("System.String"))         '調整事由
 
     End Sub
