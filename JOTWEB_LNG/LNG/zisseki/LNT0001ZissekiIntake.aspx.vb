@@ -1130,10 +1130,13 @@ Public Class LNT0001ZissekiIntake
                 Next
 
                 '更新された実績テーブルから輸送費テーブルの金額計算をし、更新
-                YusouhiUpdate(WF_TORIhdn.Value, WF_TaishoYm.Value)
-                If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
-                    Exit Sub
-                End If
+                Dim YusouhiUpdate = New YusouhiUpdate(Master, WF_TaishoYm.Value)
+                YusouhiUpdate.YusouhiTblUpd(WF_TORIhdn.Value)
+
+                'YusouhiUpdate(WF_TORIhdn.Value, WF_TaishoYm.Value)
+                'If WW_ErrSW <> C_MESSAGE_NO.NORMAL Then
+                '    Exit Sub
+                'End If
 
                 '〇届先マスタ差分抽出＆追加処理
                 TODOKESAKIMAS_Insert()
@@ -5276,6 +5279,10 @@ Public Class LNT0001ZissekiIntake
             & "             AND ZISSEKI.ORDERORGCODE = TANKA.ORGCODE                              " _
             & "             AND ZISSEKI.KASANCODEORDERORG = TANKA.KASANORGCODE                    " _
             & "             AND ZISSEKI.TODOKECODE = TANKA.AVOCADOTODOKECODE                      " _
+            & "             AND CASE WHEN TANKA.SHABAN = ''                                       " _
+            & "                      THEN 1 = 1                                                   " _
+            & "                      ELSE ZISSEKI.GYOMUTANKNUM = TANKA.SHABAN                     " _
+            & "                 END                                                               " _
             & "             AND TANKA.STYMD  <= ZISSEKI.TODOKEDATE                                " _
             & "             AND TANKA.ENDYMD >= ZISSEKI.TODOKEDATE                                " _
             & "             AND TANKA.DELFLG = @DELFLG                                            " _
