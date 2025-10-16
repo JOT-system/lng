@@ -524,8 +524,13 @@ Public Class LNT0031DieselPriceHist
                         LNT0031row("DELFLG") = LNT0031INProw("DELFLG") AndAlso                                          '削除フラグ
                         LNT0031row("LOCKFLG") = LNT0031INProw("LOCKFLG") Then                                           'ロックフラグ
 
-                        ' 変更がない時は「操作」の項目は空白にする
-                        LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                        If String.IsNullOrEmpty(LNT0031INProw("OPERATION")) Then
+                            ' 変更がある時は「操作」の項目を「更新」に設定する
+                            LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.INSERTING
+                        Else
+                            ' 変更がない時は「操作」の項目は空白にする
+                            LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.NODATA
+                        End If
                     Else
                         ' 変更がある時は「操作」の項目を「更新」に設定する
                         LNT0031INProw("OPERATION") = C_LIST_OPERATION_CODE.UPDATING
@@ -537,7 +542,7 @@ Public Class LNT0031DieselPriceHist
         Next
 
         ' 入力レコードに変更がない場合は、メッセージダイアログを表示して処理打ち切り
-        Dim selStr As String = String.Format("OPERATION='{0}'", C_LIST_OPERATION_CODE.UPDATING)
+        Dim selStr As String = String.Format("OPERATION<>'{0}'", C_LIST_OPERATION_CODE.NODATA)
         Dim selRow() = LNT0031INPtbl.Select(selStr)
         If selRow.Count = 0 Then
             Master.Output(C_MESSAGE_NO.NO_CHANGE_UPDATE, C_MESSAGE_TYPE.WAR, needsPopUp:=True)
@@ -574,6 +579,7 @@ Public Class LNT0031DieselPriceHist
                 LNT0031row.ItemArray = LNT0031INProw.ItemArray
                 LNT0031tbl.Rows.Add(LNT0031row)
             End If
+            findFlg = False
         Next
 
         '○ 画面表示データ保存

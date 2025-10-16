@@ -21,6 +21,49 @@ window.onload = function () {
 }
 
 /**
+ * 全角→半角(英数記号)
+ * @param {string} str 変換したい文字列
+ * @return {string} 変換された文字列を返す
+ */
+function replaceFullToHalf(str) {
+    return str.replace(/[！-～]/g, function (x) {
+        return String.fromCharCode(x.charCodeAt(0) - 0xFEE0);
+    });
+}
+
+/**
+ * 数値入力チェック
+ * @param {any} objid オブジェクトID
+ * @param {Number} length 桁数
+ */
+function txtNumberChange(objid, lineCnt, fieldNM) {
+    let txtObj = document.getElementById("txtpnlListArea" + fieldNM + lineCnt);
+    //let numLen = Number(length);
+    if (txtObj !== null) {
+        if (String(txtObj.value).length == 0) {
+            return true;
+        }
+        var inputVal = replaceFullToHalf(txtObj.value);
+        if (inputVal.match(/^[0-9]+(\.[0-9]+)?$/g) === null) {
+            alert("数値以外は入力できません");
+            txtObj.value = "0"
+            txtObj.focus();
+            return false;
+        }
+        //if (String(inputVal).length > numLen) {
+        //    alert(length + "桁以上の数値は入力できません");
+        //    txtObj.value = ""
+        //    txtObj.focus();
+        //    return false;
+        //}
+        txtObj.value = Number(inputVal);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
  * 最上部・最下部ボタン押下処理
  */
 function SetCellActive(mode) {
