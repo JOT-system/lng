@@ -116,7 +116,9 @@ Public Class CS0054KintoneApi
             Dim EditQuery As String = "query= 品名1コード = ""21"" "
             EditQuery += " and 届日 >= ""{0}"" "
             EditQuery += " and 届日 <= ""{1}"" "
-            EditQuery += " and 実績数量 != ""0"" limit " & GetLimit & " offset " & GetOffset
+            EditQuery += " and 実績数量 > 0 "
+            EditQuery += " and 実績数量 != """" "
+            EditQuery += " limit " & GetLimit & " offset " & GetOffset
             Dim GetQuery As String = String.Format(EditQuery, YmdFrom, YmdTo)
             'Dim GetQuery As String = "query= limit " & GetLimit & " offset " & GetOffset
 
