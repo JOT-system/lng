@@ -291,32 +291,32 @@ Public Class YusouhiUpdate
             & "          ZISSEKI.TODOKENAMES       AS TODOKENAMES,                                                                      " _
             & "          ZISSEKI.TORICODE          AS TORICODE,                                                                         " _
             & "          ZISSEKI.TORINAME          AS TORINAME,                                                                         " _
-            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                          " _
-            & "          THEN (SELECT SHUKABASHO                                                                                        " _
-            & "                  FROM LNG.LNT0001_ZISSEKI                                                                               " _
-            & "                 WHERE                                                                                                   " _
-            & "                       TORICODE     = ZISSEKI.TORICODE                                                                   " _
-            & "                   AND ORDERORG     = ZISSEKI.ORDERORG                                                                   " _
-            & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
-            & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
-            & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
-            & "                   AND DELFLG       = '0'                                                                                " _
-            & "               )                                                                                                         " _
-            & "          ELSE ZISSEKI.SHUKABASHO                                                                                        " _
-            & "          END AS SHUKABASHO,                                                                                             " _
-            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                          " _
-            & "          THEN (SELECT SHUKANAME                                                                                         " _
-            & "                  FROM LNG.LNT0001_ZISSEKI                                                                               " _
-            & "                 WHERE                                                                                                   " _
-            & "                       TORICODE     = ZISSEKI.TORICODE                                                                   " _
-            & "                   AND ORDERORG     = ZISSEKI.ORDERORG                                                                   " _
-            & "                   AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                               " _
-            & "                   AND TRIP         = ZISSEKI.TRIP -1                                                                    " _
-            & "                   AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                 " _
-            & "                   AND DELFLG       = '0'                                                                                " _
-            & "               )                                                                                                         " _
-            & "          ELSE ZISSEKI.SHUKANAME                                                                                         " _
-            & "          END AS SHUKANAME,                                                                                              " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "          THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                  WHERE                                                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                  AND DELFLG       = '0'                                                                       " _
+            & "              ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "          ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "          END AS SHUKABASHO,                                                                                   " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "          THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                  WHERE                                                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                  AND DELFLG       = '0'                                                                       " _
+            & "              ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "          ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "          END AS SHUKANAME,                                                                                    " _
             & "          ZISSEKI.SHUKANAMES        AS SHUKANAMES,                                                                       " _
             & "          ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                                                                    " _
             & "          ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                                                                    " _
@@ -690,29 +690,29 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                              " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
-            & "               WHERE                                                                                         " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                                         " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                         " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
-            & "                 AND DELFLG       = '0'                                                                      " _
-            & "             )                                                                                               " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
             & "        END AS SHUKABASHO,                                                                                   " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
-            & "               WHERE                                                                                         " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                                         " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                         " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                     " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                          " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                       " _
-            & "                 AND DELFLG       = '0'                                                                      " _
-            & "             )                                                                                               " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
             & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                            " _
@@ -1098,32 +1098,32 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                       " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                          " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                          " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                            " _
-            & "        THEN (SELECT SHUKABASHO                                                          " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                 " _
-            & "               WHERE                                                                     " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                     " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                     " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
-            & "                 AND DELFLG       = '0'                                                  " _
-            & "             )                                                                           " _
-            & "        ELSE ZISSEKI.SHUKABASHO                                                          " _
-            & "        END AS SHUKABASHO,                                                               " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                            " _
-            & "        THEN (SELECT SHUKANAME                                                           " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                 " _
-            & "               WHERE                                                                     " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                     " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                     " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                 " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                      " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                   " _
-            & "                 AND DELFLG       = '0'                                                  " _
-            & "             )                                                                           " _
-            & "        ELSE ZISSEKI.SHUKANAME                                                           " _
-            & "        END AS SHUKANAME,                                                                " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                        " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                     " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                     " _
@@ -1477,32 +1477,32 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                                                           " _
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                                                              " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                " _
-            & "        THEN (SELECT SHUKABASHO                                                                                                              " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                                                                     " _
-            & "               WHERE                                                                                                                         " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                                                                         " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                                                         " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
-            & "                 AND DELFLG       = '0'                                                                                                      " _
-            & "             )                                                                                                                               " _
-            & "        ELSE ZISSEKI.SHUKABASHO                                                                                                              " _
-            & "        END AS SHUKABASHO,                                                                                                                   " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                " _
-            & "        THEN (SELECT SHUKANAME                                                                                                               " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                                                                     " _
-            & "               WHERE                                                                                                                         " _
-            & "                     TORICODE     = ZISSEKI.TORICODE                                                                                         " _
-            & "                 AND ORDERORG     = ZISSEKI.ORDERORG                                                                                         " _
-            & "                 AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                     " _
-            & "                 AND TRIP         = ZISSEKI.TRIP -1                                                                                          " _
-            & "                 AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                       " _
-            & "                 AND DELFLG       = '0'                                                                                                      " _
-            & "             )                                                                                                                               " _
-            & "        ELSE ZISSEKI.SHUKANAME                                                                                                               " _
-            & "        END AS SHUKANAME,                                                                                                                    " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                                                            " _
             & "        ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                                                         " _
             & "        ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                                                         " _
@@ -1989,32 +1989,32 @@ Public Class YusouhiUpdate
             & "             ZISSEKI.TODOKENAMES        AS TODOKENAMES,                                                                                                                    " _
             & "             ZISSEKI.TORICODE           AS TORICODE,                                                                                                                       " _
             & "             ZISSEKI.TORINAME           AS TORINAME,                                                                                                                       " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                                         " _
-            & "             THEN (SELECT SHUKABASHO                                                                                                                                       " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                                                                                                              " _
-            & "                     WHERE                                                                                                                                                 " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                                                                                                                   " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                                                                                   " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
-            & "                     AND DELFLG       = '0'                                                                                                                                " _
-            & "                 )                                                                                                                                                         " _
-            & "             ELSE ZISSEKI.SHUKABASHO                                                                                                                                       " _
-            & "             END AS SHUKABASHO,                                                                                                                                            " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                                                                         " _
-            & "             THEN (SELECT SHUKANAME                                                                                                                                        " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                                                                                                              " _
-            & "                     WHERE                                                                                                                                                 " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                                                                                                                   " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                                                                                   " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                                                               " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                                                                                    " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                                                                 " _
-            & "                     AND DELFLG       = '0'                                                                                                                                " _
-            & "                 )                                                                                                                                                         " _
-            & "             ELSE ZISSEKI.SHUKANAME                                                                                                                                        " _
-            & "             END AS SHUKANAME,                                                                                                                                             " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "             END AS SHUKABASHO,                                                                                   " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "             END AS SHUKANAME,                                                                                    " _
             & "             ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                                                                                     " _
             & "             ZISSEKI.SHUKATORICODE      AS SHUKATORICODE,                                                                                                                  " _
             & "             ZISSEKI.SHUKATORINAME      AS SHUKATORINAME,                                                                                                                  " _
@@ -2480,32 +2480,32 @@ Public Class YusouhiUpdate
             & "             ZISSEKI.TODOKENAMES       AS TODOKENAMES,                             " _
             & "             ZISSEKI.TORICODE          AS TORICODE,                                " _
             & "             ZISSEKI.TORINAME          AS TORINAME,                                " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
-            & "             THEN (SELECT SHUKABASHO                                               " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
-            & "                     WHERE                                                         " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND DELFLG       = '0'                                        " _
-            & "                 )                                                                 " _
-            & "             ELSE ZISSEKI.SHUKABASHO                                               " _
-            & "             END AS SHUKABASHO,                                                    " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
-            & "             THEN (SELECT SHUKANAME                                                " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
-            & "                     WHERE                                                         " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND DELFLG       = '0'                                        " _
-            & "                 )                                                                 " _
-            & "             ELSE ZISSEKI.SHUKANAME                                                " _
-            & "             END AS SHUKANAME,                                                     " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "             END AS SHUKABASHO,                                                                                   " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "             END AS SHUKANAME,                                                                                    " _
             & "             ZISSEKI.SHUKANAMES        AS SHUKANAMES,                              " _
             & "             ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                           " _
             & "             ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                           " _
@@ -2951,32 +2951,32 @@ Public Class YusouhiUpdate
             & "             ZISSEKI.TODOKENAMES       AS TODOKENAMES,                             " _
             & "             ZISSEKI.TORICODE          AS TORICODE,                                " _
             & "             ZISSEKI.TORINAME          AS TORINAME,                                " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
-            & "             THEN (SELECT SHUKABASHO                                               " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
-            & "                     WHERE                                                         " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND DELFLG       = '0'                                        " _
-            & "                 )                                                                 " _
-            & "             ELSE ZISSEKI.SHUKABASHO                                               " _
-            & "             END AS SHUKABASHO,                                                    " _
-            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                 " _
-            & "             THEN (SELECT SHUKANAME                                                " _
-            & "                     FROM LNG.LNT0001_ZISSEKI                                      " _
-            & "                     WHERE                                                         " _
-            & "                         TORICODE     = ZISSEKI.TORICODE                           " _
-            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                           " _
-            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                       " _
-            & "                     AND TRIP         = ZISSEKI.TRIP -1                            " _
-            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                         " _
-            & "                     AND DELFLG       = '0'                                        " _
-            & "                 )                                                                 " _
-            & "             ELSE ZISSEKI.SHUKANAME                                                " _
-            & "             END AS SHUKANAME,                                                     " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "             ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "             END AS SHUKABASHO,                                                                                   " _
+            & "             CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "             THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                     FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                     WHERE                                                                                        " _
+            & "                         TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                     AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                     AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                     AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                     AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                     AND DELFLG       = '0'                                                                       " _
+            & "                 ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "             ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "             END AS SHUKANAME,                                                                                    " _
             & "             ZISSEKI.SHUKANAMES        AS SHUKANAMES,                              " _
             & "             ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                           " _
             & "             ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                           " _
@@ -3435,32 +3435,32 @@ Public Class YusouhiUpdate
             & "          ZISSEKI.TODOKENAMES       AS TODOKENAMES,                            " _
             & "          ZISSEKI.TORICODE          AS TORICODE,                               " _
             & "          ZISSEKI.TORINAME          AS TORINAME,                               " _
-            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                " _
-            & "          THEN (SELECT SHUKABASHO                                              " _
-            & "                  FROM LNG.LNT0001_ZISSEKI                                     " _
-            & "                  WHERE                                                        " _
-            & "                      TORICODE     = ZISSEKI.TORICODE                          " _
-            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                          " _
-            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
-            & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
-            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
-            & "                  AND DELFLG       = '0'                                       " _
-            & "              )                                                                " _
-            & "          ELSE ZISSEKI.SHUKABASHO                                              " _
-            & "          END AS SHUKABASHO,                                                   " _
-            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                " _
-            & "          THEN (SELECT SHUKANAME                                               " _
-            & "                  FROM LNG.LNT0001_ZISSEKI                                     " _
-            & "                  WHERE                                                        " _
-            & "                      TORICODE     = ZISSEKI.TORICODE                          " _
-            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                          " _
-            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                      " _
-            & "                  AND TRIP         = ZISSEKI.TRIP -1                           " _
-            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                        " _
-            & "                  AND DELFLG       = '0'                                       " _
-            & "              )                                                                " _
-            & "          ELSE ZISSEKI.SHUKANAME                                               " _
-            & "          END AS SHUKANAME,                                                    " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "          THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                  WHERE                                                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                  AND DELFLG       = '0'                                                                       " _
+            & "              ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "          ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "          END AS SHUKABASHO,                                                                                   " _
+            & "          CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "          THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                  FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                  WHERE                                                                                        " _
+            & "                      TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                  AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                  AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                  AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                  AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                  AND DELFLG       = '0'                                                                       " _
+            & "              ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "          ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "          END AS SHUKANAME,                                                                                    " _
             & "          ZISSEKI.SHUKANAMES        AS SHUKANAMES,                             " _
             & "          ZISSEKI.SHUKATORICODE     AS SHUKATORICODE,                          " _
             & "          ZISSEKI.SHUKATORINAME     AS SHUKATORINAME,                          " _
@@ -3818,7 +3818,7 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TORICODE              AS TORICODE,                                                           " _
             & "        ZISSEKI.TORINAME              AS TORINAME,                                                           " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
             & "                WHERE                                                                                        " _
             & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
@@ -3827,11 +3827,11 @@ Public Class YusouhiUpdate
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
             & "                AND DELFLG       = '0'                                                                       " _
-            & "            )                                                                                                " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
             & "        END AS SHUKABASHO,                                                                                   " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
             & "                WHERE                                                                                        " _
             & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
@@ -3840,7 +3840,7 @@ Public Class YusouhiUpdate
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
             & "                AND DELFLG       = '0'                                                                       " _
-            & "            )                                                                                                " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
             & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES            AS SHUKANAMES,                                                         " _
@@ -4238,7 +4238,7 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TORICODE           AS TORICODE,                                                              " _
             & "        ZISSEKI.TORINAME           AS TORINAME,                                                              " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKABASHO                                                                              " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
             & "                WHERE                                                                                        " _
             & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
@@ -4247,11 +4247,11 @@ Public Class YusouhiUpdate
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
             & "                AND DELFLG       = '0'                                                                       " _
-            & "            )                                                                                                " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
             & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
             & "        END AS SHUKABASHO,                                                                                   " _
             & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
-            & "        THEN (SELECT SHUKANAME                                                                               " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
             & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
             & "                WHERE                                                                                        " _
             & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
@@ -4260,7 +4260,7 @@ Public Class YusouhiUpdate
             & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
             & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
             & "                AND DELFLG       = '0'                                                                       " _
-            & "            )                                                                                                " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
             & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
             & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES         AS SHUKANAMES,                                                            " _
@@ -4657,32 +4657,32 @@ Public Class YusouhiUpdate
             & "        ZISSEKI.TODOKENAMES           AS TODOKENAMES,                                                                       " _
             & "        ZISSEKI.TORICODE              AS TORICODE,                                                                          " _
             & "        ZISSEKI.TORINAME              AS TORINAME,                                                                          " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                               " _
-            & "        THEN (SELECT SHUKABASHO                                                                                             " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                                                    " _
-            & "                WHERE                                                                                                       " _
-            & "                    TORICODE     = ZISSEKI.TORICODE                                                                         " _
-            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                                         " _
-            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
-            & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
-            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
-            & "                AND DELFLG       = '0'                                                                                      " _
-            & "            )                                                                                                               " _
-            & "        ELSE ZISSEKI.SHUKABASHO                                                                                             " _
-            & "        END AS SHUKABASHO,                                                                                                  " _
-            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                               " _
-            & "        THEN (SELECT SHUKANAME                                                                                              " _
-            & "                FROM LNG.LNT0001_ZISSEKI                                                                                    " _
-            & "                WHERE                                                                                                       " _
-            & "                    TORICODE     = ZISSEKI.TORICODE                                                                         " _
-            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                                         " _
-            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                                     " _
-            & "                AND TRIP         = ZISSEKI.TRIP -1                                                                          " _
-            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                                       " _
-            & "                AND DELFLG       = '0'                                                                                      " _
-            & "            )                                                                                                               " _
-            & "        ELSE ZISSEKI.SHUKANAME                                                                                              " _
-            & "        END AS SHUKANAME,                                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKABASHO                                                                     " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKABASHO)                                                                           " _
+            & "        ELSE ZISSEKI.SHUKABASHO                                                                              " _
+            & "        END AS SHUKABASHO,                                                                                   " _
+            & "        CASE ZISSEKI.SHUKABASHO WHEN '006928'                                                                " _
+            & "        THEN coalesce((SELECT SHUKANAME                                                                      " _
+            & "                FROM LNG.LNT0001_ZISSEKI                                                                     " _
+            & "                WHERE                                                                                        " _
+            & "                    TORICODE     = ZISSEKI.TORICODE                                                          " _
+            & "                AND ORDERORG     = ZISSEKI.ORDERORG                                                          " _
+            & "                AND GYOMUTANKNUM = ZISSEKI.GYOMUTANKNUM                                                      " _
+            & "                AND TRIP         = ZISSEKI.TRIP -1                                                           " _
+            & "                AND TODOKEDATE   = ZISSEKI.TODOKEDATE                                                        " _
+            & "                AND DELFLG       = '0'                                                                       " _
+            & "            ), ZISSEKI.SHUKANAME)                                                                            " _
+            & "        ELSE ZISSEKI.SHUKANAME                                                                               " _
+            & "        END AS SHUKANAME,                                                                                    " _
             & "        ZISSEKI.SHUKANAMES            AS SHUKANAMES,                                                                        " _
             & "        ZISSEKI.SHUKATORICODE         AS SHUKATORICODE,                                                                     " _
             & "        ZISSEKI.SHUKATORINAME         AS SHUKATORINAME,                                                                     " _
